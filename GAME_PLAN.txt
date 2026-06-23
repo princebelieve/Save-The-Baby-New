@@ -1,0 +1,798 @@
+# SAVE THE BABY
+
+## Master Development Plan (Version 1.0)
+
+### Vision
+
+Save The Baby is a story-driven Match-3 puzzle adventure inspired by the satisfying gameplay of Candy Crush Saga and Royal Match, while introducing an original rescue story, investigation mechanics, and cinematic storytelling.
+
+The goal is to create a professional-quality mobile and desktop game that is scalable, data-driven, and easy to expand with additional levels and content without rewriting core code.
+
+---
+
+# Development Philosophy
+
+This project follows several core principles.
+
+## 1. No Hardcoding
+
+Anything that can be stored as data must be stored as data.
+
+Examples include:
+
+* Levels
+* Objectives
+* Rewards
+* Story
+* Dialogues
+* Characters
+* Obstacles
+* Powerups
+* Animations
+* Game settings
+
+All of these should be loaded from JSON files or configurable resources whenever practical.
+
+Adding Level 501 should require creating only a new JSON file, not modifying the engine.
+
+---
+
+## 2. Modular Architecture
+
+Every system should be independent.
+
+Example managers include:
+
+GameManager
+BoardManager
+LevelManager
+StoryManager
+SaveManager
+AudioManager
+RewardManager
+UIManager
+AnimationManager
+AdsManager
+
+Each manager should have one clear responsibility.
+
+---
+
+## 3. Reusable Components
+
+Instead of writing separate scripts for every object, reusable scripts will power multiple game elements.
+
+Example:
+
+One Tile.gd script should represent all collectible tiles.
+
+The tile type will be determined by configuration rather than unique scripts.
+
+---
+
+## 4. Data-Driven Levels
+
+Every level will be described using JSON.
+
+Example properties:
+
+* board size
+* moves
+* objectives
+* tile types
+* obstacles
+* difficulty
+* rewards
+* tutorial messages
+
+No level-specific code should exist.
+
+---
+
+## 5. Scalable Design
+
+Every new feature should be designed so future content can be added without modifying existing systems.
+
+---
+
+# Technology Stack
+
+Engine:
+Godot 4.x
+
+Language:
+GDScript
+
+IDE:
+VS Code
+
+Version Control:
+Git + GitHub
+
+Configuration:
+JSON
+
+Graphics:
+PNG
+
+Audio:
+OGG / WAV
+
+Target Platforms:
+Android
+Windows
+Web
+
+---
+
+# Folder Structure
+
+SaveTheBaby/
+
+assets/
+sprites/
+backgrounds/
+ui/
+effects/
+audio/
+fonts/
+animations/
+
+levels/
+level001.json
+level002.json
+...
+
+stories/
+intro.json
+chapter01.json
+chapter02.json
+
+scenes/
+main/
+menu/
+board/
+ui/
+story/
+gameover/
+victory/
+
+scripts/
+managers/
+board/
+tiles/
+powerups/
+obstacles/
+ui/
+story/
+save/
+
+configs/
+
+docs/
+
+---
+
+# Core Gameplay Loop
+
+Player enters level
+
+↓
+
+Board generated
+
+↓
+
+Player swaps two tiles
+
+↓
+
+Engine validates move
+
+↓
+
+Match detected
+
+↓
+
+Destroy matched tiles
+
+↓
+
+Apply gravity
+
+↓
+
+Spawn new tiles
+
+↓
+
+Detect cascades
+
+↓
+
+Repeat until stable
+
+↓
+
+Update objectives
+
+↓
+
+Win or Lose
+
+↓
+
+Reward player
+
+↓
+
+Load story or next level
+
+---
+
+# Tile Types
+
+Key
+
+Phone
+
+Fingerprint
+
+Recorder
+
+Tape
+
+Bomb
+
+Chain
+
+Locked Door
+
+Opened Door
+
+Missile
+
+Pincher
+
+Plier
+
+Thunder Bolt
+
+Clock
+
+Additional tile types can be added later without changing the engine.
+
+---
+
+# Powerups
+
+Match 4
+
+Creates Rocket
+
+Clears row or column.
+
+
+
+Match 5
+
+Creates Thunder Bolt
+
+Destroys every tile of one selected type.
+
+
+
+Square Match
+
+Creates Bomb
+
+Destroys surrounding tiles.
+
+
+
+Powerup Combinations
+
+Rocket + Rocket
+
+Rocket + Bomb
+
+Bomb + Bomb
+
+Bomb + Thunder
+
+Thunder + Thunder
+
+Each combination should have unique animations and effects.
+
+
+
+# Obstacles
+
+Chains
+
+Require multiple matches.
+
+
+
+Locks
+
+Require keys.
+
+
+
+Tape
+
+Restricts movement.
+
+
+
+Bombs
+
+Countdown before explosion.
+
+
+
+Missiles
+
+Destroy parts of board if ignored.
+
+
+
+Electric Traps
+
+Require Thunder powerups.
+
+
+
+Additional obstacles should plug into the obstacle system without rewriting existing code.
+
+
+
+# Objectives
+
+Collect Items
+
+Destroy Obstacles
+
+Unlock Doors
+
+Defuse Bombs
+
+Reach Score
+
+Collect Evidence
+
+Timed Objectives
+
+Rescue Objectives
+
+Objectives are loaded from level data.
+
+
+
+# Story
+
+Opening
+
+Victor kidnaps Ethan.
+
+↓
+
+Amara asks David for help.
+
+↓
+
+Player chooses:
+
+Call Police
+
+Trace Signal
+
+Go Alone
+
+↓
+
+Different story scenes.
+
+↓
+
+Gameplay begins.
+
+↓
+
+Story scene every five levels.
+
+↓
+
+Tracks eventually converge.
+
+↓
+
+Factory infiltration.
+
+↓
+
+Final rescue.
+
+↓
+
+Boss battle.
+
+↓
+
+Save Ethan.
+
+The player's choices should affect dialogue and presentation while allowing the main campaign to converge later, reducing development complexity.
+
+
+
+# Rewards
+
+Coins
+
+Stars
+
+Treasure Chests
+
+Daily Rewards
+
+Lucky Wheel
+
+Victory Bonus
+
+Perfect Completion Bonus
+
+First Try Bonus
+
+Win Streak Rewards
+
+Powerup Rewards
+
+Reward values should come from configuration files.
+
+
+
+# Economy
+
+Coins
+
+Lives
+
+Boosters
+
+Unlimited Lives
+
+Future Gems (optional premium currency)
+
+Ad Rewards
+
+All values configurable.
+
+
+
+# Lives
+
+Maximum:
+5
+
+Lose one on failure.
+
+One life regenerates every 30 minutes.
+
+Unlimited lives from rewards or ads.
+
+No life lost when replaying already-completed tutorial levels.
+
+
+
+# Save System
+
+Save:
+
+Unlocked levels
+
+Coins
+
+Lives
+
+Powerups
+
+Settings
+
+Achievements
+
+Story progress
+
+Daily reward progress
+
+Statistics
+
+Future cloud save support should be considered during architecture.
+
+
+
+# User Interface
+
+Splash Screen
+
+Loading Screen
+
+Main Menu
+
+Level Select
+
+Story Dialog
+
+Gameplay HUD
+
+Pause Menu
+
+Settings
+
+Victory Screen
+
+Game Over
+
+Reward Screens
+
+Daily Reward
+
+Lucky Wheel
+
+Shop
+
+Achievements
+
+
+
+# Audio
+
+Background Music
+
+Menu Music
+
+Story Music
+
+Victory Music
+
+Game Over Music
+
+Sound Effects
+
+Voice Effects (future)
+
+Volume settings stored in save data.
+
+
+
+# Animations
+
+Tile swap
+
+Tile destruction
+
+Tile fall
+
+Spawn
+
+Powerups
+
+Explosions
+
+Story transitions
+
+Reward popups
+
+Character animations
+
+
+
+# Story System
+
+Story should not be hardcoded.
+
+Every dialogue should be loaded from JSON.
+
+Each story file should include:
+
+Background
+
+Character
+
+Portrait
+
+Dialogue
+
+Choices
+
+Animation
+
+Sound
+
+Next Scene
+
+
+
+# Level Progression
+
+Levels 1-10
+
+Tutorial
+
+Easy
+
+
+
+Levels 11-20
+
+Introduce obstacles.
+
+
+
+Levels 21-35
+
+Powerup combinations.
+
+
+
+Levels 36-50
+
+Advanced mechanics.
+
+
+
+Boss Level
+
+Special gameplay.
+
+
+
+Next chapter begins.
+
+
+
+# Coding Standards
+
+Use descriptive names.
+
+No duplicate code.
+
+Functions should do one job.
+
+Prefer composition over inheritance.
+
+Document important systems.
+
+Avoid global variables unless necessary.
+
+Use signals where appropriate.
+
+Keep scripts focused and reusable.
+
+
+
+# Development Roadmap
+
+Phase 1
+Project setup
+Folder structure
+Configuration system
+
+Phase 2
+Match-3 engine
+Grid
+Swapping
+Matching
+Gravity
+Refill
+Cascade
+
+Phase 3
+Objectives
+Moves
+Winning
+Losing
+Scoring
+
+Phase 4
+Powerups
+
+Phase 5
+Obstacles
+
+Phase 6
+Menus
+UI
+Animations
+
+Phase 7
+Story system
+
+Phase 8
+Rewards
+Coins
+Lives
+Saving
+
+Phase 9
+Audio
+Particles
+Optimization
+
+Phase 10
+Testing
+Balancing
+Android Export
+Play Store Release
+
+
+
+# Development Workflow
+
+For every milestone:
+
+1. Plan
+2. Write code
+3. Test
+4. Debug
+5. Refactor
+6. Commit to Git
+7. Document progress
+8. Continue
+
+No feature should be added until the previous milestone is stable.
+
+
+
+# Team Workflow
+
+ChatGPT will:
+
+* Design architecture.
+* Write most of the GDScript.
+* Refactor code when necessary.
+* Keep systems modular.
+* Help debug errors.
+* Plan future expansions.
+* Maintain consistency across the project.
+
+Developer will:
+
+* Create folders.
+* Import assets.
+* Test builds.
+* Report errors.
+* Commit changes to Git.
+* Provide feedback on gameplay and visuals.
+
+
+
+# Long-Term Vision
+
+Version 1.0:
+A polished story-driven Match-3 game with approximately 50 handcrafted levels, cinematic storytelling, rewards, powerups, obstacles, and a complete rescue campaign.
+
+Future updates may include:
+
+* Additional chapters
+* New villains
+* More environments
+* Seasonal events
+* More powerups
+* More obstacles
+* Daily challenges
+* Online leaderboards
+* Cloud saves
+* Achievement system
+* Cosmetic themes
+* Additional languages
+* Expanded story content
+
+The project should be designed from the beginning so these additions can be integrated with minimal changes to the core engine.
+
+
+
+# Final Goal
+
+Build a maintainable, professional-quality Match-3 engine that powers Save The Baby through reusable systems, configurable data, and scalable architecture. Every gameplay feature, story event, reward, and level should be easy to extend without rewriting existing code, allowing the game to grow from a solid first release into a long-term project.
