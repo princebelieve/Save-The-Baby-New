@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://b5ksh5thu12bj"]
+
+[ext_resource type="Script" uid="uid://cox5pw8r7ju5g" path="res://scripts/managers/board_manager.gd" id="1_s78fa"]
+
+[node name="Board" type="Node2D" unique_id=391965358]
+script = ExtResource("1_s78fa")
+
+[node name="Tiles" type="Node2D" parent="." unique_id=683916662]

@@ -1,0 +1,468 @@
+configs/
+Configuration System API Map (Version 1.0 Freeze)
+
+The Config System is the single source of static game data.
+
+Configuration files contain no executable code.
+
+Configuration files contain no gameplay flow.
+
+Configuration files are read through ConfigLoader.
+
+Managers never hardcode gameplay values.
+
+Subsystems obtain configuration data from their corresponding configuration files.
+
+Configuration files may reference resources but never load them directly.
+
+Folder Structure
+configs/
+
+game.json
+levels.json
+tiles.json
+powerups.json
+obstacles.json
+objectives.json
+rewards.json
+economy.json
+story.json
+audio.json
+ui.json
+animation.json
+board.json
+effects.json
+localization.json
+debug.json
+1. game.json
+Purpose
+
+Stores global game configuration.
+
+No gameplay progression.
+
+Contains
+
+Game Information
+
+game_name
+version
+save_version
+build_number
+
+Display
+
+target_fps
+target_physics_fps
+
+Gameplay Limits
+
+max_levels
+max_lives
+max_moves
+minimum_match
+
+General Settings
+
+autosave_enabled
+vibration_enabled
+tutorial_enabled
+2. levels.json
+Purpose
+
+Contains every playable level.
+
+Loaded by LevelManager.
+
+Contains
+
+Per Level
+
+level_id
+board_layout
+width
+height
+difficulty
+available_tiles
+available_obstacles
+objectives
+move_limit
+score_targets
+rewards
+story_before
+story_after
+background
+music
+3. tiles.json
+Purpose
+
+Defines every tile type.
+
+Loaded only by TileDatabase.
+
+Contains
+
+Per Tile
+
+id
+enum
+name
+texture
+icon
+animation_set
+score
+spawn_weight
+matchable
+spawnable
+hidden
+special
+4. powerups.json
+Purpose
+
+Defines every powerup.
+
+Loaded by the Powerup subsystem.
+
+Contains
+
+Per Powerup
+
+id
+enum
+name
+icon
+texture
+animation_set
+activation_type
+combination_rules
+description
+5. obstacles.json
+Purpose
+
+Defines every obstacle.
+
+Loaded by the Obstacle subsystem.
+
+Contains
+
+Per Obstacle
+
+id
+enum
+name
+texture
+animation_set
+health
+destroy_score
+blocks_gravity
+blocks_matching
+removable
+description
+6. objectives.json
+Purpose
+
+Defines every objective type.
+
+Loaded by BoardManager and LevelManager.
+
+Contains
+
+Per Objective
+
+id
+enum
+description
+target_type
+completion_condition
+icon
+7. rewards.json
+Purpose
+
+Defines reward tables.
+
+Loaded by RewardManager.
+
+Contains
+
+Level Rewards
+
+Star Rewards
+
+Daily Rewards
+
+Chest Rewards
+
+Story Rewards
+
+Bonus Rewards
+
+Random Reward Pools
+
+8. economy.json
+Purpose
+
+Defines economy balancing.
+
+Loaded by EconomyManager.
+
+Contains
+
+Coins
+
+Lives
+
+Boosters
+
+Stars
+
+Shop Prices
+
+Life Regen
+
+Unlimited Lives
+
+Starting Resources
+
+Maximum Resources
+
+9. story.json
+Purpose
+
+Defines story metadata.
+
+Dialogue text belongs inside the stories/ folder.
+
+Contains
+
+Story List
+
+Character References
+
+Unlock Conditions
+
+Dialogue File References
+
+Story Order
+
+10. audio.json
+Purpose
+
+Defines audio metadata.
+
+Loaded by AudioManager.
+
+Contains
+
+Music
+
+SFX
+
+Volume Defaults
+
+Audio Bus Mapping
+
+Loop Settings
+
+11. ui.json
+Purpose
+
+Defines UI configuration.
+
+Loaded by UIManager.
+
+Contains
+
+HUD
+
+Fonts
+
+Themes
+
+Popup Definitions
+
+Notification Timing
+
+UI Scaling
+
+12. animation.json
+Purpose
+
+Defines animation metadata.
+
+Loaded by AnimationManager.
+
+Contains
+
+Animation Names
+
+Animation Durations
+
+Default Tweens
+
+Transition Settings
+
+Animation Sets
+
+13. board.json
+Purpose
+
+Defines board generation rules.
+
+Loaded by BoardManager.
+
+Contains
+
+Gravity Direction
+
+Spawn Direction
+
+Cascade Delay
+
+Swap Duration
+
+Shuffle Rules
+
+Refill Delay
+
+Board Padding
+
+14. effects.json
+Purpose
+
+Defines visual effects metadata.
+
+Loaded by AnimationManager.
+
+Contains
+
+Particles
+
+Screen Shake
+
+Flash Effects
+
+Explosion Effects
+
+Spawn Effects
+
+Destroy Effects
+
+15. localization.json
+Purpose
+
+Defines supported languages.
+
+Contains
+
+Languages
+
+Translation Files
+
+Default Language
+
+Font Overrides
+
+RTL Support
+
+16. debug.json
+Purpose
+
+Defines debug configuration.
+
+Loaded only in development builds.
+
+Contains
+
+Debug Flags
+
+Logging Options
+
+Developer Settings
+
+Performance Options
+
+Testing Options
+
+Frozen Configuration Dependencies
+                  ConfigLoader
+                        │
+      ┌─────────────────┼─────────────────┐
+      ▼                 ▼                 ▼
+   game.json      levels.json       board.json
+      │                 │                 │
+      ▼                 ▼                 ▼
+ GameManager      LevelManager     BoardManager
+
+      ▼
+ tiles.json
+      │
+      ▼
+ TileDatabase
+
+      ▼
+ powerups.json
+      │
+      ▼
+ Powerup System
+
+      ▼
+ obstacles.json
+      │
+      ▼
+ Obstacle System
+
+      ▼
+ objectives.json
+      │
+      ▼
+ BoardManager
+
+      ▼
+ rewards.json
+      │
+      ▼
+ RewardManager
+
+      ▼
+ economy.json
+      │
+      ▼
+ EconomyManager
+
+      ▼
+ story.json
+      │
+      ▼
+ StoryManager
+
+      ▼
+ audio.json
+      │
+      ▼
+ AudioManager
+
+      ▼
+ animation.json
+      │
+      ▼
+ AnimationManager
+
+      ▼
+ ui.json
+      │
+      ▼
+ UIManager
+Version 1 Rules
+The configs/ folder is the only source of static gameplay configuration.
+Every configuration file is loaded through ConfigLoader.
+Managers and subsystems must not hardcode configurable gameplay values.
+Configuration files contain data only and never executable logic.
+tiles.json is the only source of tile metadata.
+levels.json is the only source of level definitions.
+powerups.json is the only source of powerup definitions.
+obstacles.json is the only source of obstacle definitions.
+rewards.json is the only source of reward tables.
+economy.json is the only source of economy balancing values.
+story.json contains story metadata only; dialogue content resides in the stories/ folder.
+Configuration files may reference assets, resources, and scenes by path but never load them directly.
+The Config System depends on no gameplay subsystem; gameplay subsystems depend on it through ConfigLoader.

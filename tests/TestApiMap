@@ -1,0 +1,537 @@
+scripts/test/
+Test System API Map (Version 1.0 Freeze)
+Purpose
+
+The Test System provides developer-only tools for testing, debugging, profiling, and validating the game during development.
+
+It never contains gameplay logic.
+
+It never replaces managers.
+
+It never owns game state.
+
+It only issues requests to existing managers and utilities.
+
+The entire subsystem can be disabled or excluded from release builds without affecting gameplay.
+
+Folder Responsibilities
+
+Responsible for:
+
+Developer menu
+Debug commands
+Runtime cheats
+Test scenarios
+Performance profiling
+Validation tools
+Automated test helpers
+Debug overlays
+
+Not responsible for:
+
+Gameplay
+Saving
+Rewards
+Story progression
+Board logic
+Economy logic
+UI gameplay
+1. DeveloperMenu.gd
+Purpose
+
+Controls the F1 developer window.
+
+Displays every available developer command.
+
+Never performs gameplay itself.
+
+Calls TestController.
+
+Public API
+Initialization
+
+initialize()
+
+show()
+
+hide()
+
+toggle()
+
+is_visible()
+
+Categories
+
+show_board_tools()
+
+show_level_tools()
+
+show_story_tools()
+
+show_save_tools()
+
+show_reward_tools()
+
+show_audio_tools()
+
+show_animation_tools()
+
+show_debug_tools()
+
+show_performance_tools()
+
+Commands
+
+execute_command(command,data={})
+
+refresh()
+
+Internal
+
+_current_tab
+
+_is_visible
+
+2. TestController.gd
+Purpose
+
+Central coordinator for every testing command.
+
+Receives requests from DeveloperMenu.
+
+Routes commands to the appropriate manager.
+
+Never performs gameplay directly.
+
+Public API
+Initialization
+
+initialize()
+
+General
+
+execute(command,data={})
+
+register_command(name)
+
+has_command(name)
+
+list_commands()
+
+Runtime
+
+enable_testing()
+
+disable_testing()
+
+is_testing_enabled()
+
+Internal
+
+_registered_commands
+
+_testing_enabled
+
+3. DebugCommands.gd
+Purpose
+
+Implements gameplay-independent debug commands.
+
+Each command delegates work to managers.
+
+Public API
+Level
+
+jump_to_level(level)
+
+reload_level()
+
+restart_level()
+
+complete_level()
+
+fail_level()
+
+Economy
+
+add_coins(amount)
+
+remove_coins(amount)
+
+set_lives(amount)
+
+restore_lives()
+
+add_booster(type,amount)
+
+clear_boosters()
+
+Save
+
+save_game()
+
+load_game()
+
+delete_save()
+
+export_save(path)
+
+import_save(path)
+
+Board
+
+shuffle_board()
+
+clear_board()
+
+refill_board()
+
+lock_board()
+
+unlock_board()
+
+spawn_tile(type,position)
+
+spawn_powerup(type,position)
+
+spawn_obstacle(type,position)
+
+Story
+
+play_story(id)
+
+skip_story()
+
+reset_story()
+
+Rewards
+
+grant_reward(data)
+
+grant_daily_reward()
+
+grant_chest()
+
+Game
+
+pause_game()
+
+resume_game()
+
+restart_game()
+
+quit_game()
+
+UI
+
+show_popup(name)
+
+hide_popup(name)
+
+show_notification(text)
+
+Audio
+
+play_music(track)
+
+play_sfx(sound)
+
+stop_music()
+
+Animation
+
+play_animation(name,target)
+
+stop_animation(target)
+
+4. DebugOverlay.gd
+Purpose
+
+Draws runtime debugging information.
+
+Never modifies gameplay.
+
+Public API
+
+initialize()
+
+show()
+
+hide()
+
+toggle()
+
+refresh()
+
+Display
+
+show_fps()
+
+show_memory()
+
+show_draw_calls()
+
+show_board_state()
+
+show_grid()
+
+show_coordinates()
+
+show_tile_states()
+
+show_match_info()
+
+show_input()
+
+show_signals()
+
+show_save_status()
+
+Visibility
+
+enable_overlay(name)
+
+disable_overlay(name)
+
+is_overlay_enabled(name)
+
+Internal
+
+_enabled_overlays
+
+5. PerformanceProfiler.gd
+Purpose
+
+Collects runtime performance statistics.
+
+No gameplay logic.
+
+Public API
+
+initialize()
+
+start()
+
+stop()
+
+reset()
+
+Metrics
+
+get_fps()
+
+get_frame_time()
+
+get_memory_usage()
+
+get_draw_calls()
+
+get_node_count()
+
+get_object_count()
+
+get_texture_memory()
+
+get_audio_memory()
+
+Reports
+
+generate_report()
+
+export_report(path)
+
+Internal
+
+_current_report
+
+6. TestScenarioRunner.gd
+Purpose
+
+Runs predefined automated gameplay scenarios.
+
+Used to repeatedly test systems.
+
+Never contains gameplay implementations.
+
+Public API
+
+initialize()
+
+run(name)
+
+stop()
+
+pause()
+
+resume()
+
+is_running()
+
+Scenario Control
+
+load_scenario(name)
+
+restart_scenario()
+
+next_step()
+
+previous_step()
+
+skip_step()
+
+Internal
+
+_current_scenario
+
+_current_step
+
+_running
+
+7. TestScenario.gd
+Purpose
+
+Represents one automated testing scenario.
+
+Contains no gameplay logic.
+
+Only stores steps.
+
+Public API
+
+initialize()
+
+add_step(step)
+
+remove_step(index)
+
+clear()
+
+step_count()
+
+get_step(index)
+
+duplicate()
+
+validate()
+
+Internal
+
+_steps
+
+8. ValidationTools.gd
+Purpose
+
+Runs consistency checks across the project.
+
+Used before releases.
+
+Never modifies gameplay.
+
+Public API
+Configuration
+
+validate_configs()
+
+validate_levels()
+
+validate_story()
+
+validate_rewards()
+
+validate_tiles()
+
+validate_powerups()
+
+validate_obstacles()
+
+validate_audio()
+
+validate_ui()
+
+Save
+
+validate_save()
+
+validate_save_version()
+
+Runtime
+
+validate_board()
+
+validate_managers()
+
+validate_signal_connections()
+
+validate_resources()
+
+Reports
+
+generate_validation_report()
+
+9. DebugConsole.gd
+Purpose
+
+Optional command console.
+
+Executes developer commands.
+
+Public API
+
+initialize()
+
+show()
+
+hide()
+
+toggle()
+
+execute(text)
+
+clear_history()
+
+history()
+
+autocomplete(prefix)
+
+Internal
+
+_command_history
+
+_registered_commands
+
+Frozen Test System Dependency
+             DeveloperMenu
+                    │
+                    ▼
+             TestController
+      ┌────────┬────────┬────────┐
+      ▼        ▼        ▼        ▼
+ DebugCommands Overlay Profiler ScenarioRunner
+      │                 │
+      ▼                 ▼
+ ValidationTools    DebugConsole
+      │
+      ▼
+ Existing Managers
+(GameManager, BoardManager, SaveManager,
+ LevelManager, RewardManager,
+ UIManager, AnimationManager,
+ AudioManager, EconomyManager,
+ StoryManager)
+Version 1 Rules
+The Test System exists only for development.
+It may be completely disabled in release builds.
+It never contains gameplay logic.
+It never owns gameplay state.
+Every gameplay action is delegated to the appropriate manager.
+It never bypasses manager responsibilities.
+It may depend on all managers and utilities.
+Managers must never depend on the Test System.
+DeveloperMenu is the only entry point for developer tools.
+TestController routes all developer commands.
+DebugCommands never implement gameplay; they only invoke manager APIs.
+DebugOverlay is read-only and displays runtime information.
+PerformanceProfiler only measures runtime performance.
+ValidationTools performs consistency checks without changing game state.
+TestScenarioRunner automates sequences of manager API calls for testing.
+The subsystem should be removable without requiring changes to gameplay systems.

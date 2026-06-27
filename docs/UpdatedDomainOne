@@ -1,0 +1,154 @@
+FINAL CORRECT GODOT STRUCTURE (100% MATCHING YOUR API MAP)
+
+This is the structure you should build:
+
+Game (Node2D)
+├── Managers
+│ ├── GameManager
+│ ├── BoardManager
+│ ├── LevelManager
+│ ├── RewardManager
+│ ├── StoryManager
+│ ├── AudioManager
+│ ├── SaveManager
+│ ├── UIManager
+│ ├── AnimationManager
+│ └── EconomyManager
+│
+├── BoardRoot
+│ ├── Board
+│ ├── TileContainer
+│ ├── ObstacleContainer
+│ └── PowerupContainer
+│
+├── UIRoot (CanvasLayer)
+└── MainCamera (Camera2D)
+🎮 4. EXACT GODOT STEP-BY-STEP (UPDATED + CORRECTED)
+🟩 STEP 1 — CREATE MAIN SCENE
+
+Godot:
+
+Scene → New Scene → Node2D
+
+Rename:
+
+Game
+
+Save:
+
+scenes/game/Game.tscn
+🟦 STEP 2 — CREATE MANAGERS CONTAINER
+
+Select Game
+
+Right click → Add Child Node → Node
+Rename: Managers
+🟨 STEP 3 — ADD ALL MANAGERS (IMPORTANT ORDER)
+
+Inside Managers, add:
+
+Add Node → Name → Script
+Node Script
+GameManager scripts/managers/GameManager.gd
+BoardManager scripts/managers/BoardManager.gd
+LevelManager scripts/managers/LevelManager.gd
+RewardManager scripts/managers/RewardManager.gd
+StoryManager scripts/managers/StoryManager.gd
+AudioManager scripts/managers/AudioManager.gd
+SaveManager scripts/managers/SaveManager.gd
+UIManager scripts/managers/UIManager.gd
+AnimationManager scripts/managers/AnimationManager.gd
+EconomyManager scripts/managers/EconomyManager.gd
+🧠 CRITICAL GODOT EXPECTATION HERE
+
+Each manager node:
+
+MUST be a Node (or Node2D if needed, but usually Node is enough)
+MUST have script attached
+MUST NOT contain children unless explicitly required later
+🟧 STEP 4 — BOARD ROOT
+
+Under Game:
+
+Add Child Node → Node2D → rename BoardRoot
+
+Inside BoardRoot:
+
+Node2D → Board
+Node2D → TileContainer
+Node2D → ObstacleContainer
+Node2D → PowerupContainer
+
+Attach:
+
+Board → scripts/board/Board.gd
+🟥 STEP 5 — CAMERA
+
+Under Game:
+
+Camera2D → MainCamera
+
+Enable:
+
+Current = true
+🟪 STEP 6 — UI ROOT
+
+Under Game:
+
+CanvasLayer → UIRoot
+
+(No children yet — correct per your freeze rules)
+
+🧩 5. HOW YOUR FOLDER STRUCTURE MAPS TO THIS (IMPORTANT CLARITY)
+Managers layer
+scripts/managers/_
+↓
+Game/Managers/_
+
+They are runtime nodes.
+
+Board system
+scripts/board/\*
+↓
+Game/BoardRoot/Board
+Tiles / Obstacles / Powerups
+
+They are NOT in scene tree initially.
+
+They spawn into:
+
+TileContainer
+ObstacleContainer
+PowerupContainer
+
+via factories.
+
+⚠️ 6. THE KEY MISUNDERSTANDING I FIXED
+
+Earlier I implied:
+
+“Managers are optional / external / not important in scene setup”
+
+That is WRONG for YOUR architecture.
+
+Your system is:
+
+✔ Scene-first architecture
+Game.tscn owns runtime composition
+Managers are part of scene tree
+SignalBus connects everything
+Factories spawn into containers
+🧠 7. SIMPLE RULE (THIS IS YOUR TRUE DESIGN)
+
+If someone asks:
+
+“Where does logic live?”
+
+Answer:
+
+Scene = structure
+Managers = orchestration
+Scripts = behavior
+Factories = creation
+Board system = mechanics
+Utilities = tools

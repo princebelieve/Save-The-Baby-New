@@ -41,7 +41,7 @@ Documents/Godot/SaveTheBaby
 
 Renderer:
 
-Forward+
+Mobile
 
 Version Control:
 

@@ -1,0 +1,355 @@
+levels/
+Level JSON API Map (Version 1.0 Freeze)
+
+This folder contains every playable level.
+
+The Match-3 engine never hardcodes a level. Every aspect of gameplay is loaded from a level JSON file.
+
+Folder
+levels/
+    level001.json
+    level002.json
+    ...
+    level050.json
+
+Future versions can simply add:
+
+level051.json
+level052.json
+...
+
+without modifying the engine.
+
+Common JSON Structure
+
+Every level uses the same schema.
+
+{
+    "level_id": 1,
+    "name": "",
+    "description": "",
+    "difficulty": "",
+    "board": {},
+    "moves": {},
+    "objectives": [],
+    "tile_pool": {},
+    "powerups": {},
+    "obstacles": {},
+    "rewards": {},
+    "tutorial": {},
+    "story": {},
+    "audio": {},
+    "background": {},
+    "settings": {},
+    "metadata": {}
+}
+level_id
+
+Unique level number.
+
+"level_id": 1
+name
+
+Display name.
+
+"name": "Level 1"
+description
+
+Optional.
+
+"description": "Learn the basics."
+difficulty
+
+Possible values
+
+TUTORIAL
+EASY
+MEDIUM
+HARD
+BOSS
+
+Example
+
+"difficulty": "TUTORIAL"
+board
+
+Defines the game board.
+
+{
+    "rows": 8,
+    "columns": 8,
+    "tile_size": 96,
+    "spawn_points": [],
+    "blocked_cells": [],
+    "locked_cells": []
+}
+rows
+"rows": 8
+columns
+"columns": 8
+tile_size
+"tile_size": 96
+spawn_points
+
+Optional custom spawn positions.
+
+[
+    { "x":0,"y":0 },
+    { "x":1,"y":0 }
+]
+blocked_cells
+
+Cells that cannot contain tiles.
+
+[
+    { "x":3,"y":4 },
+    { "x":4,"y":4 }
+]
+locked_cells
+
+Cells that start locked.
+
+[
+    { "x":2,"y":2 }
+]
+moves
+{
+    "total": 30
+}
+objectives
+
+Array.
+
+[
+    { ... },
+    { ... }
+]
+
+Each objective uses
+
+{
+    "type":"",
+    "target":"",
+    "amount":0
+}
+Objective Types
+COLLECT_ITEMS
+COLLECT_EVIDENCE
+DESTROY_OBSTACLES
+UNLOCK_DOORS
+DEFUSE_BOMBS
+REACH_SCORE
+RESCUE_BABY
+SURVIVE
+CLEAR_ALL_JELLY
+
+Example
+
+{
+    "type":"COLLECT_ITEMS",
+    "target":"PHONE",
+    "amount":20
+}
+tile_pool
+
+Tiles allowed to spawn.
+
+{
+    "tiles":[
+        "KEY",
+        "PHONE",
+        "RECORDER",
+        "CLOCK"
+    ],
+    "weights":[
+        30,
+        30,
+        20,
+        20
+    ]
+}
+powerups
+
+Powerups enabled in this level.
+
+{
+    "enabled":true,
+    "available":[
+        "ROCKET",
+        "BOMB",
+        "THUNDER"
+    ]
+}
+obstacles
+
+Obstacles placed at the start of the level.
+
+{
+    "items":[
+        {
+            "type":"CHAIN",
+            "x":2,
+            "y":4,
+            "health":2
+        }
+    ]
+}
+rewards
+
+Rewards for completing the level.
+
+{
+    "coins":100,
+    "stars":3,
+    "first_try_bonus":50,
+    "perfect_bonus":100,
+    "powerups":[]
+}
+tutorial
+
+Tutorial configuration.
+
+{
+    "enabled":true,
+    "steps":[]
+}
+
+Each tutorial step
+
+{
+    "message":"Swipe these tiles.",
+    "highlight":[
+        { "x":3,"y":4 },
+        { "x":4,"y":4 }
+    ]
+}
+story
+
+Story integration.
+
+"story":
+{
+    "before_level":"",
+    "after_level":"",
+    "first_clear":"",
+    "return_to_map":true
+}
+
+Either value may be omitted if no story is played.
+
+audio
+
+Level-specific audio.
+
+{
+    "music":"level_theme_01",
+    "victory":"victory",
+    "game_over":"game_over"
+}
+background
+
+Background art.
+
+{
+    "image":"city_day",
+    "parallax":false
+}
+settings
+
+Optional gameplay modifiers.
+
+{
+    "time_limit":0,
+    "allow_shuffle":true,
+    "allow_boosters":true
+}
+
+A time limit of 0 means the level is move-based rather than timed.
+
+metadata
+
+Internal information.
+
+{
+    "version":1,
+    "author":"Save The Baby",
+    "notes":""
+}
+Level Progression Responsibilities
+level001.json
+
+Purpose
+
+First tutorial level
+Teach swipe-to-swap
+No obstacles
+Very easy objectives
+level002.json
+
+Purpose
+
+Continue tutorial
+Introduce simple matching
+Reinforce board mechanics
+Levels 003–010
+
+Purpose
+
+Complete tutorial
+Introduce objectives
+Increase board complexity gradually
+Levels 011–020
+
+Purpose
+
+Introduce basic obstacles
+Require more strategic play
+Levels 021–035
+
+Purpose
+
+Introduce powerup combinations
+More complex board layouts
+Multi-objective levels
+Levels 036–049
+
+Purpose
+
+Advanced mechanics
+Mixed obstacles
+Higher difficulty
+Complex objective combinations
+level050.json
+
+Purpose
+
+Boss level
+Final challenge of Version 1
+Story climax
+Leads directly to ending.json
+Level Flow
+level001.json
+      │
+      ▼
+level002.json
+      │
+      ▼
+...
+      │
+      ▼
+level050.json
+Frozen Responsibilities
+File(s)	Responsibility
+level001.json	First tutorial level
+level002.json	Continue tutorial
+level003–010.json	Complete tutorial and introduce objectives
+level011–020.json	Introduce obstacles
+level021–035.json	Introduce powerups and combinations
+level036–049.json	Advanced gameplay and difficulty
+level050.json	Boss level and campaign finale
+
+This freezes the JSON schema and responsibilities for every file under:
+
+levels/
+
+All gameplay systems (such as LevelManager, BoardGenerator, RewardManager, StoryManager, and BoardManager) should read level data from this schema without requiring changes to the file format during Version 1.
