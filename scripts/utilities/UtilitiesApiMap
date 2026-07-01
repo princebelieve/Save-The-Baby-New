@@ -3,27 +3,6 @@ Utilities System API Map (Version 1.0 Freeze)
 
 The Utilities folder provides reusable services for the entire project.
 
-Initialization Contract
-
-All utilities must be explicitly initialized before use when applicable.
-
-Boot.gd is responsible for initializing all utilities exactly once during application startup.
-
-Initialization order must follow dependency direction:
-
-1. Constants (no initialization required)
-2. SignalBus (no initialization required)
-3. RandomGenerator.initialize()
-4. TimeHelper (no initialization required)
-5. ConfigLoader.initialize()
-6. ResourceManager.initialize()
-7. JsonLoader.initialize()
-8. FileHelper (no initialization required)
-9. DebugLogger.initialize()
-10. Version (no initialization required)
-
-No utility may assume another utility has been initialized unless listed after it in this order.
-
 No utility may initialize another utility internally.
 
 Utilities contain no gameplay logic.

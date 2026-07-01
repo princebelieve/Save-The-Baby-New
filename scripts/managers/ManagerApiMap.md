@@ -7,17 +7,15 @@ Managers communicate through SignalBus, use helper classes from utilities, and c
 
 No manager should perform another manager's responsibility.
 
-Boot Integration
+Initialization Contract
 
-Application startup is coordinated exclusively by Boot.gd.
+Each manager exposes an initialize() method for setup of its internal state.
 
-Boot.gd creates the runtime environment, initializes the managers, loads configuration and save data, and loads the initial Game scene.
+Managers do not define or control application startup flow.
 
-Managers never initialize other managers.
+Managers do not depend on a specific startup orchestrator.
 
-Each manager's initialize() method initializes only that manager's own internal state.
-
-Managers assume that Boot.gd has completed application startup before gameplay begins.
+Initialization timing is handled by the scene or system that instantiates the managers.
 
 1. GameManager.gd
    Purpose

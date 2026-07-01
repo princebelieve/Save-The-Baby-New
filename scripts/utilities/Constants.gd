@@ -1,41 +1,45 @@
 extends Node
+class_name Constants
 
-# --------------------------------------------------
-# Constants.gd (Version 1.0 Freeze)
-#
-# Global constants + enumerations only.
-#
-# Rules:
-# - No functions
-# - No gameplay logic
-# - No state mutation
-# - Pure data definitions only
-# --------------------------------------------------
+# =========================================================
+# PROJECT METADATA (ENGINE IDENTITY ONLY)
+# =========================================================
 
-
-# =========================
-# Project Constants
-# =========================
 const GAME_NAME: String = "Save The Baby"
-const VERSION: String = "1.0"
+const VERSION: String = "1.0.0"
+
+# NOTE:
+# SAVE_VERSION and BUILD_NUMBER are duplicated in Version.gd,
+# but Constants keeps runtime-safe read-only mirrors for convenience.
+
+const SAVE_VERSION: int = 1
+const BUILD_NUMBER: int = 1
+
+
+# =========================================================
+# PERFORMANCE / ENGINE BEHAVIOR (NOT GAME BALANCE)
+# =========================================================
+
 const TARGET_FPS: int = 60
 
-const GRID_WIDTH: int = 8
-const GRID_HEIGHT: int = 8
 
-const MAX_LEVEL: int = 1000
-const MAX_LIVES: int = 5
-const LIFE_REGEN_SECONDS: int = 1800
+# =========================================================
+# SCENE PATHS
+# =========================================================
 
-
-# =========================
-# Paths
-# =========================
 class ScenePaths:
-	const GAME: String = "res://scenes/game/Game.tscn"
 	const BOOT: String = "res://scenes/boot/Boot.tscn"
-	const LOADING: String = "res://scenes/boot/Loading.tscn"
+	const GAME: String = "res://scenes/game/Game.tscn"
+	const BOARD: String = "res://scenes/board/Board.tscn"
+	const MAIN_MENU: String = "res://scenes/menu/MainMenu.tscn"
+	const LEVEL_SELECT: String = "res://scenes/menu/LevelSelect.tscn"
+	const STORY: String = "res://scenes/story/StoryScene.tscn"
+	const UI_ROOT: String = "res://scenes/ui/UIRoot.tscn"
 
+
+# =========================================================
+# CONFIG PATHS
+# =========================================================
 
 class ConfigPaths:
 	const GAME: String = "res://configs/game.json"
@@ -52,164 +56,150 @@ class ConfigPaths:
 	const ANIMATION: String = "res://configs/animation.json"
 	const BOARD: String = "res://configs/board.json"
 	const EFFECTS: String = "res://configs/effects.json"
-	const LOCALIZATION: String = "res://configs/localization.json"
 	const DEBUG: String = "res://configs/debug.json"
 
 
-class SavePaths:
-	const SAVE_FILE: String = "user://save.dat"
-	const BACKUP_FILE: String = "user://save_backup.dat"
+# =========================================================
+# SAVE PATHS
+# =========================================================
 
+class SavePaths:
+	const SAVE_DIR: String = "user://save/"
+	const MAIN_SAVE_FILE: String = "user://save/save_data.json"
+
+
+# =========================================================
+# RESOURCE PATHS
+# =========================================================
 
 class ResourcePaths:
-	const TEXTURES: String = "res://assets/textures/"
-	const AUDIO: String = "res://assets/audio/"
-	const FONTS: String = "res://assets/fonts/"
-	const ANIMATIONS: String = "res://assets/animations/"
-	const SCENES: String = "res://scenes/"
+	const TILE_SPRITES: String = "res://assets/sprites/tiles/"
+	const UI_SPRITES: String = "res://assets/sprites/ui/"
+	const POWERUP_SPRITES: String = "res://assets/sprites/powerups/"
+	const OBSTACLE_SPRITES: String = "res://assets/sprites/obstacles/"
+	const AUDIO_MUSIC: String = "res://assets/audio/music/"
+	const AUDIO_SFX: String = "res://assets/audio/sfx/"
 
 
-# =========================
-# Node Groups
-# =========================
-class NodeGroups:
-	const TILE: String = "tile"
+# =========================================================
+# NODE GROUPS
+# =========================================================
+
+class Groups:
+	const TILES: String = "tiles"
 	const BOARD: String = "board"
+	const MANAGERS: String = "managers"
 	const UI: String = "ui"
-	const MANAGER: String = "manager"
 
 
-# =========================
-# Physics Layers
-# =========================
-class PhysicsLayers:
+# =========================================================
+# PHYSICS LAYERS (ENGINE STRUCTURE ONLY)
+# =========================================================
+
+class Layers:
 	const TILE: int = 1
 	const OBSTACLE: int = 2
-	const BOARD: int = 4
+	const UI: int = 3
 
 
-# =========================
-# Enums
-# =========================
+# =========================================================
+# ENUMS (ENGINE CONTRACTS ONLY)
+# These MUST NOT contain balancing values.
+# Only identity/type definitions.
+# =========================================================
 
 enum GameState {
 	BOOT,
-	INITIALIZING,
-	MENU,
+	MAIN_MENU,
+	LOADING,
 	PLAYING,
 	PAUSED,
+	VICTORY,
 	GAME_OVER
 }
 
-
 enum BoardState {
 	IDLE,
-	CREATING,
-	READY,
-	LOCKED,
-	RESOLVING,
-	CLEARED
+	PROCESSING,
+	SWAPPING,
+	MATCHING,
+	CASCADING,
+	SHUFFLING,
+	STABLE
 }
-
-
-enum TileState {
-	IDLE,
-	MOVING,
-	FALLING,
-	LANDED,
-	DESTROYED
-}
-
 
 enum TileType {
-	RED,
-	BLUE,
-	GREEN,
-	YELLOW,
-	PURPLE,
-	SPECIAL
+	KEY,
+	PHONE,
+	FINGERPRINT,
+	RECORDER,
+	TAPE,
+	CLOCK,
+	CHAIN,
+	LOCK,
+	BOMB,
+	MISSILE,
+	PINCHER,
+	PLIER,
+	ROCKET,
+	THUNDER,
+	BOMB_POWER
 }
-
 
 enum PowerupType {
-	NONE,
-	BOMB,
 	ROCKET,
-	RAINBOW
+	BOMB,
+	THUNDER
 }
-
 
 enum PowerupCombo {
-	NONE,
+	ROCKET_ROCKET,
+	ROCKET_BOMB,
 	BOMB_BOMB,
-	BOMB_ROCKET,
-	ROCKET_ROCKET
+	THUNDER_BOMB,
+	THUNDER_THUNDER
 }
-
 
 enum ObstacleType {
-	WOOD,
-	ICE,
-	STONE,
-	CHAIN
+	CHAIN,
+	LOCK,
+	TAPE,
+	BOMB,
+	MISSILE,
+	ELECTRIC_TRAP
 }
-
 
 enum ObjectiveType {
-	COLLECT_TILES,
-	SCORE_POINTS,
-	DESTROY_OBSTACLES,
-	CLEAR_BOARD
+	COLLECT,
+	DESTROY,
+	UNLOCK,
+	SCORE,
+	TIMER,
+	RESCUE
 }
-
 
 enum RewardType {
 	COINS,
 	STARS,
-	BOOSTERS,
+	CHEST,
+	BOOSTER,
 	LIVES
 }
-
 
 enum BoosterType {
 	HAMMER,
 	SWAP,
-	BOMB
+	BOMB,
+	ROCKET
 }
-
-
-enum StoryTrack {
-	INTRO,
-	CHAPTER_1,
-	CHAPTER_2,
-	ENDING
-}
-
-
-enum Character {
-	BABY,
-	MOTHER,
-	FATHER,
-	NARRATOR
-}
-
-
-enum Difficulty {
-	EASY,
-	NORMAL,
-	HARD,
-	HARDCORE
-}
-
 
 enum MatchPattern {
-	THREE,
-	FOUR,
-	FIVE,
+	HORIZONTAL,
+	VERTICAL,
 	L_SHAPE,
-	T_SHAPE
+	T_SHAPE,
+	SQUARE
 }
-
 
 enum Direction {
 	UP,
@@ -218,10 +208,16 @@ enum Direction {
 	RIGHT
 }
 
-
 enum AudioBus {
-	MASTER,
 	MUSIC,
 	SFX,
-	UI
+	UI,
+	VOICE
+}
+
+enum Difficulty {
+	EASY,
+	MEDIUM,
+	HARD,
+	BOSS
 }

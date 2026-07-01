@@ -4,7 +4,7 @@ UI System API Map (Version 1.0 Freeze)
 The UI system is responsible only for presentation and user interaction. It never contains gameplay logic. Gameplay managers (GameManager, BoardManager, StoryManager, RewardManager, etc.) notify the UI through signals or public APIs.
 
 51. HUD.gd
-Purpose
+    Purpose
 
 Displays gameplay information while a level is running.
 
@@ -59,8 +59,7 @@ show()
 
 hide()
 
-reset()
-52. PauseMenu.gd
+reset() 52. PauseMenu.gd
 Purpose
 
 Handles the in-game pause menu.
@@ -86,8 +85,7 @@ return_to_menu()
 
 quit_game()
 Utility
-reset()
-53. VictoryScreen.gd
+reset() 53. VictoryScreen.gd
 Purpose
 
 Displays level completion information.
@@ -115,8 +113,7 @@ play_open_animation()
 
 play_close_animation()
 Utility
-reset()
-54. GameOverScreen.gd
+reset() 54. GameOverScreen.gd
 Purpose
 
 Displays failure information.
@@ -144,8 +141,7 @@ play_open_animation()
 
 play_close_animation()
 Utility
-reset()
-55. LoadingScreen.gd
+reset() 55. LoadingScreen.gd
 Purpose
 
 Displays loading progress during scene transitions.
@@ -173,11 +169,10 @@ show()
 
 hide()
 
-reset()
-56. UIManager.gd
+reset() 56. UIManager.gd
 Purpose
 
-Coordinates every UI screen in the game.
+Coordinates the UI presentation layer by controlling HUD, screens, popups, notifications, loading, and input locking. It does not contain gameplay logic.
 
 Initialization
 initialize()
@@ -225,23 +220,23 @@ reset()
 shutdown()
 Frozen Dependency Graph
 HUD
- │
- ├──────────────┬──────────────┬──────────────┐
- ▼              ▼              ▼              ▼
-PauseMenu  VictoryScreen  GameOverScreen  LoadingScreen
-        │         │              │              │
-        └─────────┴──────────────┴──────────────┘
-                          │
-                          ▼
-                     UIManager
+│
+├──────────────┬──────────────┬──────────────┐
+▼ ▼ ▼ ▼
+PauseMenu VictoryScreen GameOverScreen LoadingScreen
+│ │ │ │
+└─────────┴──────────────┴──────────────┘
+│
+▼
+UIManager
 Responsibilities
-File	Responsibility
-HUD.gd	Displays gameplay information (moves, score, objectives, coins, lives, boosters)
-PauseMenu.gd	Handles the pause menu
-VictoryScreen.gd	Displays level completion results and rewards
-GameOverScreen.gd	Displays failure results and retry options
-LoadingScreen.gd	Displays loading progress during scene transitions
-UIManager.gd	Coordinates every UI screen and popup
+File Responsibility
+HUD.gd Displays gameplay information (moves, score, objectives, coins, lives, boosters)
+PauseMenu.gd Handles the pause menu
+VictoryScreen.gd Displays level completion results and rewards
+GameOverScreen.gd Displays failure results and retry options
+LoadingScreen.gd Displays loading progress during scene transitions
+UIManager.gd Coordinates every UI screen and popup
 UI Features Supported
 
 The frozen API supports:

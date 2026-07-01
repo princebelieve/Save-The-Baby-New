@@ -125,6 +125,7 @@ scripts/
 │
 ├── animation/
 ├── board/
+├── boot/
 ├── economy/
 ├── managers/
 ├── obstacles/

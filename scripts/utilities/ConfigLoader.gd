@@ -1,36 +1,26 @@
 extends Node
 class_name ConfigLoader
 
-# --------------------------------------------------
-# ConfigLoader.gd (Version 1.0 Freeze)
-#
-# Purpose:
+# =========================================================
+# PURPOSE
 # Loads and caches configuration files.
-#
-# Rules:
-# - Used by managers
-# - Never owns gameplay
-# - No gameplay logic
-# - No coordination logic
-# --------------------------------------------------
+# Used by managers.
+# Never owns gameplay.
+# =========================================================
 
-
-# =========================
-# Internal State
-# =========================
 var _cache: Dictionary = {}
 
-
-# =========================
-# Initialization
-# =========================
+# =========================================================
+# INITIALIZATION
+# =========================================================
 func initialize() -> void:
 	_cache.clear()
 
 
-# =========================
-# Public API
-# =========================
+# =========================================================
+# CORE CONTROL
+# =========================================================
+
 func reload() -> void:
 	_cache.clear()
 
@@ -39,39 +29,38 @@ func clear_cache() -> void:
 	_cache.clear()
 
 
-func load(path: String):
+# =========================================================
+# LOADING
+# =========================================================
+
+func load(path: String) -> Dictionary:
 	if _cache.has(path):
 		return _cache[path]
 
-	if not FileHelper.file_exists(path):
-		return null
+	var data = JsonLoader.load_file(path)
 
-	var file := FileAccess.open(path, FileAccess.READ)
-	if file == null:
-		return null
-
-	var content := file.get_as_text()
-	file.close()
-
-	var data = JSON.parse_string(content)
-
-	if not _validate(data):
-		return null
+	if typeof(data) != TYPE_DICTIONARY:
+		DebugLogger.error("ConfigLoader: Invalid config format (expected Dictionary) -> " + path)
+		return {}
 
 	_cache[path] = data
 	return data
 
 
-func reload_file(path: String):
+func reload_file(path: String) -> Dictionary:
 	_cache.erase(path)
 	return load(path)
 
+
+# =========================================================
+# QUERY API
+# =========================================================
 
 func has(path: String) -> bool:
 	return _cache.has(path)
 
 
-func get(path: String):
+func get(path: String) -> Dictionary:
 	if _cache.has(path):
 		return _cache[path]
 
@@ -90,22 +79,29 @@ func get_value(path: String, key: String, default = null):
 	return default
 
 
-func get_section(path: String, section: String):
+func get_section(path: String, section: String) -> Dictionary:
 	var data = get(path)
 
 	if typeof(data) != TYPE_DICTIONARY:
-		return null
+		return {}
 
 	if data.has(section) and typeof(data[section]) == TYPE_DICTIONARY:
 		return data[section]
 
-	return null
+	return {}
 
 
-# =========================
-# Internal
-# =========================
-func _validate(data) -> bool:
-	# ConfigLoader only ensures valid JSON structure exists
-	# No gameplay-specific validation allowed
-	return data != null
+# =========================================================
+# INTERNAL VALIDATION (PRIVATE)
+# =========================================================
+
+func _validate(path: String, data) -> bool:
+	if data == null:
+		DebugLogger.error("ConfigLoader: Null config -> " + path)
+		return false
+
+	if typeof(data) != TYPE_DICTIONARY:
+		DebugLogger.error("ConfigLoader: Config is not a dictionary -> " + path)
+		return false
+
+	return true
