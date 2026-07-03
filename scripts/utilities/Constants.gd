@@ -43,7 +43,6 @@ class ScenePaths:
 
 class ConfigPaths:
 	const GAME: String = "res://configs/game.json"
-	const LEVELS: String = "res://configs/levels.json"
 	const TILES: String = "res://configs/tiles.json"
 	const POWERUPS: String = "res://configs/powerups.json"
 	const OBSTACLES: String = "res://configs/obstacles.json"
@@ -57,7 +56,16 @@ class ConfigPaths:
 	const BOARD: String = "res://configs/board.json"
 	const EFFECTS: String = "res://configs/effects.json"
 	const DEBUG: String = "res://configs/debug.json"
+	const LOCALIZATION = "res://configs/localization.json"
 
+	# =========================================================
+# LEVEL PATHS
+# =========================================================
+
+class LevelPaths:
+	const DIRECTORY: String = "res://levels/"
+	const FILE_PREFIX: String = "level"
+	const FILE_EXTENSION: String = ".json"
 
 # =========================================================
 # SAVE PATHS

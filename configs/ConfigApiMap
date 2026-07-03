@@ -19,7 +19,6 @@ Folder Structure
 configs/
 
 game.json
-levels.json
 tiles.json
 powerups.json
 obstacles.json
@@ -67,33 +66,7 @@ General Settings
 autosave_enabled
 vibration_enabled
 tutorial_enabled
-2. levels.json
-Purpose
-
-Contains every playable level.
-
-Loaded by LevelManager.
-
-Contains
-
-Per Level
-
-level_id
-board_layout
-width
-height
-difficulty
-available_tiles
-available_obstacles
-objectives
-move_limit
-score_targets
-rewards
-story_before
-story_after
-background
-music
-3. tiles.json
+2. tiles.json
 Purpose
 
 Defines every tile type.
@@ -116,7 +89,7 @@ matchable
 spawnable
 hidden
 special
-4. powerups.json
+3. powerups.json
 Purpose
 
 Defines every powerup.
@@ -136,7 +109,7 @@ animation_set
 activation_type
 combination_rules
 description
-5. obstacles.json
+4. obstacles.json
 Purpose
 
 Defines every obstacle.
@@ -158,7 +131,7 @@ blocks_gravity
 blocks_matching
 removable
 description
-6. objectives.json
+5. objectives.json
 Purpose
 
 Defines every objective type.
@@ -175,7 +148,7 @@ description
 target_type
 completion_condition
 icon
-7. rewards.json
+6. rewards.json
 Purpose
 
 Defines reward tables.
@@ -198,7 +171,7 @@ Bonus Rewards
 
 Random Reward Pools
 
-8. economy.json
+7. economy.json
 Purpose
 
 Defines economy balancing.
@@ -225,7 +198,7 @@ Starting Resources
 
 Maximum Resources
 
-9. story.json
+8. story.json
 Purpose
 
 Defines story metadata.
@@ -244,7 +217,7 @@ Dialogue File References
 
 Story Order
 
-10. audio.json
+9. audio.json
 Purpose
 
 Defines audio metadata.
@@ -263,7 +236,7 @@ Audio Bus Mapping
 
 Loop Settings
 
-11. ui.json
+10. ui.json
 Purpose
 
 Defines UI configuration.
@@ -284,7 +257,7 @@ Notification Timing
 
 UI Scaling
 
-12. animation.json
+11. animation.json
 Purpose
 
 Defines animation metadata.
@@ -303,7 +276,7 @@ Transition Settings
 
 Animation Sets
 
-13. board.json
+12. board.json
 Purpose
 
 Defines board generation rules.
@@ -326,7 +299,7 @@ Refill Delay
 
 Board Padding
 
-14. effects.json
+13. effects.json
 Purpose
 
 Defines visual effects metadata.
@@ -347,7 +320,7 @@ Spawn Effects
 
 Destroy Effects
 
-15. localization.json
+14. localization.json
 Purpose
 
 Defines supported languages.
@@ -364,7 +337,7 @@ Font Overrides
 
 RTL Support
 
-16. debug.json
+15. debug.json
 Purpose
 
 Defines debug configuration.
@@ -388,7 +361,7 @@ Frozen Configuration Dependencies
                         │
       ┌─────────────────┼─────────────────┐
       ▼                 ▼                 ▼
-   game.json      levels.json       board.json
+   game.json          levels/        board.json
       │                 │                 │
       ▼                 ▼                 ▼
  GameManager      LevelManager     BoardManager
@@ -419,6 +392,10 @@ Frozen Configuration Dependencies
 
       ▼
  rewards.json
+      │
+      ▼
+       
+ RewardTable
       │
       ▼
  RewardManager
@@ -458,7 +435,8 @@ Every configuration file is loaded through ConfigLoader.
 Managers and subsystems must not hardcode configurable gameplay values.
 Configuration files contain data only and never executable logic.
 tiles.json is the only source of tile metadata.
-levels.json is the only source of level definitions.
+The levels/ folder is the only source of level definitions.
+Each playable level is stored as an individual JSON file following the frozen Level JSON schema.
 powerups.json is the only source of powerup definitions.
 obstacles.json is the only source of obstacle definitions.
 rewards.json is the only source of reward tables.

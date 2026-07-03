@@ -37,7 +37,7 @@ Every level follows the same lifecycle.
 Level Selected
         │
         ▼
-Load Level JSON
+Load Level JSON File
         │
         ▼
 Request Before-Level Story (Optional)
@@ -522,7 +522,7 @@ Future replays skip them automatically.
 
 Responsibilities
 LevelManager
-Loads level JSON.
+Loads the requested level JSON file
 Starts gameplay.
 Ends gameplay.
 Requests stories.

@@ -145,8 +145,14 @@ notify_gameplay_start()
 notify_story_finished()
 Utility
 reset()
-
 shutdown()
+
+Internal State
+
+_current_story
+_current_scene
+_current_dialogue
+
 Frozen Dependency Graph
 DialoguePlayer
         │

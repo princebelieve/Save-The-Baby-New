@@ -59,10 +59,16 @@ SAVE THE BABY — CORRECT CONNECTED FILE TREE (V1.0 STRICT)
    LevelManager
    │
    ├── loads:
-   │ └── configs/levels.json (via ConfigLoader)
+   │   └── levels/levelXXX.json (via JsonLoader)
+   │
+   ├── validates:
+   │   └── Frozen Level JSON schema
+   │
+   ├── exposes:
+   │   └── Current level data
    │
    └── triggers:
-   └── BoardManager.create*board()
+      └── BoardManager.create_board(level_data)
    BoardManager
    │
    ├── uses:
@@ -99,10 +105,23 @@ SAVE THE BABY — CORRECT CONNECTED FILE TREE (V1.0 STRICT)
    RewardManager
    │
    ├── loads:
-   │ └── configs/rewards.json
+   │   └── configs/rewards.json
+   │
+   ├── coordinates:
+   │   └── Reward System
+   │
+   ├── uses:
+   │   ├── RewardCalculator
+   │   ├── RewardTable
+   │   ├── RewardValidator
+   │   ├── RewardDistributor
+   │   ├── RewardQueue
+   │   ├── RewardFactory
+   │   ├── RewardPreview
+   │   └── RewardData
    │
    └── triggered by:
-   └── LevelManager result
+    └── LevelManager result
    SaveManager
    │
    ├── uses:
@@ -176,17 +195,40 @@ SAVE THE BABY — CORRECT CONNECTED FILE TREE (V1.0 STRICT)
    └── uses:
    ResourceManager (textures, assets)
 6. CONFIG SYSTEM (DATA SOURCE ONLY)
+
    ConfigLoader
    │
    └── loads:
-   configs/\*.json
-   ├── game.json
-   ├── levels.json
-   ├── tiles.json
-   ├── economy.json
-   ├── story.json
-   └── others
+    configs/*.json
+    ├── game.json
+    ├── tiles.json
+    ├── powerups.json
+    ├── obstacles.json
+    ├── objectives.json
+    ├── rewards.json
+    ├── economy.json
+    ├── story.json
+    ├── audio.json
+    ├── ui.json
+    ├── animation.json
+    ├── board.json
+    ├── effects.json
+    ├── localization.json
+    ├── debug.json
+    └── ...
 
+LevelManager
+│
+└── loads:
+    levels/
+    ├── level001.json
+    ├── level002.json
+    ├── ...
+    └── level050.json
+
+✔ ConfigLoader loads configuration files only.
+✔ LevelManager loads playable level files.
+✔ Level files are not part of the configs/ folder.
 ✔ No gameplay logic
 ✔ No runtime state
 
@@ -232,7 +274,7 @@ Load Game.tscn
 ↓
 GameManager initializes system state
 ↓
-LevelManager loads level
+LevelManager loads and validates levelXXX.json
 ↓
 BoardManager creates board
 ↓

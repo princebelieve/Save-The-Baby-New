@@ -112,9 +112,16 @@ Internal
 \_board_locked
 
 3. LevelManager.gd
-   Purpose
 
-Loads levels and controls level progression.
+Purpose
+
+Loads the requested level JSON file from the levels/ folder and controls level progression.
+
+Each level is stored in its own JSON file using the frozen Level JSON schema.
+
+LevelManager is responsible for locating, loading, validating, and exposing the currently loaded level data.
+
+LevelManager never contains hardcoded level content and never assumes gameplay, story, tutorial, or reward behavior beyond the data defined in the loaded level file.
 
 Public Signals
 level_loading(level)
@@ -222,7 +229,7 @@ end_story()
 story_progress()
 Internal
 \_current_story
-
+_current_scene
 \_current_dialogue
 
 6. AudioManager.gd
@@ -261,9 +268,22 @@ mute()
 
 unmute()
 Internal
-\_music_player
 
-\_sfx_players
+_music_player
+
+_sfx_players
+
+_audio_config
+
+_master_volume
+
+_music_volume
+
+_sfx_volume
+
+_muted
+
+_is_initialized
 
 7. SaveManager.gd
    Purpose
@@ -309,10 +329,20 @@ Internal
 
 \_save_path
 
+_serializer
+_save_file
+_validator
+_migrator
+_autosave_scheduler
+
 8. UIManager.gd
    Purpose
 
-Controls all UI screens and popups.
+Controls the entire UI presentation layer.
+
+Coordinates UI screens, popups, HUD, notifications, loading, and input locking.
+
+Contains no gameplay logic.
 
 Public Signals
 popup_opened(name)
@@ -338,10 +368,29 @@ show_notification(text)
 show_loading()
 
 hide_loading()
+
+close_all_popups()
+
+hide_notification()
+
+lock_input()
+
+unlock_input()
+
+is_input_locked()
+
+reset()
+
+shutdown()
+
 Internal
 \_current_screen
 
 \_open_popups
+
+_input_locked
+
+_is_initialized
 
 9. AnimationManager.gd
    Purpose
@@ -421,15 +470,14 @@ purchase(cost)
 
 update_life_timer()
 Internal
-\_coins
 
-\_lives
+_player_inventory
 
-\_stars
+_life_system
 
-\_boosters
+_booster_inventory
 
-\_unlimited_lives_timer
+_validator
 Relationships
 GameManager
 │

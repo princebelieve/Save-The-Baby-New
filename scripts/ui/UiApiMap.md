@@ -169,52 +169,57 @@ show()
 
 hide()
 
-reset() 56. UIManager.gd
-Purpose
+reset() 
 
-Coordinates the UI presentation layer by controlling HUD, screens, popups, notifications, loading, and input locking. It does not contain gameplay logic.
+52. UIManager.gd
+Coordinates the UI presentation layer.
+
+Controls UI screens, popups, HUD, notifications, loading, and input locking.
+
+Contains no gameplay logic.
 
 Initialization
-initialize()
-HUD
-show_hud()
 
-hide_hud()
+initialize()
+
+HUD
 
 update_hud()
+
 Screens
-show_pause()
 
-hide_pause()
+show_screen(name)
 
-show_victory(result)
-
-hide_victory()
-
-show_game_over(result)
-
-hide_game_over()
+hide_screen(name)
 
 show_loading()
 
 hide_loading()
+
 Popups
-show_popup(name, data)
+
+show_popup(name, data={})
 
 hide_popup(name)
 
 close_all_popups()
+
 Notifications
+
 show_notification(text)
 
 hide_notification()
+
 Input
+
 lock_input()
 
 unlock_input()
 
 is_input_locked()
+
 Utility
+
 reset()
 
 shutdown()

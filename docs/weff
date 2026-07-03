@@ -1,684 +1,58 @@
-Are you indirectly saying you deliberately skipped this file from what I sent so that you can request for it again or something? What more do you need to give me this file (LevelManager.gd)? Please give me the script before you say anything else
+Please help me with SaveManager.gd script, following the frozen Api map
 
 
 
-LevelManager.gd
+7. SaveManager.gd
    Purpose
 
-Loads levels and controls level progression.
+Owns all player save data.
 
 Public Signals
-level_loading(level)
+save_requested
 
-level_loaded(level)
+save_completed
 
-level_started(level)
+save_failed
 
-level_completed(level)
+load_requested
 
-level_failed(level)
+load_completed
+
+load_failed
 Public API
 initialize()
 
-load_level(level_id)
+new_game()
 
-reload_level()
+save_game()
 
-start_level()
+load_game()
 
-complete_level()
+auto_save()
 
-fail_level()
+delete_save()
 
-next_level()
+save_exists()
 
-previous_level()
+export_save(path)
 
-current_level()
+import_save(path)
 
-get_level_data()
+get_save_data()
 
-is_last_level()
+set_save_data(data)
 Internal
-\_current_level
+\_save_data
 
-\_level_data
+\_save_path
 
+_serializer
+_save_file
+_validator
+_migrator
+_autosave_scheduler
 
-
-SAVE THE BABY — CORRECT CONNECTED FILE TREE (V1.0 STRICT)
-
-
-
-1. BOOT LAYER (ONLY REAL ENTRY POINT)
-
-   Boot.gd
-
-   │
-
-   ├── initializes utilities:
-
-   │ ├── DebugLogger
-
-   │ ├── RandomGenerator
-
-   │ ├── ConfigLoader
-
-   │ ├── ResourceManager
-
-   │ └── JsonLoader
-
-   │
-
-   ├── reloads configuration:
-
-   │ └── ConfigLoader.reload()
-
-   │
-
-   ├── loads game scene:
-
-   │ └── ResourceManager.load_scene(Constants.ScenePaths.GAME)
-
-   │
-
-   └── instantiates:
-
-   └── Game.tscn (root runtime scene)
-
-
-
-✔ Boot DOES NOT talk to managers
-
-✔ Boot DOES NOT control gameplay
-
-✔ Boot ends immediately after scene load
-
-
-
-2. GAME SCENE ROOT (RUNTIME ORCHESTRATION BOUNDARY)
-
-   Game.tscn
-
-   │
-
-   └── contains managers:
-
-   ├── GameManager
-
-   ├── LevelManager
-
-   ├── BoardManager
-
-   ├── RewardManager
-
-   ├── EconomyManager
-
-   ├── StoryManager
-
-   ├── SaveManager
-
-   ├── AudioManager
-
-   ├── UIManager
-
-   └── AnimationManager
-
-
-
-✔ This is where runtime coordination begins
-
-✔ Managers initialize themselves (per API contract)
-
-✔ No Boot involvement beyond this point
-
-
-
-3. MANAGER LAYER (ONLY COORDINATION)
-
-   Core dependency rule from your API:
-
-   Managers communicate via SignalBus
-
-   Managers use Utilities
-
-   Managers DO NOT own subsystem implementation
-
-   Relationship structure (explicit only)
-
-   GameManager
-
-   │
-
-   ├── triggers:
-
-   │ ├── LevelManager
-
-   │ ├── BoardManager
-
-   │ └── StoryManager
-
-   │
-
-   └── receives signals via SignalBus
-
-   LevelManager
-
-   │
-
-   ├── loads:
-
-   │ └── configs/levels.json (via ConfigLoader)
-
-   │
-
-   └── triggers:
-
-   └── BoardManager.create*board()
-
-   BoardManager
-
-   │
-
-   ├── uses:
-
-   │ ├── Board.gd
-
-   │ ├── TileFactory
-
-   │ └── TileDatabase
-
-   │
-
-   ├── controls:
-
-   │ └── Board System
-
-   │
-
-   └── emits via SignalBus:
-
-   ├── board_created
-
-   ├── board_ready
-
-   └── board_cleared
-
-   StoryManager
-
-   │
-
-   ├── loads:
-
-   │ ├── configs/story.json
-
-   │ └── stories/*
-
-   │
-
-   └── emits:
-
-   ├── story*started
-
-   └── dialogue events
-
-   EconomyManager
-
-   │
-
-   ├── loads:
-
-   │ └── configs/economy.json
-
-   │
-
-   └── updates:
-
-   ├── coins
-
-   ├── lives
-
-   ├── boosters
-
-   └── stars
-
-   RewardManager
-
-   │
-
-   ├── loads:
-
-   │ └── configs/rewards.json
-
-   │
-
-   └── triggered by:
-
-   └── LevelManager result
-
-   SaveManager
-
-   │
-
-   ├── uses:
-
-   │ ├── FileHelper
-
-   │ └── TimeHelper
-
-   │
-
-   └── interacts with:
-
-   └── save/ folder
-
-   AudioManager
-
-   │
-
-   ├── loads:
-
-   │ └── configs/audio.json
-
-   │
-
-   └── plays:
-
-   ├── music
-
-   └── sfx
-
-   UIManager
-
-   │
-
-   ├── loads:
-
-   │ └── configs/ui.json
-
-   │
-
-   └── controls:
-
-   ├── HUD
-
-   ├── popups
-
-   └── screens/
-
-   AnimationManager
-
-   │
-
-   ├── uses:
-
-   │ └── scripts/animation/*
-
-   │
-
-   └── dispatches to:
-
-   ├── TileAnimator
-
-   ├── BoardAnimator
-
-   ├── UIAnimator
-
-   └── StoryAnimator
-
-4. BOARD SYSTEM (PURE GAMEPLAY ENGINE)
-
-   BoardManager
-
-   │
-
-   └── owns:
-
-   Board.gd
-
-   │
-
-   ├── BoardGenerator
-
-   ├── MoveValidator
-
-   ├── MatchFinder
-
-   ├── GravitySolver
-
-   ├── RefillSystem
-
-   ├── CascadeProcessor
-
-   ├── BoardShuffler
-
-   └── BoardAnimator
-
-
-
-✔ ONLY BoardManager coordinates gameplay
-
-✔ Board.gd is internal coordinator only
-
-
-
-5. TILE SYSTEM (ATOMIC GAME OBJECT LAYER)
-
-   BoardManager
-
-   │
-
-   └── uses:
-
-   TileFactory
-
-   │
-
-   └── creates:
-
-   Tile.gd
-
-   │
-
-   ├── TileState
-
-   ├── TileAnimator
-
-   └── TileDatabase
-
-   External dependencies:
-
-   TileDatabase
-
-   └── loads:
-
-   configs/tiles.json
-
-   TileFactory
-
-   └── uses:
-
-   ResourceManager (textures, assets)
-
-6. CONFIG SYSTEM (DATA SOURCE ONLY)
-
-   ConfigLoader
-
-   │
-
-   └── loads:
-
-   configs/\*.json
-
-   ├── game.json
-
-   ├── levels.json
-
-   ├── tiles.json
-
-   ├── economy.json
-
-   ├── story.json
-
-   └── others
-
-
-
-✔ No gameplay logic
-
-✔ No runtime state
-
-
-
-7. RESOURCE SYSTEM (ASSET SOURCE ONLY)
-
-   ResourceManager
-
-   │
-
-   └── loads:
-
-   resources/
-
-   ├── tiles/
-
-   ├── powerups/
-
-   └── obstacles/
-
-
-
-Used by:
-
-
-
-TileFactory
-
-UIManager
-
-Animation systems 8. ANIMATION FRAMEWORK (GENERIC LAYER)
-
-AnimationManager
-
-│
-
-└── uses:
-
-scripts/animation/
-
-├── AnimationQueue
-
-├── AnimationSequence
-
-├── AnimationRequest
-
-├── TweenHelper
-
-└── AnimationLibrary
-
-
-
-Then dispatches to:
-
-
-
-Subsystem Animators:
-
-├── TileAnimator
-
-├── BoardAnimator
-
-├── UIAnimator
-
-└── StoryAnimator
-
-🔥 FINAL CORRECT LIFECYCLE (ABSOLUTE TRUTH)
-
-Boot.gd
-
-↓
-
-Utilities initialize
-
-↓
-
-ConfigLoader.reload()
-
-↓
-
-Load Game.tscn
-
-↓
-
-GameManager initializes system state
-
-↓
-
-LevelManager loads level
-
-↓
-
-BoardManager creates board
-
-↓
-
-TileFactory spawns tiles
-
-↓
-
-Board system runs gameplay loop
-
-↓
-
-AnimationManager handles visuals
-
-↓
-
-UI / Audio / Story react via signals
-
-🧠 IMPORTANT FIX SUMMARY
-
-
-
-What was corrected:
-
-
-
-❌ Boot does NOT coordinate managers
-
-❌ Boot does NOT participate in gameplay flow
-
-❌ Managers are NOT initialized by Boot
-
-✔ Boot ONLY loads scene + utilities
-
-✔ Game scene is the real runtime root
-
-✔ Managers self-initialize inside Game scene
-
-✔ BoardManager is the ONLY gameplay coordinator for board system
-
-
-
----
-
-
-
-The correct execution flow (NO ambiguity version)
-
-
-
-This is the real chain:
-
-
-
-Boot.gd
-
-↓
-
-Initialize utilities (services)
-
-↓
-
-ResourceManager loads Game.tscn
-
-↓
-
-Instantiate Game.tscn
-
-↓
-
-Add Game.tscn to scene tree
-
-↓
-
-GameManager becomes active (via \_ready)
-
-↓
-
-GameManager initializes gameplay systems
-
-↓
-
-Game loop begins
-
-
-
----
-
-
-
-Who initializes what?
-
-
-
-This is the most important clarity point.
-
-
-
-Step-by-step:
-
-
-
-1. Boot runs
-
-
-
-It initializes services:
-
-
-
-ConfigLoader
-
-ResourceManager
-
-etc.
-
-
-
-No gameplay exists yet.
-
-
-
-2. Boot loads Game.tscn via ResourceManager
-
-   var packed_scene = ResourceManager.load_scene(...)
-
-
-
-So ResourceManager is just a tool here.
-
-
-
-3. Game.tscn is added to scene tree
-
-
-
-Now everything inside Game.tscn wakes up.
-
-
-
-Godot automatically calls:
-
-
-
-\_ready() on all nodes 4. GameManager activates
-
-
-
-Now GameManager runs:
-
-
-
-initializes itself
-
-then starts LevelManager, BoardManager, etc.
-
-
-
-THIS is the real “game start moment”
-
-_____________________________________________________________________
+___________________________________________________________________________
 
 
 
@@ -910,11 +284,25 @@ Internal
 
 3. LevelManager.gd
 
-   Purpose
+
+
+Purpose
 
 
 
-Loads levels and controls level progression.
+Loads the requested level JSON file from the levels/ folder and controls level progression.
+
+
+
+Each level is stored in its own JSON file using the frozen Level JSON schema.
+
+
+
+LevelManager is responsible for locating, loading, validating, and exposing the currently loaded level data.
+
+
+
+LevelManager never contains hardcoded level content and never assumes gameplay, story, tutorial, or reward behavior beyond the data defined in the loaded level file.
 
 
 
@@ -1130,7 +518,7 @@ Internal
 
 \_current_story
 
-
+_current_scene
 
 \_current_dialogue
 
@@ -1208,99 +596,89 @@ unmute()
 
 Internal
 
-\_music_player
+
+
+_music_player
 
 
 
-\_sfx_players
+_sfx_players
 
 
 
-7. SaveManager.gd
+_audio_config
 
+
+
+_master_volume
+
+
+
+_music_volume
+
+
+
+_sfx_volume
+
+
+
+_muted
+
+
+
+_is_initialized
+
+
+
+7.SaveManager.gd
    Purpose
-
-
 
 Owns all player save data.
 
-
-
 Public Signals
-
 save_requested
-
-
 
 save_completed
 
-
-
 save_failed
-
-
 
 load_requested
 
-
-
 load_completed
 
-
-
 load_failed
-
 Public API
-
 initialize()
-
-
 
 new_game()
 
-
-
 save_game()
-
-
 
 load_game()
 
-
-
 auto_save()
-
-
 
 delete_save()
 
-
-
 save_exists()
-
-
 
 export_save(path)
 
-
-
 import_save(path)
-
-
 
 get_save_data()
 
-
-
 set_save_data(data)
-
 Internal
-
 \_save_data
 
-
-
 \_save_path
+
+_serializer
+_save_file
+_validator
+_migrator
+_autosave_scheduler
 
 
 
@@ -1596,201 +974,95 @@ Managers should not contain hardcoded level, story, reward, or configuration dat
 
 This API map defines the complete public surface of the scripts/managers/ folder for Version 1. Subsequent folder APIs (board, economy, story, save, animation, UI, etc.) should be designed to work under these managers without requiring changes to the manager interfaces.
 
-_____________________________________
+______________________________________________
 
 
 
-resources/
+scripts/save/
 
-Resources System API Map (Version 1.0 Freeze)
-
-
-
-The resources/ folder contains reusable Godot Resource (.tres) assets used throughout the project.
-
-
-
-Resources are data assets only.
-
-
-
-Resources contain no executable code.
-
-
-
-Resources contain no gameplay logic.
-
-
-
-Resources contain no runtime state.
-
-
-
-Resources are loaded only through ResourceManager.gd.
-
-
-
-Configuration files may reference resource paths but never load resources directly.
-
-
-
-Folder Structure
-
-resources/
-
-
-
-├── tiles/
-
-│   ├── key.tres
-
-│   ├── phone.tres
-
-│   ├── fingerprint.tres
-
-│   ├── recorder.tres
-
-│   ├── clock.tres
-
-│   ├── opened_door.tres
-
-│   └── ...
-
-│
-
-├── powerups/
-
-│   ├── rocket.tres
-
-│   ├── bomb.tres
-
-│   └── thunder.tres
-
-│
-
-└── obstacles/
-
-    ├── chain.tres
-
-    ├── lock.tres
-
-    ├── tape.tres
-
-    ├── missile.tres
-
-    ├── bomb.tres
-
-    └── electric_trap.tres
-
-resources/tiles/
+Save System API Map (Version 1.0 Freeze)
 
 Purpose
 
 
 
-Stores reusable tile resources.
+The Save System provides the specialized implementation used by SaveManager to persist player progress.
 
 
 
-Each tile resource may contain asset references such as:
+It is responsible only for save data representation, serialization, validation, migration, and file storage.
 
 
 
-Texture
-
-Icon
-
-Material
-
-Shader
-
-Particle Resources
-
-Animation Resources
+It never coordinates gameplay.
 
 
 
-Tile resources contain no gameplay values.
+It never coordinates saving or loading.
 
 
 
-Gameplay configuration belongs in configs/tiles.json.
+It never decides when saving occurs.
 
 
 
-resources/powerups/
-
-Purpose
+Those responsibilities belong exclusively to SaveManager.
 
 
 
-Stores reusable powerup resources.
+Configuration comes from ConfigLoader.
 
 
 
-Each powerup resource may contain:
+File operations may use FileHelper.
 
 
 
-Texture
-
-Icon
-
-Material
-
-Shader
-
-Particle Resources
-
-Animation Resources
+Time calculations may use TimeHelper.
 
 
 
-Powerup behavior is defined by the Powerup System and configuration files.
+Communication occurs through SignalBus.
 
 
 
-resources/obstacles/
+This folder is fully aligned with the frozen Manager API and Utilities API.
+
+
+
+1. SaveData.gd
 
 Purpose
 
 
 
-Stores reusable obstacle resources.
+Represents one complete save.
 
 
 
-Each obstacle resource may contain:
+Contains persistent player data only.
 
 
 
-Texture
-
-Icon
-
-Material
-
-Shader
-
-Particle Resources
-
-Animation Resources
+Contains no gameplay logic.
 
 
 
-Obstacle gameplay is defined by the Obstacle System and configuration files.
+Contains no file logic.
 
 
 
-ResourceManager Integration
+Contains no serialization logic.
 
 
 
-All resources are loaded through ResourceManager.gd.
+Contains no validation logic.
 
 
 
 Public API
+
+Initialization
 
 
 
@@ -1798,23 +1070,31 @@ initialize()
 
 
 
-load_resource(path)
+reset()
 
 
 
-reload_resource(path)
+duplicate_data() -> SaveData
 
 
 
-unload_resource(path)
+Save Data
 
 
 
-has(path)
+set_value(key, value)
 
 
 
-get(path)
+get_value(key)
+
+
+
+has_value(key) -> bool
+
+
+
+remove_value(key)
 
 
 
@@ -1822,79 +1102,505 @@ clear()
 
 
 
-clear_unused()
+Sections
 
-Frozen Dependency Graph
 
-configs/*.json
 
-       │
+set_section(name, data)
 
-       ▼
 
- ConfigLoader
 
-       │
+get_section(name)
 
-       ▼
 
- Gameplay Subsystems
 
-       │
+has_section(name) -> bool
 
-       ▼
 
- ResourceManager
 
-       │
+remove_section(name)
 
-       ▼
 
- resources/
 
- ├── tiles/
+Metadata
 
- ├── powerups/
 
- └── obstacles/
 
-Responsibilities
+set_save_version(version)
 
-Folder	Responsibility
 
-resources/tiles	Stores reusable tile assets
 
-resources/powerups	Stores reusable powerup assets
+get_save_version()
 
-resources/obstacles	Stores reusable obstacle assets
 
-ResourceManager	Loads, caches, reloads and unloads resources
+
+set_timestamp(timestamp)
+
+
+
+get_timestamp()
+
+
+
+Internal
+
+
+
+_data
+
+
+
+_version
+
+
+
+_timestamp
+
+
+
+2. SaveSerializer.gd
+
+Purpose
+
+
+
+Converts SaveData between runtime objects and serialized data.
+
+
+
+Contains no gameplay logic.
+
+
+
+Contains no file operations.
+
+
+
+Public API
+
+Initialization
+
+
+
+initialize()
+
+
+
+Serialization
+
+
+
+serialize(save_data) -> Dictionary
+
+
+
+deserialize(data) -> SaveData
+
+
+
+Conversion
+
+
+
+to_json(save_data)
+
+
+
+from_json(json_text)
+
+
+
+Internal
+
+
+
+_convert_to_dictionary()
+
+
+
+_convert_from_dictionary()
+
+
+
+3. SaveFile.gd
+
+Purpose
+
+
+
+Performs physical save-file operations.
+
+
+
+Contains no gameplay logic.
+
+
+
+Contains no serialization logic.
+
+
+
+Contains no save coordination.
+
+
+
+Public API
+
+Initialization
+
+
+
+initialize()
+
+
+
+File Operations
+
+
+
+read(path)
+
+
+
+write(path, data)
+
+
+
+delete(path)
+
+
+
+exists(path)
+
+
+
+copy(source, destination)
+
+
+
+rename(path, new_name)
+
+
+
+Backup
+
+
+
+create_backup(path)
+
+
+
+restore_backup(path)
+
+
+
+Internal
+
+
+
+_open_file()
+
+
+
+_close_file()
+
+
+
+4. SaveValidator.gd
+
+Purpose
+
+
+
+Validates save data before loading.
+
+
+
+Contains no gameplay logic.
+
+
+
+Contains no migration logic.
+
+
+
+Public API
+
+Initialization
+
+
+
+initialize()
+
+
+
+Validation
+
+
+
+validate(save_data) -> bool
+
+
+
+validate_version(save_data) -> bool
+
+
+
+validate_sections(save_data) -> bool
+
+
+
+validate_required_fields(save_data) -> bool
+
+
+
+get_validation_errors() -> Array
+
+
+
+Internal
+
+
+
+_errors
+
+
+
+5. SaveMigrator.gd
+
+Purpose
+
+
+
+Migrates older save formats to the current version.
+
+
+
+Contains no gameplay logic.
+
+
+
+Contains no file operations.
+
+
+
+Public API
+
+Initialization
+
+
+
+initialize()
+
+
+
+Migration
+
+
+
+can_migrate(version) -> bool
+
+
+
+migrate(save_data) -> SaveData
+
+
+
+get_supported_versions()
+
+
+
+get_current_version()
+
+
+
+Internal
+
+
+
+_apply_migration()
+
+
+
+6. AutosaveScheduler.gd
+
+Purpose
+
+
+
+Provides autosave timing services.
+
+
+
+It never performs saving.
+
+
+
+It never writes files.
+
+
+
+It only determines when an autosave should be requested.
+
+
+
+SaveManager decides whether to save.
+
+
+
+Public API
+
+Initialization
+
+
+
+initialize()
+
+
+
+Control
+
+
+
+start()
+
+
+
+stop()
+
+
+
+pause()
+
+
+
+resume()
+
+
+
+Timing
+
+
+
+set_interval(seconds)
+
+
+
+get_interval()
+
+
+
+update(delta)
+
+
+
+is_time_to_autosave() -> bool
+
+
+
+reset_timer()
+
+
+
+Internal
+
+
+
+_interval
+
+
+
+_elapsed_time
+
+
+
+_running
+
+
+
+_paused
+
+
+
+Frozen Save System Dependency
+
+                 SaveManager
+
+                      │
+
+      ┌───────────────┼───────────────┐
+
+      ▼               ▼               ▼
+
+ SaveSerializer   SaveValidator   AutosaveScheduler
+
+      │               │
+
+      ▼               ▼
+
+   SaveData      SaveMigrator
+
+      │
+
+      ▼
+
+   SaveFile
 
 Version 1 Rules
 
-Resources contain reusable Godot assets only.
 
-Resources contain no executable code.
 
-Resources contain no gameplay logic.
-
-Resources contain no runtime state.
-
-Resources are loaded exclusively through ResourceManager.
-
-Configuration files may reference resource paths but never load resources directly.
-
-Gameplay configuration belongs in the configs/ folder.
-
-Runtime state belongs to gameplay objects (Tile, Powerup, Obstacle).
-
-Managers and gameplay systems never load resources directly; they access them through ResourceManager.
+The Save System provides the implementation used by SaveManager.
 
 
 
-This API freezes the resources/ folder for Version 1.
+SaveManager is the only class that coordinates saving and loading.
 
-_____________________________________________
+
+
+SaveData represents persistent data only.
+
+
+
+SaveSerializer converts between runtime objects and serialized formats.
+
+
+
+SaveFile performs only physical file operations.
+
+
+
+SaveValidator validates save data before loading.
+
+
+
+SaveMigrator upgrades older save formats to the current save version.
+
+
+
+AutosaveScheduler determines when an autosave should be requested but never performs the save itself.
+
+
+
+The Save System contains no gameplay logic.
+
+
+
+The Save System contains no gameplay coordination.
+
+
+
+The Save System never decides rewards, progression, story, levels, objectives, or economy.
+
+
+
+The Save System may depend on FileHelper, JsonLoader, TimeHelper, Version, Constants, and SignalBus from scripts/utilities/.
+
+
+
+The Save System must not depend directly on gameplay managers. It is coordinated exclusively through SaveManager.
+
+_____________________________________________________________________
 
 
 
@@ -3070,3709 +2776,1556 @@ DebugLogger is the project's central logging service.
 
 Version stores only version metadata.
 
-__________________________________________________________________________
+_______________________________________________________
 
 
 
-What does this statement mean to you?
-
-
-
-"Memory rule (copy this if you want to store it)
-
-
-
-Always classify every API map element into one of three layers before deciding placement:
-
-
-
-ENGINE LAYER (Constants.gd / Utilities)
-
-structural definitions only
-
-scene paths, config paths, node groups, physics layers
-
-enums that define system contracts
-
-NO gameplay or balancing values
-
-DATA LAYER (configs/\*.json)
-
-all gameplay tuning values
-
-economy, levels, difficulty, grid sizes, lives, rewards
-
-single source of truth for balancing
-
-RUNTIME LAYER (Managers / Scenes)
-
-execution and coordination only
-
-no ownership of static configuration
-
-
-
-If a value appears in configs/\*.json, it MUST NOT exist in Constants.gd.
-
-Conflicts are resolved in favor of CONFIGS ALWAYS.
-
-"
-
-___________________________________
-
-
-
-configs/
-
-Configuration System API Map (Version 1.0 Freeze)
-
-
-
-The Config System is the single source of static game data.
-
-
-
-Configuration files contain no executable code.
-
-
-
-Configuration files contain no gameplay flow.
-
-
-
-Configuration files are read through ConfigLoader.
-
-
-
-Managers never hardcode gameplay values.
-
-
-
-Subsystems obtain configuration data from their corresponding configuration files.
-
-
-
-Configuration files may reference resources but never load them directly.
-
-
-
-Folder Structure
-
-configs/
-
-
-
-game.json
-
-levels.json
-
-tiles.json
-
-powerups.json
-
-obstacles.json
-
-objectives.json
-
-rewards.json
-
-economy.json
-
-story.json
-
-audio.json
-
-ui.json
-
-animation.json
-
-board.json
-
-effects.json
-
-localization.json
-
-debug.json
-
-1. game.json
-
-Purpose
-
-
-
-Stores global game configuration.
-
-
-
-No gameplay progression.
-
-
-
-Contains
-
-
-
-Game Information
-
-
-
-game_name
-
-version
-
-save_version
-
-build_number
-
-
-
-Display
-
-
-
-target_fps
-
-target_physics_fps
-
-
-
-Gameplay Limits
-
-
-
-max_levels
-
-max_lives
-
-max_moves
-
-minimum_match
-
-
-
-General Settings
-
-
-
-autosave_enabled
-
-vibration_enabled
-
-tutorial_enabled
-
-2. levels.json
-
-Purpose
-
-
-
-Contains every playable level.
-
-
-
-Loaded by LevelManager.
-
-
-
-Contains
-
-
-
-Per Level
-
-
-
-level_id
-
-board_layout
-
-width
-
-height
-
-difficulty
-
-available_tiles
-
-available_obstacles
-
-objectives
-
-move_limit
-
-score_targets
-
-rewards
-
-story_before
-
-story_after
-
-background
-
-music
-
-3. tiles.json
-
-Purpose
-
-
-
-Defines every tile type.
-
-
-
-Loaded only by TileDatabase.
-
-
-
-Contains
-
-
-
-Per Tile
-
-
-
-id
-
-enum
-
-name
-
-texture
-
-icon
-
-animation_set
-
-score
-
-spawn_weight
-
-matchable
-
-spawnable
-
-hidden
-
-special
-
-4. powerups.json
-
-Purpose
-
-
-
-Defines every powerup.
-
-
-
-Loaded by the Powerup subsystem.
-
-
-
-Contains
-
-
-
-Per Powerup
-
-
-
-id
-
-enum
-
-name
-
-icon
-
-texture
-
-animation_set
-
-activation_type
-
-combination_rules
-
-description
-
-5. obstacles.json
-
-Purpose
-
-
-
-Defines every obstacle.
-
-
-
-Loaded by the Obstacle subsystem.
-
-
-
-Contains
-
-
-
-Per Obstacle
-
-
-
-id
-
-enum
-
-name
-
-texture
-
-animation_set
-
-health
-
-destroy_score
-
-blocks_gravity
-
-blocks_matching
-
-removable
-
-description
-
-6. objectives.json
-
-Purpose
-
-
-
-Defines every objective type.
-
-
-
-Loaded by BoardManager and LevelManager.
-
-
-
-Contains
-
-
-
-Per Objective
-
-
-
-id
-
-enum
-
-description
-
-target_type
-
-completion_condition
-
-icon
-
-7. rewards.json
-
-Purpose
-
-
-
-Defines reward tables.
-
-
-
-Loaded by RewardManager.
-
-
-
-Contains
-
-
-
-Level Rewards
-
-
-
-Star Rewards
-
-
-
-Daily Rewards
-
-
-
-Chest Rewards
-
-
-
-Story Rewards
-
-
-
-Bonus Rewards
-
-
-
-Random Reward Pools
-
-
-
-8. economy.json
-
-Purpose
-
-
-
-Defines economy balancing.
-
-
-
-Loaded by EconomyManager.
-
-
-
-Contains
-
-
-
-Coins
-
-
-
-Lives
-
-
-
-Boosters
-
-
-
-Stars
-
-
-
-Shop Prices
-
-
-
-Life Regen
-
-
-
-Unlimited Lives
-
-
-
-Starting Resources
-
-
-
-Maximum Resources
-
-
-
-9. story.json
-
-Purpose
-
-
-
-Defines story metadata.
-
-
-
-Dialogue text belongs inside the stories/ folder.
-
-
-
-Contains
-
-
-
-Story List
-
-
-
-Character References
-
-
-
-Unlock Conditions
-
-
-
-Dialogue File References
-
-
-
-Story Order
-
-
-
-10. audio.json
-
-Purpose
-
-
-
-Defines audio metadata.
-
-
-
-Loaded by AudioManager.
-
-
-
-Contains
-
-
-
-Music
-
-
-
-SFX
-
-
-
-Volume Defaults
-
-
-
-Audio Bus Mapping
-
-
-
-Loop Settings
-
-
-
-11. ui.json
-
-Purpose
-
-
-
-Defines UI configuration.
-
-
-
-Loaded by UIManager.
-
-
-
-Contains
-
-
-
-HUD
-
-
-
-Fonts
-
-
-
-Themes
-
-
-
-Popup Definitions
-
-
-
-Notification Timing
-
-
-
-UI Scaling
-
-
-
-12. animation.json
-
-Purpose
-
-
-
-Defines animation metadata.
-
-
-
-Loaded by AnimationManager.
-
-
-
-Contains
-
-
-
-Animation Names
-
-
-
-Animation Durations
-
-
-
-Default Tweens
-
-
-
-Transition Settings
-
-
-
-Animation Sets
-
-
-
-13. board.json
-
-Purpose
-
-
-
-Defines board generation rules.
-
-
-
-Loaded by BoardManager.
-
-
-
-Contains
-
-
-
-Gravity Direction
-
-
-
-Spawn Direction
-
-
-
-Cascade Delay
-
-
-
-Swap Duration
-
-
-
-Shuffle Rules
-
-
-
-Refill Delay
-
-
-
-Board Padding
-
-
-
-14. effects.json
-
-Purpose
-
-
-
-Defines visual effects metadata.
-
-
-
-Loaded by AnimationManager.
-
-
-
-Contains
-
-
-
-Particles
-
-
-
-Screen Shake
-
-
-
-Flash Effects
-
-
-
-Explosion Effects
-
-
-
-Spawn Effects
-
-
-
-Destroy Effects
-
-
-
-15. localization.json
-
-Purpose
-
-
-
-Defines supported languages.
-
-
-
-Contains
-
-
-
-Languages
-
-
-
-Translation Files
-
-
-
-Default Language
-
-
-
-Font Overrides
-
-
-
-RTL Support
-
-
-
-16. debug.json
-
-Purpose
-
-
-
-Defines debug configuration.
-
-
-
-Loaded only in development builds.
-
-
-
-Contains
-
-
-
-Debug Flags
-
-
-
-Logging Options
-
-
-
-Developer Settings
-
-
-
-Performance Options
-
-
-
-Testing Options
-
-
-
-Frozen Configuration Dependencies
-
-                  ConfigLoader
-
-                        │
-
-      ┌─────────────────┼─────────────────┐
-
-      ▼                 ▼                 ▼
-
-   game.json      levels.json       board.json
-
-      │                 │                 │
-
-      ▼                 ▼                 ▼
-
- GameManager      LevelManager     BoardManager
-
-
-
-      ▼
-
- tiles.json
-
-      │
-
-      ▼
-
- TileDatabase
-
-
-
-      ▼
-
- powerups.json
-
-      │
-
-      ▼
-
- Powerup System
-
-
-
-      ▼
-
- obstacles.json
-
-      │
-
-      ▼
-
- Obstacle System
-
-
-
-      ▼
-
- objectives.json
-
-      │
-
-      ▼
-
- BoardManager
-
-
-
-      ▼
-
- rewards.json
-
-      │
-
-      ▼
-
- RewardManager
-
-
-
-      ▼
-
- economy.json
-
-      │
-
-      ▼
-
- EconomyManager
-
-
-
-      ▼
-
- story.json
-
-      │
-
-      ▼
-
- StoryManager
-
-
-
-      ▼
-
- audio.json
-
-      │
-
-      ▼
-
- AudioManager
-
-
-
-      ▼
-
- animation.json
-
-      │
-
-      ▼
-
- AnimationManager
-
-
-
-      ▼
-
- ui.json
-
-      │
-
-      ▼
-
- UIManager
-
-Version 1 Rules
-
-The configs/ folder is the only source of static gameplay configuration.
-
-Every configuration file is loaded through ConfigLoader.
-
-Managers and subsystems must not hardcode configurable gameplay values.
-
-Configuration files contain data only and never executable logic.
-
-tiles.json is the only source of tile metadata.
-
-levels.json is the only source of level definitions.
-
-powerups.json is the only source of powerup definitions.
-
-obstacles.json is the only source of obstacle definitions.
-
-rewards.json is the only source of reward tables.
-
-economy.json is the only source of economy balancing values.
-
-story.json contains story metadata only; dialogue content resides in the stories/ folder.
-
-Configuration files may reference assets, resources, and scenes by path but never load them directly.
-
-The Config System depends on no gameplay subsystem; gameplay subsystems depend on it through ConfigLoader.
-
-_________________________________
-
-
-
-Boot.gd
+FileHelper.gd
 
 extends Node
 
-
-
-var _game_scene: Node = null
-
-var _is_initialized: bool = false
+class_name FileHelper
 
 
 
+# =========================================================
+
+# PURPOSE
+
+# Low-level filesystem helper only.
+
+# No gameplay logic.
+
+# No state management.
+
+# No dependency on managers.
+
+# =========================================================
 
 
-func _ready() -> void:
-
-	initialize()
 
 
 
+# =========================================================
+
+# FILES
+
+# =========================================================
 
 
-func initialize() -> void:
 
-	if _is_initialized:
+func file_exists(path: String) -> bool:
+
+	return FileAccess.file_exists(path)
+
+
+
+
+
+func copy_file(source: String, destination: String) -> bool:
+
+	if not FileAccess.file_exists(source):
+
+		return false
+
+
+
+	var src_file := FileAccess.open(source, FileAccess.READ)
+
+	if src_file == null:
+
+		return false
+
+
+
+	var data := src_file.get_buffer(src_file.get_length())
+
+	src_file.close()
+
+
+
+	_ensure_directory(destination.get_base_dir())
+
+
+
+	var dst_file := FileAccess.open(destination, FileAccess.WRITE)
+
+	if dst_file == null:
+
+		return false
+
+
+
+	dst_file.store_buffer(data)
+
+	dst_file.close()
+
+
+
+	return true
+
+
+
+
+
+func move_file(source: String, destination: String) -> bool:
+
+	if not copy_file(source, destination):
+
+		return false
+
+
+
+	return delete_file(source)
+
+
+
+
+
+func delete_file(path: String) -> bool:
+
+	if not FileAccess.file_exists(path):
+
+		return false
+
+
+
+	var dir := DirAccess.open(path.get_base_dir())
+
+	if dir == null:
+
+		return false
+
+
+
+	var file_name := path.get_file()
+
+	return dir.remove(file_name) == OK
+
+
+
+
+
+func rename_file(path: String, new_name: String) -> bool:
+
+	if not FileAccess.file_exists(path):
+
+		return false
+
+
+
+	var dir_path := path.get_base_dir()
+
+	var old_name := path.get_file()
+
+	var new_path := dir_path.path_join(new_name)
+
+
+
+	var dir := DirAccess.open(dir_path)
+
+	if dir == null:
+
+		return false
+
+
+
+	return dir.rename(old_name, new_name) == OK
+
+
+
+
+
+func get_file_size(path: String) -> int:
+
+	if not FileAccess.file_exists(path):
+
+		return -1
+
+
+
+	var file := FileAccess.open(path, FileAccess.READ)
+
+	if file == null:
+
+		return -1
+
+
+
+	var size := file.get_length()
+
+	file.close()
+
+
+
+	return size
+
+
+
+
+
+# =========================================================
+
+# DIRECTORIES
+
+# =========================================================
+
+
+
+func directory_exists(path: String) -> bool:
+
+	return DirAccess.dir_exists_absolute(path)
+
+
+
+
+
+func create_directory(path: String) -> bool:
+
+	var dir := DirAccess.open("user://")
+
+	if dir == null:
+
+		return false
+
+
+
+	return dir.make_dir_recursive(path) == OK
+
+
+
+
+
+func delete_directory(path: String) -> bool:
+
+	if not DirAccess.dir_exists_absolute(path):
+
+		return false
+
+
+
+	var dir := DirAccess.open(path)
+
+	if dir == null:
+
+		return false
+
+
+
+	dir.list_dir_begin()
+
+	var file_name := dir.get_next()
+
+
+
+	while file_name != "":
+
+		if file_name != "." and file_name != "..":
+
+			var full_path := path.path_join(file_name)
+
+
+
+			if dir.current_is_dir():
+
+				delete_directory(full_path)
+
+			else:
+
+				dir.remove(file_name)
+
+
+
+		file_name = dir.get_next()
+
+
+
+	dir.list_dir_end()
+
+
+
+	# finally remove empty directory
+
+	var parent := DirAccess.open(path.get_base_dir())
+
+	if parent == null:
+
+		return false
+
+
+
+	return parent.remove(path.get_file()) == OK
+
+
+
+
+
+func list_files(path: String) -> Array:
+
+	var result: Array = []
+
+
+
+	var dir := DirAccess.open(path)
+
+	if dir == null:
+
+		return result
+
+
+
+	dir.list_dir_begin()
+
+	var file_name := dir.get_next()
+
+
+
+	while file_name != "":
+
+		if not dir.current_is_dir() and file_name != "." and file_name != "..":
+
+			result.append(file_name)
+
+
+
+		file_name = dir.get_next()
+
+
+
+	dir.list_dir_end()
+
+
+
+	return result
+
+
+
+
+
+func list_directories(path: String) -> Array:
+
+	var result: Array = []
+
+
+
+	var dir := DirAccess.open(path)
+
+	if dir == null:
+
+		return result
+
+
+
+	dir.list_dir_begin()
+
+	var file_name := dir.get_next()
+
+
+
+	while file_name != "":
+
+		if dir.current_is_dir() and file_name != "." and file_name != "..":
+
+			result.append(file_name)
+
+
+
+		file_name = dir.get_next()
+
+
+
+	dir.list_dir_end()
+
+
+
+	return result
+
+
+
+
+
+# =========================================================
+
+# INTERNAL HELPERS
+
+# =========================================================
+
+
+
+func _ensure_directory(path: String) -> void:
+
+	var dir_path := path.get_base_dir()
+
+
+
+	if dir_path == "":
 
 		return
 
 
 
-	_is_initialized = true
+	var dir := DirAccess.open("user://")
 
+	if dir != null:
 
+		dir.make_dir_recursive(dir_path)
 
-	initialize_utilities()
+_______________________________________________
 
-	load_configuration()
 
-	create_game_scene()
 
-	finish_boot()
+ JsonLoader.gd
 
+extends Node
 
+class_name JsonLoader
 
 
 
-func initialize_utilities() -> void:
+# =========================================================
 
-	DebugLogger.initialize()
+# PURPOSE
 
-	RandomGenerator.initialize()
+# Generic JSON serialization utility.
 
-	ConfigLoader.initialize()
+# No gameplay logic.
 
-	ResourceManager.initialize()
+# No coordination responsibility.
 
-	JsonLoader.initialize()
+# =========================================================
 
 
 
+# Optional internal reuse of parsed data (safe cache)
 
+var _cache: Dictionary = {}
 
-func load_configuration() -> void:
 
-	ConfigLoader.reload()
 
+# =========================================================
 
+# INITIALIZATION
 
+# =========================================================
 
+func initialize() -> void:
 
-func create_game_scene() -> void:
+	_cache.clear()
 
-	var packed_scene = ResourceManager.load_scene(Constants.ScenePaths.GAME)
 
-	_game_scene = packed_scene.instantiate()
 
-	get_tree().root.add_child(_game_scene)
+# =========================================================
 
+# LOADING
 
+# =========================================================
 
 
 
-func finish_boot() -> void:
+func load_file(path: String) -> Dictionary:
 
-	queue_free()
-______________________________________________________________
+	if _cache.has(path):
 
+		return _cache[path]
 
-scripts/tiles/
-Tile System API Map (Version 1.0 Freeze)
 
-The Tile System defines everything about an individual tile.
 
-It is responsible only for tile data, tile visuals, tile creation, tile animation, and tile metadata.
+	if not file_exists(path):
 
-It never performs gameplay coordination.
+		DebugLogger.error("JsonLoader: File not found -> " + path)
 
-Gameplay flow belongs to BoardManager.
+		return {}
 
-Animation scheduling belongs to AnimationManager.
 
-Tile creation requests come from BoardManager.
 
-Configuration comes from ConfigLoader.
+	var file := FileAccess.open(path, FileAccess.READ)
 
-Resources come from ResourceManager.
+	if file == null:
 
-Communication occurs through SignalBus.
+		DebugLogger.error("JsonLoader: Cannot open file -> " + path)
 
-This folder is therefore fully aligned with the Manager API and Utilities API.
+		return {}
 
-1. TileState.gd
-Purpose
 
-Stores every piece of gameplay state belonging to one tile.
 
-Contains no visual logic.
+	var content := file.get_as_text()
 
-Contains no animation logic.
+	file.close()
 
-Contains no board logic.
 
-Public API
-Initialization
 
-initialize(tile_type, grid_position)
+	var result = JSON.parse_string(content)
 
-reset()
 
-duplicate_state() -> TileState
 
-Identity
+	if typeof(result) != TYPE_DICTIONARY:
 
-set_tile_type(type)
+		DebugLogger.error("JsonLoader: Invalid JSON dictionary -> " + path)
 
-get_tile_type() -> Constants.TileType
+		return {}
 
-Grid
 
-set_position(position)
 
-get_position() -> Vector2i
+	_cache[path] = result
 
-State
+	return result
 
-set_state(state)
 
-get_state() -> Constants.TileState
 
-is_state(state) -> bool
 
-Powerup
 
-set_powerup(type)
+func load_array(path: String) -> Array:
 
-get_powerup() -> Constants.PowerupType
+	if _cache.has(path):
 
-has_powerup() -> bool
+		return _cache[path]
 
-clear_powerup()
 
-Obstacle
 
-set_obstacle(type)
+	if not file_exists(path):
 
-get_obstacle() -> Constants.ObstacleType
+		DebugLogger.error("JsonLoader: File not found -> " + path)
 
-has_obstacle() -> bool
+		return []
 
-clear_obstacle()
 
-Health
 
-set_health(value)
+	var file := FileAccess.open(path, FileAccess.READ)
 
-get_health() -> int
+	if file == null:
 
-damage(amount)
+		DebugLogger.error("JsonLoader: Cannot open file -> " + path)
 
-heal(amount)
+		return []
 
-is_destroyed() -> bool
 
-Flags
 
-set_selected(value)
+	var content := file.get_as_text()
 
-is_selected() -> bool
+	file.close()
 
-set_matched(value)
 
-is_matched() -> bool
 
-set_falling(value)
+	var result = JSON.parse_string(content)
 
-is_falling() -> bool
 
-set_locked(value)
 
-is_locked() -> bool
+	if typeof(result) != TYPE_ARRAY:
 
-set_hidden(value)
+		DebugLogger.error("JsonLoader: Invalid JSON array -> " + path)
 
-is_hidden() -> bool
+		return []
 
-reset_flags()
 
-Internal
 
-_tile_type
+	_cache[path] = result
 
-_grid_position
+	return result
 
-_state
 
-_powerup
 
-_obstacle
+# =========================================================
 
-_health
+# SAVING
 
-_selected
+# =========================================================
 
-_matched
 
-_falling
 
-_locked
+func save_file(path: String, data) -> bool:
 
-_hidden
+	var file := FileAccess.open(path, FileAccess.WRITE)
 
-2. Tile.gd
-Purpose
+	if file == null:
 
-Represents one tile node inside the scene tree.
+		DebugLogger.error("JsonLoader: Cannot write file -> " + path)
 
-Responsible only for:
+		return false
 
-visual representation
-input forwarding
-holding a TileState
-requesting animations
-exposing tile information
 
-Never performs gameplay decisions.
 
-Never performs matching.
+	var json_string := JSON.stringify(data)
 
-Never performs gravity.
+	file.store_string(json_string)
 
-Never performs objectives.
+	file.close()
 
-Never performs scoring.
 
-Signals
 
-pressed(tile)
+	_cache[path] = data
 
-released(tile)
+	return true
 
-clicked(tile)
 
-hover_entered(tile)
 
-hover_exited(tile)
+# =========================================================
 
-Public API
-Initialization
+# VALIDATION
 
-initialize(tile_type, grid_position)
+# =========================================================
 
-reset()
 
-Tile State
 
-get_tile_state() -> TileState
+func file_exists(path: String) -> bool:
 
-set_tile_state(state)
+	return FileHelper.file_exists(path)
 
-duplicate_tile_state() -> TileState
 
-Grid
 
-set_grid_position(position)
 
-get_grid_position() -> Vector2i
 
-move_to_grid(position)
+func validate_json(path: String) -> bool:
 
-Tile Type
+	if not file_exists(path):
 
-set_tile_type(type)
+		return false
 
-get_tile_type() -> Constants.TileType
 
-State
 
-set_state(state)
+	var file := FileAccess.open(path, FileAccess.READ)
 
-get_state()
+	if file == null:
 
-is_idle()
+		return false
 
-Selection
 
-select()
 
-deselect()
+	var content := file.get_as_text()
 
-is_selected()
+	file.close()
 
-Match
 
-mark_matched()
 
-clear_match()
+	var result = JSON.parse_string(content)
 
-is_matched()
 
-Falling
 
-begin_fall()
+	if result == null:
 
-end_fall()
+		return false
 
-is_falling()
 
-Lock
 
-lock()
+	# Valid JSON (either dictionary or array is acceptable)
 
-unlock()
+	if typeof(result) == TYPE_DICTIONARY or typeof(result) == TYPE_ARRAY:
 
-is_locked()
+		return true
 
-Powerups
 
-set_powerup(type)
 
-get_powerup()
+	return false
 
-has_powerup()
+_________________________________________________________
 
-clear_powerup()
 
-Obstacles
 
-set_obstacle(type)
+ConfigLoader.gd
 
-get_obstacle()
+extends Node
 
-has_obstacle()
+class_name ConfigLoader
 
-clear_obstacle()
 
-Health
 
-damage(amount)
+# =========================================================
 
-heal(amount)
+# PURPOSE
 
-is_destroyed()
+# Loads and caches configuration files.
 
-Visual
+# Used by managers.
 
-set_texture(texture)
+# Never owns gameplay.
 
-get_texture()
+# =========================================================
 
-set_modulate(color)
 
-reset_modulate()
 
-show()
+var _cache: Dictionary = {}
 
-hide()
 
-set_visible(value)
 
-Animation
+# =========================================================
 
-request_animation(name)
+# INITIALIZATION
 
-is_animation_playing() -> bool
+# =========================================================
 
-Input
+func initialize() -> void:
 
-enable_input()
+	_cache.clear()
 
-disable_input()
 
-is_input_enabled() -> bool
 
-Internal
 
-_state
 
-_sprite
+# =========================================================
 
-_animation_player
+# CORE CONTROL
 
-_input_enabled
+# =========================================================
 
-3. TileDatabase.gd
-Purpose
 
-Loads every tile definition from
 
-configs/tiles.json
+func reload() -> void:
 
-Provides lookup services only.
+	_cache.clear()
 
-Contains no gameplay logic.
 
-Public API
-Initialization
 
-initialize()
 
-reload()
 
-clear()
+func clear_cache() -> void:
 
-Lookup
+	_cache.clear()
 
-get_tile(id)
 
-has_tile(id)
 
-get_tile_by_enum(type)
 
-get_tile_name(type)
 
-get_tile_texture_path(type)
+# =========================================================
 
-get_tile_icon_path(type)
+# LOADING
 
-get_tile_animation_set(type)
+# =========================================================
 
-get_tile_score(type)
 
-Collections
 
-get_all_tiles()
+func load(path: String) -> Dictionary:
 
-get_matchable_tiles()
+	if _cache.has(path):
 
-get_spawnable_tiles()
+		return _cache[path]
 
-get_special_tiles()
 
-get_hidden_tiles()
 
-Random
+	var data = JsonLoader.load_file(path)
 
-get_random_spawnable_tile()
 
-Validation
 
-is_matchable(type)
+	if typeof(data) != TYPE_DICTIONARY:
 
-is_spawnable(type)
+		DebugLogger.error("ConfigLoader: Invalid config format (expected Dictionary) -> " + path)
 
-is_special(type)
+		return {}
 
-is_hidden(type)
 
-Internal
 
-_tile_cache
+	_cache[path] = data
 
-4. TileFactory.gd
-Purpose
+	return data
 
-Creates and destroys Tile nodes.
 
-Never decides gameplay.
 
-Never decides tile placement.
 
-Never performs spawning logic.
 
-Those belong to BoardManager.
+func reload_file(path: String) -> Dictionary:
 
-Public API
-Initialization
+	_cache.erase(path)
 
-initialize()
+	return load(path)
 
-Creation
 
-create_tile(tile_type)
 
-create_tile_at(tile_type, grid_position)
 
-create_random_tile()
 
-create_random_tile_at(position)
+# =========================================================
 
-Copy
+# QUERY API
 
-duplicate_tile(tile)
+# =========================================================
 
-Lifecycle
 
-destroy_tile(tile)
 
-recycle_tile(tile)
+func has(path: String) -> bool:
 
-reset_tile(tile)
+	return _cache.has(path)
 
-Internal
 
-_apply_database_data(tile)
 
-_assign_texture(tile)
 
-_assign_animation_set(tile)
 
-_assign_metadata(tile)
+func get(path: String) -> Dictionary:
 
-5. TileAnimator.gd
-Purpose
+	if _cache.has(path):
 
-Owns every animation that affects an individual tile.
+		return _cache[path]
 
-AnimationManager decides when animations occur.
 
-TileAnimator performs how tile animations are played.
 
-Public API
-Initialization
+	return load(path)
 
-initialize()
 
-Basic
 
-play_idle(tile)
 
-play_spawn(tile)
 
-play_destroy(tile)
+func get_value(path: String, key: String, default = null):
 
-play_fall(tile)
+	var data = get(path)
 
-play_swap(tile_a, tile_b)
 
-play_move(tile, position)
 
-play_bounce(tile)
+	if typeof(data) != TYPE_DICTIONARY:
 
-play_shake(tile)
+		return default
 
-play_highlight(tile)
 
-Selection
 
-play_select(tile)
+	if data.has(key):
 
-play_deselect(tile)
+		return data[key]
 
-Powerups
 
-play_powerup_create(tile)
 
-play_powerup_activate(tile)
+	return default
 
-play_powerup_combo(tile)
 
-Obstacles
 
-play_obstacle_damage(tile)
 
-play_obstacle_break(tile)
 
-Utility
+func get_section(path: String, section: String) -> Dictionary:
 
-stop(tile)
+	var data = get(path)
 
-stop_all()
 
-pause(tile)
 
-resume(tile)
+	if typeof(data) != TYPE_DICTIONARY:
 
-is_playing(tile) -> bool
+		return {}
 
-wait_until_finished(tile)
 
-Internal
 
-_create_tween()
+	if data.has(section) and typeof(data[section]) == TYPE_DICTIONARY:
 
-_finish_animation()
+		return data[section]
 
-Frozen Tile System Dependency
-                BoardManager
-                      │
-                      ▼
-                TileFactory
-                      │
-                      ▼
-                    Tile
-                      │
-            ┌─────────┴─────────┐
-            ▼                   ▼
-       TileState          TileAnimator
-            │
-            ▼
-       TileDatabase
-            │
-            ▼
- ConfigLoader / ResourceManager
-Version 1 Rules
-The Tile System represents individual tiles only.
-BoardManager is the only manager that coordinates tile gameplay.
-AnimationManager decides when tile animations should run.
-TileAnimator only performs tile animations.
-TileFactory only creates, duplicates, resets, recycles, and destroys tile nodes.
-TileDatabase is the only source of tile metadata loaded from configs/tiles.json.
-TileState stores gameplay data for one tile only.
-Tile.gd is responsible only for the visual node, forwarding input/events, and requesting animation playback through TileAnimator.
-The Tile System never performs board generation, matching, gravity, cascades, objectives, scoring, rewards, or economy.
-The Tile System may depend on Constants, SignalBus, ConfigLoader, ResourceManager, and RandomGenerator from scripts/utilities/.
-The Tile System must not depend on any gameplay manager except through requests made by BoardManager or notifications through SignalBus.
 
-This API is aligned with the frozen scripts/utilities/ API and the frozen scripts/managers/ API, so subsequent folders (board, powerups, obstacles, animation, UI, economy, story, save, etc.) can be built without requiring changes to the Tile System.
-________________________________________________________
 
-levels/
-Level JSON API Map (Version 1.0 Freeze)
+	return {}
 
-This folder contains every playable level.
 
-The Match-3 engine never hardcodes a level. Every aspect of gameplay is loaded from a level JSON file.
 
-Folder
-levels/
-    level001.json
-    level002.json
-    ...
-    level050.json
 
-Future versions can simply add:
 
-level051.json
-level052.json
-...
+# =========================================================
 
-without modifying the engine.
+# INTERNAL VALIDATION (PRIVATE)
 
-Common JSON Structure
+# =========================================================
 
-Every level uses the same schema.
 
-{
-    "level_id": 1,
-    "name": "",
-    "description": "",
-    "difficulty": "",
-    "board": {},
-    "moves": {},
-    "objectives": [],
-    "tile_pool": {},
-    "powerups": {},
-    "obstacles": {},
-    "rewards": {},
-    "tutorial": {},
-    "story": {},
-    "audio": {},
-    "background": {},
-    "settings": {},
-    "metadata": {}
-}
-level_id
 
-Unique level number.
+func _validate(path: String, data) -> bool:
 
-"level_id": 1
-name
+	if data == null:
 
-Display name.
+		DebugLogger.error("ConfigLoader: Null config -> " + path)
 
-"name": "Level 1"
-description
+		return false
 
-Optional.
 
-"description": "Learn the basics."
-difficulty
 
-Possible values
+	if typeof(data) != TYPE_DICTIONARY:
 
-TUTORIAL
-EASY
-MEDIUM
-HARD
-BOSS
+		DebugLogger.error("ConfigLoader: Config is not a dictionary -> " + path)
 
-Example
+		return false
 
-"difficulty": "TUTORIAL"
-board
 
-Defines the game board.
 
-{
-    "rows": 8,
-    "columns": 8,
-    "tile_size": 96,
-    "spawn_points": [],
-    "blocked_cells": [],
-    "locked_cells": []
-}
-rows
-"rows": 8
-columns
-"columns": 8
-tile_size
-"tile_size": 96
-spawn_points
+	return true
 
-Optional custom spawn positions.
+___________________________________________________________
 
-[
-    { "x":0,"y":0 },
-    { "x":1,"y":0 }
-]
-blocked_cells
 
-Cells that cannot contain tiles.
 
-[
-    { "x":3,"y":4 },
-    { "x":4,"y":4 }
-]
-locked_cells
+SAVE THE BABY — CORRECT CONNECTED FILE TREE (V1.0 STRICT)
 
-Cells that start locked.
 
-[
-    { "x":2,"y":2 }
-]
-moves
-{
-    "total": 30
-}
-objectives
 
-Array.
+1. BOOT LAYER (ONLY REAL ENTRY POINT)
 
-[
-    { ... },
-    { ... }
-]
+   Boot.gd
 
-Each objective uses
+   │
 
-{
-    "type":"",
-    "target":"",
-    "amount":0
-}
-Objective Types
-COLLECT_ITEMS
-COLLECT_EVIDENCE
-DESTROY_OBSTACLES
-UNLOCK_DOORS
-DEFUSE_BOMBS
-REACH_SCORE
-RESCUE_BABY
-SURVIVE
-CLEAR_ALL_JELLY
+   ├── initializes utilities:
 
-Example
+   │ ├── DebugLogger
 
-{
-    "type":"COLLECT_ITEMS",
-    "target":"PHONE",
-    "amount":20
-}
-tile_pool
+   │ ├── RandomGenerator
 
-Tiles allowed to spawn.
+   │ ├── ConfigLoader
 
-{
-    "tiles":[
-        "KEY",
-        "PHONE",
-        "RECORDER",
-        "CLOCK"
-    ],
-    "weights":[
-        30,
-        30,
-        20,
-        20
-    ]
-}
-powerups
+   │ ├── ResourceManager
 
-Powerups enabled in this level.
+   │ └── JsonLoader
 
-{
-    "enabled":true,
-    "available":[
-        "ROCKET",
-        "BOMB",
-        "THUNDER"
-    ]
-}
-obstacles
+   │
 
-Obstacles placed at the start of the level.
+   ├── reloads configuration:
 
-{
-    "items":[
-        {
-            "type":"CHAIN",
-            "x":2,
-            "y":4,
-            "health":2
-        }
-    ]
-}
-rewards
+   │ └── ConfigLoader.reload()
 
-Rewards for completing the level.
+   │
 
-{
-    "coins":100,
-    "stars":3,
-    "first_try_bonus":50,
-    "perfect_bonus":100,
-    "powerups":[]
-}
-tutorial
+   ├── loads game scene:
 
-Tutorial configuration.
+   │ └── ResourceManager.load_scene(Constants.ScenePaths.GAME)
 
-{
-    "enabled":true,
-    "steps":[]
-}
+   │
 
-Each tutorial step
+   └── instantiates:
 
-{
-    "message":"Swipe these tiles.",
-    "highlight":[
-        { "x":3,"y":4 },
-        { "x":4,"y":4 }
-    ]
-}
-story
+   └── Game.tscn (root runtime scene)
 
-Story integration.
 
-"story":
-{
-    "before_level":"",
-    "after_level":"",
-    "first_clear":"",
-    "return_to_map":true
-}
 
-Either value may be omitted if no story is played.
+✔ Boot DOES NOT talk to managers
 
-audio
+✔ Boot DOES NOT control gameplay
 
-Level-specific audio.
+✔ Boot ends immediately after scene load
 
-{
-    "music":"level_theme_01",
-    "victory":"victory",
-    "game_over":"game_over"
-}
-background
 
-Background art.
 
-{
-    "image":"city_day",
-    "parallax":false
-}
-settings
+2. GAME SCENE ROOT (RUNTIME ORCHESTRATION BOUNDARY)
 
-Optional gameplay modifiers.
+   Game.tscn
 
-{
-    "time_limit":0,
-    "allow_shuffle":true,
-    "allow_boosters":true
-}
+   │
 
-A time limit of 0 means the level is move-based rather than timed.
+   └── contains managers:
 
-metadata
+   ├── GameManager
 
-Internal information.
+   ├── LevelManager
 
-{
-    "version":1,
-    "author":"Save The Baby",
-    "notes":""
-}
-Level Progression Responsibilities
-level001.json
+   ├── BoardManager
 
-Purpose
+   ├── RewardManager
 
-First tutorial level
-Teach swipe-to-swap
-No obstacles
-Very easy objectives
-level002.json
+   ├── EconomyManager
 
-Purpose
+   ├── StoryManager
 
-Continue tutorial
-Introduce simple matching
-Reinforce board mechanics
-Levels 003–010
+   ├── SaveManager
 
-Purpose
+   ├── AudioManager
 
-Complete tutorial
-Introduce objectives
-Increase board complexity gradually
-Levels 011–020
+   ├── UIManager
 
-Purpose
+   └── AnimationManager
 
-Introduce basic obstacles
-Require more strategic play
-Levels 021–035
 
-Purpose
 
-Introduce powerup combinations
-More complex board layouts
-Multi-objective levels
-Levels 036–049
+✔ This is where runtime coordination begins
 
-Purpose
+✔ Managers initialize themselves (per API contract)
 
-Advanced mechanics
-Mixed obstacles
-Higher difficulty
-Complex objective combinations
-level050.json
+✔ No Boot involvement beyond this point
 
-Purpose
 
-Boss level
-Final challenge of Version 1
-Story climax
-Leads directly to ending.json
-Level Flow
-level001.json
-      │
-      ▼
-level002.json
-      │
-      ▼
-...
-      │
-      ▼
-level050.json
-Frozen Responsibilities
-File(s)	Responsibility
-level001.json	First tutorial level
-level002.json	Continue tutorial
-level003–010.json	Complete tutorial and introduce objectives
-level011–020.json	Introduce obstacles
-level021–035.json	Introduce powerups and combinations
-level036–049.json	Advanced gameplay and difficulty
-level050.json	Boss level and campaign finale
 
-This freezes the JSON schema and responsibilities for every file under:
+3. MANAGER LAYER (ONLY COORDINATION)
 
-levels/
+   Core dependency rule from your API:
 
-All gameplay systems (such as LevelManager, BoardGenerator, RewardManager, StoryManager, and BoardManager) should read level data from this schema without requiring changes to the file format during Version 1.
-________________________________________________________________
+   Managers communicate via SignalBus
 
-Save The Baby
-Levels & Story Integration Guide (Version 1.0 Freeze)
-Purpose
+   Managers use Utilities
 
-This document defines the relationship between:
+   Managers DO NOT own subsystem implementation
 
-levels/
-stories/
+   Relationship structure (explicit only)
+
+   GameManager
+
+   │
+
+   ├── triggers:
+
+   │ ├── LevelManager
+
+   │ ├── BoardManager
+
+   │ └── StoryManager
+
+   │
+
+   └── receives signals via SignalBus
+
+   LevelManager
+
+   │
+
+   ├── loads:
+
+   │   └── levels/levelXXX.json (via JsonLoader)
+
+   │
+
+   ├── validates:
+
+   │   └── Frozen Level JSON schema
+
+   │
+
+   ├── exposes:
+
+   │   └── Current level data
+
+   │
+
+   └── triggers:
+
+      └── BoardManager.create_board(level_data)
+
+   BoardManager
+
+   │
+
+   ├── uses:
+
+   │ ├── Board.gd
+
+   │ ├── TileFactory
+
+   │ └── TileDatabase
+
+   │
+
+   ├── controls:
+
+   │ └── Board System
+
+   │
+
+   └── emits via SignalBus:
+
+   ├── board_created
+
+   ├── board_ready
+
+   └── board_cleared
+
+   StoryManager
+
+   │
+
+   ├── loads:
+
+   │ ├── configs/story.json
+
+   │ └── stories/*
+
+   │
+
+   └── emits:
+
+   ├── story*started
+
+   └── dialogue events
+
+   EconomyManager
+
+   │
+
+   ├── loads:
+
+   │ └── configs/economy.json
+
+   │
+
+   └── updates:
+
+   ├── coins
+
+   ├── lives
+
+   ├── boosters
+
+   └── stars
+
+   RewardManager
+
+   │
+
+   ├── loads:
+
+   │ └── configs/rewards.json
+
+   │
+
+   └── triggered by:
+
+   └── LevelManager result
+
+   SaveManager
+
+   │
+
+   ├── uses:
+
+   │ ├── FileHelper
+
+   │ └── TimeHelper
+
+   │
+
+   └── interacts with:
+
+   └── save/ folder
+
+   AudioManager
+
+   │
+
+   ├── loads:
+
+   │ └── configs/audio.json
+
+   │
+
+   └── plays:
+
+   ├── music
+
+   └── sfx
+
+   UIManager
+
+   │
+
+   ├── loads:
+
+   │ └── configs/ui.json
+
+   │
+
+   └── controls:
+
+   ├── HUD
+
+   ├── popups
+
+   └── screens/
+
+   AnimationManager
+
+   │
+
+   ├── uses:
+
+   │ └── scripts/animation/*
+
+   │
+
+   └── dispatches to:
+
+   ├── TileAnimator
+
+   ├── BoardAnimator
+
+   ├── UIAnimator
+
+   └── StoryAnimator
+
+4. BOARD SYSTEM (PURE GAMEPLAY ENGINE)
+
+   BoardManager
+
+   │
+
+   └── owns:
+
+   Board.gd
+
+   │
+
+   ├── BoardGenerator
+
+   ├── MoveValidator
+
+   ├── MatchFinder
+
+   ├── GravitySolver
+
+   ├── RefillSystem
+
+   ├── CascadeProcessor
+
+   ├── BoardShuffler
+
+   └── BoardAnimator
+
+
+
+✔ ONLY BoardManager coordinates gameplay
+
+✔ Board.gd is internal coordinator only
+
+
+
+5. TILE SYSTEM (ATOMIC GAME OBJECT LAYER)
+
+   BoardManager
+
+   │
+
+   └── uses:
+
+   TileFactory
+
+   │
+
+   └── creates:
+
+   Tile.gd
+
+   │
+
+   ├── TileState
+
+   ├── TileAnimator
+
+   └── TileDatabase
+
+   External dependencies:
+
+   TileDatabase
+
+   └── loads:
+
+   configs/tiles.json
+
+   TileFactory
+
+   └── uses:
+
+   ResourceManager (textures, assets)
+
+6. CONFIG SYSTEM (DATA SOURCE ONLY)
+
+
+
+   ConfigLoader
+
+   │
+
+   └── loads:
+
+    configs/*.json
+
+    ├── game.json
+
+    ├── tiles.json
+
+    ├── powerups.json
+
+    ├── obstacles.json
+
+    ├── objectives.json
+
+    ├── rewards.json
+
+    ├── economy.json
+
+    ├── story.json
+
+    ├── audio.json
+
+    ├── ui.json
+
+    ├── animation.json
+
+    ├── board.json
+
+    ├── effects.json
+
+    ├── localization.json
+
+    ├── debug.json
+
+    └── ...
+
+
+
 LevelManager
-StoryManager
-RewardManager
-SaveManager
+
+│
+
+└── loads:
+
+    levels/
+
+    ├── level001.json
+
+    ├── level002.json
+
+    ├── ...
+
+    └── level050.json
+
+
+
+✔ ConfigLoader loads configuration files only.
+
+✔ LevelManager loads playable level files.
+
+✔ Level files are not part of the configs/ folder.
+
+✔ No gameplay logic
+
+✔ No runtime state
+
+
+
+7. RESOURCE SYSTEM (ASSET SOURCE ONLY)
+
+   ResourceManager
+
+   │
+
+   └── loads:
+
+   resources/
+
+   ├── tiles/
+
+   ├── powerups/
+
+   └── obstacles/
+
+
+
+Used by:
+
+
+
+TileFactory
+
 UIManager
 
-It freezes the gameplay flow between the Match-3 engine, story system, tutorial system, rewards, and level map.
+Animation systems 8. ANIMATION FRAMEWORK (GENERIC LAYER)
 
-No manager should contain hardcoded knowledge of specific levels or story events.
+AnimationManager
 
-Everything is driven by JSON data.
+│
 
-Core Philosophy
+└── uses:
 
-Levels contain gameplay.
+scripts/animation/
 
-Stories contain narrative.
+├── AnimationQueue
 
-Tutorials teach gameplay.
+├── AnimationSequence
 
-The Level Map represents player progression.
+├── AnimationRequest
 
-Managers coordinate these systems but never hardcode their content.
+├── TweenHelper
 
-Overall Gameplay Flow
+└── AnimationLibrary
 
-Every level follows the same lifecycle.
 
-Level Selected
-        │
-        ▼
-Load Level JSON
-        │
-        ▼
-Request Before-Level Story (Optional)
-        │
-        ▼
-StoryManager
-        │
-        ▼
-Story Finished
-        │
-        ▼
-        │
-        ▼
-GameManager
-        │
-        ├── Return to Level Map
-        ├── Start Gameplay
-        ├── Load Another Story
-        └── Show Credits
-Request Tutorial (Optional)
-        │
-        ▼
-Tutorial Finished
-        │
-        ▼
-BoardManager Generates Board
-        │
-        ▼
-Gameplay
-        │
-        ▼
-Victory / Failure
-Failure Flow
-Level Failed
-        │
-        ▼
-Lose Life
-        │
-        ▼
-Show Failure Screen
-        │
-        ▼
-Retry
-OR
-Return To Map
 
-No story is played after failure unless explicitly configured in future versions.
+Then dispatches to:
 
-Victory Flow
-Level Completed
-        │
-        ▼
-Finish Remaining Move Bonus
-        │
-        ▼
-Calculate Final Score
-        │
-        ▼
-Calculate Stars
-        │
-        ▼
-Grant Rewards
-        │
-        ▼
-Save Progress
-        │
-        ▼
-Unlock Next Level
-        │
-        ▼
-Play "After Level" Story (Optional)
-        │
-        ▼
-Return To Level Map
-Level Map
 
-The level map is the player's navigation screen.
 
-It is not responsible for gameplay.
+Subsystem Animators:
 
-It only displays information already stored in SaveManager.
+├── TileAnimator
 
-Each node displays:
+├── BoardAnimator
 
-Locked
-Unlocked
-Completed
-Star Rating
-First Try Badge (optional)
-Perfect Badge (optional)
+├── UIAnimator
 
-Selecting a node requests:
+└── StoryAnimator
 
-LevelManager.load_level(level_id)
-Remaining Move Bonus
+🔥 FINAL CORRECT LIFECYCLE (ABSOLUTE TRUTH)
 
-When objectives are completed before all moves are used:
-
-Remaining Moves
-        │
-        ▼
-RewardManager
-        │
-        ▼
-Bonus Score
-        │
-        ▼
-Celebration Animation
-
-The celebration may include:
-
-Rockets
-Bombs
-Thunder
-Random explosions
-
-These animations are visual only.
-
-RewardManager determines the bonus.
-
-AnimationManager performs the animation.
-
-Stars
-
-Stars are awarded after completion.
-
-Stars depend on configurable score thresholds.
-
-Example:
-
-1 Star
-
-5000
-
-2 Stars
-
-10000
-
-3 Stars
-
-15000
-
-Thresholds should come from configuration.
-
-They must never be hardcoded.
-
-Coins
-
-Coins are calculated by RewardManager.
-
-Example:
-
-Base Reward
-
-100
-
-+
-
-Remaining Move Bonus
-
-20
-
-+
-
-First Try Bonus
-
-50
-
-+
-
-Perfect Bonus
-
-100
-
-=
-
-270 Coins
-
-Future reward types may include:
-
-Boosters
-Unlimited Lives
-Story Rewards
-Treasure Chests
-Unlocking Levels
-
-After a successful completion:
-
-Highest Completed Level
+Boot.gd
 
 ↓
 
-Highest Unlocked Level
+Utilities initialize
 
 ↓
 
-SaveManager
-
-Only SaveManager stores progression.
-
-The map reads it.
-
-Story Integration
-
-Levels never contain dialogue.
-
-Stories never contain gameplay.
-
-Levels only reference story scenes.
-
-Example:
-
-"story":
-{
-    "before_level": "intro_scene_01",
-    "after_level": "intro_scene_02",
-    "first_clear": "intro_scene_03",
-    "return_to_map": true
-}
-
-Meaning:
-
-before_level
-
-Story plays every time before gameplay.
-
-after_level
-
-Story plays every successful completion.
-
-first_clear
-
-Story plays only once after the player's first victory.
-
-return_to_map
-
-If true:
-
-Story
+ConfigLoader.reload()
 
 ↓
 
-Map
-
-If false:
-
-Story
+Load Game.tscn
 
 ↓
 
-Another Story
+GameManager initializes system state
 
 ↓
 
-Credits
+LevelManager loads and validates levelXXX.json
 
 ↓
 
-Map
-
-Useful for the ending sequence.
-
-Tutorial Integration
-
-Tutorial definitions belong to levels.
-
-LevelManager loads the tutorial data.
-
-UIManager presents the tutorial.
-
-BoardManager receives gameplay input after tutorial completion.
-
-Tutorial behaviour is entirely data-driven.
-
-Example:
-
-"tutorial":
-{
-    "enabled": true,
-    "play_once": true,
-    "steps":
-    [
-        ...
-    ]
-}
-
-play_once
-
-If true:
-
-SaveManager remembers completion.
-
-Tutorial never plays again unless progress is reset.
-
-Tutorial Step Types
-
-Every tutorial step has a type.
-
-Supported Version 1 types:
-
-MESSAGE
-
-Display tutorial text.
-
-HIGHLIGHT_TILE
-
-Highlight one board tile.
-
-HIGHLIGHT_TILES
-
-Highlight multiple tiles.
-
-HIGHLIGHT_UI
-
-Highlight a HUD element.
-
-POINT_ARROW
-
-Display an animated arrow.
-
-LOCK_INPUT
-
-Disable unrelated player input.
-
-UNLOCK_INPUT
-
-Restore input.
-
-WAIT_FOR_INPUT
-
-Wait for player tap.
-
-WAIT_FOR_SWIPE
-
-Wait for player swipe.
-
-WAIT_FOR_MATCH
-
-Wait until a required match occurs.
-
-WAIT_FOR_POWERUP
-
-Wait until a specified powerup is created.
-
-WAIT_FOR_OBJECTIVE
-
-Wait until an objective progresses.
-
-PLAY_ANIMATION
-
-Play a scripted animation.
-
-COMPLETE
-
-Finish the tutorial.
-
-Example Tutorial
-"tutorial":
-{
-    "enabled": true,
-    "play_once": true,
-    "steps":
-    [
-        {
-            "type":"MESSAGE",
-            "text":"Swipe these tiles to make a match."
-        },
-
-        {
-            "type":"HIGHLIGHT_TILES",
-            "tiles":
-            [
-                {"x":3,"y":4},
-                {"x":4,"y":4}
-            ]
-        },
-
-        {
-            "type":"LOCK_INPUT"
-        },
-
-        {
-            "type":"WAIT_FOR_MATCH",
-            "required_match":3
-        },
-
-        {
-            "type":"UNLOCK_INPUT"
-        },
-
-        {
-            "type":"COMPLETE"
-        }
-    ]
-}
-
-No tutorial logic should be hardcoded into the engine.
-
-Story Schedule
-
-Story progression follows gameplay milestones.
-
-Recommended Version 1 schedule:
-
-Opening Story
+BoardManager creates board
 
 ↓
 
-Level 1
+TileFactory spawns tiles
 
 ↓
 
-Tutorial Story
+Board system runs gameplay loop
 
 ↓
 
-Levels 2–5
+AnimationManager handles visuals
 
 ↓
 
-Story Scene
+UI / Audio / Story react via signals
+
+🧠 IMPORTANT FIX SUMMARY
+
+
+
+What was corrected:
+
+
+
+❌ Boot does NOT coordinate managers
+
+❌ Boot does NOT participate in gameplay flow
+
+❌ Managers are NOT initialized by Boot
+
+✔ Boot ONLY loads scene + utilities
+
+✔ Game scene is the real runtime root
+
+✔ Managers self-initialize inside Game scene
+
+✔ BoardManager is the ONLY gameplay coordinator for board system
+
+
+
+---
+
+
+
+The correct execution flow (NO ambiguity version)
+
+
+
+This is the real chain:
+
+
+
+Boot.gd
 
 ↓
 
-Levels 6–10
+Initialize utilities (services)
 
 ↓
 
-Story Scene
+ResourceManager loads Game.tscn
 
 ↓
 
-Levels 11–15
+Instantiate Game.tscn
 
 ↓
 
-Story Scene
+Add Game.tscn to scene tree
 
 ↓
 
-Continue every five levels
+GameManager becomes active (via \_ready)
 
 ↓
 
-Level 50
+GameManager initializes gameplay systems
 
 ↓
 
-Final Story
+Game loop begins
 
-↓
 
-Ending
 
-↓
+---
 
-Credits
 
-The engine never assumes "every five levels."
 
-Only the JSON determines whether a story plays.
+Who initializes what?
 
-First-Time Events
 
-Certain events should only happen once.
 
-Examples:
+This is the most important clarity point.
 
-Opening tutorial
-First Rocket
-First Bomb
-First Thunder
-First Obstacle
-First Story Choice
-First Daily Reward
 
-The responsible system emits a SignalBus event.
 
-SaveManager records the completion and saves the updated progress.
+Step-by-step:
 
-Future replays skip them automatically.
 
-Responsibilities
-LevelManager
-Loads level JSON.
-Starts gameplay.
-Ends gameplay.
-Requests stories.
-Never owns dialogue.
-StoryManager
-Loads story JSON.
-Plays scenes.
-Processes choices.
-Emits story events.
-Never owns gameplay.
-RewardManager
-Calculates score.
-Calculates stars.
-Calculates coins.
-Calculates bonuses.
-Never saves progression.
-SaveManager
 
-Stores:
+1. Boot runs
 
-Highest unlocked level
-Highest completed level
-Story progress
-Tutorial completion
-First-clear events
-Stars
-Rewards
-Player economy
-UIManager
 
-Displays:
 
-Level Map
-Victory Screen
-Failure Screen
-Story UI
-Tutorial UI
-Reward UI
-Version 1 Rules
+It initializes services:
 
-Levels contain gameplay only.
 
-Stories contain narrative only.
 
-Tutorials contain teaching sequences only.
+ConfigLoader
 
-The level map displays progression only.
+ResourceManager
 
-RewardManager calculates rewards only.
+etc.
 
-SaveManager stores progression only.
 
-Managers communicate through SignalBus.
 
-No level-specific gameplay, tutorial, reward, or story logic may be hardcoded into scripts.
+No gameplay exists yet.
 
-Every new level should be created by adding a JSON file only.
 
-Every new story chapter should be created by adding a JSON file only.
 
-Every new tutorial should be created by editing level JSON only.
+2. Boot loads Game.tscn via ResourceManager
 
-This document freezes the interaction between the Level, Story, Tutorial, Reward, Save, and Map systems for Version 1.
+   var packed_scene = ResourceManager.load_scene(...)
 
 
 
+So ResourceManager is just a tool here.
 
 
 
+3. Game.tscn is added to scene tree
 
 
 
+Now everything inside Game.tscn wakes up.
 
 
-Your words,
 
+Godot automatically calls:
 
 
-"We are doing a single decision correction across the frozen docs:
 
+\_ready() on all nodes 4. GameManager activates
 
 
-We are switching from configs/levels.json → levels/levelXXX.json
 
+Now GameManager runs:
 
 
-That means we only touch documents that mention where levels live, not gameplay logic.
 
+initializes itself
 
+then starts LevelManager, BoardManager, etc.
 
-Files / API maps that MUST be edited
 
-1. ✅ configs/ (Configuration System API Map)
 
-What changes:
-
-Remove levels.json as a container of all levels
-
-Replace with per-file level storage reference
-
-Sections affected:
-
-levels.json entry
-
-“Frozen Configuration Dependencies” graph
-
-“Version 1 Rules”
-
-2. ✅ LevelManager.gd section inside Manager System API Map
-
-What changes:
-
-
-
-Only this conceptual line:
-
-
-
-load_level(level_id) currently assumes levels.json
-
-
-
-It must now reflect:
-
-
-
-file-per-level loading
-
-or registry-based loading (we’ll decide wording when editing)
-
-3. ✅ Levels & Story Integration Guide
-
-What changes:
-
-
-
-This is the BIG contradiction source.
-
-
-
-You must update:
-
-
-
-“Load Level JSON”
-
-“Every new level should be created by adding JSON file only” (needs clarification consistency)
-
-any implication of centralized levels.json
-
-
-
-This doc is currently half-centralized, half-file-based → we fix it fully.
-
-
-
-4. ✅ levels/ Level JSON API Map
-
-What changes:
-
-
-
-This one becomes VALID (but needs cleanup alignment)
-
-
-
-We will:
-
-
-
-REMOVE any assumption of central levels.json
-
-KEEP per-file schema
-
-KEEP level001 → level050 structure
-
-
-
-This becomes the source of truth for level files
-
-
-
-5. ⚠️ OPTIONAL but recommended consistency fix
-
-Story Integration Guide (small check)
-
-
-
-Only if it mentions:
-
-
-
-Level loading assumptions tied to config system
-
-
-
-We may adjust phrasing slightly, but likely minimal.
-
-
-
-What we are NOT touching
-
-
-
-To keep risk low:
-
-
-
-❌ BoardManager API
-
-❌ RewardManager API
-
-❌ SaveManager API
-
-❌ Story system APIs
-
-❌ UI system
-
-❌ animation/audio configs
-
-
-
-None of those depend on where levels are stored, only on level data structure.
-
-
-
-Summary (clean dependency view)
-
-
-
-We are only editing:
-
-
-
-configs/
-
-Manager System API Map (LevelManager section)
-
-Levels & Story Integration Guide
-
-levels/ API map
-
-(optional small consistency check in story guide)
-
-How we proceed (your workflow)
-
-
-
-We do exactly what you asked:
-
-
-
-You paste one file at a time
-
-I rewrite ONLY the necessary sections
-
-We keep everything else frozen
-
-No hidden restructuring beyond this decision"
-
-
-
-
-
-1. 
-
-
-
-configs/
-
-Configuration System API Map (Version 1.0 Freeze)
-
-
-
-The Config System is the single source of static game data.
-
-
-
-Configuration files contain no executable code.
-
-
-
-Configuration files contain no gameplay flow.
-
-
-
-Configuration files are read through ConfigLoader.
-
-
-
-Managers never hardcode gameplay values.
-
-
-
-Subsystems obtain configuration data from their corresponding configuration files.
-
-
-
-Configuration files may reference resources but never load them directly.
-
-
-
-Folder Structure
-
-configs/
-
-
-
-game.json
-
-levels.json
-
-tiles.json
-
-powerups.json
-
-obstacles.json
-
-objectives.json
-
-rewards.json
-
-economy.json
-
-story.json
-
-audio.json
-
-ui.json
-
-animation.json
-
-board.json
-
-effects.json
-
-localization.json
-
-debug.json
-
-1. game.json
-
-Purpose
-
-
-
-Stores global game configuration.
-
-
-
-No gameplay progression.
-
-
-
-Contains
-
-
-
-Game Information
-
-
-
-game_name
-
-version
-
-save_version
-
-build_number
-
-
-
-Display
-
-
-
-target_fps
-
-target_physics_fps
-
-
-
-Gameplay Limits
-
-
-
-max_levels
-
-max_lives
-
-max_moves
-
-minimum_match
-
-
-
-General Settings
-
-
-
-autosave_enabled
-
-vibration_enabled
-
-tutorial_enabled
-
-2. levels.json
-
-Purpose
-
-
-
-Contains every playable level.
-
-
-
-Loaded by LevelManager.
-
-
-
-Contains
-
-
-
-Per Level
-
-
-
-level_id
-
-board_layout
-
-width
-
-height
-
-difficulty
-
-available_tiles
-
-available_obstacles
-
-objectives
-
-move_limit
-
-score_targets
-
-rewards
-
-story_before
-
-story_after
-
-background
-
-music
-
-3. tiles.json
-
-Purpose
-
-
-
-Defines every tile type.
-
-
-
-Loaded only by TileDatabase.
-
-
-
-Contains
-
-
-
-Per Tile
-
-
-
-id
-
-enum
-
-name
-
-texture
-
-icon
-
-animation_set
-
-score
-
-spawn_weight
-
-matchable
-
-spawnable
-
-hidden
-
-special
-
-4. powerups.json
-
-Purpose
-
-
-
-Defines every powerup.
-
-
-
-Loaded by the Powerup subsystem.
-
-
-
-Contains
-
-
-
-Per Powerup
-
-
-
-id
-
-enum
-
-name
-
-icon
-
-texture
-
-animation_set
-
-activation_type
-
-combination_rules
-
-description
-
-5. obstacles.json
-
-Purpose
-
-
-
-Defines every obstacle.
-
-
-
-Loaded by the Obstacle subsystem.
-
-
-
-Contains
-
-
-
-Per Obstacle
-
-
-
-id
-
-enum
-
-name
-
-texture
-
-animation_set
-
-health
-
-destroy_score
-
-blocks_gravity
-
-blocks_matching
-
-removable
-
-description
-
-6. objectives.json
-
-Purpose
-
-
-
-Defines every objective type.
-
-
-
-Loaded by BoardManager and LevelManager.
-
-
-
-Contains
-
-
-
-Per Objective
-
-
-
-id
-
-enum
-
-description
-
-target_type
-
-completion_condition
-
-icon
-
-7. rewards.json
-
-Purpose
-
-
-
-Defines reward tables.
-
-
-
-Loaded by RewardManager.
-
-
-
-Contains
-
-
-
-Level Rewards
-
-
-
-Star Rewards
-
-
-
-Daily Rewards
-
-
-
-Chest Rewards
-
-
-
-Story Rewards
-
-
-
-Bonus Rewards
-
-
-
-Random Reward Pools
-
-
-
-8. economy.json
-
-Purpose
-
-
-
-Defines economy balancing.
-
-
-
-Loaded by EconomyManager.
-
-
-
-Contains
-
-
-
-Coins
-
-
-
-Lives
-
-
-
-Boosters
-
-
-
-Stars
-
-
-
-Shop Prices
-
-
-
-Life Regen
-
-
-
-Unlimited Lives
-
-
-
-Starting Resources
-
-
-
-Maximum Resources
-
-
-
-9. story.json
-
-Purpose
-
-
-
-Defines story metadata.
-
-
-
-Dialogue text belongs inside the stories/ folder.
-
-
-
-Contains
-
-
-
-Story List
-
-
-
-Character References
-
-
-
-Unlock Conditions
-
-
-
-Dialogue File References
-
-
-
-Story Order
-
-
-
-10. audio.json
-
-Purpose
-
-
-
-Defines audio metadata.
-
-
-
-Loaded by AudioManager.
-
-
-
-Contains
-
-
-
-Music
-
-
-
-SFX
-
-
-
-Volume Defaults
-
-
-
-Audio Bus Mapping
-
-
-
-Loop Settings
-
-
-
-11. ui.json
-
-Purpose
-
-
-
-Defines UI configuration.
-
-
-
-Loaded by UIManager.
-
-
-
-Contains
-
-
-
-HUD
-
-
-
-Fonts
-
-
-
-Themes
-
-
-
-Popup Definitions
-
-
-
-Notification Timing
-
-
-
-UI Scaling
-
-
-
-12. animation.json
-
-Purpose
-
-
-
-Defines animation metadata.
-
-
-
-Loaded by AnimationManager.
-
-
-
-Contains
-
-
-
-Animation Names
-
-
-
-Animation Durations
-
-
-
-Default Tweens
-
-
-
-Transition Settings
-
-
-
-Animation Sets
-
-
-
-13. board.json
-
-Purpose
-
-
-
-Defines board generation rules.
-
-
-
-Loaded by BoardManager.
-
-
-
-Contains
-
-
-
-Gravity Direction
-
-
-
-Spawn Direction
-
-
-
-Cascade Delay
-
-
-
-Swap Duration
-
-
-
-Shuffle Rules
-
-
-
-Refill Delay
-
-
-
-Board Padding
-
-
-
-14. effects.json
-
-Purpose
-
-
-
-Defines visual effects metadata.
-
-
-
-Loaded by AnimationManager.
-
-
-
-Contains
-
-
-
-Particles
-
-
-
-Screen Shake
-
-
-
-Flash Effects
-
-
-
-Explosion Effects
-
-
-
-Spawn Effects
-
-
-
-Destroy Effects
-
-
-
-15. localization.json
-
-Purpose
-
-
-
-Defines supported languages.
-
-
-
-Contains
-
-
-
-Languages
-
-
-
-Translation Files
-
-
-
-Default Language
-
-
-
-Font Overrides
-
-
-
-RTL Support
-
-
-
-16. debug.json
-
-Purpose
-
-
-
-Defines debug configuration.
-
-
-
-Loaded only in development builds.
-
-
-
-Contains
-
-
-
-Debug Flags
-
-
-
-Logging Options
-
-
-
-Developer Settings
-
-
-
-Performance Options
-
-
-
-Testing Options
-
-
-
-Frozen Configuration Dependencies
-
-                  ConfigLoader
-
-                        │
-
-      ┌─────────────────┼─────────────────┐
-
-      ▼                 ▼                 ▼
-
-   game.json      levels.json       board.json
-
-      │                 │                 │
-
-      ▼                 ▼                 ▼
-
- GameManager      LevelManager     BoardManager
-
-
-
-      ▼
-
- tiles.json
-
-      │
-
-      ▼
-
- TileDatabase
-
-
-
-      ▼
-
- powerups.json
-
-      │
-
-      ▼
-
- Powerup System
-
-
-
-      ▼
-
- obstacles.json
-
-      │
-
-      ▼
-
- Obstacle System
-
-
-
-      ▼
-
- objectives.json
-
-      │
-
-      ▼
-
- BoardManager
-
-
-
-      ▼
-
- rewards.json
-
-      │
-
-      ▼
-
- RewardManager
-
-
-
-      ▼
-
- economy.json
-
-      │
-
-      ▼
-
- EconomyManager
-
-
-
-      ▼
-
- story.json
-
-      │
-
-      ▼
-
- StoryManager
-
-
-
-      ▼
-
- audio.json
-
-      │
-
-      ▼
-
- AudioManager
-
-
-
-      ▼
-
- animation.json
-
-      │
-
-      ▼
-
- AnimationManager
-
-
-
-      ▼
-
- ui.json
-
-      │
-
-      ▼
-
- UIManager
-
-Version 1 Rules
-
-The configs/ folder is the only source of static gameplay configuration.
-
-Every configuration file is loaded through ConfigLoader.
-
-Managers and subsystems must not hardcode configurable gameplay values.
-
-Configuration files contain data only and never executable logic.
-
-tiles.json is the only source of tile metadata.
-
-levels.json is the only source of level definitions.
-
-powerups.json is the only source of powerup definitions.
-
-obstacles.json is the only source of obstacle definitions.
-
-rewards.json is the only source of reward tables.
-
-economy.json is the only source of economy balancing values.
-
-story.json contains story metadata only; dialogue content resides in the stories/ folder.
-
-Configuration files may reference assets, resources, and scenes by path but never load them directly.
-
-The Config System depends on no gameplay subsystem; gameplay subsystems depend on it through ConfigLoader.
+THIS is the real “game start moment”
