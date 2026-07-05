@@ -22,6 +22,8 @@ func initialize() -> void:
 	_is_initialized = true
 	_current_state = Constants.GameState.NONE
 
+	SignalBus.animation_manager = get_tree().get_first_node_in_group("animation_manager")
+
 
 func start_game() -> void:
 	if is_game_running():

@@ -1,136 +1,228 @@
 extends RefCounted
-
 class_name TileState
 
+# =========================================================
+# INTERNAL STATE
+# =========================================================
 
-var tile_type: Constants.TileType = Constants.TileType.KEY
-var grid_position: Vector2i = Vector2i.ZERO
+var _tile_type: Constants.TileType
+var _grid_position: Vector2i = Vector2i.ZERO
+var _state: Constants.TileState = Constants.TileState.IDLE
 
-var state: Constants.TileState = Constants.TileState.IDLE
+var _powerup = null
+var _obstacle = null
 
-var health: int = 1
+var _health: int = 1
 
-var selected: bool = false
-var matched: bool = false
-var falling: bool = false
-var locked: bool = false
-var spawning: bool = false
-var destroyed: bool = false
-
-var powerup: Constants.PowerupType = Constants.PowerupType.NONE
-
-var obstacle: Constants.ObstacleType = Constants.ObstacleType.NONE
+var _selected: bool = false
+var _matched: bool = false
+var _falling: bool = false
+var _locked: bool = false
+var _hidden: bool = false
 
 
-func initialize(
-	type: Constants.TileType,
-	position: Vector2i
-) -> void:
-	tile_type = type
-	grid_position = position
+# =========================================================
+# INITIALIZATION
+# =========================================================
+
+func initialize(tile_type: Constants.TileType, grid_position: Vector2i) -> void:
+	_tile_type = tile_type
+	_grid_position = grid_position
+	_state = Constants.TileState.IDLE
+
+	_powerup = null
+	_obstacle = null
+
+	_health = 1
 
 	reset_flags()
 
 
-func reset_flags() -> void:
-	state = Constants.TileState.IDLE
+func reset() -> void:
+	_tile_type = Constants.TileType.KEY
+	_grid_position = Vector2i.ZERO
+	_state = Constants.TileState.IDLE
 
-	selected = false
-	matched = false
-	falling = false
-	locked = false
-	spawning = false
-	destroyed = false
+	_powerup = null
+	_obstacle = null
 
+	_health = 1
 
-func set_state(new_state: Constants.TileState) -> void:
-	state = new_state
-
-
-func get_state() -> Constants.TileState:
-	return state
-
-
-func set_position(position: Vector2i) -> void:
-	grid_position = position
-
-
-func get_position() -> Vector2i:
-	return grid_position
-
-
-func set_tile_type(type: Constants.TileType) -> void:
-	tile_type = type
-
-
-func get_tile_type() -> Constants.TileType:
-	return tile_type
-
-
-func set_powerup(type: Constants.PowerupType) -> void:
-	powerup = type
-
-
-func clear_powerup() -> void:
-	powerup = Constants.PowerupType.NONE
-
-
-func has_powerup() -> bool:
-	return powerup != Constants.PowerupType.NONE
-
-
-func set_obstacle(type: Constants.ObstacleType) -> void:
-	obstacle = type
-
-
-func clear_obstacle() -> void:
-	obstacle = Constants.ObstacleType.NONE
-
-
-func has_obstacle() -> bool:
-	return obstacle != Constants.ObstacleType.NONE
-
-
-func damage(amount: int = 1) -> void:
-	health = max(0, health - amount)
-
-	if health == 0:
-		destroyed = true
-		state = Constants.TileState.DESTROYING
-
-
-func heal(amount: int = 1) -> void:
-	health += amount
-
-
-func is_destroyed() -> bool:
-	return destroyed
-
-
-func is_available() -> bool:
-	return (
-		not destroyed
-		and not locked
-		and state != Constants.TileState.DISABLED
-	)
+	reset_flags()
 
 
 func duplicate_state() -> TileState:
 	var copy := TileState.new()
 
-	copy.tile_type = tile_type
-	copy.grid_position = grid_position
-	copy.state = state
-	copy.health = health
+	copy._tile_type = _tile_type
+	copy._grid_position = _grid_position
+	copy._state = _state
 
-	copy.selected = selected
-	copy.matched = matched
-	copy.falling = falling
-	copy.locked = locked
-	copy.spawning = spawning
-	copy.destroyed = destroyed
+	copy._powerup = _powerup
+	copy._obstacle = _obstacle
 
-	copy.powerup = powerup
-	copy.obstacle = obstacle
+	copy._health = _health
+
+	copy._selected = _selected
+	copy._matched = _matched
+	copy._falling = _falling
+	copy._locked = _locked
+	copy._hidden = _hidden
 
 	return copy
+
+
+# =========================================================
+# IDENTITY
+# =========================================================
+
+func set_tile_type(type: Constants.TileType) -> void:
+	_tile_type = type
+
+
+func get_tile_type() -> Constants.TileType:
+	return _tile_type
+
+
+# =========================================================
+# GRID
+# =========================================================
+
+func set_position(position: Vector2i) -> void:
+	_grid_position = position
+
+
+func get_position() -> Vector2i:
+	return _grid_position
+
+
+# =========================================================
+# TILE STATE
+# =========================================================
+
+func set_state(state: Constants.TileState) -> void:
+	_state = state
+
+
+func get_state() -> Constants.TileState:
+	return _state
+
+
+func is_state(state: Constants.TileState) -> bool:
+	return _state == state
+
+
+# =========================================================
+# POWERUP
+# =========================================================
+
+func set_powerup(type: Constants.PowerupType) -> void:
+	_powerup = type
+
+
+func get_powerup():
+	return _powerup
+
+
+func has_powerup() -> bool:
+	return _powerup != null
+
+
+func clear_powerup() -> void:
+	_powerup = null
+
+
+# =========================================================
+# OBSTACLE
+# =========================================================
+
+func set_obstacle(type: Constants.ObstacleType) -> void:
+	_obstacle = type
+
+
+func get_obstacle():
+	return _obstacle
+
+
+func has_obstacle() -> bool:
+	return _obstacle != null
+
+
+func clear_obstacle() -> void:
+	_obstacle = null
+
+
+# =========================================================
+# HEALTH
+# =========================================================
+
+func set_health(value: int) -> void:
+	_health = max(0, value)
+
+
+func get_health() -> int:
+	return _health
+
+
+func damage(amount: int) -> void:
+	set_health(_health - amount)
+
+
+func heal(amount: int) -> void:
+	set_health(_health + amount)
+
+
+func is_destroyed() -> bool:
+	return _health <= 0
+
+
+# =========================================================
+# FLAGS
+# =========================================================
+
+func set_selected(value: bool) -> void:
+	_selected = value
+
+
+func is_selected() -> bool:
+	return _selected
+
+
+func set_matched(value: bool) -> void:
+	_matched = value
+
+
+func is_matched() -> bool:
+	return _matched
+
+
+func set_falling(value: bool) -> void:
+	_falling = value
+
+
+func is_falling() -> bool:
+	return _falling
+
+
+func set_locked(value: bool) -> void:
+	_locked = value
+
+
+func is_locked() -> bool:
+	return _locked
+
+
+func set_hidden(value: bool) -> void:
+	_hidden = value
+
+
+func is_hidden() -> bool:
+	return _hidden
+
+
+func reset_flags() -> void:
+	_selected = false
+	_matched = false
+	_falling = false
+	_locked = false
+	_hidden = false

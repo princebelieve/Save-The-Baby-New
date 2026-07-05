@@ -177,7 +177,7 @@ signal play_sfx(sound)
 # ==================================================
 # Animation
 # ==================================================
-
+var animation_manager: AnimationManager
 signal animation_started(name)
 signal animation_finished(name)
 

@@ -59,8 +59,10 @@ show()
 
 hide()
 
-reset() 52. PauseMenu.gd
-Purpose
+reset()
+
+52. PauseMenu.gd
+    Purpose
 
 Handles the in-game pause menu.
 
@@ -76,17 +78,17 @@ toggle()
 is_visible()
 Actions
 resume_game()
-
 restart_level()
-
 open_settings()
-
 return_to_menu()
-
 quit_game()
+
+→ All actions are forwarded to UIManager only
 Utility
-reset() 53. VictoryScreen.gd
-Purpose
+reset()
+
+53. VictoryScreen.gd
+    Purpose
 
 Displays level completion information.
 
@@ -103,18 +105,22 @@ set_stars(stars)
 
 set_rewards(rewards)
 Navigation
+
 next_level()
-
 replay_level()
-
 return_to_menu()
+
+→ All navigation actions are forwarded to UIManager only
+
 Animation
 play_open_animation()
 
 play_close_animation()
 Utility
-reset() 54. GameOverScreen.gd
-Purpose
+reset()
+
+54. GameOverScreen.gd
+    Purpose
 
 Displays failure information.
 
@@ -129,20 +135,24 @@ set_reason(reason)
 
 set_remaining_objectives(objectives)
 Navigation
+
 retry_level()
-
 return_to_menu()
-
 watch_reward_ad()
-
 buy_extra_moves()
+
+→ All actions are forwarded to UIManager only
+→ UIManager decides actual gameplay/economy execution
+
 Animation
 play_open_animation()
 
 play_close_animation()
 Utility
-reset() 55. LoadingScreen.gd
-Purpose
+reset()
+
+55. LoadingScreen.gd
+    Purpose
 
 Displays loading progress during scene transitions.
 
@@ -169,10 +179,10 @@ show()
 
 hide()
 
-reset() 
+reset()
 
-52. UIManager.gd
-Coordinates the UI presentation layer.
+56. UIManager.gd
+    Coordinates the UI presentation layer.
 
 Controls UI screens, popups, HUD, notifications, loading, and input locking.
 
@@ -261,5 +271,3 @@ Screen management
 No gameplay logic should be implemented in these UI classes. They should only display information provided by the game's managers.
 
 This freezes the public API for every file under:
-
-scripts/ui/

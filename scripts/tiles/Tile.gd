@@ -1,277 +1,307 @@
 extends Node2D
-
 class_name Tile
 
+# =========================================================
+# SIGNALS
+# =========================================================
 
-signal clicked(tile: Tile)
-signal pressed(tile: Tile)
-signal released(tile: Tile)
+signal pressed(tile)
+signal released(tile)
+signal clicked(tile)
+signal hover_entered(tile)
+signal hover_exited(tile)
+
+# =========================================================
+# INTERNAL STATE
+# =========================================================
+
+var _state: TileState
+var _input_enabled: bool = true
+
+@onready var _sprite: Sprite2D = $Sprite2D
+@onready var _animation_player: AnimationPlayer = $AnimationPlayer
 
 
-@export var tile_size: int = 96
-
-
-var state: TileState = TileState.new()
-
-var sprite: Sprite2D
-var animation_player: AnimationPlayer
-var area: Area2D
-var collision: CollisionShape2D
-
-
-func _ready() -> void:
-	_create_nodes()
-	_update_visual_position()
-
-
-# ==========================================================
+# =========================================================
 # INITIALIZATION
-# ==========================================================
+# =========================================================
 
-func initialize(
-	tile_type: Constants.TileType,
-	grid_position: Vector2i
-) -> void:
-	state.initialize(tile_type, grid_position)
-	_update_visual_position()
+func initialize(tile_type, grid_position: Vector2i) -> void:
+	if _state == null:
+		_state = TileState.new()
 
-
-# ==========================================================
-# NODE CREATION
-# ==========================================================
-
-func _create_nodes() -> void:
-	if sprite == null:
-		sprite = Sprite2D.new()
-		sprite.name = "Sprite"
-		add_child(sprite)
-
-	if animation_player == null:
-		animation_player = AnimationPlayer.new()
-		animation_player.name = "AnimationPlayer"
-		add_child(animation_player)
-
-	if area == null:
-		area = Area2D.new()
-		area.name = "Area2D"
-		add_child(area)
-
-	if collision == null:
-		collision = CollisionShape2D.new()
-		collision.name = "CollisionShape2D"
-
-		var shape := RectangleShape2D.new()
-		shape.size = Vector2(tile_size, tile_size)
-
-		collision.shape = shape
-
-		area.add_child(collision)
-
-	if not area.input_event.is_connected(_on_input_event):
-		area.input_event.connect(_on_input_event)
+	_state.initialize(tile_type, grid_position)
 
 
-# ==========================================================
-# GRID POSITION
-# ==========================================================
+func reset() -> void:
+	if _state != null:
+		_state.reset()
+
+	reset_tile_modulate()
+	set_tile_visible(true)
+	_input_enabled = true
+
+
+# =========================================================
+# TILE STATE
+# =========================================================
+
+func get_tile_state() -> TileState:
+	return _state
+
+
+func set_tile_state(state: TileState) -> void:
+	_state = state
+
+
+func duplicate_tile_state() -> TileState:
+	return _state.duplicate_state() if _state != null else null
+
+
+# =========================================================
+# GRID
+# =========================================================
 
 func set_grid_position(position: Vector2i) -> void:
-	state.set_position(position)
-	_update_visual_position()
+	_state.set_position(position)
 
 
 func get_grid_position() -> Vector2i:
-	return state.get_position()
+	return _state.get_position()
 
 
-func _update_visual_position() -> void:
-	position = Vector2(
-		state.grid_position.x * tile_size,
-		state.grid_position.y * tile_size
-	)
+func move_to_grid(position: Vector2i) -> void:
+	_state.set_position(position)
 
 
-# ==========================================================
+# =========================================================
 # TILE TYPE
-# ==========================================================
+# =========================================================
 
-func set_tile_type(type: Constants.TileType) -> void:
-	state.set_tile_type(type)
-
-
-func get_tile_type() -> Constants.TileType:
-	return state.get_tile_type()
+func set_tile_type(type) -> void:
+	_state.set_tile_type(type)
 
 
-# ==========================================================
+func get_tile_type():
+	return _state.get_tile_type()
+
+
+# =========================================================
 # STATE
-# ==========================================================
+# =========================================================
 
-func set_state(new_state: Constants.TileState) -> void:
-	state.set_state(new_state)
+func set_state(state) -> void:
+	_state.set_state(state)
 
 
-func get_state() -> Constants.TileState:
-	return state.get_state()
+func get_state():
+	return _state.get_state()
 
 
 func is_idle() -> bool:
-	return get_state() == Constants.TileState.IDLE
+	return _state.is_state(Constants.TileState.IDLE)
 
 
-func is_selected() -> bool:
-	return state.selected
-
+# =========================================================
+# SELECTION
+# =========================================================
 
 func select() -> void:
-	state.selected = true
-	set_state(Constants.TileState.SELECTED)
+	_state.set_selected(true)
 
 
 func deselect() -> void:
-	state.selected = false
-	set_state(Constants.TileState.IDLE)
+	_state.set_selected(false)
 
 
-# ==========================================================
+func is_selected() -> bool:
+	return _state.is_selected()
+
+
+# =========================================================
 # MATCH
-# ==========================================================
+# =========================================================
 
 func mark_matched() -> void:
-	state.matched = true
-	set_state(Constants.TileState.MATCHED)
+	_state.set_matched(true)
 
 
 func clear_match() -> void:
-	state.matched = false
-
-	if get_state() == Constants.TileState.MATCHED:
-		set_state(Constants.TileState.IDLE)
+	_state.set_matched(false)
 
 
 func is_matched() -> bool:
-	return state.matched
+	return _state.is_matched()
 
 
-# ==========================================================
+# =========================================================
 # FALLING
-# ==========================================================
+# =========================================================
 
 func begin_fall() -> void:
-	state.falling = true
-	set_state(Constants.TileState.FALLING)
+	_state.set_falling(true)
 
 
 func end_fall() -> void:
-	state.falling = false
-	set_state(Constants.TileState.IDLE)
+	_state.set_falling(false)
 
 
 func is_falling() -> bool:
-	return state.falling
+	return _state.is_falling()
 
 
-# ==========================================================
+# =========================================================
+# LOCK
+# =========================================================
+
+func lock() -> void:
+	_state.set_locked(true)
+
+
+func unlock() -> void:
+	_state.set_locked(false)
+
+
+func is_locked() -> bool:
+	return _state.is_locked()
+
+
+# =========================================================
 # POWERUPS
-# ==========================================================
+# =========================================================
 
-func set_powerup(type: Constants.PowerupType) -> void:
-	state.set_powerup(type)
+func set_powerup(type) -> void:
+	_state.set_powerup(type)
+
+
+func get_powerup():
+	return _state.get_powerup()
 
 
 func has_powerup() -> bool:
-	return state.has_powerup()
-
-
-func get_powerup() -> Constants.PowerupType:
-	return state.powerup
+	return _state.has_powerup()
 
 
 func clear_powerup() -> void:
-	state.clear_powerup()
+	_state.clear_powerup()
 
 
-# ==========================================================
+# =========================================================
 # OBSTACLES
-# ==========================================================
+# =========================================================
 
-func set_obstacle(type: Constants.ObstacleType) -> void:
-	state.set_obstacle(type)
+func set_obstacle(type) -> void:
+	_state.set_obstacle(type)
+
+
+func get_obstacle():
+	return _state.get_obstacle()
 
 
 func has_obstacle() -> bool:
-	return state.has_obstacle()
-
-
-func get_obstacle() -> Constants.ObstacleType:
-	return state.obstacle
+	return _state.has_obstacle()
 
 
 func clear_obstacle() -> void:
-	state.clear_obstacle()
+	_state.clear_obstacle()
 
 
-# ==========================================================
+# =========================================================
 # HEALTH
-# ==========================================================
+# =========================================================
 
-func damage(amount: int = 1) -> void:
-	state.damage(amount)
+func damage(amount: int) -> void:
+	_state.damage(amount)
 
 
-func heal(amount: int = 1) -> void:
-	state.heal(amount)
+func heal(amount: int) -> void:
+	_state.heal(amount)
 
 
 func is_destroyed() -> bool:
-	return state.is_destroyed()
+	return _state.is_destroyed()
 
 
-# ==========================================================
-# SPRITE
-# ==========================================================
+# =========================================================
+# VISUAL (SAFE WRAPPERS)
+# =========================================================
 
 func set_texture(texture: Texture2D) -> void:
-	sprite.texture = texture
+	if _sprite:
+		_sprite.texture = texture
 
 
 func get_texture() -> Texture2D:
-	return sprite.texture
+	return _sprite.texture if _sprite else null
 
 
-# ==========================================================
+func set_tile_modulate(color: Color) -> void:
+	modulate = color
+
+
+func reset_tile_modulate() -> void:
+	modulate = Color.WHITE
+
+
+# IMPORTANT: renamed to avoid Godot override conflict
+func set_tile_visible(value: bool) -> void:
+	visible = value
+
+
+func is_tile_visible() -> bool:
+	return visible
+
+
+# =========================================================
+# ANIMATION REQUEST
+# =========================================================
+
+func request_animation(name: String) -> void:
+	SignalBus.animation_manager.play(name, self)
+
+
+func is_animation_playing() -> bool:
+	return _animation_player != null and _animation_player.is_playing()
+
+
+# =========================================================
 # INPUT
-# ==========================================================
+# =========================================================
 
-func _on_input_event(
-	_viewport,
-	event,
-	_shape_idx
-) -> void:
-	if event is InputEventScreenTouch:
-		if event.pressed:
-			pressed.emit(self)
-		else:
-			released.emit(self)
+func enable_input() -> void:
+	_input_enabled = true
 
-	elif event is InputEventMouseButton:
+
+func disable_input() -> void:
+	_input_enabled = false
+
+
+func is_input_enabled() -> bool:
+	return _input_enabled
+
+
+# =========================================================
+# GODOT INPUT
+# =========================================================
+
+func _input_event(viewport, event, shape_idx) -> void:
+	if not _input_enabled:
+		return
+
+	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			if event.pressed:
 				pressed.emit(self)
 			else:
 				released.emit(self)
-
-	elif event is InputEventScreenDrag:
-		clicked.emit(self)
+				clicked.emit(self)
 
 
-# ==========================================================
-# RESET
-# ==========================================================
-
-func reset() -> void:
-	state.reset_flags()
+func _mouse_enter() -> void:
+	if _input_enabled:
+		hover_entered.emit(self)
 
 
-func duplicate_tile_state() -> TileState:
-	return state.duplicate_state()
+func _mouse_exit() -> void:
+	if _input_enabled:
+		hover_exited.emit(self)

@@ -1,354 +1,266 @@
-extends RefCounted
-
+extends Node
 class_name TileAnimator
 
+# =========================================================
+# INTERNAL STATE
+# =========================================================
 
-const DEFAULT_SWAP_DURATION := 0.15
-const DEFAULT_FALL_DURATION := 0.20
-const DEFAULT_SPAWN_DURATION := 0.18
-const DEFAULT_DESTROY_DURATION := 0.18
-const DEFAULT_BOUNCE_DURATION := 0.08
+var _active_tweens: Dictionary = {}
+var _paused: bool = false
 
 
-static func animate_swap(
-	tile_a: Tile,
-	tile_b: Tile,
-	duration: float = DEFAULT_SWAP_DURATION
-) -> Tween:
+# =========================================================
+# INITIALIZATION
+# =========================================================
 
-	if tile_a == null or tile_b == null:
-		return null
+func initialize() -> void:
+	_active_tweens.clear()
+	_paused = false
 
-	var tree := tile_a.get_tree()
 
-	if tree == null:
-		return null
+# =========================================================
+# BASIC ANIMATIONS
+# =========================================================
 
-	var tween := tree.create_tween()
-	tween.set_parallel(true)
-
-	var position_a := tile_a.position
-	var position_b := tile_b.position
-
-	tween.tween_property(
-		tile_a,
-		"position",
-		position_b,
-		duration
-	)
-
-	tween.tween_property(
-		tile_b,
-		"position",
-		position_a,
-		duration
-	)
-
-	return tween
-
-
-static func animate_move(
-	tile: Tile,
-	target_position: Vector2,
-	duration: float = DEFAULT_SWAP_DURATION
-) -> Tween:
-
-	if tile == null:
-		return null
-
-	var tree := tile.get_tree()
-
-	if tree == null:
-		return null
-
-	var tween := tree.create_tween()
-
-	tween.tween_property(
-		tile,
-		"position",
-		target_position,
-		duration
-	)
-
-	return tween
-
-
-static func animate_fall(
-	tile: Tile,
-	target_position: Vector2,
-	duration: float = DEFAULT_FALL_DURATION
-) -> Tween:
-
-	if tile == null:
-		return null
-
-	var tree := tile.get_tree()
-
-	if tree == null:
-		return null
-
-	var tween := tree.create_tween()
-
-	tween.tween_property(
-		tile,
-		"position",
-		target_position,
-		duration
-	)
-
-	tween.tween_callback(
-		func():
-			tile.land()
-	)
-
-	return tween
-
-
-static func animate_spawn(
-	tile: Tile,
-	start_position: Vector2,
-	target_position: Vector2,
-	duration: float = DEFAULT_SPAWN_DURATION
-) -> Tween:
-
-	if tile == null:
-		return null
-
-	var tree := tile.get_tree()
-
-	if tree == null:
-		return null
-
-	tile.position = start_position
-	tile.scale = Vector2(0.0, 0.0)
-	tile.modulate.a = 0.0
-
-	var tween := tree.create_tween()
-	tween.set_parallel(true)
-
-	tween.tween_property(
-		tile,
-		"position",
-		target_position,
-		duration
-	)
-
-	tween.tween_property(
-		tile,
-		"scale",
-		Vector2.ONE,
-		duration
-	)
-
-	tween.tween_property(
-		tile,
-		"modulate:a",
-		1.0,
-		duration
-	)
-
-	tween.tween_callback(
-		func():
-			tile.finish_spawn()
-	)
-
-	return tween
-
-
-static func animate_destroy(
-	tile: Tile,
-	duration: float = DEFAULT_DESTROY_DURATION
-) -> Tween:
-
-	if tile == null:
-		return null
-
-	var tree := tile.get_tree()
-
-	if tree == null:
-		return null
-
-	var tween := tree.create_tween()
-	tween.set_parallel(true)
-
-	tween.tween_property(
-		tile,
-		"scale",
-		Vector2.ZERO,
-		duration
-	)
-
-	tween.tween_property(
-		tile,
-		"modulate:a",
-		0.0,
-		duration
-	)
-
-	tween.tween_callback(
-		func():
-			if is_instance_valid(tile):
-				tile.queue_free()
-	)
-
-	return tween
-
-
-static func animate_selection(tile: Tile) -> Tween:
-
-	if tile == null:
-		return null
-
-	var tree := tile.get_tree()
-
-	if tree == null:
-		return null
-
-	var tween := tree.create_tween()
-
-	tween.tween_property(
-		tile,
-		"scale",
-		Vector2(1.10, 1.10),
-		DEFAULT_BOUNCE_DURATION
-	)
-
-	return tween
-
-
-static func animate_deselection(tile: Tile) -> Tween:
-
-	if tile == null:
-		return null
-
-	var tree := tile.get_tree()
-
-	if tree == null:
-		return null
-
-	var tween := tree.create_tween()
-
-	tween.tween_property(
-		tile,
-		"scale",
-		Vector2.ONE,
-		DEFAULT_BOUNCE_DURATION
-	)
-
-	return tween
-
-
-static func animate_bounce(tile: Tile) -> Tween:
-
-	if tile == null:
-		return null
-
-	var tree := tile.get_tree()
-
-	if tree == null:
-		return null
-
-	var tween := tree.create_tween()
-
-	tween.tween_property(
-		tile,
-		"scale",
-		Vector2(1.12, 1.12),
-		DEFAULT_BOUNCE_DURATION
-	)
-
-	tween.tween_property(
-		tile,
-		"scale",
-		Vector2.ONE,
-		DEFAULT_BOUNCE_DURATION
-	)
-
-	return tween
-
-
-static func animate_shake(
-	tile: Tile,
-	distance: float = 8.0,
-	duration: float = 0.05
-) -> Tween:
-
-	if tile == null:
-		return null
-
-	var tree := tile.get_tree()
-
-	if tree == null:
-		return null
-
-	var original_position := tile.position
-
-	var tween := tree.create_tween()
-
-	tween.tween_property(
-		tile,
-		"position",
-		original_position + Vector2(distance, 0),
-		duration
-	)
-
-	tween.tween_property(
-		tile,
-		"position",
-		original_position - Vector2(distance, 0),
-		duration
-	)
-
-	tween.tween_property(
-		tile,
-		"position",
-		original_position,
-		duration
-	)
-
-	return tween
-
-
-static func animate_highlight(
-	tile: Tile,
-	color: Color,
-	duration: float = 0.25
-) -> Tween:
-
-	if tile == null:
-		return null
-
-	var tree := tile.get_tree()
-
-	if tree == null:
-		return null
-
-	var original := tile.modulate
-
-	var tween := tree.create_tween()
-
-	tween.tween_property(
-		tile,
-		"modulate",
-		color,
-		duration
-	)
-
-	tween.tween_property(
-		tile,
-		"modulate",
-		original,
-		duration
-	)
-
-	return tween
-
-
-static func stop_all(tile: Tile) -> void:
-
+func play_idle(tile: Tile) -> void:
 	if tile == null:
 		return
 
-	for child in tile.get_children():
-		if child is Tween:
-			child.kill()
+
+func play_spawn(tile: Tile) -> void:
+	if tile == null:
+		return
+
+	var tween = _create_tween(tile)
+	tile.scale = Vector2.ZERO
+	tween.tween_property(tile, "scale", Vector2.ONE, 0.25)
+
+	_finish_animation(tile, tween)
+
+
+func play_destroy(tile: Tile) -> void:
+	if tile == null:
+		return
+
+	var tween = _create_tween(tile)
+
+	tween.tween_property(tile, "scale", Vector2.ZERO, 0.2)
+	tween.tween_callback(func():
+		tile.hide()
+	)
+
+	_finish_animation(tile, tween)
+
+
+func play_fall(tile: Tile) -> void:
+	if tile == null:
+		return
+
+	var tween = _create_tween(tile)
+	tween.tween_property(tile, "position", tile.position, 0.15)
+
+	_finish_animation(tile, tween)
+
+
+func play_swap(tile_a: Tile, tile_b: Tile) -> void:
+	if tile_a == null or tile_b == null:
+		return
+
+	var tween_a = _create_tween(tile_a)
+	var tween_b = _create_tween(tile_b)
+
+	var pos_a = tile_a.position
+	var pos_b = tile_b.position
+
+	tween_a.tween_property(tile_a, "position", pos_b, 0.2)
+	tween_b.tween_property(tile_b, "position", pos_a, 0.2)
+
+	_finish_animation(tile_a, tween_a)
+	_finish_animation(tile_b, tween_b)
+
+
+func play_move(tile: Tile, position: Vector2) -> void:
+	if tile == null:
+		return
+
+	var tween = _create_tween(tile)
+	tween.tween_property(tile, "position", position, 0.2)
+
+	_finish_animation(tile, tween)
+
+
+func play_bounce(tile: Tile) -> void:
+	if tile == null:
+		return
+
+	var tween = _create_tween(tile)
+
+	tween.tween_property(tile, "scale", Vector2(1.1, 1.1), 0.1)
+	tween.tween_property(tile, "scale", Vector2.ONE, 0.1)
+
+	_finish_animation(tile, tween)
+
+
+func play_shake(tile: Tile) -> void:
+	if tile == null:
+		return
+
+	var tween = _create_tween(tile)
+
+	var original_pos = tile.position
+
+	tween.tween_property(tile, "position", original_pos + Vector2(4, 0), 0.05)
+	tween.tween_property(tile, "position", original_pos + Vector2(-4, 0), 0.05)
+	tween.tween_property(tile, "position", original_pos, 0.05)
+
+	_finish_animation(tile, tween)
+
+
+func play_highlight(tile: Tile) -> void:
+	if tile == null:
+		return
+
+	var tween = _create_tween(tile)
+
+	tween.tween_property(tile, "modulate", Color(1, 1, 0.8), 0.1)
+	tween.tween_property(tile, "modulate", Color.WHITE, 0.1)
+
+	_finish_animation(tile, tween)
+
+
+# =========================================================
+# SELECTION
+# =========================================================
+
+func play_select(tile: Tile) -> void:
+	if tile == null:
+		return
+
+	var tween = _create_tween(tile)
+	tween.tween_property(tile, "scale", Vector2(1.15, 1.15), 0.1)
+
+	_finish_animation(tile, tween)
+
+
+func play_deselect(tile: Tile) -> void:
+	if tile == null:
+		return
+
+	var tween = _create_tween(tile)
+	tween.tween_property(tile, "scale", Vector2.ONE, 0.1)
+
+	_finish_animation(tile, tween)
+
+
+# =========================================================
+# POWERUPS
+# =========================================================
+
+func play_powerup_create(tile: Tile) -> void:
+	if tile == null:
+		return
+
+	var tween = _create_tween(tile)
+	tween.tween_property(tile, "modulate", Color(0.5, 1, 0.5), 0.15)
+
+	_finish_animation(tile, tween)
+
+
+func play_powerup_activate(tile: Tile) -> void:
+	if tile == null:
+		return
+
+	var tween = _create_tween(tile)
+
+	tween.tween_property(tile, "scale", Vector2(1.3, 1.3), 0.1)
+	tween.tween_property(tile, "scale", Vector2.ZERO, 0.2)
+
+	_finish_animation(tile, tween)
+
+
+func play_powerup_combo(tile_a: Tile, tile_b: Tile) -> void:
+	play_destroy(tile_a)
+	play_destroy(tile_b)
+
+
+# =========================================================
+# OBSTACLES
+# =========================================================
+
+func play_obstacle_damage(tile: Tile) -> void:
+	if tile == null:
+		return
+
+	var tween = _create_tween(tile)
+	tween.tween_property(tile, "modulate", Color(1, 0.5, 0.5), 0.1)
+
+	_finish_animation(tile, tween)
+
+
+func play_obstacle_break(tile: Tile) -> void:
+	play_destroy(tile)
+
+
+# =========================================================
+# UTILITY
+# =========================================================
+
+func stop(tile: Tile) -> void:
+	if tile == null:
+		return
+
+	if _active_tweens.has(tile):
+		_active_tweens[tile].kill()
+		_active_tweens.erase(tile)
+
+
+func stop_all() -> void:
+	for tween in _active_tweens.values():
+		tween.kill()
+
+	_active_tweens.clear()
+
+
+func pause(tile: Tile) -> void:
+	if tile == null:
+		return
+
+	if _active_tweens.has(tile):
+		_active_tweens[tile].set_pause_mode(true)
+
+
+func resume(tile: Tile) -> void:
+	if tile == null:
+		return
+
+	if _active_tweens.has(tile):
+		_active_tweens[tile].set_pause_mode(false)
+
+
+func is_playing(tile: Tile) -> bool:
+	return _active_tweens.has(tile)
+
+
+func wait_until_finished(tile: Tile) -> void:
+	while _active_tweens.has(tile):
+		await get_tree().process_frame
+
+
+# =========================================================
+# INTERNAL
+# =========================================================
+
+func _create_tween(tile: Tile) -> Tween:
+	var tween = create_tween()
+	_active_tweens[tile] = tween
+	return tween
+
+
+func _finish_animation(tile: Tile, tween: Tween) -> void:
+	if tween == null:
+		return
+
+	tween.finished.connect(func():
+		if _active_tweens.get(tile) == tween:
+			_active_tweens.erase(tile)
+	)

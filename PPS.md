@@ -130,6 +130,7 @@ scripts/
 ├── managers/
 ├── obstacles/
 ├── powerups/
+├── rewards/
 ├── save/
 ├── story/
 ├── tiles/

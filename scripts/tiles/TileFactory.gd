@@ -1,191 +1,137 @@
 extends Node
-
 class_name TileFactory
 
+# =========================================================
+# DEPENDENCIES
+# =========================================================
 
-var tile_database: TileDatabase
-var resource_manager: ResourceManager
+var _tile_scene: PackedScene
+var _tile_database: TileDatabase
 
 
-func _ready() -> void:
-	_initialize_dependencies()
-
-
-# ==========================================================
+# =========================================================
 # INITIALIZATION
-# ==========================================================
+# =========================================================
 
-func _initialize_dependencies() -> void:
-	if tile_database == null:
-		tile_database = get_node_or_null("/root/TileDatabase")
-
-	if resource_manager == null:
-		resource_manager = get_node_or_null("/root/ResourceManager")
+func initialize(tile_scene: PackedScene, tile_database: TileDatabase) -> void:
+	_tile_scene = tile_scene
+	_tile_database = tile_database
 
 
-# ==========================================================
-# TILE CREATION
-# ==========================================================
+# =========================================================
+# CREATION
+# =========================================================
 
-func create_tile(
-	tile_id: String,
-	grid_position: Vector2i
-) -> Tile:
-	if tile_database == null:
-		push_error("TileFactory: TileDatabase not found.")
-		return null
-
-	var tile_data := tile_database.get_tile(tile_id)
-
-	if tile_data.is_empty():
-		push_error("TileFactory: Unknown tile '%s'." % tile_id)
-		return null
-
-	var tile := Tile.new()
-
-	var tile_type := _get_tile_type(tile_id)
-
-	tile.initialize(
-		tile_type,
-		grid_position
-	)
-
-	_apply_tile_data(tile, tile_data)
-
+func create_tile(tile_type) -> Tile:
+	var tile: Tile = _tile_scene.instantiate()
+	_apply_database_data(tile, tile_type)
 	return tile
 
 
-func create_random_tile(
-	grid_position: Vector2i
-) -> Tile:
-	if tile_database == null:
-		push_error("TileFactory: TileDatabase not found.")
+func create_tile_at(tile_type, grid_position: Vector2i) -> Tile:
+	var tile: Tile = create_tile(tile_type)
+	tile.initialize(tile_type, grid_position)
+	return tile
+
+
+func create_random_tile() -> Tile:
+	if _tile_database == null:
 		return null
 
-	var tile_data := tile_database.get_random_tile()
-
-	if tile_data.is_empty():
-		push_error("TileFactory: No spawnable tiles found.")
+	var data = _tile_database.get_random_spawnable_tile()
+	if data.is_empty():
 		return null
 
-	return create_tile(
-		String(tile_data["id"]),
-		grid_position
-	)
+	return create_tile(data.get("type"))
 
 
-# ==========================================================
-# DATA APPLICATION
-# ==========================================================
+func create_random_tile_at(position: Vector2i) -> Tile:
+	if _tile_database == null:
+		return null
 
-func _apply_tile_data(
-	tile: Tile,
-	tile_data: Dictionary
-) -> void:
-	if tile_data.has("texture"):
-		var texture := _load_texture(
-			String(tile_data["texture"])
-		)
+	var data = _tile_database.get_random_spawnable_tile()
+	if data.is_empty():
+		return null
 
-		if texture != null:
-			tile.set_texture(texture)
-
-	if tile_data.has("health"):
-		tile.state.health = int(tile_data["health"])
-
-	if tile_data.has("powerup"):
-		if bool(tile_data["powerup"]):
-			tile.state.powerup = Constants.PowerupType.NONE
-
-	if tile_data.has("obstacle"):
-		if bool(tile_data["obstacle"]):
-			tile.state.obstacle = Constants.ObstacleType.NONE
+	return create_tile_at(data.get("type"), position)
 
 
-func _load_texture(path: String) -> Texture2D:
-	if resource_manager == null:
-		return load(path)
+# =========================================================
+# COPY
+# =========================================================
 
-	return resource_manager.load_texture(path)
+func duplicate_tile(tile: Tile) -> Tile:
+	if tile == null:
+		return null
 
+	var new_tile: Tile = _tile_scene.instantiate()
 
-# ==========================================================
-# TILE TYPE CONVERSION
-# ==========================================================
+	new_tile.set_tile_state(tile.get_tile_state().duplicate_state())
 
-func _get_tile_type(
-	tile_id: String
-) -> Constants.TileType:
-	match tile_id.to_lower():
+	_apply_database_data(new_tile, tile.get_tile_type())
 
-		"key":
-			return Constants.TileType.KEY
-
-		"phone":
-			return Constants.TileType.PHONE
-
-		"fingerprint":
-			return Constants.TileType.FINGERPRINT
-
-		"recorder":
-			return Constants.TileType.RECORDER
-
-		"plier":
-			return Constants.TileType.PLIER
-
-		"clock":
-			return Constants.TileType.CLOCK
-
-		"ethan":
-			return Constants.TileType.ETHAN
-
-		_:
-			push_warning(
-				"TileFactory: Unknown tile id '%s'. Using KEY."
-				% tile_id
-			)
-			return Constants.TileType.KEY
+	return new_tile
 
 
-# ==========================================================
-# HELPERS
-# ==========================================================
+# =========================================================
+# LIFECYCLE
+# =========================================================
 
-func create_tiles_from_ids(
-	ids: Array,
-	start_position: Vector2i = Vector2i.ZERO
-) -> Array:
-	var tiles: Array = []
-
-	var x := start_position.x
-
-	for id in ids:
-		var tile := create_tile(
-			String(id),
-			Vector2i(x, start_position.y)
-		)
-
-		if tile != null:
-			tiles.append(tile)
-
-		x += 1
-
-	return tiles
-
-
-# ==========================================================
-# DEBUG
-# ==========================================================
-
-func print_available_tiles() -> void:
-	if tile_database == null:
+func destroy_tile(tile: Tile) -> void:
+	if tile == null:
 		return
 
-	print("--------------------------------")
-	print("Available Tiles")
-	print("--------------------------------")
+	tile.queue_free()
 
-	for id in tile_database.get_tile_ids():
-		print(id)
 
-	print("--------------------------------")
+func recycle_tile(tile: Tile) -> void:
+	if tile == null:
+		return
+
+	tile.reset()
+
+
+func reset_tile(tile: Tile) -> void:
+	if tile == null:
+		return
+
+	tile.reset()
+
+
+# =========================================================
+# INTERNAL
+# =========================================================
+
+func _apply_database_data(tile: Tile, tile_type) -> void:
+	if tile == null or _tile_database == null:
+		return
+
+	var data = _tile_database.get_tile_by_enum(tile_type)
+	if data.is_empty():
+		return
+
+	_assign_metadata(tile, data)
+	_assign_texture(tile, data)
+	_assign_animation_set(tile, data)
+
+
+func _assign_metadata(tile: Tile, data: Dictionary) -> void:
+	# Metadata is already enforced via TileState
+	# Factory does not interpret gameplay meaning
+	pass
+
+
+func _assign_texture(tile: Tile, data: Dictionary) -> void:
+	var texture_path: String = data.get("texture", "")
+	if texture_path == "":
+		return
+
+	var texture = ResourceManager.get(texture_path)
+	if texture:
+		tile.set_texture(texture)
+
+
+func _assign_animation_set(tile: Tile, data: Dictionary) -> void:
+	# Animation sets are referenced, not executed
+	# Actual animation execution belongs to AnimationManager/TileAnimator
+	tile.set_meta("animation_set", data.get("animation_set", "default"))

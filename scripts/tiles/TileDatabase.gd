@@ -1,182 +1,169 @@
 extends Node
-
 class_name TileDatabase
 
+# =========================================================
+# INTERNAL CACHE
+# =========================================================
 
-var _tiles: Dictionary = {}
+var _tile_cache: Dictionary = {}
+var _config_data: Dictionary = {}
 
 
-func _ready() -> void:
-	load_database()
+# =========================================================
+# INITIALIZATION
+# =========================================================
+
+func initialize() -> void:
+	reload()
 
 
-# ==========================================================
-# LOADING
-# ==========================================================
+func reload() -> void:
+	clear()
 
-func load_database() -> void:
-	_tiles.clear()
+	_config_data = ConfigLoader.load_config("tiles") # expects configs/tiles.json
 
-	var config := ConfigManager.get_config("tiles")
+	if _config_data == null:
+		push_error("TileDatabase: Failed to load tiles config.")
+		_config_data = {}
 
-	if config.is_empty():
-		push_warning("TileDatabase: tiles.json could not be loaded.")
+	_build_cache()
+
+
+func clear() -> void:
+	_tile_cache.clear()
+	_config_data.clear()
+
+
+# =========================================================
+# CACHE BUILD
+# =========================================================
+
+func _build_cache() -> void:
+	if not _config_data.has("tiles"):
 		return
 
-	if not config.has("tiles"):
-		push_warning("TileDatabase: Missing 'tiles' section.")
-		return
+	for tile_entry in _config_data["tiles"]:
+		var id = tile_entry.get("id")
+		if id == null:
+			continue
 
-	var tile_list = config["tiles"]
-
-	if tile_list is Array:
-		for tile_data in tile_list:
-			if tile_data is Dictionary:
-				_register_tile(tile_data)
+		_tile_cache[id] = tile_entry
 
 
-func reload_database() -> void:
-	load_database()
+# =========================================================
+# LOOKUP
+# =========================================================
+
+func get_tile(id) -> Dictionary:
+	return _tile_cache.get(id, {})
 
 
-func _register_tile(tile_data: Dictionary) -> void:
-	if not tile_data.has("id"):
-		push_warning("TileDatabase: Tile missing id.")
-		return
-
-	var id := String(tile_data["id"])
-
-	_tiles[id] = tile_data
+func has_tile(id) -> bool:
+	return _tile_cache.has(id)
 
 
-# ==========================================================
-# LOOKUPS
-# ==========================================================
-
-func has_tile(id: String) -> bool:
-	return _tiles.has(id)
-
-
-func get_tile(id: String) -> Dictionary:
-	if _tiles.has(id):
-		return _tiles[id]
-
-	push_warning("TileDatabase: Unknown tile '%s'." % id)
+func get_tile_by_enum(type) -> Dictionary:
+	for tile in _tile_cache.values():
+		if tile.get("type") == type:
+			return tile
 	return {}
 
 
-func get_all_tiles() -> Dictionary:
-	return _tiles
+func get_tile_name(type) -> String:
+	var tile = get_tile_by_enum(type)
+	return tile.get("name", "")
 
 
-func get_tile_ids() -> Array:
-	return _tiles.keys()
+func get_tile_texture_path(type) -> String:
+	var tile = get_tile_by_enum(type)
+	return tile.get("texture", "")
 
 
-func get_tile_count() -> int:
-	return _tiles.size()
+func get_tile_icon_path(type) -> String:
+	var tile = get_tile_by_enum(type)
+	return tile.get("icon", "")
 
 
-# ==========================================================
-# PROPERTIES
-# ==========================================================
-
-func get_property(
-	id: String,
-	property: String,
-	default_value: Variant = null
-) -> Variant:
-	if not _tiles.has(id):
-		return default_value
-
-	var tile: Dictionary = _tiles[id]
-
-	if tile.has(property):
-		return tile[property]
-
-	return default_value
+func get_tile_animation_set(type) -> String:
+	var tile = get_tile_by_enum(type)
+	return tile.get("animation_set", "")
 
 
-func get_texture_path(id: String) -> String:
-	return String(
-		get_property(id, "texture", "")
-	)
+func get_tile_score(type) -> int:
+	var tile = get_tile_by_enum(type)
+	return tile.get("score", 0)
 
 
-func get_name(id: String) -> String:
-	return String(
-		get_property(id, "name", "")
-	)
+# =========================================================
+# COLLECTIONS
+# =========================================================
+
+func get_all_tiles() -> Array:
+	return _tile_cache.values()
 
 
-func get_match_value(id: String) -> int:
-	return int(
-		get_property(id, "match_value", 0)
-	)
+func get_matchable_tiles() -> Array:
+	var result := []
+	for tile in _tile_cache.values():
+		if tile.get("matchable", true):
+			result.append(tile)
+	return result
 
 
-func get_score(id: String) -> int:
-	return int(
-		get_property(id, "score", 0)
-	)
+func get_spawnable_tiles() -> Array:
+	var result := []
+	for tile in _tile_cache.values():
+		if tile.get("spawnable", true):
+			result.append(tile)
+	return result
 
 
-func is_spawnable(id: String) -> bool:
-	return bool(
-		get_property(id, "spawnable", true)
-	)
+func get_special_tiles() -> Array:
+	var result := []
+	for tile in _tile_cache.values():
+		if tile.get("special", false):
+			result.append(tile)
+	return result
 
 
-func has_powerup(id: String) -> bool:
-	return bool(
-		get_property(id, "powerup", false)
-	)
+func get_hidden_tiles() -> Array:
+	var result := []
+	for tile in _tile_cache.values():
+		if tile.get("hidden", false):
+			result.append(tile)
+	return result
 
 
-func is_special(id: String) -> bool:
-	return bool(
-		get_property(id, "special", false)
-	)
+# =========================================================
+# RANDOM
+# =========================================================
+
+func get_random_spawnable_tile():
+	var pool = get_spawnable_tiles()
+	if pool.is_empty():
+		return null
+	return pool[randi() % pool.size()]
 
 
-# ==========================================================
-# RANDOM TILE
-# ==========================================================
+# =========================================================
+# VALIDATION
+# =========================================================
 
-func get_random_tile() -> Dictionary:
-	var available: Array = []
-
-	for id in _tiles.keys():
-		if is_spawnable(id):
-			available.append(_tiles[id])
-
-	if available.is_empty():
-		return {}
-
-	return RandomGenerator.random_item(available)
+func is_matchable(type) -> bool:
+	var tile = get_tile_by_enum(type)
+	return tile.get("matchable", true)
 
 
-func get_random_tile_id() -> String:
-	var tile := get_random_tile()
-
-	if tile.is_empty():
-		return ""
-
-	return String(tile["id"])
+func is_spawnable(type) -> bool:
+	var tile = get_tile_by_enum(type)
+	return tile.get("spawnable", true)
 
 
-# ==========================================================
-# DEBUG
-# ==========================================================
+func is_special(type) -> bool:
+	var tile = get_tile_by_enum(type)
+	return tile.get("special", false)
 
-func print_database() -> void:
-	print("--------------------------------")
-	print("Tile Database")
-	print("--------------------------------")
 
-	for id in _tiles.keys():
-		print(id)
-
-	print("--------------------------------")
-	print("Total Tiles: ", _tiles.size())
-	print("--------------------------------")
+func is_hidden(type) -> bool:
+	var tile = get_tile_by_enum(type)
+	return tile.get("hidden", false)

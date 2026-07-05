@@ -22,7 +22,7 @@ Communication occurs through SignalBus.
 This folder is therefore fully aligned with the Manager API and Utilities API.
 
 1. TileState.gd
-Purpose
+   Purpose
 
 Stores every piece of gameplay state belonging to one tile.
 
@@ -119,30 +119,30 @@ reset_flags()
 
 Internal
 
-_tile_type
+\_tile_type
 
-_grid_position
+\_grid_position
 
-_state
+\_state
 
-_powerup
+\_powerup
 
-_obstacle
+\_obstacle
 
-_health
+\_health
 
-_selected
+\_selected
 
-_matched
+\_matched
 
-_falling
+\_falling
 
-_locked
+\_locked
 
-_hidden
+\_hidden
 
 2. Tile.gd
-Purpose
+   Purpose
 
 Represents one tile node inside the scene tree.
 
@@ -279,9 +279,9 @@ set_texture(texture)
 
 get_texture()
 
-set_modulate(color)
+set_tile_modulate(color)
 
-reset_modulate()
+reset_tile_modulate()
 
 show()
 
@@ -305,16 +305,16 @@ is_input_enabled() -> bool
 
 Internal
 
-_state
+\_state
 
-_sprite
+\_sprite
 
-_animation_player
+\_animation_player
 
-_input_enabled
+\_input_enabled
 
 3. TileDatabase.gd
-Purpose
+   Purpose
 
 Loads every tile definition from
 
@@ -379,10 +379,10 @@ is_hidden(type)
 
 Internal
 
-_tile_cache
+\_tile_cache
 
 4. TileFactory.gd
-Purpose
+   Purpose
 
 Creates and destroys Tile nodes.
 
@@ -423,16 +423,16 @@ reset_tile(tile)
 
 Internal
 
-_apply_database_data(tile)
+\_apply_database_data(tile)
 
-_assign_texture(tile)
+\_assign_texture(tile)
 
-_assign_animation_set(tile)
+\_assign_animation_set(tile)
 
-_assign_metadata(tile)
+\_assign_metadata(tile)
 
 5. TileAnimator.gd
-Purpose
+   Purpose
 
 Owns every animation that affects an individual tile.
 
@@ -501,28 +501,28 @@ wait_until_finished(tile)
 
 Internal
 
-_create_tween()
+\_create_tween()
 
-_finish_animation()
+\_finish_animation()
 
 Frozen Tile System Dependency
-                BoardManager
-                      │
-                      ▼
-                TileFactory
-                      │
-                      ▼
-                    Tile
-                      │
-            ┌─────────┴─────────┐
-            ▼                   ▼
-       TileState          TileAnimator
-            │
-            ▼
-       TileDatabase
-            │
-            ▼
- ConfigLoader / ResourceManager
+BoardManager
+│
+▼
+TileFactory
+│
+▼
+Tile
+│
+┌─────────┴─────────┐
+▼ ▼
+TileState TileAnimator
+│
+▼
+TileDatabase
+│
+▼
+ConfigLoader / ResourceManager
 Version 1 Rules
 The Tile System represents individual tiles only.
 BoardManager is the only manager that coordinates tile gameplay.

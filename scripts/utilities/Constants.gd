@@ -229,3 +229,12 @@ enum Difficulty {
 	HARD,
 	BOSS
 }
+
+enum TileState {
+	IDLE,
+	SELECTED,
+	MATCHED,
+	FALLING,
+	LOCKED,
+	HIDDEN
+}

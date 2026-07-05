@@ -46,7 +46,6 @@ func initialize() -> void:
 	_input_locked = false
 	_is_initialized = true
 
-
 func show_screen(name: StringName) -> void:
 	if screens == null:
 		return
@@ -91,6 +90,7 @@ func show_popup(name: StringName, data := {}) -> void:
 	_open_popups[name] = popup
 
 	emit_signal("popup_opened", name)
+	SignalBus.popup_opened.emit(name)
 
 
 func hide_popup(name: StringName) -> void:
@@ -108,6 +108,7 @@ func hide_popup(name: StringName) -> void:
 	_open_popups.erase(name)
 
 	emit_signal("popup_closed", name)
+	SignalBus.popup_closed.emit(name)
 
 
 func close_all_popups() -> void:
@@ -119,7 +120,8 @@ func update_hud() -> void:
 	if hud == null:
 		return
 
-	emit_signal("hud_updated")
+	hud_updated.emit()
+	SignalBus.hud_updated.emit()
 
 
 func show_notification(text: String) -> void:
