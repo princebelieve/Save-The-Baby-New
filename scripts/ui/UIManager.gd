@@ -245,3 +245,33 @@ func shutdown() -> void:
 	reset()
 	_open_popups.clear()
 	_is_initialized = false
+
+
+	# =========================================================
+# GAME FLOW INTENT FORWARDING
+# (Called by UI screens only)
+# =========================================================
+
+func restart_level() -> void:
+	SignalBus.game_restarted.emit()
+
+func return_to_menu() -> void:
+	SignalBus.game_quit.emit()
+
+func request_resume_game() -> void:
+	SignalBus.game_resumed.emit()
+
+func request_restart_level() -> void:
+	SignalBus.game_restarted.emit()
+
+func request_open_settings() -> void:
+	show_popup("Settings")
+
+func request_return_to_menu() -> void:
+	SignalBus.game_quit.emit()
+
+func request_quit_game() -> void:
+	SignalBus.game_quit.emit()
+
+func request_next_level() -> void:
+	SignalBus.next_level_requested.emit()

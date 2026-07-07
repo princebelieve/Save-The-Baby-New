@@ -1,173 +1,111 @@
 extends Node
 class_name UIManager
 
+# =========================================================
+# SIGNALS
+# =========================================================
 signal popup_opened(name)
 signal popup_closed(name)
 signal hud_updated
 
-@export var hud: HUD
-@export var pause_menu: PauseMenu
-@export var victory_screen: VictoryScreen
-@export var game_over_screen: GameOverScreen
-@export var loading_screen: LoadingScreen
-
-# Optional UI containers
-@export var screens: Node
-@export var popups: Node
-@export var notification: Node
-
-var _current_screen: Node = null
-var _open_popups: Dictionary = {}
+# =========================================================
+# INTERNAL STATE
+# =========================================================
+var _current_screen: String = ""
+var _open_popups: Array = []
 var _input_locked: bool = false
 var _is_initialized: bool = false
 
 
+# =========================================================
+# INITIALIZATION
+# =========================================================
 func initialize() -> void:
 	if _is_initialized:
 		return
 
-	if hud:
-		hud.initialize()
-
-	if pause_menu:
-		pause_menu.initialize()
-
-	if victory_screen:
-		victory_screen.initialize()
-
-	if game_over_screen:
-		game_over_screen.initialize()
-
-	if loading_screen:
-		loading_screen.initialize()
-
-	_current_screen = null
+	_current_screen = ""
 	_open_popups.clear()
 	_input_locked = false
 	_is_initialized = true
 
-func show_screen(name: StringName) -> void:
-	if screens == null:
+
+func _ready() -> void:
+	initialize()
+
+
+# =========================================================
+# SCREENS
+# =========================================================
+func show_screen(name: String) -> void:
+	if name == "":
 		return
 
-	if _current_screen:
-		_current_screen.hide()
+	_current_screen = name
 
-	var screen := screens.get_node_or_null(NodePath(name))
-
-	if screen:
-		screen.show()
-		_current_screen = screen
+	SignalBus.popup_requested.emit(name, {})
+	popup_opened.emit(name)
 
 
-func hide_screen(name: StringName) -> void:
-	if screens == null:
+func hide_screen(name: String) -> void:
+	if _current_screen != name:
 		return
 
-	var screen := screens.get_node_or_null(NodePath(name))
+	_current_screen = ""
 
-	if screen:
-		screen.hide()
-
-	if _current_screen == screen:
-		_current_screen = null
-
-
-func show_popup(name: StringName, data := {}) -> void:
-	if popups == null:
-		return
-
-	var popup := popups.get_node_or_null(NodePath(name))
-
-	if popup == null:
-		return
-
-	if popup.has_method("show_popup"):
-		popup.show_popup(data)
-	else:
-		popup.show()
-
-	_open_popups[name] = popup
-
-	emit_signal("popup_opened", name)
-	SignalBus.popup_opened.emit(name)
-
-
-func hide_popup(name: StringName) -> void:
-	if !_open_popups.has(name):
-		return
-
-	var popup: Node = _open_popups[name]
-
-	if is_instance_valid(popup):
-		if popup.has_method("hide_popup"):
-			popup.hide_popup()
-		else:
-			popup.hide()
-
-	_open_popups.erase(name)
-
-	emit_signal("popup_closed", name)
+	popup_closed.emit(name)
 	SignalBus.popup_closed.emit(name)
 
 
-func close_all_popups() -> void:
-	for popup_name in _open_popups.keys():
-		hide_popup(popup_name)
-
-
+# =========================================================
+# HUD
+# =========================================================
 func update_hud() -> void:
-	if hud == null:
-		return
-
 	hud_updated.emit()
 	SignalBus.hud_updated.emit()
 
 
-func show_notification(text: String) -> void:
-	if notification == null:
+# =========================================================
+# POPUPS
+# =========================================================
+func show_popup(name: String, data: Dictionary = {}) -> void:
+	if name == "":
 		return
 
-	if notification.has_method("show_notification"):
-		notification.show_notification(text)
-	elif notification.has_method("show_message"):
-		notification.show_message(text)
-	elif notification.has_method("set_text"):
-		notification.set_text(text)
+	if not _open_popups.has(name):
+		_open_popups.append(name)
 
-	if notification.has_method("show"):
-		notification.show()
+	popup_opened.emit(name)
+	SignalBus.popup_requested.emit(name, data)
+
+
+func hide_popup(name: String) -> void:
+	if _open_popups.has(name):
+		_open_popups.erase(name)
+
+	popup_closed.emit(name)
+	SignalBus.popup_closed.emit(name)
+
+
+func close_all_popups() -> void:
+	for popup in _open_popups.duplicate():
+		hide_popup(popup)
+
+
+# =========================================================
+# NOTIFICATIONS
+# =========================================================
+func show_notification(text: String) -> void:
+	SignalBus.debug_message.emit(text)
 
 
 func hide_notification() -> void:
-	if notification == null:
-		return
-
-	if notification.has_method("hide_notification"):
-		notification.hide_notification()
-	elif notification.has_method("clear_message"):
-		notification.clear_message()
-
-	if notification.has_method("hide"):
-		notification.hide()
+	pass
 
 
-func show_loading() -> void:
-	if loading_screen == null:
-		return
-
-	loading_screen.show()
-	loading_screen.start_loading()
-
-
-func hide_loading() -> void:
-	if loading_screen == null:
-		return
-
-	loading_screen.finish_loading()
-	loading_screen.hide()
-
-
+# =========================================================
+# INPUT CONTROL
+# =========================================================
 func lock_input() -> void:
 	_input_locked = true
 
@@ -180,35 +118,45 @@ func is_input_locked() -> bool:
 	return _input_locked
 
 
+# =========================================================
+# UI LIFECYCLE
+# =========================================================
 func reset() -> void:
-	close_all_popups()
-
-	hide_notification()
-
-	if loading_screen:
-		loading_screen.reset()
-
-	if pause_menu:
-		pause_menu.reset()
-
-	if victory_screen:
-		victory_screen.reset()
-
-	if game_over_screen:
-		game_over_screen.reset()
-
-	if hud:
-		hud.reset()
-
-	if _current_screen:
-		_current_screen.hide()
-
-	_current_screen = null
+	_current_screen = ""
+	_open_popups.clear()
 	_input_locked = false
 
 
 func shutdown() -> void:
 	reset()
-
-	_open_popups.clear()
 	_is_initialized = false
+
+
+# =========================================================
+# GAMEPLAY INTENT BRIDGE (CRITICAL MISSING PART)
+# =========================================================
+# These DO NOT execute gameplay.
+# They forward intent to the appropriate manager layer.
+
+func request_resume_game() -> void:
+	SignalBus.game_resumed.emit()
+
+
+func request_restart_level() -> void:
+	SignalBus.game_restarted.emit()
+
+
+func request_return_to_menu() -> void:
+	SignalBus.game_quit.emit()
+
+
+func request_open_settings() -> void:
+	show_popup("Settings", {})
+
+
+func request_quit_game() -> void:
+	SignalBus.game_quit.emit()
+
+
+func request_next_level() -> void:
+	SignalBus.next_level_requested.emit()

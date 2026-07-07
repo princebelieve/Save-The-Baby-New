@@ -7,26 +7,30 @@ signal boosters_changed(boosters)
 signal stars_changed(stars)
 
 var _coins: PlayerInventory
-var _lives: LifeSystem
 var _stars: PlayerInventory
+var _lives: LifeSystem
 var _boosters: BoosterInventory
-var _unlimited_lives_timer: LifeSystem
+var _validator: EconomyValidator
 
 
 func initialize() -> void:
 	_coins = PlayerInventory.new()
 	_coins.initialize()
 
+	_stars = PlayerInventory.new()
+	_stars.initialize()
+
 	_lives = LifeSystem.new()
 	_lives.initialize()
-
-	_stars = _coins
 
 	_boosters = BoosterInventory.new()
 	_boosters.initialize()
 
-	_unlimited_lives_timer = _lives
+	_validator = EconomyValidator.new()
+	_validator.initialize()
 
+
+# ---------------- COINS ----------------
 
 func add_coins(amount: int) -> void:
 	_coins.add_coins(amount)
@@ -42,6 +46,19 @@ func get_coins() -> int:
 	return _coins.get_coins()
 
 
+# ---------------- STARS ----------------
+
+func add_stars(amount: int) -> void:
+	_stars.add_stars(amount)
+	emit_signal("stars_changed", _stars.get_stars())
+
+
+func get_stars() -> int:
+	return _stars.get_stars()
+
+
+# ---------------- LIVES ----------------
+
 func add_life(amount: int = 1) -> void:
 	_lives.add_life(amount)
 	emit_signal("lives_changed", _lives.get_lives())
@@ -56,19 +73,12 @@ func get_lives() -> int:
 	return _lives.get_lives()
 
 
-func restore_full_lives() -> void:
-	_lives.restore_full_lives()
+func update_life_timer() -> void:
+	_lives.update()
 	emit_signal("lives_changed", _lives.get_lives())
 
 
-func start_unlimited_lives(duration: float) -> void:
-	_unlimited_lives_timer.start_unlimited_lives(duration)
-	emit_signal("lives_changed", _lives.get_lives())
-
-
-func has_unlimited_lives() -> bool:
-	return _unlimited_lives_timer.has_unlimited_lives()
-
+# ---------------- BOOSTERS ----------------
 
 func add_booster(type: String, amount: int) -> void:
 	_boosters.add_booster(type, amount)
@@ -80,31 +90,14 @@ func use_booster(type: String) -> void:
 	emit_signal("boosters_changed", _boosters.get_all_boosters())
 
 
-func get_booster_count(type: String) -> int:
-	return _boosters.get_booster_count(type)
-
-
-func add_stars(amount: int) -> void:
-	_stars.add_stars(amount)
-	emit_signal("stars_changed", _stars.get_stars())
-
-
-func get_stars() -> int:
-	return _stars.get_stars()
-
+# ---------------- PURCHASE ----------------
 
 func can_afford(cost: Purchase) -> bool:
-	var validator := EconomyValidator.new()
-	validator.initialize()
-
-	return validator.can_afford(_coins, cost)
+	return _validator.can_afford(_coins, cost)
 
 
 func purchase(cost: Purchase) -> bool:
-	var validator := EconomyValidator.new()
-	validator.initialize()
-
-	if not validator.can_afford(_coins, cost):
+	if not _validator.can_afford(_coins, cost):
 		return false
 
 	match cost.get_currency():
@@ -120,9 +113,3 @@ func purchase(cost: Purchase) -> bool:
 			return false
 
 	return true
-
-
-func update_life_timer() -> void:
-	_lives.update()
-
-	emit_signal("lives_changed", _lives.get_lives())

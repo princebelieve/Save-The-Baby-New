@@ -1,3432 +1,1192 @@
-Please help me with SaveManager.gd script, following the frozen Api map
+scripts/economy/
 
-
-
-7. SaveManager.gd
-   Purpose
-
-Owns all player save data.
-
-Public Signals
-save_requested
-
-save_completed
-
-save_failed
-
-load_requested
-
-load_completed
-
-load_failed
-Public API
-initialize()
-
-new_game()
-
-save_game()
-
-load_game()
-
-auto_save()
-
-delete_save()
-
-save_exists()
-
-export_save(path)
-
-import_save(path)
-
-get_save_data()
-
-set_save_data(data)
-Internal
-\_save_data
-
-\_save_path
-
-_serializer
-_save_file
-_validator
-_migrator
-_autosave_scheduler
-
-___________________________________________________________________________
-
-
-
-scripts/managers/
-
-Manager System API Map (Version 1.0 Freeze)
-
-
-
-The manager layer coordinates every major gameplay subsystem.
-
-
-
-Managers communicate through SignalBus, use helper classes from utilities, and coordinate specialized classes in their respective folders.
-
-
-
-No manager should perform another manager's responsibility.
-
-
-
-Initialization Contract
-
-
-
-Each manager exposes an initialize() method for setup of its internal state.
-
-
-
-Managers do not define or control application startup flow.
-
-
-
-Managers do not depend on a specific startup orchestrator.
-
-
-
-Initialization timing is handled by the scene or system that instantiates the managers.
-
-
-
-1. GameManager.gd
-
-   Purpose
-
-
-
-Owns the overall game lifecycle and global game state.
-
-
-
-Public Signals
-
-game_started
-
-
-
-game_paused
-
-
-
-game_resumed
-
-
-
-game_restarted
-
-
-
-game_quit
-
-
-
-game_state_changed(previous_state,current_state)
-
-Public API
-
-initialize()
-
-
-
-start_game()
-
-
-
-pause_game()
-
-
-
-resume_game()
-
-
-
-restart_game()
-
-
-
-quit_game()
-
-
-
-set_state(state)
-
-
-
-get_state()
-
-
-
-is_state(state)
-
-
-
-is_game_running()
-
-
-
-is_game_paused()
-
-
-
-reset_game()
-
-Internal
-
-\_current_state
-
-
-
-\_is_initialized
-
-
-
-2. BoardManager.gd
-
-   Purpose
-
-
-
-Owns board creation and gameplay flow.
-
-
-
-Coordinates the board subsystem.
-
-
-
-Public Signals
-
-board_created
-
-
-
-board_ready
-
-
-
-board_locked
-
-
-
-board_unlocked
-
-
-
-board_cleared
-
-Public API
-
-initialize()
-
-
-
-create_board(level_data)
-
-
-
-clear_board()
-
-
-
-reset_board()
-
-
-
-lock_board()
-
-
-
-unlock_board()
-
-
-
-is_board_locked()
-
-
-
-get_board()
-
-
-
-get_tile(position)
-
-
-
-swap_tiles(tile_a,tile_b)
-
-
-
-refill_board()
-
-
-
-update_board()
-
-
-
-is_board_stable()
-
-Internal
-
-\_board
-
-
-
-\_board_locked
-
-
-
-3. LevelManager.gd
-
-
+Economy System API Map (Version 1.0 Freeze)
 
 Purpose
 
+The Economy System owns every persistent player-owned gameplay resource.
 
+It performs economy operations only.
 
-Loads the requested level JSON file from the levels/ folder and controls level progression.
+It never coordinates gameplay progression.
 
+Gameplay coordination belongs to EconomyManager.
 
+Reward calculation belongs to RewardManager.
 
-Each level is stored in its own JSON file using the frozen Level JSON schema.
+Configuration comes from ConfigLoader.
 
+Time calculations come from TimeHelper.
 
+Communication occurs through SignalBus.
 
-LevelManager is responsible for locating, loading, validating, and exposing the currently loaded level data.
+The Economy System therefore acts as the gameplay engine underneath EconomyManager.
 
+Folder Structure
 
+scripts/
 
-LevelManager never contains hardcoded level content and never assumes gameplay, story, tutorial, or reward behavior beyond the data defined in the loaded level file.
+└── economy/
 
+    ├── PlayerInventory.gd
 
+    ├── LifeSystem.gd
 
-Public Signals
+    ├── BoosterInventory.gd
 
-level_loading(level)
+    ├── EthanInventory.gd
 
+    ├── Shop.gd
 
+    ├── Purchase.gd
 
-level_loaded(level)
+    ├── EconomyValidator.gd
 
+    └── EconomyAnimator.gd
 
+1. PlayerInventory.gd
 
-level_started(level)
+Purpose
 
+Stores every persistent player-owned resource except lives.
 
+Owns only player inventory.
 
-level_completed(level)
+Contains no gameplay progression.
 
+Contains no shop logic.
 
+Contains no reward calculation.
 
-level_failed(level)
+Contains no save logic.
+
+Loaded and saved through SaveManager.
 
 Public API
 
-initialize()
-
-
-
-load_level(level_id)
-
-
-
-reload_level()
-
-
-
-start_level()
-
-
-
-complete_level()
-
-
-
-fail_level()
-
-
-
-next_level()
-
-
-
-previous_level()
-
-
-
-current_level()
-
-
-
-get_level_data()
-
-
-
-is_last_level()
-
-Internal
-
-\_current_level
-
-
-
-\_level_data
-
-
-
-4. RewardManager.gd
-
-   Purpose
-
-
-
-Calculates and grants all rewards.
-
-
-
-Public Signals
-
-reward_granted(data)
-
-
-
-reward_collected(data)
-
-Public API
+Initialization
 
 initialize()
 
+reset()
 
+clear()
 
-calculate_level_rewards(result)
-
-
-
-calculate_bonus_rewards(result)
-
-
-
-grant_rewards(reward_data)
-
-
-
-grant_daily_reward()
-
-
-
-grant_story_reward()
-
-
-
-grant_chest_reward()
-
-
-
-preview_rewards(level)
-
-
-
-claim_rewards()
-
-
-
-clear_pending_rewards()
-
-Internal
-
-\_pending_rewards
-
-
-
-5. StoryManager.gd
-
-   Purpose
-
-
-
-Controls story progression.
-
-
-
-Public Signals
-
-story_started(id)
-
-
-
-dialogue_started(id)
-
-
-
-dialogue_finished(id)
-
-
-
-choice_selected(choice)
-
-
-
-story_finished(id)
-
-Public API
-
-initialize()
-
-
-
-load_story(id)
-
-
-
-start_story(id)
-
-
-
-play_dialogue(dialogue)
-
-
-
-present_choices(choices)
-
-
-
-select_choice(choice)
-
-
-
-next_dialogue()
-
-
-
-skip_story()
-
-
-
-end_story()
-
-
-
-story_progress()
-
-Internal
-
-\_current_story
-
-_current_scene
-
-\_current_dialogue
-
-
-
-6. AudioManager.gd
-
-   Purpose
-
-
-
-Controls all game audio.
-
-
-
-Public Signals
-
-music_changed(track)
-
-
-
-music_finished
-
-
-
-sound_played(sound)
-
-Public API
-
-initialize()
-
-
-
-play_music(track)
-
-
-
-stop_music()
-
-
-
-pause_music()
-
-
-
-resume_music()
-
-
-
-play_sfx(sound)
-
-
-
-stop_sfx(sound)
-
-
-
-set_master_volume(value)
-
-
-
-set_music_volume(value)
-
-
-
-set_sfx_volume(value)
-
-
-
-mute()
-
-
-
-unmute()
-
-Internal
-
-
-
-_music_player
-
-
-
-_sfx_players
-
-
-
-_audio_config
-
-
-
-_master_volume
-
-
-
-_music_volume
-
-
-
-_sfx_volume
-
-
-
-_muted
-
-
-
-_is_initialized
-
-
-
-7.SaveManager.gd
-   Purpose
-
-Owns all player save data.
-
-Public Signals
-save_requested
-
-save_completed
-
-save_failed
-
-load_requested
-
-load_completed
-
-load_failed
-Public API
-initialize()
-
-new_game()
-
-save_game()
-
-load_game()
-
-auto_save()
-
-delete_save()
-
-save_exists()
-
-export_save(path)
-
-import_save(path)
-
-get_save_data()
-
-set_save_data(data)
-Internal
-\_save_data
-
-\_save_path
-
-_serializer
-_save_file
-_validator
-_migrator
-_autosave_scheduler
-
-
-
-8. UIManager.gd
-
-   Purpose
-
-
-
-Controls all UI screens and popups.
-
-
-
-Public Signals
-
-popup_opened(name)
-
-
-
-popup_closed(name)
-
-
-
-hud_updated
-
-Public API
-
-initialize()
-
-
-
-show_screen(name)
-
-
-
-hide_screen(name)
-
-
-
-show_popup(name,data={})
-
-
-
-hide_popup(name)
-
-
-
-update_hud()
-
-
-
-show_notification(text)
-
-
-
-show_loading()
-
-
-
-hide_loading()
-
-Internal
-
-\_current_screen
-
-
-
-\_open_popups
-
-
-
-9. AnimationManager.gd
-
-   Purpose
-
-
-
-Coordinates game animations.
-
-
-
-Public Signals
-
-animation_started(name)
-
-
-
-animation_finished(name)
-
-Public API
-
-initialize()
-
-
-
-play(name,target)
-
-
-
-stop(target)
-
-
-
-stop_all()
-
-
-
-pause_all()
-
-
-
-resume_all()
-
-
-
-is_playing(target)
-
-
-
-wait_for_animation(target)
-
-Internal
-
-\_active_animations
-
-
-
-10. EconomyManager.gd
-
-    Purpose
-
-
-
-Owns the player's economy.
-
-
-
-Public Signals
-
-coins_changed(coins)
-
-
-
-lives_changed(lives)
-
-
-
-boosters_changed(boosters)
-
-
-
-stars_changed(stars)
-
-Public API
-
-initialize()
-
-
+Coins
 
 add_coins(amount)
 
-
-
 remove_coins(amount)
 
-
+set_coins(amount)
 
 get_coins()
 
+has_coins(amount)
 
-
-add_life(amount=1)
-
-
-
-lose_life(amount=1)
-
-
-
-get_lives()
-
-
-
-restore_full_lives()
-
-
-
-start_unlimited_lives(duration)
-
-
-
-has_unlimited_lives()
-
-
-
-add_booster(type,amount)
-
-
-
-use_booster(type)
-
-
-
-get_booster_count(type)
-
-
+Stars
 
 add_stars(amount)
 
+remove_stars(amount)
 
+set_stars(amount)
 
 get_stars()
 
+has_stars(amount)
 
+Premium Currency
 
-can_afford(cost)
+add_gold_bars(amount)
 
+remove_gold_bars(amount)
 
+set_gold_bars(amount)
 
-purchase(cost)
+get_gold_bars()
 
+has_gold_bars(amount)
 
+(Version 1 may simply remain at zero.)
 
-update_life_timer()
+Utility
+
+duplicate_inventory()
 
 Internal
 
 \_coins
 
-
-
-\_lives
-
-
-
 \_stars
 
+\_gold_bars
 
-
-\_boosters
-
-
-
-\_unlimited_lives_timer
-
-Relationships
-
-GameManager
-
-│
-
-┌──────────────┼──────────────┐
-
-│ │ │
-
-LevelManager BoardManager StoryManager
-
-│ │ │
-
-├──────────────┼──────────────┤
-
-│ │ │
-
-RewardManager EconomyManager SaveManager
-
-│ │ │
-
-└──────────────┼──────────────┘
-
-│
-
-UIManager
-
-│
-
-AnimationManager
-
-│
-
-AudioManager
-
-Version 1 Rules
-
-Every gameplay subsystem has one coordinating manager.
-
-Managers communicate through SignalBus rather than direct dependencies whenever practical.
-
-Managers may call utility classes (JsonLoader, RandomGenerator, FileHelper, etc.) but utilities never manage gameplay.
-
-Managers coordinate the specialized scripts within their corresponding folders but do not duplicate their responsibilities.
-
-Managers should not contain hardcoded level, story, reward, or configuration data; those come from JSON/configuration files.
-
-This API map defines the complete public surface of the scripts/managers/ folder for Version 1. Subsequent folder APIs (board, economy, story, save, animation, UI, etc.) should be designed to work under these managers without requiring changes to the manager interfaces.
-
-______________________________________________
-
-
-
-scripts/save/
-
-Save System API Map (Version 1.0 Freeze)
+2. LifeSystem.gd
 
 Purpose
 
+Owns player lives.
 
+Calculates regeneration.
 
-The Save System provides the specialized implementation used by SaveManager to persist player progress.
+Owns unlimited-life sessions.
 
+Uses TimeHelper.
 
+Contains no reward logic.
 
-It is responsible only for save data representation, serialization, validation, migration, and file storage.
-
-
-
-It never coordinates gameplay.
-
-
-
-It never coordinates saving or loading.
-
-
-
-It never decides when saving occurs.
-
-
-
-Those responsibilities belong exclusively to SaveManager.
-
-
-
-Configuration comes from ConfigLoader.
-
-
-
-File operations may use FileHelper.
-
-
-
-Time calculations may use TimeHelper.
-
-
-
-Communication occurs through SignalBus.
-
-
-
-This folder is fully aligned with the frozen Manager API and Utilities API.
-
-
-
-1. SaveData.gd
-
-Purpose
-
-
-
-Represents one complete save.
-
-
-
-Contains persistent player data only.
-
-
-
-Contains no gameplay logic.
-
-
-
-Contains no file logic.
-
-
-
-Contains no serialization logic.
-
-
-
-Contains no validation logic.
-
-
+Contains no UI logic.
 
 Public API
 
 Initialization
 
-
-
 initialize()
-
-
 
 reset()
 
+Lives
 
+add_life(amount)
 
-duplicate_data() -> SaveData
+lose_life(amount)
 
+set_lives(amount)
 
+get_lives()
 
-Save Data
+restore_full_lives()
 
+has_lives()
 
+is_full()
 
-set_value(key, value)
+Unlimited Lives
 
+start_unlimited_lives(duration)
 
+stop_unlimited_lives()
 
-get_value(key)
+has_unlimited_lives()
 
+remaining_unlimited_time()
 
+Regeneration
 
-has_value(key) -> bool
+update()
 
+restore_regenerated_lives()
 
+seconds_until_next_life()
 
-remove_value(key)
+Internal
 
+\_current_lives
 
+\_last_regeneration_time
+
+\_unlimited_timer
+
+3. BoosterInventory.gd
+
+Purpose
+
+Stores every booster owned outside gameplay.
+
+It owns inventory only.
+
+Powerup behaviour belongs to the Powerup System.
+
+Public API
+
+Initialization
+
+initialize()
+
+reset()
+
+Inventory
+
+add_booster(type,amount)
+
+remove_booster(type,amount)
+
+use_booster(type)
+
+get_booster_count(type)
+
+has_booster(type)
+
+get_all_boosters()
 
 clear()
 
-
-
-Sections
-
-
-
-set_section(name, data)
-
-
-
-get_section(name)
-
-
-
-has_section(name) -> bool
-
-
-
-remove_section(name)
-
-
-
-Metadata
-
-
-
-set_save_version(version)
-
-
-
-get_save_version()
-
-
-
-set_timestamp(timestamp)
-
-
-
-get_timestamp()
-
-
-
 Internal
 
+\_boosters
 
-
-_data
-
-
-
-_version
-
-
-
-_timestamp
-
-
-
-2. SaveSerializer.gd
+4. EthanInventory.gd
 
 Purpose
 
+Owns every persistent Ethan resource.
 
+This class exists because Ethan is a unique gameplay mechanic rather than a standard booster.
 
-Converts SaveData between runtime objects and serialized data.
+It stores Ethan ownership and availability.
 
+It never performs Ethan board mechanics.
 
+Those belong to the Tile and Board systems.
 
-Contains no gameplay logic.
-
-
-
-Contains no file operations.
-
-
+It never performs reward calculation.
 
 Public API
 
 Initialization
 
-
-
 initialize()
 
+reset()
 
+Inventory
 
-Serialization
+add_ethan(amount)
 
+remove_ethan(amount)
 
+use_ethan()
 
-serialize(save_data) -> Dictionary
+get_ethan_count()
 
+has_ethan()
 
+Suggestions
 
-deserialize(data) -> SaveData
+can_suggest_ethan()
 
+mark_suggestion_shown()
 
-
-Conversion
-
-
-
-to_json(save_data)
-
-
-
-from_json(json_text)
-
-
+reset_suggestion()
 
 Internal
 
+\_ethan_count
 
+\_suggestion_shown
 
-_convert_to_dictionary()
-
-
-
-_convert_from_dictionary()
-
-
-
-3. SaveFile.gd
+5. Shop.gd
 
 Purpose
 
+Provides shop catalogue lookups.
 
+Uses configs/economy.json.
 
-Performs physical save-file operations.
+Never deducts currency.
 
+Never grants rewards.
 
-
-Contains no gameplay logic.
-
-
-
-Contains no serialization logic.
-
-
-
-Contains no save coordination.
-
-
+Never modifies inventory.
 
 Public API
 
 Initialization
 
-
-
 initialize()
-
-
-
-File Operations
-
-
-
-read(path)
-
-
-
-write(path, data)
-
-
-
-delete(path)
-
-
-
-exists(path)
-
-
-
-copy(source, destination)
-
-
-
-rename(path, new_name)
-
-
-
-Backup
-
-
-
-create_backup(path)
-
-
-
-restore_backup(path)
-
-
-
-Internal
-
-
-
-_open_file()
-
-
-
-_close_file()
-
-
-
-4. SaveValidator.gd
-
-Purpose
-
-
-
-Validates save data before loading.
-
-
-
-Contains no gameplay logic.
-
-
-
-Contains no migration logic.
-
-
-
-Public API
-
-Initialization
-
-
-
-initialize()
-
-
-
-Validation
-
-
-
-validate(save_data) -> bool
-
-
-
-validate_version(save_data) -> bool
-
-
-
-validate_sections(save_data) -> bool
-
-
-
-validate_required_fields(save_data) -> bool
-
-
-
-get_validation_errors() -> Array
-
-
-
-Internal
-
-
-
-_errors
-
-
-
-5. SaveMigrator.gd
-
-Purpose
-
-
-
-Migrates older save formats to the current version.
-
-
-
-Contains no gameplay logic.
-
-
-
-Contains no file operations.
-
-
-
-Public API
-
-Initialization
-
-
-
-initialize()
-
-
-
-Migration
-
-
-
-can_migrate(version) -> bool
-
-
-
-migrate(save_data) -> SaveData
-
-
-
-get_supported_versions()
-
-
-
-get_current_version()
-
-
-
-Internal
-
-
-
-_apply_migration()
-
-
-
-6. AutosaveScheduler.gd
-
-Purpose
-
-
-
-Provides autosave timing services.
-
-
-
-It never performs saving.
-
-
-
-It never writes files.
-
-
-
-It only determines when an autosave should be requested.
-
-
-
-SaveManager decides whether to save.
-
-
-
-Public API
-
-Initialization
-
-
-
-initialize()
-
-
-
-Control
-
-
-
-start()
-
-
-
-stop()
-
-
-
-pause()
-
-
-
-resume()
-
-
-
-Timing
-
-
-
-set_interval(seconds)
-
-
-
-get_interval()
-
-
-
-update(delta)
-
-
-
-is_time_to_autosave() -> bool
-
-
-
-reset_timer()
-
-
-
-Internal
-
-
-
-_interval
-
-
-
-_elapsed_time
-
-
-
-_running
-
-
-
-_paused
-
-
-
-Frozen Save System Dependency
-
-                 SaveManager
-
-                      │
-
-      ┌───────────────┼───────────────┐
-
-      ▼               ▼               ▼
-
- SaveSerializer   SaveValidator   AutosaveScheduler
-
-      │               │
-
-      ▼               ▼
-
-   SaveData      SaveMigrator
-
-      │
-
-      ▼
-
-   SaveFile
-
-Version 1 Rules
-
-
-
-The Save System provides the implementation used by SaveManager.
-
-
-
-SaveManager is the only class that coordinates saving and loading.
-
-
-
-SaveData represents persistent data only.
-
-
-
-SaveSerializer converts between runtime objects and serialized formats.
-
-
-
-SaveFile performs only physical file operations.
-
-
-
-SaveValidator validates save data before loading.
-
-
-
-SaveMigrator upgrades older save formats to the current save version.
-
-
-
-AutosaveScheduler determines when an autosave should be requested but never performs the save itself.
-
-
-
-The Save System contains no gameplay logic.
-
-
-
-The Save System contains no gameplay coordination.
-
-
-
-The Save System never decides rewards, progression, story, levels, objectives, or economy.
-
-
-
-The Save System may depend on FileHelper, JsonLoader, TimeHelper, Version, Constants, and SignalBus from scripts/utilities/.
-
-
-
-The Save System must not depend directly on gameplay managers. It is coordinated exclusively through SaveManager.
-
-_____________________________________________________________________
-
-
-
-scripts/utilities/
-
-Utilities System API Map (Version 1.0 Freeze)
-
-
-
-The Utilities folder provides reusable services for the entire project.
-
-
-
-No utility may initialize another utility internally.
-
-
-
-Utilities contain no gameplay logic.
-
-
-
-Utilities never coordinate gameplay.
-
-
-
-Utilities never replace managers.
-
-
-
-Every subsystem may depend on utilities.
-
-
-
-Utilities depend on no gameplay subsystem.
-
-
-
-1. SignalBus.gd
-
-Purpose
-
-
-
-Central event hub.
-
-
-
-Managers communicate through SignalBus instead of directly referencing one another whenever practical.
-
-
-
-Public Signals
-
-Game
-
-
-
-game_started
-
-
-
-game_paused
-
-
-
-game_resumed
-
-
-
-game_restarted
-
-
-
-game_quit
-
-
-
-game_state_changed(previous,current)
-
-
-
-Level
-
-
-
-level_loading(level_id)
-
-
-
-level_loaded(level_data)
-
-
-
-level_started(level_id)
-
-
-
-level_completed(level_id)
-
-
-
-level_failed(level_id)
-
-
-
-next_level_requested
-
-
-
-Board
-
-
-
-board_creating(level_data)
-
-
-
-board_created
-
-
-
-board_ready
-
-
-
-board_locked
-
-
-
-board_unlocked
-
-
-
-board_shuffled
-
-
-
-board_stable
-
-
-
-board_cleared
-
-
-
-Input
-
-
-
-swipe_started(tile)
-
-
-
-swipe_completed(from_tile,to_tile)
-
-
-
-swipe_cancelled(tile)
-
-
-
-Tile
-
-
-
-tile_swapped(tile_a,tile_b)
-
-
-
-tile_swap_rejected(tile_a,tile_b)
-
-
-
-tile_spawned(tile)
-
-
-
-tile_falling(tile)
-
-
-
-tile_landed(tile)
-
-
-
-tile_destroyed(tile)
-
-
-
-Match
-
-
-
-match_found(match)
-
-
-
-matches_found(matches)
-
-
-
-cascade_started
-
-
-
-cascade_finished
-
-
-
-gravity_started
-
-
-
-gravity_finished
-
-
-
-refill_started
-
-
-
-refill_finished
-
-
-
-Powerups
-
-
-
-powerup_created(powerup)
-
-
-
-powerup_activated(powerup)
-
-
-
-powerup_combined(first,second)
-
-
-
-powerup_finished(powerup)
-
-
-
-Obstacles
-
-
-
-obstacle_damaged(obstacle)
-
-
-
-obstacle_destroyed(obstacle)
-
-
-
-Objectives
-
-
-
-objective_progress(type,amount)
-
-
-
-objective_completed(type)
-
-
-
-objective_failed(type)
-
-
-
-all_objectives_completed
-
-
-
-Score
-
-
-
-score_added(points)
-
-
-
-score_changed(score)
-
-
-
-Moves
-
-
-
-move_used(moves)
-
-
-
-moves_changed(moves)
-
-
-
-Economy
-
-
-
-coins_changed(coins)
-
-
-
-stars_changed(stars)
-
-
-
-lives_changed(lives)
-
-
-
-boosters_changed(boosters)
-
-
-
-life_restored
-
-
-
-unlimited_lives_started
-
-
-
-unlimited_lives_finished
-
-
-
-Story
-
-
-
-story_started(id)
-
-
-
-story_choice_presented(choices)
-
-
-
-choice_selected(choice)
-
-
-
-dialogue_started(id)
-
-
-
-dialogue_finished(id)
-
-
-
-story_finished(id)
-
-
-
-Rewards
-
-
-
-reward_granted(data)
-
-
-
-reward_collected(data)
-
-
-
-daily_reward_claimed
-
-
-
-chest_opened(id)
-
-
-
-Save
-
-
-
-save_requested
-
-
-
-save_completed
-
-
-
-save_failed
-
-
-
-load_requested
-
-
-
-load_completed(data)
-
-
-
-load_failed
-
-
-
-Audio
-
-
-
-play_music(track)
-
-
-
-stop_music
-
-
-
-music_changed(track)
-
-
-
-music_finished
-
-
-
-play_sfx(sound)
-
-
-
-Animation
-
-
-
-animation_started(name)
-
-
-
-animation_finished(name)
-
-
-
-UI
-
-
-
-hud_updated
-
-
-
-popup_requested(name,data)
-
-
-
-popup_closed(name)
-
-
-
-Debug
-
-
-
-debug_message(message)
-
-
-
-error_occurred(message)
-
-
-
-2. Constants.gd
-
-Purpose
-
-
-
-Stores all global constants and enumerations.
-
-
-
-Contains no executable gameplay logic.
-
-
-
-Public API
-
-
-
-No methods.
-
-
-
-Project Constants
-
-
-
-GAME_NAME
-
-
-
-VERSION
-
-
-
-TARGET_FPS
-
-
-
-GRID_WIDTH
-
-
-
-GRID_HEIGHT
-
-
-
-MAX_LEVEL
-
-
-
-MAX_LIVES
-
-
-
-LIFE_REGEN_SECONDS
-
-
-
-Paths
-
-
-
-Scene Paths
-
-
-
-Config Paths
-
-
-
-Save Paths
-
-
-
-Resource Paths
-
-
-
-Node Groups
-
-Physics Layers
-
-Enums
-
-
-
-GameState
-
-
-
-BoardState
-
-
-
-TileState
-
-
-
-TileType
-
-
-
-PowerupType
-
-
-
-PowerupCombo
-
-
-
-ObstacleType
-
-
-
-ObjectiveType
-
-
-
-RewardType
-
-
-
-BoosterType
-
-
-
-StoryTrack
-
-
-
-Character
-
-
-
-Difficulty
-
-
-
-MatchPattern
-
-
-
-Direction
-
-
-
-AudioBus
-
-
-
-3. JsonLoader.gd
-
-Purpose
-
-
-
-Generic JSON serialization.
-
-
-
-No gameplay logic.
-
-
-
-Public API
-
-Initialization
-
-
-
-initialize()
-
-
-
-Loading
-
-
-
-load_file(path)->Dictionary
-
-
-
-load_array(path)->Array
-
-
-
-Saving
-
-
-
-save_file(path,data)->bool
-
-
-
-Validation
-
-
-
-file_exists(path)
-
-
-
-validate_json(path)
-
-
-
-4. ConfigLoader.gd
-
-Purpose
-
-
-
-Loads and caches configuration files.
-
-
-
-Used by managers.
-
-
-
-Never owns gameplay.
-
-
-
-Public API
-
-
-
-initialize()
-
-
 
 reload()
 
+Lookup
 
+get_item(id)
 
-clear_cache()
+has_item(id)
 
+get_price(id)
 
+get_currency(id)
 
-load(path)
+get_category(id)
 
-
-
-reload_file(path)
-
-
-
-has(path)
-
-
-
-get(path)
-
-
-
-get_value(path,key,default)
-
-
-
-get_section(path,section)
-
-
+get_all_items()
 
 Internal
 
+\_shop_cache
 
-
-_cache
-
-
-
-_validate()
-
-
-
-5. ResourceManager.gd
+6. Purchase.gd
 
 Purpose
 
+Represents one purchase transaction.
 
+Contains data only.
 
-Caches Godot resources.
-
-
-
-No gameplay decisions.
-
-
+Contains no gameplay logic.
 
 Public API
 
-
+Initialization
 
 initialize()
 
+Data
 
+set_item(id)
 
-clear()
+get_item()
 
+set_currency(currency)
 
+get_currency()
 
-clear_unused()
+set_price(price)
 
+get_price()
 
+set_quantity(quantity)
 
-load_resource(path)
-
-
-
-reload_resource(path)
-
-
-
-unload_resource(path)
-
-
-
-has(path)
-
-
-
-get(path)
-
-
-
-load_scene(path)
-
-
-
-load_texture(path)
-
-
-
-load_audio(path)
-
-
-
-load_font(path)
-
-
-
-load_animation(path)
-
-
+get_quantity()
 
 Internal
 
+\_item
 
+\_currency
 
-_resource_cache
+\_price
 
+\_quantity
 
-
-6. RandomGenerator.gd
-
-Purpose
-
-
-
-Single source of randomness.
-
-
-
-Every manager requiring randomness uses this class.
-
-
-
-Public API
-
-
-
-initialize(seed=-1)
-
-
-
-random_int(min,max)
-
-
-
-random_float(min,max)
-
-
-
-random_bool()
-
-
-
-chance(percent)
-
-
-
-random_index(array)
-
-
-
-random_item(array)
-
-
-
-shuffle(array)
-
-
-
-pick_multiple(array,count)
-
-
-
-weighted_choice(items,weights)
-
-
-
-random_direction()
-
-
-
-random_tile_type(include_ethan=false)
-
-
-
-Internal
-
-
-
-_rng
-
-
-
-7. FileHelper.gd
+7. EconomyValidator.gd
 
 Purpose
 
+Validates economy operations.
 
+Never changes inventory.
 
-Low-level filesystem helper.
+Never performs purchases.
 
-
-
-No gameplay logic.
-
-
+Never grants rewards.
 
 Public API
-
-Files
-
-
-
-file_exists(path)
-
-
-
-copy_file(source,destination)
-
-
-
-move_file(source,destination)
-
-
-
-delete_file(path)
-
-
-
-rename_file(path,new_name)
-
-
-
-get_file_size(path)
-
-
-
-Directories
-
-
-
-directory_exists(path)
-
-
-
-create_directory(path)
-
-
-
-delete_directory(path)
-
-
-
-list_files(path)
-
-
-
-list_directories(path)
-
-
-
-8. TimeHelper.gd
-
-Purpose
-
-
-
-Common date and time calculations.
-
-
-
-Used by SaveManager, EconomyManager and RewardManager.
-
-
-
-Public API
-
-
-
-current_unix_time()
-
-
-
-current_datetime()
-
-
-
-seconds_between(a,b)
-
-
-
-minutes_between(a,b)
-
-
-
-hours_between(a,b)
-
-
-
-days_between(a,b)
-
-
-
-format_duration(seconds)
-
-
-
-9. DebugLogger.gd
-
-Purpose
-
-
-
-Central logging utility.
-
-
-
-Can be disabled in release builds.
-
-
-
-Public API
-
-
 
 initialize()
 
+can_afford(inventory,purchase)
 
+can_use_booster(inventory,type)
 
-info(message)
+can_use_ethan(inventory)
 
+can_lose_life(life_system)
 
+validate_purchase(purchase)
 
-warning(message)
+validate_inventory(inventory)
 
+Internal
 
+None
 
-error(message)
-
-
-
-debug(message)
-
-
-
-clear_log()
-
-
-
-enable()
-
-
-
-disable()
-
-
-
-10. Version.gd
+8. EconomyAnimator.gd
 
 Purpose
 
+Owns every animation affecting the player's economy.
 
+AnimationManager decides when economy animations execute.
 
-Stores project version information.
+EconomyAnimator implements how they are performed.
 
+Uses the reusable animation framework from scripts/animation/.
 
+Contains no gameplay logic.
+
+Contains no reward logic.
+
+Contains no UI flow.
 
 Public API
 
+Initialization
 
+initialize()
 
-GAME_NAME
+Currency
 
+play_coin_gain()
 
+play_coin_spend()
 
-VERSION
+play_star_gain()
 
+play_gold_bar_gain()
 
+Lives
 
-SAVE_VERSION
+play_life_gain()
 
+play_life_loss()
 
+play_unlimited_lives_start()
 
-BUILD_NUMBER
+play_unlimited_lives_end()
 
+Boosters
 
+play_booster_gain(type)
 
-version_string()
+play_booster_use(type)
 
+Ethan
 
+play_ethan_gain()
 
-save_version()
+play_ethan_use()
 
+play_ethan_suggestion()
 
+Shop
 
-build_number()
+play_purchase_success()
 
+play_purchase_failed()
 
+Utility
 
-Frozen Utilities Dependency
+stop(target)
 
-                   Constants
+stop_all()
+
+pause(target)
+
+resume(target)
+
+is_playing(target)
+
+wait_until_finished(target)
+
+Internal
+
+\_execute(request)
+
+\_complete(request)
+
+Frozen Economy System Dependencies
+
+                  EconomyManager
 
                         │
 
-        ┌───────────────┼───────────────┐
+        ┌───────────────┼────────────────────┐
 
-        ▼               ▼               ▼
+        ▼               ▼                    ▼
 
-   SignalBus     RandomGenerator   TimeHelper
+PlayerInventory LifeSystem BoosterInventory
 
-        │               │
+        │               │                    │
 
-        ▼               ▼
+        │               │                    ▼
 
-  ConfigLoader    ResourceManager
+        │               │             EthanInventory
+
+        │               │                    │
+
+        └───────────────┼────────────────────┘
+
+                        │
+
+                        ▼
+
+               EconomyValidator
+
+                        │
+
+                 ┌──────┴──────┐
+
+                 ▼             ▼
+
+              Shop        Purchase
+
+AnimationManager
 
         │
 
         ▼
 
-   JsonLoader
+EconomyAnimator
 
-        │
+ConfigLoader
 
-        ▼
+ResourceManager
 
-    FileHelper
+TimeHelper
 
-
-
-DebugLogger
-
-
-
-Version
+SignalBus
 
 Version 1 Rules
 
-Utilities contain no gameplay logic.
+The Economy System owns persistent player resources only.
 
-Utilities never coordinate gameplay; that is the responsibility of managers.
+EconomyManager coordinates the Economy System.
 
-Managers may depend on any utility.
+RewardManager determines what the player earns and when it is earned.
 
-Utilities must never depend on managers or any gameplay subsystem.
+The Economy System stores, validates, consumes, regenerates, and spends those resources.
 
-SignalBus is the only global event bus.
+PlayerInventory owns Coins, Stars, and future premium currencies.
 
-Constants is the only source of global constants and enums.
+LifeSystem owns lives, regeneration, and unlimited-life timers.
 
-RandomGenerator is the only source of random values.
+BoosterInventory owns booster inventory only. Booster behaviour belongs to the Powerup System.
 
-ConfigLoader is the only configuration cache.
+EthanInventory owns Ethan as a unique persistent gameplay resource. Ethan gameplay effects (such as granting an extra move or an extra life when matched according to your game rules) belong to the Board/Tile gameplay systems, while obtaining, storing, consuming, and suggesting Ethan belong to the Economy System.
 
-ResourceManager is the only resource cache.
+Shop provides shop metadata loaded from configs/economy.json.
 
-JsonLoader performs generic JSON serialization only.
+Purchase is a data object only.
 
-FileHelper performs only low-level filesystem operations.
+EconomyValidator validates economy operations without modifying player resources.
 
-TimeHelper performs only date/time calculations.
+EconomyAnimator owns only economy-related animations. AnimationManager decides when they run, and the reusable framework in scripts/animation/ provides the scheduling infrastructure.
 
-DebugLogger is the project's central logging service.
+The Economy System may depend on Constants, SignalBus, ConfigLoader, ResourceManager, TimeHelper, and the reusable animation framework.
 
-Version stores only version metadata.
+The Economy System must not coordinate board mechanics, tile mechanics, powerup behaviour, obstacle behaviour, reward calculation, story progression, save operations, UI flow, or gameplay progression.
 
-_______________________________________________________
+---
 
+Hope the files below help.
 
+resources/
 
-FileHelper.gd
+Resources System API Map (Version 1.0 Freeze)
+
+The resources/ folder contains reusable Godot Resource (.tres) assets used throughout the project.
+
+Resources are data assets only.
+
+Resources contain no executable code.
+
+Resources contain no gameplay logic.
+
+Resources contain no runtime state.
+
+Resources are loaded only through ResourceManager.gd.
+
+Configuration files may reference resource paths but never load resources directly.
+
+Folder Structure
+
+resources/
+
+├── tiles/
+
+│ ├── key.tres
+
+│ ├── phone.tres
+
+│ ├── fingerprint.tres
+
+│ ├── recorder.tres
+
+│ ├── clock.tres
+
+│ ├── opened_door.tres
+
+│ └── ...
+
+│
+
+├── powerups/
+
+│ ├── rocket.tres
+
+│ ├── bomb.tres
+
+│ └── thunder.tres
+
+│
+
+└── obstacles/
+
+    ├── chain.tres
+
+    ├── lock.tres
+
+    ├── tape.tres
+
+    ├── missile.tres
+
+    ├── bomb.tres
+
+    └── electric_trap.tres
+
+resources/tiles/
+
+Purpose
+
+Stores reusable tile resources.
+
+Each tile resource may contain asset references such as:
+
+Texture
+
+Icon
+
+Material
+
+Shader
+
+Particle Resources
+
+Animation Resources
+
+Tile resources contain no gameplay values.
+
+Gameplay configuration belongs in configs/tiles.json.
+
+resources/powerups/
+
+Purpose
+
+Stores reusable powerup resources.
+
+Each powerup resource may contain:
+
+Texture
+
+Icon
+
+Material
+
+Shader
+
+Particle Resources
+
+Animation Resources
+
+Powerup behavior is defined by the Powerup System and configuration files.
+
+resources/obstacles/
+
+Purpose
+
+Stores reusable obstacle resources.
+
+Each obstacle resource may contain:
+
+Texture
+
+Icon
+
+Material
+
+Shader
+
+Particle Resources
+
+Animation Resources
+
+Obstacle gameplay is defined by the Obstacle System and configuration files.
+
+ResourceManager Integration
+
+All resources are loaded through ResourceManager.gd.
+
+Public API
+
+initialize()
+
+load_resource(path)
+
+reload_resource(path)
+
+unload_resource(path)
+
+has(path)
+
+get(path)
+
+clear()
+
+clear_unused()
+
+Frozen Dependency Graph
+
+configs/\*.json
+
+       │
+
+       ▼
+
+ConfigLoader
+
+       │
+
+       ▼
+
+Gameplay Subsystems
+
+       │
+
+       ▼
+
+ResourceManager
+
+       │
+
+       ▼
+
+resources/
+
+├── tiles/
+
+├── powerups/
+
+└── obstacles/
+
+Responsibilities
+
+Folder Responsibility
+
+resources/tiles Stores reusable tile assets
+
+resources/powerups Stores reusable powerup assets
+
+resources/obstacles Stores reusable obstacle assets
+
+ResourceManager Loads, caches, reloads and unloads resources
+
+Version 1 Rules
+
+Resources contain reusable Godot assets only.
+
+Resources contain no executable code.
+
+Resources contain no gameplay logic.
+
+Resources contain no runtime state.
+
+Resources are loaded exclusively through ResourceManager.
+
+Configuration files may reference resource paths but never load resources directly.
+
+Gameplay configuration belongs in the configs/ folder.
+
+Runtime state belongs to gameplay objects (Tile, Powerup, Obstacle).
+
+Managers and gameplay systems never load resources directly; they access them through ResourceManager.
+
+This API freezes the resources/ folder for Version 1.
+
+---
+
+AnimationManager.gd
 
 extends Node
 
-class_name FileHelper
+class_name AnimationManager
 
+signal animation_started(name)
 
+signal animation_finished(name)
 
-# =========================================================
-
-# PURPOSE
-
-# Low-level filesystem helper only.
-
-# No gameplay logic.
-
-# No state management.
-
-# No dependency on managers.
-
-# =========================================================
-
-
-
-
-
-# =========================================================
-
-# FILES
-
-# =========================================================
-
-
-
-func file_exists(path: String) -> bool:
-
-	return FileAccess.file_exists(path)
-
-
-
-
-
-func copy_file(source: String, destination: String) -> bool:
-
-	if not FileAccess.file_exists(source):
-
-		return false
-
-
-
-	var src_file := FileAccess.open(source, FileAccess.READ)
-
-	if src_file == null:
-
-		return false
-
-
-
-	var data := src_file.get_buffer(src_file.get_length())
-
-	src_file.close()
-
-
-
-	_ensure_directory(destination.get_base_dir())
-
-
-
-	var dst_file := FileAccess.open(destination, FileAccess.WRITE)
-
-	if dst_file == null:
-
-		return false
-
-
-
-	dst_file.store_buffer(data)
-
-	dst_file.close()
-
-
-
-	return true
-
-
-
-
-
-func move_file(source: String, destination: String) -> bool:
-
-	if not copy_file(source, destination):
-
-		return false
-
-
-
-	return delete_file(source)
-
-
-
-
-
-func delete_file(path: String) -> bool:
-
-	if not FileAccess.file_exists(path):
-
-		return false
-
-
-
-	var dir := DirAccess.open(path.get_base_dir())
-
-	if dir == null:
-
-		return false
-
-
-
-	var file_name := path.get_file()
-
-	return dir.remove(file_name) == OK
-
-
-
-
-
-func rename_file(path: String, new_name: String) -> bool:
-
-	if not FileAccess.file_exists(path):
-
-		return false
-
-
-
-	var dir_path := path.get_base_dir()
-
-	var old_name := path.get_file()
-
-	var new_path := dir_path.path_join(new_name)
-
-
-
-	var dir := DirAccess.open(dir_path)
-
-	if dir == null:
-
-		return false
-
-
-
-	return dir.rename(old_name, new_name) == OK
-
-
-
-
-
-func get_file_size(path: String) -> int:
-
-	if not FileAccess.file_exists(path):
-
-		return -1
-
-
-
-	var file := FileAccess.open(path, FileAccess.READ)
-
-	if file == null:
-
-		return -1
-
-
-
-	var size := file.get_length()
-
-	file.close()
-
-
-
-	return size
-
-
-
-
-
-# =========================================================
-
-# DIRECTORIES
-
-# =========================================================
-
-
-
-func directory_exists(path: String) -> bool:
-
-	return DirAccess.dir_exists_absolute(path)
-
-
-
-
-
-func create_directory(path: String) -> bool:
-
-	var dir := DirAccess.open("user://")
-
-	if dir == null:
-
-		return false
-
-
-
-	return dir.make_dir_recursive(path) == OK
-
-
-
-
-
-func delete_directory(path: String) -> bool:
-
-	if not DirAccess.dir_exists_absolute(path):
-
-		return false
-
-
-
-	var dir := DirAccess.open(path)
-
-	if dir == null:
-
-		return false
-
-
-
-	dir.list_dir_begin()
-
-	var file_name := dir.get_next()
-
-
-
-	while file_name != "":
-
-		if file_name != "." and file_name != "..":
-
-			var full_path := path.path_join(file_name)
-
-
-
-			if dir.current_is_dir():
-
-				delete_directory(full_path)
-
-			else:
-
-				dir.remove(file_name)
-
-
-
-		file_name = dir.get_next()
-
-
-
-	dir.list_dir_end()
-
-
-
-	# finally remove empty directory
-
-	var parent := DirAccess.open(path.get_base_dir())
-
-	if parent == null:
-
-		return false
-
-
-
-	return parent.remove(path.get_file()) == OK
-
-
-
-
-
-func list_files(path: String) -> Array:
-
-	var result: Array = []
-
-
-
-	var dir := DirAccess.open(path)
-
-	if dir == null:
-
-		return result
-
-
-
-	dir.list_dir_begin()
-
-	var file_name := dir.get_next()
-
-
-
-	while file_name != "":
-
-		if not dir.current_is_dir() and file_name != "." and file_name != "..":
-
-			result.append(file_name)
-
-
-
-		file_name = dir.get_next()
-
-
-
-	dir.list_dir_end()
-
-
-
-	return result
-
-
-
-
-
-func list_directories(path: String) -> Array:
-
-	var result: Array = []
-
-
-
-	var dir := DirAccess.open(path)
-
-	if dir == null:
-
-		return result
-
-
-
-	dir.list_dir_begin()
-
-	var file_name := dir.get_next()
-
-
-
-	while file_name != "":
-
-		if dir.current_is_dir() and file_name != "." and file_name != "..":
-
-			result.append(file_name)
-
-
-
-		file_name = dir.get_next()
-
-
-
-	dir.list_dir_end()
-
-
-
-	return result
-
-
-
-
-
-# =========================================================
-
-# INTERNAL HELPERS
-
-# =========================================================
-
-
-
-func _ensure_directory(path: String) -> void:
-
-	var dir_path := path.get_base_dir()
-
-
-
-	if dir_path == "":
-
-		return
-
-
-
-	var dir := DirAccess.open("user://")
-
-	if dir != null:
-
-		dir.make_dir_recursive(dir_path)
-
-_______________________________________________
-
-
-
- JsonLoader.gd
-
-extends Node
-
-class_name JsonLoader
-
-
-
-# =========================================================
-
-# PURPOSE
-
-# Generic JSON serialization utility.
-
-# No gameplay logic.
-
-# No coordination responsibility.
-
-# =========================================================
-
-
-
-# Optional internal reuse of parsed data (safe cache)
-
-var _cache: Dictionary = {}
-
-
-
-# =========================================================
-
-# INITIALIZATION
-
-# =========================================================
+var \_active_animations: Dictionary = {}
 
 func initialize() -> void:
 
-	_cache.clear()
+    _active_animations.clear()
 
+func play(name: String, target: Object) -> void:
 
+    if target == null:
 
-# =========================================================
+    	push_warning("AnimationManager: Cannot play animation '%s' on a null target." % name)
 
-# LOADING
+    	return
 
-# =========================================================
 
 
+    var request := AnimationRequest.new()
 
-func load_file(path: String) -> Dictionary:
 
-	if _cache.has(path):
 
-		return _cache[path]
+    request.animation_name = name
 
+    request.target = target
 
 
-	if not file_exists(path):
 
-		DebugLogger.error("JsonLoader: File not found -> " + path)
+    _active_animations[target] = request
 
-		return {}
 
 
+    emit_signal("animation_started", name)
 
-	var file := FileAccess.open(path, FileAccess.READ)
 
-	if file == null:
 
-		DebugLogger.error("JsonLoader: Cannot open file -> " + path)
+    _dispatch_request(request)
 
-		return {}
+func stop(target: Object) -> void:
 
+    if target == null:
 
+    	return
 
-	var content := file.get_as_text()
 
-	file.close()
 
+    if not _active_animations.has(target):
 
+    	return
 
-	var result = JSON.parse_string(content)
 
 
+    var request: AnimationRequest = _active_animations[target]
 
-	if typeof(result) != TYPE_DICTIONARY:
 
-		DebugLogger.error("JsonLoader: Invalid JSON dictionary -> " + path)
 
-		return {}
+    if request.has_method("cancel"):
 
+    	request.cancel()
 
 
-	_cache[path] = result
 
-	return result
+    _active_animations.erase(target)
 
 
 
+    emit_signal("animation_finished", request.animation_name)
 
+func stop_all() -> void:
 
-func load_array(path: String) -> Array:
+    var targets := _active_animations.keys()
 
-	if _cache.has(path):
 
-		return _cache[path]
 
+    for target in targets:
 
+    	stop(target)
 
-	if not file_exists(path):
+func pause_all() -> void:
 
-		DebugLogger.error("JsonLoader: File not found -> " + path)
+    for request in _active_animations.values():
 
-		return []
+    	if request.has_method("pause"):
 
+    		request.pause()
 
+func resume_all() -> void:
 
-	var file := FileAccess.open(path, FileAccess.READ)
+    for request in _active_animations.values():
 
-	if file == null:
+    	if request.has_method("resume"):
 
-		DebugLogger.error("JsonLoader: Cannot open file -> " + path)
+    		request.resume()
 
-		return []
+func is_playing(target: Object) -> bool:
 
+    return _active_animations.has(target)
 
+func wait_for_animation(target: Object) -> void:
 
-	var content := file.get_as_text()
+    if target == null:
 
-	file.close()
+    	return
 
 
 
-	var result = JSON.parse_string(content)
+    while _active_animations.has(target):
 
+    	await get_tree().process_frame
 
+func \_dispatch_request(request: AnimationRequest) -> void:
 
-	if typeof(result) != TYPE_ARRAY:
+    if request == null:
 
-		DebugLogger.error("JsonLoader: Invalid JSON array -> " + path)
+    	return
 
-		return []
 
 
+    if request.target != null and request.target.has_method("play_animation"):
 
-	_cache[path] = result
+    	request.target.play_animation(request)
 
-	return result
 
 
+    if request.has_signal("finished"):
 
-# =========================================================
+    	request.finished.connect(_on_request_finished.bind(request), CONNECT_ONE_SHOT)
 
-# SAVING
+func \_on_request_finished(request: AnimationRequest) -> void:
 
-# =========================================================
+    if request == null:
 
+    	return
 
 
-func save_file(path: String, data) -> bool:
 
-	var file := FileAccess.open(path, FileAccess.WRITE)
+    if _active_animations.get(request.target) == request:
 
-	if file == null:
+    	_active_animations.erase(request.target)
 
-		DebugLogger.error("JsonLoader: Cannot write file -> " + path)
 
-		return false
 
+    emit_signal("animation_finished", request.animation_name)
 
+---
 
-	var json_string := JSON.stringify(data)
+scripts/animation/
 
-	file.store_string(json_string)
+Purpose
 
-	file.close()
+Provides the reusable animation framework used by every gameplay subsystem.
 
+It contains no gameplay-specific animations.
 
+It does not know what a tile, obstacle, story character, popup, or powerup is.
 
-	_cache[path] = data
+It provides scheduling, sequencing, requests, and shared tween utilities.
 
-	return true
+AnimationQueue.gd
 
+Purpose
 
+Owns the queue of pending animations.
 
-# =========================================================
+Example responsibilities
 
-# VALIDATION
+enqueue(animation)
 
-# =========================================================
+dequeue()
 
+clear()
 
+has_pending()
 
-func file_exists(path: String) -> bool:
+is_empty()
 
-	return FileHelper.file_exists(path)
+AnimationSequence.gd
 
+Purpose
 
+Represents a sequence of animations that must play in order.
 
+Example
 
+Swap
 
-func validate_json(path: String) -> bool:
+↓
 
-	if not file_exists(path):
+Destroy
 
-		return false
+↓
 
+Fall
 
+↓
 
-	var file := FileAccess.open(path, FileAccess.READ)
+Spawn
 
-	if file == null:
+↓
 
-		return false
+Cascade
 
+AnimationManager executes the sequence.
 
+AnimationRequest.gd
 
-	var content := file.get_as_text()
+Purpose
 
-	file.close()
+Represents a single animation request.
 
+Instead of passing many parameters everywhere,
 
+AnimationManager creates
 
-	var result = JSON.parse_string(content)
+AnimationRequest
 
+containing
 
+animation name
 
-	if result == null:
+target
 
-		return false
+duration
 
+delay
 
+callback
 
-	# Valid JSON (either dictionary or array is acceptable)
+priority
 
-	if typeof(result) == TYPE_DICTIONARY or typeof(result) == TYPE_ARRAY:
+Then AnimationManager dispatches the request to the appropriate subsystem animator, which performs the animation.
 
-		return true
+TweenHelper.gd
 
+Purpose
 
+Reusable helper around Godot Tweens.
 
-	return false
+Contains reusable tween creation.
 
-_________________________________________________________
+Examples
 
+move()
 
+fade()
+
+scale()
+
+rotate()
+
+shake()
+
+bounce()
+
+flash()
+
+No gameplay knowledge.
+
+AnimationLibrary.gd
+
+Purpose
+
+Central registry of animation names.
+
+Example
+
+tile_spawn
+
+tile_swap
+
+tile_destroy
+
+popup_open
+
+popup_close
+
+reward_collect
+
+story_transition
+
+No animation code.
+
+Only names/lookup/default durations.
+
+Then each subsystem owns HOW animations happen.
+
+Example
+
+TileAnimator
+
+implements
+
+play_spawn()
+
+play_swap()
+
+play_destroy()
+
+play_fall()
+
+ObstacleAnimator
+
+implements
+
+play_break()
+
+play_damage()
+
+play_unlock()
+
+UIAnimator
+
+implements
+
+play_popup()
+
+play_button_press()
+
+play_notification()
+
+StoryAnimator
+
+implements
+
+play_portrait_enter()
+
+play_dialogue()
+
+play_scene_transition()
+
+AnimationManager becomes very clean
+
+AnimationManager becomes only the coordinator.
+
+play()
+
+↓
+
+create AnimationRequest
+
+↓
+
+Queue request
+
+↓
+
+execute request
+
+↓
+
+wait
+
+↓
+
+emit animation_finished
+
+It never knows how a tile explodes.
+
+It only knows that
+
+"play tile_destroy on this tile."
+
+The TileAnimator performs it.
+
+This also aligns perfectly with your architecture
+
+Your architecture already establishes this pattern:
+
+Managers coordinate.
+
+Subsystems implement.
+
+Utilities provide reusable services.
+
+The scripts/animation/ folder fits naturally as the reusable animation infrastructure between AnimationManager and the subsystem-specific animators.
+
+So I would freeze the responsibilities as:
+
+AnimationManager → decides when animations run.
+
+scripts/animation/ → provides the generic animation framework (queueing, sequencing, requests, tween helpers, animation registry).
+
+TileAnimator, PowerupAnimator, ObstacleAnimator, UIAnimator, StoryAnimator → implement how animations are performed for their own subsystem.
+
+I think this is the cleanest design because every folder ends up with a distinct responsibility, and no two folders overlap.
+
+---
 
 ConfigLoader.gd
 
 extends Node
 
 class_name ConfigLoader
-
-
 
 # =========================================================
 
@@ -3440,11 +1200,7 @@ class_name ConfigLoader
 
 # =========================================================
 
-
-
-var _cache: Dictionary = {}
-
-
+var \_cache: Dictionary = {}
 
 # =========================================================
 
@@ -3454,11 +1210,7 @@ var _cache: Dictionary = {}
 
 func initialize() -> void:
 
-	_cache.clear()
-
-
-
-
+    _cache.clear()
 
 # =========================================================
 
@@ -3466,23 +1218,13 @@ func initialize() -> void:
 
 # =========================================================
 
-
-
 func reload() -> void:
 
-	_cache.clear()
-
-
-
-
+    _cache.clear()
 
 func clear_cache() -> void:
 
-	_cache.clear()
-
-
-
-
+    _cache.clear()
 
 # =========================================================
 
@@ -3490,45 +1232,35 @@ func clear_cache() -> void:
 
 # =========================================================
 
-
-
 func load(path: String) -> Dictionary:
 
-	if _cache.has(path):
+    if _cache.has(path):
 
-		return _cache[path]
-
-
-
-	var data = JsonLoader.load_file(path)
+    	return _cache[path]
 
 
 
-	if typeof(data) != TYPE_DICTIONARY:
-
-		DebugLogger.error("ConfigLoader: Invalid config format (expected Dictionary) -> " + path)
-
-		return {}
+    var data = JsonLoader.load_file(path)
 
 
 
-	_cache[path] = data
+    if typeof(data) != TYPE_DICTIONARY:
 
-	return data
+    	DebugLogger.error("ConfigLoader: Invalid config format (expected Dictionary) -> " + path)
+
+    	return {}
 
 
 
+    _cache[path] = data
 
+    return data
 
 func reload_file(path: String) -> Dictionary:
 
-	_cache.erase(path)
+    _cache.erase(path)
 
-	return load(path)
-
-
-
-
+    return load(path)
 
 # =========================================================
 
@@ -3536,77 +1268,59 @@ func reload_file(path: String) -> Dictionary:
 
 # =========================================================
 
-
-
 func has(path: String) -> bool:
 
-	return _cache.has(path)
-
-
-
-
+    return _cache.has(path)
 
 func get(path: String) -> Dictionary:
 
-	if _cache.has(path):
+    if _cache.has(path):
 
-		return _cache[path]
-
-
-
-	return load(path)
+    	return _cache[path]
 
 
 
-
+    return load(path)
 
 func get_value(path: String, key: String, default = null):
 
-	var data = get(path)
+    var data = get(path)
 
 
 
-	if typeof(data) != TYPE_DICTIONARY:
+    if typeof(data) != TYPE_DICTIONARY:
 
-		return default
-
-
-
-	if data.has(key):
-
-		return data[key]
+    	return default
 
 
 
-	return default
+    if data.has(key):
+
+    	return data[key]
 
 
 
-
+    return default
 
 func get_section(path: String, section: String) -> Dictionary:
 
-	var data = get(path)
+    var data = get(path)
 
 
 
-	if typeof(data) != TYPE_DICTIONARY:
+    if typeof(data) != TYPE_DICTIONARY:
 
-		return {}
-
-
-
-	if data.has(section) and typeof(data[section]) == TYPE_DICTIONARY:
-
-		return data[section]
+    	return {}
 
 
 
-	return {}
+    if data.has(section) and typeof(data[section]) == TYPE_DICTIONARY:
+
+    	return data[section]
 
 
 
-
+    return {}
 
 # =========================================================
 
@@ -3614,718 +1328,686 @@ func get_section(path: String, section: String) -> Dictionary:
 
 # =========================================================
 
+func \_validate(path: String, data) -> bool:
 
+    if data == null:
 
-func _validate(path: String, data) -> bool:
+    	DebugLogger.error("ConfigLoader: Null config -> " + path)
 
-	if data == null:
+    	return false
 
-		DebugLogger.error("ConfigLoader: Null config -> " + path)
 
-		return false
 
+    if typeof(data) != TYPE_DICTIONARY:
 
+    	DebugLogger.error("ConfigLoader: Config is not a dictionary -> " + path)
 
-	if typeof(data) != TYPE_DICTIONARY:
+    	return false
 
-		DebugLogger.error("ConfigLoader: Config is not a dictionary -> " + path)
 
-		return false
 
-
-
-	return true
-
-___________________________________________________________
-
-
-
-SAVE THE BABY — CORRECT CONNECTED FILE TREE (V1.0 STRICT)
-
-
-
-1. BOOT LAYER (ONLY REAL ENTRY POINT)
-
-   Boot.gd
-
-   │
-
-   ├── initializes utilities:
-
-   │ ├── DebugLogger
-
-   │ ├── RandomGenerator
-
-   │ ├── ConfigLoader
-
-   │ ├── ResourceManager
-
-   │ └── JsonLoader
-
-   │
-
-   ├── reloads configuration:
-
-   │ └── ConfigLoader.reload()
-
-   │
-
-   ├── loads game scene:
-
-   │ └── ResourceManager.load_scene(Constants.ScenePaths.GAME)
-
-   │
-
-   └── instantiates:
-
-   └── Game.tscn (root runtime scene)
-
-
-
-✔ Boot DOES NOT talk to managers
-
-✔ Boot DOES NOT control gameplay
-
-✔ Boot ends immediately after scene load
-
-
-
-2. GAME SCENE ROOT (RUNTIME ORCHESTRATION BOUNDARY)
-
-   Game.tscn
-
-   │
-
-   └── contains managers:
-
-   ├── GameManager
-
-   ├── LevelManager
-
-   ├── BoardManager
-
-   ├── RewardManager
-
-   ├── EconomyManager
-
-   ├── StoryManager
-
-   ├── SaveManager
-
-   ├── AudioManager
-
-   ├── UIManager
-
-   └── AnimationManager
-
-
-
-✔ This is where runtime coordination begins
-
-✔ Managers initialize themselves (per API contract)
-
-✔ No Boot involvement beyond this point
-
-
-
-3. MANAGER LAYER (ONLY COORDINATION)
-
-   Core dependency rule from your API:
-
-   Managers communicate via SignalBus
-
-   Managers use Utilities
-
-   Managers DO NOT own subsystem implementation
-
-   Relationship structure (explicit only)
-
-   GameManager
-
-   │
-
-   ├── triggers:
-
-   │ ├── LevelManager
-
-   │ ├── BoardManager
-
-   │ └── StoryManager
-
-   │
-
-   └── receives signals via SignalBus
-
-   LevelManager
-
-   │
-
-   ├── loads:
-
-   │   └── levels/levelXXX.json (via JsonLoader)
-
-   │
-
-   ├── validates:
-
-   │   └── Frozen Level JSON schema
-
-   │
-
-   ├── exposes:
-
-   │   └── Current level data
-
-   │
-
-   └── triggers:
-
-      └── BoardManager.create_board(level_data)
-
-   BoardManager
-
-   │
-
-   ├── uses:
-
-   │ ├── Board.gd
-
-   │ ├── TileFactory
-
-   │ └── TileDatabase
-
-   │
-
-   ├── controls:
-
-   │ └── Board System
-
-   │
-
-   └── emits via SignalBus:
-
-   ├── board_created
-
-   ├── board_ready
-
-   └── board_cleared
-
-   StoryManager
-
-   │
-
-   ├── loads:
-
-   │ ├── configs/story.json
-
-   │ └── stories/*
-
-   │
-
-   └── emits:
-
-   ├── story*started
-
-   └── dialogue events
-
-   EconomyManager
-
-   │
-
-   ├── loads:
-
-   │ └── configs/economy.json
-
-   │
-
-   └── updates:
-
-   ├── coins
-
-   ├── lives
-
-   ├── boosters
-
-   └── stars
-
-   RewardManager
-
-   │
-
-   ├── loads:
-
-   │ └── configs/rewards.json
-
-   │
-
-   └── triggered by:
-
-   └── LevelManager result
-
-   SaveManager
-
-   │
-
-   ├── uses:
-
-   │ ├── FileHelper
-
-   │ └── TimeHelper
-
-   │
-
-   └── interacts with:
-
-   └── save/ folder
-
-   AudioManager
-
-   │
-
-   ├── loads:
-
-   │ └── configs/audio.json
-
-   │
-
-   └── plays:
-
-   ├── music
-
-   └── sfx
-
-   UIManager
-
-   │
-
-   ├── loads:
-
-   │ └── configs/ui.json
-
-   │
-
-   └── controls:
-
-   ├── HUD
-
-   ├── popups
-
-   └── screens/
-
-   AnimationManager
-
-   │
-
-   ├── uses:
-
-   │ └── scripts/animation/*
-
-   │
-
-   └── dispatches to:
-
-   ├── TileAnimator
-
-   ├── BoardAnimator
-
-   ├── UIAnimator
-
-   └── StoryAnimator
-
-4. BOARD SYSTEM (PURE GAMEPLAY ENGINE)
-
-   BoardManager
-
-   │
-
-   └── owns:
-
-   Board.gd
-
-   │
-
-   ├── BoardGenerator
-
-   ├── MoveValidator
-
-   ├── MatchFinder
-
-   ├── GravitySolver
-
-   ├── RefillSystem
-
-   ├── CascadeProcessor
-
-   ├── BoardShuffler
-
-   └── BoardAnimator
-
-
-
-✔ ONLY BoardManager coordinates gameplay
-
-✔ Board.gd is internal coordinator only
-
-
-
-5. TILE SYSTEM (ATOMIC GAME OBJECT LAYER)
-
-   BoardManager
-
-   │
-
-   └── uses:
-
-   TileFactory
-
-   │
-
-   └── creates:
-
-   Tile.gd
-
-   │
-
-   ├── TileState
-
-   ├── TileAnimator
-
-   └── TileDatabase
-
-   External dependencies:
-
-   TileDatabase
-
-   └── loads:
-
-   configs/tiles.json
-
-   TileFactory
-
-   └── uses:
-
-   ResourceManager (textures, assets)
-
-6. CONFIG SYSTEM (DATA SOURCE ONLY)
-
-
-
-   ConfigLoader
-
-   │
-
-   └── loads:
-
-    configs/*.json
-
-    ├── game.json
-
-    ├── tiles.json
-
-    ├── powerups.json
-
-    ├── obstacles.json
-
-    ├── objectives.json
-
-    ├── rewards.json
-
-    ├── economy.json
-
-    ├── story.json
-
-    ├── audio.json
-
-    ├── ui.json
-
-    ├── animation.json
-
-    ├── board.json
-
-    ├── effects.json
-
-    ├── localization.json
-
-    ├── debug.json
-
-    └── ...
-
-
-
-LevelManager
-
-│
-
-└── loads:
-
-    levels/
-
-    ├── level001.json
-
-    ├── level002.json
-
-    ├── ...
-
-    └── level050.json
-
-
-
-✔ ConfigLoader loads configuration files only.
-
-✔ LevelManager loads playable level files.
-
-✔ Level files are not part of the configs/ folder.
-
-✔ No gameplay logic
-
-✔ No runtime state
-
-
-
-7. RESOURCE SYSTEM (ASSET SOURCE ONLY)
-
-   ResourceManager
-
-   │
-
-   └── loads:
-
-   resources/
-
-   ├── tiles/
-
-   ├── powerups/
-
-   └── obstacles/
-
-
-
-Used by:
-
-
-
-TileFactory
-
-UIManager
-
-Animation systems 8. ANIMATION FRAMEWORK (GENERIC LAYER)
-
-AnimationManager
-
-│
-
-└── uses:
-
-scripts/animation/
-
-├── AnimationQueue
-
-├── AnimationSequence
-
-├── AnimationRequest
-
-├── TweenHelper
-
-└── AnimationLibrary
-
-
-
-Then dispatches to:
-
-
-
-Subsystem Animators:
-
-├── TileAnimator
-
-├── BoardAnimator
-
-├── UIAnimator
-
-└── StoryAnimator
-
-🔥 FINAL CORRECT LIFECYCLE (ABSOLUTE TRUTH)
-
-Boot.gd
-
-↓
-
-Utilities initialize
-
-↓
-
-ConfigLoader.reload()
-
-↓
-
-Load Game.tscn
-
-↓
-
-GameManager initializes system state
-
-↓
-
-LevelManager loads and validates levelXXX.json
-
-↓
-
-BoardManager creates board
-
-↓
-
-TileFactory spawns tiles
-
-↓
-
-Board system runs gameplay loop
-
-↓
-
-AnimationManager handles visuals
-
-↓
-
-UI / Audio / Story react via signals
-
-🧠 IMPORTANT FIX SUMMARY
-
-
-
-What was corrected:
-
-
-
-❌ Boot does NOT coordinate managers
-
-❌ Boot does NOT participate in gameplay flow
-
-❌ Managers are NOT initialized by Boot
-
-✔ Boot ONLY loads scene + utilities
-
-✔ Game scene is the real runtime root
-
-✔ Managers self-initialize inside Game scene
-
-✔ BoardManager is the ONLY gameplay coordinator for board system
-
-
+    return true
 
 ---
 
+TimeHelper
+
+extends Node
+
+class_name TimeHelper
+
+"""
+
+Purpose:
+
+Common date and time calculations for the entire project.
+
+Rules:
+
+- No gameplay logic
+
+- No state tracking
+
+- No dependencies on managers
+
+- Only pure time utilities
+
+"""
+
+# ----------------------------------------------------
+
+# CURRENT TIME
+
+# ----------------------------------------------------
+
+func current_unix_time() -> int:
+
+    # Returns current system time in seconds (UTC-based Unix timestamp)
+
+    return Time.get_unix_time_from_system()
+
+func current_datetime() -> Dictionary:
+
+    # Returns full system datetime breakdown as Dictionary
+
+    # Example keys: year, month, day, hour, minute, second
+
+    return Time.get_datetime_dict_from_system()
+
+# ----------------------------------------------------
+
+# DIFFERENCES (expects Unix timestamps)
+
+# ----------------------------------------------------
+
+func seconds_between(a: int, b: int) -> int:
+
+    # Absolute difference in seconds
+
+    return abs(a - b)
+
+func minutes_between(a: int, b: int) -> int:
+
+    # Converts seconds difference into minutes
+
+    return int(abs(a - b) / 60)
+
+func hours_between(a: int, b: int) -> int:
+
+    # Converts seconds difference into hours
+
+    return int(abs(a - b) / 3600)
+
+func days_between(a: int, b: int) -> int:
+
+    # Converts seconds difference into days
+
+    return int(abs(a - b) / 86400)
+
+# ----------------------------------------------------
+
+# FORMATTING
+
+# ----------------------------------------------------
+
+func format_duration(seconds: int) -> String:
+
+    """
+
+    Converts raw seconds into a human-readable format.
 
 
-The correct execution flow (NO ambiguity version)
+
+    Examples:
+
+    - 65 -> "00:01:05"
+
+    - 3600 -> "01:00:00"
+
+    """
 
 
 
-This is the real chain:
+    var clamped := max(0, seconds)
 
 
 
-Boot.gd
+    var hrs := clamped / 3600
 
-↓
+    var mins := (clamped % 3600) / 60
 
-Initialize utilities (services)
-
-↓
-
-ResourceManager loads Game.tscn
-
-↓
-
-Instantiate Game.tscn
-
-↓
-
-Add Game.tscn to scene tree
-
-↓
-
-GameManager becomes active (via \_ready)
-
-↓
-
-GameManager initializes gameplay systems
-
-↓
-
-Game loop begins
+    var secs := clamped % 60
 
 
+
+    return "%02d:%02d:%02d" % [hrs, mins, secs]
 
 ---
 
+SignalBus.gd
+
+extends Node
+
+# --------------------------------------------------
+
+# SignalBus.gd
+
+#
+
+# Version 1.0
+
+#
+
+# Central event hub.
+
+#
+
+# Managers communicate through SignalBus instead of
+
+# directly referencing one another whenever practical.
+
+#
+
+# Contains no gameplay logic.
+
+# Contains no runtime state.
+
+# Contains only global project signals.
+
+# --------------------------------------------------
+
+# ==================================================
+
+# Game
+
+# ==================================================
+
+signal game_started
+
+signal game_paused
+
+signal game_resumed
+
+signal game_restarted
+
+signal game_quit
+
+signal game_state_changed(previous, current)
+
+# ==================================================
+
+# Level
+
+# ==================================================
+
+signal level_loading(level_id)
+
+signal level_loaded(level_data)
+
+signal level_started(level_id)
+
+signal level_completed(level_id)
+
+signal level_failed(level_id)
+
+signal next_level_requested
+
+# ==================================================
+
+# Board
+
+# ==================================================
+
+signal board_creating(level_data)
+
+signal board_created
+
+signal board_ready
+
+signal board_locked
+
+signal board_unlocked
+
+signal board_shuffled
+
+signal board_stable
+
+signal board_cleared
+
+# ==================================================
+
+# Input
+
+# ==================================================
+
+signal swipe_started(tile)
+
+signal swipe_completed(from_tile, to_tile)
+
+signal swipe_cancelled(tile)
+
+# ==================================================
+
+# Tile
+
+# ==================================================
+
+signal tile_swapped(tile_a, tile_b)
+
+signal tile_swap_rejected(tile_a, tile_b)
+
+signal tile_spawned(tile)
+
+signal tile_falling(tile)
+
+signal tile_landed(tile)
+
+signal tile_destroyed(tile)
+
+# ==================================================
+
+# Match
+
+# ==================================================
+
+signal match_found(match)
+
+signal matches_found(matches)
+
+signal cascade_started
+
+signal cascade_finished
+
+signal gravity_started
+
+signal gravity_finished
+
+signal refill_started
+
+signal refill_finished
+
+# ==================================================
+
+# Powerups
+
+# ==================================================
+
+signal powerup_created(powerup)
+
+signal powerup_activated(powerup)
+
+signal powerup_combined(first, second)
+
+signal powerup_finished(powerup)
+
+# ==================================================
+
+# Obstacles
+
+# ==================================================
+
+signal obstacle_damaged(obstacle)
+
+signal obstacle_destroyed(obstacle)
+
+# ==================================================
+
+# Objectives
+
+# ==================================================
+
+signal objective_progress(type, amount)
+
+signal objective_completed(type)
+
+signal objective_failed(type)
+
+signal all_objectives_completed
+
+# ==================================================
+
+# Score
+
+# ==================================================
+
+signal score_added(points)
+
+signal score_changed(score)
+
+# ==================================================
+
+# Moves
+
+# ==================================================
+
+signal move_used(moves)
+
+signal moves_changed(moves)
+
+# ==================================================
+
+# Economy
+
+# ==================================================
+
+signal coins_changed(coins)
+
+signal stars_changed(stars)
+
+signal lives_changed(lives)
+
+signal boosters_changed(boosters)
+
+signal life_restored
+
+signal unlimited_lives_started
+
+signal unlimited_lives_finished
+
+# ==================================================
+
+# Story
+
+# ==================================================
+
+signal story_started(id)
+
+signal story_choice_presented(choices)
+
+signal choice_selected(choice)
+
+signal dialogue_started(id)
+
+signal dialogue_finished(id)
+
+signal story_finished(id)
+
+# ==================================================
+
+# Rewards
+
+# ==================================================
+
+signal reward_granted(data)
+
+signal reward_collected(data)
+
+signal daily_reward_claimed
+
+signal chest_opened(id)
+
+# ==================================================
+
+# Save
+
+# ==================================================
+
+signal save_requested
+
+signal save_completed
+
+signal save_failed
+
+signal load_requested
+
+signal load_completed(data)
+
+signal load_failed
+
+# ==================================================
+
+# Audio
+
+# ==================================================
+
+signal play_music(track)
+
+signal stop_music
+
+signal music_changed(track)
+
+signal music_finished
+
+signal play_sfx(sound)
+
+# ==================================================
+
+# Animation
+
+# ==================================================
+
+var animation_manager: AnimationManager
+
+signal animation_started(name)
+
+signal animation_finished(name)
+
+# ==================================================
+
+# UI
+
+# ==================================================
+
+signal hud_updated
+
+signal popup_requested(name, data)
+
+signal popup_closed(name)
+
+# ==================================================
+
+# Debug
+
+# ==================================================
+
+signal debug_message(message)
+
+signal error_occurred(message)
+
+---
+
+ResourceManager.gd
+
+extends Node
+
+class_name ResourceManager
+
+# =========================================================
+
+# PURPOSE
+
+# Central cache for all Godot resources.
+
+#
+
+# Rules:
+
+# - No gameplay logic
+
+# - No coordination
+
+# - No decision-making
+
+# - Only load/cache/unload resources
+
+# =========================================================
+
+var \_resource_cache: Dictionary = {}
+
+# =========================================================
+
+# INITIALIZATION
+
+# =========================================================
+
+func initialize() -> void:
+
+    _resource_cache.clear()
+
+# =========================================================
+
+# CORE CACHE CONTROL
+
+# =========================================================
+
+func clear() -> void:
+
+    _resource_cache.clear()
+
+func clear_unused() -> void:
+
+    # Removes unused cached resources from memory
+
+    for path in _resource_cache.keys():
+
+    	var res = _resource_cache[path]
 
 
-Who initializes what?
+
+    	if res == null:
+
+    		_resource_cache.erase(path)
+
+    		continue
 
 
 
-This is the most important clarity point.
+    	# If no external references exist, safe to drop
+
+    	if res.get_reference_count() <= 1:
+
+    		_resource_cache.erase(path)
 
 
 
-Step-by-step:
+    # Also ask engine to purge unused cache entries
+
+    ResourceLoader.clear_cache()
+
+# =========================================================
+
+# GENERIC LOADING
+
+# =========================================================
+
+func load_resource(path: String) -> Resource:
+
+    if _resource_cache.has(path):
+
+    	return _resource_cache[path]
 
 
 
-1. Boot runs
+    var resource = ResourceLoader.load(path)
 
 
 
-It initializes services:
+    if resource == null:
+
+    	DebugLogger.error("ResourceManager: Failed to load resource -> " + path)
+
+    	return null
 
 
 
-ConfigLoader
+    _resource_cache[path] = resource
 
-ResourceManager
+    return resource
 
-etc.
+func reload_resource(path: String) -> Resource:
 
+    unload_resource(path)
 
+    return load_resource(path)
 
-No gameplay exists yet.
+func unload_resource(path: String) -> void:
 
+    if _resource_cache.has(path):
 
+    	var res = _resource_cache[path]
 
-2. Boot loads Game.tscn via ResourceManager
-
-   var packed_scene = ResourceManager.load_scene(...)
-
-
-
-So ResourceManager is just a tool here.
+    	_resource_cache.erase(path)
 
 
 
-3. Game.tscn is added to scene tree
+    	# Remove from engine cache so it can be fully freed if unused
+
+    	if res != null:
+
+    		ResourceLoader.remove_from_cache(path)
+
+# =========================================================
+
+# CACHE QUERIES
+
+# =========================================================
+
+func has(path: String) -> bool:
+
+    return _resource_cache.has(path)
+
+func get(path: String) -> Resource:
+
+    if _resource_cache.has(path):
+
+    	return _resource_cache[path]
 
 
 
-Now everything inside Game.tscn wakes up.
+    return load_resource(path)
+
+# =========================================================
+
+# SPECIALIZED LOADERS
+
+# =========================================================
+
+func load_scene(path: String) -> PackedScene:
+
+    var res = get(path)
 
 
 
-Godot automatically calls:
+    if res is PackedScene:
+
+    	return res
 
 
 
-\_ready() on all nodes 4. GameManager activates
+    DebugLogger.error("ResourceManager: Not a PackedScene -> " + path)
+
+    return null
+
+func load_texture(path: String) -> Texture2D:
+
+    var res = get(path)
 
 
 
-Now GameManager runs:
+    if res is Texture2D:
+
+    	return res
 
 
 
-initializes itself
+    DebugLogger.error("ResourceManager: Not a Texture2D -> " + path)
 
-then starts LevelManager, BoardManager, etc.
+    return null
+
+func load_audio(path: String) -> AudioStream:
+
+    var res = get(path)
 
 
 
-THIS is the real “game start moment”
+    if res is AudioStream:
+
+    	return res
+
+
+
+    DebugLogger.error("ResourceManager: Not an AudioStream -> " + path)
+
+    return null
+
+func load_font(path: String) -> Font:
+
+    var res = get(path)
+
+
+
+    if res is Font:
+
+    	return res
+
+
+
+    DebugLogger.error("ResourceManager: Not a Font -> " + path)
+
+    return null
+
+func load_animation(path: String) -> Resource:
+
+    # Animation resources can vary (AnimationPlayer libraries, custom resources, etc.)
+
+    return get(path)
