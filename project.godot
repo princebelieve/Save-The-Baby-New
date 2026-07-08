@@ -17,7 +17,12 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-SignalBus="*uid://q0vs5flunpye"
+SignalBus="*uid://b40t173wb88dw"
+DebugLogger="*uid://bv4w1encej0ll"
+RandomGenerator="*uid://uxhwmradss1c"
+ConfigLoader="*uid://cu8j86nxy8kq0"
+ResourceManager="*uid://dvkv8hfsbjwme"
+JsonLoader="*uid://bosxr5gwvr1tg"
 
 [physics]
 

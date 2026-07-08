@@ -23,14 +23,14 @@ The Economy System therefore acts as the gameplay engine underneath EconomyManag
 Folder Structure
 scripts/
 └── economy/
-    ├── PlayerInventory.gd
-    ├── LifeSystem.gd
-    ├── BoosterInventory.gd
-    ├── EthanInventory.gd
-    ├── Shop.gd
-    ├── Purchase.gd
-    ├── EconomyValidator.gd
-    └── EconomyAnimator.gd
+	├── PlayerInventory.gd
+	├── LifeSystem.gd
+	├── BoosterInventory.gd
+	├── EthanInventory.gd
+	├── Shop.gd
+	├── Purchase.gd
+	├── EconomyValidator.gd
+	└── EconomyAnimator.gd
 1. PlayerInventory.gd
 Purpose
 

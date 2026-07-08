@@ -29,16 +29,16 @@ The Board System therefore acts as the gameplay engine underneath BoardManager.
 Folder Structure
 scripts/
 └── board/
-    ├── Board.gd
-    ├── BoardGenerator.gd
-    ├── MoveValidator.gd
-    ├── MatchFinder.gd
-    ├── Match.gd
-    ├── GravitySolver.gd
-    ├── RefillSystem.gd
-    ├── CascadeProcessor.gd
-    ├── BoardShuffler.gd
-    └── BoardAnimator.gd
+	├── Board.gd
+	├── BoardGenerator.gd
+	├── MoveValidator.gd
+	├── MatchFinder.gd
+	├── Match.gd
+	├── GravitySolver.gd
+	├── RefillSystem.gd
+	├── CascadeProcessor.gd
+	├── BoardShuffler.gd
+	└── BoardAnimator.gd
 1. Board.gd
 Purpose
 
@@ -411,31 +411,31 @@ _execute(request)
 
 _complete(request)
 Frozen Board System Dependencies
-                    BoardManager
-                         │
-                         ▼
-                       Board
-        ┌──────────────┼──────────────┐
-        ▼              ▼              ▼
+					BoardManager
+						 │
+						 ▼
+					   Board
+		┌──────────────┼──────────────┐
+		▼              ▼              ▼
  BoardGenerator  MoveValidator  MatchFinder
-        │              │              │
-        ▼              ▼              ▼
+		│              │              │
+		▼              ▼              ▼
  GravitySolver   RefillSystem      Match
-        │
-        ▼
+		│
+		▼
  CascadeProcessor
-        │
-        ▼
+		│
+		▼
  BoardShuffler
 
 AnimationManager
-        │
-        ▼
+		│
+		▼
  BoardAnimator
 
 TileFactory
-        │
-        ▼
+		│
+		▼
  Tile → TileState → TileAnimator
 
 ConfigLoader
