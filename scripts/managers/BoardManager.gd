@@ -13,6 +13,8 @@ var _board_locked: bool = false
 
 func _ready() -> void:
 	initialize()
+	if not SignalBus.level_loaded.is_connected(_on_level_loaded):
+		SignalBus.level_loaded.connect(_on_level_loaded)
 
 
 func initialize() -> void:
@@ -23,10 +25,25 @@ func initialize() -> void:
 func create_board(level_data) -> void:
 	clear_board()
 
-	_board = Board.new()
-	add_child(_board)
+	var board_scene := ResourceManager.load_scene(Constants.ScenePaths.BOARD)
+	if board_scene == null:
+		DebugLogger.error("BoardManager: Board scene could not be loaded.")
+		return
+	_board = board_scene.instantiate() as Board
+	if _board == null:
+		DebugLogger.error("BoardManager: Board scene has no Board script.")
+		return
+	var board_root := get_tree().get_first_node_in_group("board_root")
+	if board_root == null:
+		DebugLogger.error("BoardManager: BoardRoot is missing from the game scene.")
+		_board = null
+		return
+	board_root.add_child(_board)
 
-	_board.initialize(level_data)
+	if not _board.initialize(level_data):
+		DebugLogger.error("BoardManager: Failed to initialize the board.")
+		clear_board()
+		return
 	_board_locked = false
 
 	board_created.emit()
@@ -107,7 +124,10 @@ func swap_tiles(tile_a, tile_b) -> void:
 	if _board_locked:
 		return
 
-	_board.swap_tiles(tile_a, tile_b)
+	if tile_a == null or tile_b == null:
+		return
+
+	_board.swap_tiles(tile_a.get_grid_position(), tile_b.get_grid_position())
 
 
 func refill_board() -> void:
@@ -129,3 +149,7 @@ func is_board_stable() -> bool:
 		return true
 
 	return _board.is_stable()
+
+
+func _on_level_loaded(level_data: Dictionary) -> void:
+	create_board(level_data)

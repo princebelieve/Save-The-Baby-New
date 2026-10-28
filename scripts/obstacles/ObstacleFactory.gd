@@ -37,6 +37,7 @@ func initialize(database: ObstacleDatabase, animation_manager: ObstacleAnimator 
 
 func create_obstacle(type) -> Obstacle:
 	var obstacle := _create_obstacle_node()
+	obstacle.initialize(type, Vector2i.ZERO)
 	_apply_database_data(obstacle, type)
 	return obstacle
 
@@ -130,7 +131,7 @@ func _assign_texture(obstacle: Obstacle, type) -> void:
 	if path == "":
 		return
 
-	var texture = ResourceManager.load_resource(path)
+	var texture := ResourceManager.load_texture(path)
 	if texture != null:
 		obstacle.set_texture(texture)
 

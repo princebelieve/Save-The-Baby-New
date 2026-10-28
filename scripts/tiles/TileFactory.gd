@@ -42,7 +42,7 @@ func create_random_tile() -> Tile:
 	if data.is_empty():
 		return null
 
-	return create_tile(data.get("type"))
+	return create_tile(data.get("enum"))
 
 
 func create_random_tile_at(position: Vector2i) -> Tile:
@@ -53,7 +53,7 @@ func create_random_tile_at(position: Vector2i) -> Tile:
 	if data.is_empty():
 		return null
 
-	return create_tile_at(data.get("type"), position)
+	return create_tile_at(data.get("enum"), position)
 
 
 # =========================================================
@@ -126,7 +126,7 @@ func _assign_texture(tile: Tile, data: Dictionary) -> void:
 	if texture_path == "":
 		return
 
-	var texture = ResourceManager.get(texture_path)
+	var texture := ResourceManager.load_texture(texture_path)
 	if texture:
 		tile.set_texture(texture)
 

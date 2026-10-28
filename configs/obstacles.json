@@ -1,0 +1,115 @@
+{
+  "obstacles": {
+    "chain": {
+      "id": "chain",
+      "enum": 0,
+      "name": "Chain",
+      "texture": "res://resources/obstacles/chain.tres",
+      "animation_set": {
+        "spawn": "spawn",
+        "damage": "damage",
+        "destroy": "destroy"
+      },
+      "health": 2,
+      "destroy_score": 20,
+      "blocks_gravity": false,
+      "blocks_matching": false,
+      "removable": true,
+      "hidden": false,
+      "description": "Clear adjacent matches to break the chain."
+    },
+    "lock": {
+      "id": "lock",
+      "enum": 1,
+      "name": "Lock",
+      "texture": "res://resources/obstacles/lock.tres",
+      "animation_set": {
+        "spawn": "spawn",
+        "damage": "damage",
+        "destroy": "unlock"
+      },
+      "health": 1,
+      "destroy_score": 20,
+      "blocks_gravity": false,
+      "blocks_matching": true,
+      "removable": true,
+      "hidden": false,
+      "description": "Collect a key to open the lock."
+    },
+    "tape": {
+      "id": "tape",
+      "enum": 2,
+      "name": "Tape",
+      "texture": "res://resources/obstacles/tape.tres",
+      "animation_set": {
+        "spawn": "spawn",
+        "damage": "damage",
+        "destroy": "destroy"
+      },
+      "health": 1,
+      "destroy_score": 10,
+      "blocks_gravity": false,
+      "blocks_matching": false,
+      "removable": true,
+      "hidden": false,
+      "description": "Clear a match on or beside the tape to remove it."
+    },
+    "bomb": {
+      "id": "bomb",
+      "enum": 3,
+      "name": "Bomb",
+      "texture": "res://resources/obstacles/bomb.tres",
+      "animation_set": {
+        "spawn": "spawn",
+        "damage": "damage",
+        "destroy": "destroy",
+        "activate": "activate"
+      },
+      "health": 1,
+      "destroy_score": 30,
+      "blocks_gravity": false,
+      "blocks_matching": false,
+      "removable": true,
+      "hidden": false,
+      "description": "Defuse it before its configured countdown expires."
+    },
+    "missile": {
+      "id": "missile",
+      "enum": 4,
+      "name": "Missile",
+      "texture": "res://resources/obstacles/missile.tres",
+      "animation_set": {
+        "spawn": "spawn",
+        "damage": "damage",
+        "destroy": "destroy",
+        "activate": "activate"
+      },
+      "health": 1,
+      "destroy_score": 30,
+      "blocks_gravity": false,
+      "blocks_matching": false,
+      "removable": true,
+      "hidden": false,
+      "description": "A timed threat whose level behavior is configured per level."
+    },
+    "electric_trap": {
+      "id": "electric_trap",
+      "enum": 5,
+      "name": "Electric Trap",
+      "texture": "res://resources/obstacles/electric_trap.tres",
+      "animation_set": {
+        "spawn": "spawn",
+        "activate": "activate",
+        "deactivate": "deactivate",
+        "destroy": "destroy"
+      },
+      "health": 1,
+      "destroy_score": 30,
+      "blocks_gravity": false,
+      "blocks_matching": false,
+      "removable": true,
+      "hidden": false,
+      "description": "Requires a compatible powerup to disarm."
+    }
+  }
+}

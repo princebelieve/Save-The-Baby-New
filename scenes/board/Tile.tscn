@@ -1,8 +1,21 @@
 [gd_scene format=3 uid="uid://cm4dbgr15bsp7"]
 
-[ext_resource type="Script" uid="uid://c3icj2g44wtwd" path="res://scripts/tiles/Tile.gd" id="1_bfaab"]
+[ext_resource type="Script" path="res://scripts/tiles/Tile.gd" id="1_tile"]
 
-[node name="Tile" type="Node2D" unique_id=546854000]
-script = ExtResource("1_bfaab")
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_tile"]
+size = Vector2(64, 64)
 
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=2082055502]
+[node name="Tile" type="Node2D"]
+script = ExtResource("1_tile")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+
+[node name="Area2D" type="Area2D" parent="."]
+input_pickable = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("RectangleShape2D_tile")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+
+[connection signal="input_event" from="Area2D" to="." method="_input_event"]

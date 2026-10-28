@@ -1,0 +1,74 @@
+{
+  "tiles": [
+    {
+      "id": "key",
+      "enum": 0,
+      "name": "Key",
+      "texture": "res://resources/tiles/key.tres",
+      "icon": "res://assets/sprites/tiles/key_objective_icon.jpeg",
+      "animation_set": "default",
+      "score": 10,
+      "spawn_weight": 20,
+      "matchable": true,
+      "spawnable": true,
+      "hidden": false,
+      "special": false
+    },
+    {
+      "id": "phone",
+      "enum": 1,
+      "name": "Phone",
+      "texture": "res://resources/tiles/phone.tres",
+      "icon": "res://assets/sprites/tiles/phone_evidence_icon.svg",
+      "animation_set": "default",
+      "score": 10,
+      "spawn_weight": 20,
+      "matchable": true,
+      "spawnable": true,
+      "hidden": false,
+      "special": false
+    },
+    {
+      "id": "fingerprint",
+      "enum": 2,
+      "name": "Fingerprint",
+      "texture": "res://resources/tiles/fingerprint.tres",
+      "icon": "res://assets/sprites/tiles/fingerprint_evidence_icon.svg",
+      "animation_set": "default",
+      "score": 10,
+      "spawn_weight": 20,
+      "matchable": true,
+      "spawnable": true,
+      "hidden": false,
+      "special": false
+    },
+    {
+      "id": "recorder",
+      "enum": 3,
+      "name": "Recorder",
+      "texture": "res://resources/tiles/recorder.tres",
+      "icon": "res://assets/sprites/tiles/recorder_evidence_icon.jpeg",
+      "animation_set": "default",
+      "score": 10,
+      "spawn_weight": 20,
+      "matchable": true,
+      "spawnable": true,
+      "hidden": false,
+      "special": false
+    },
+    {
+      "id": "clock",
+      "enum": 5,
+      "name": "Clock",
+      "texture": "res://resources/tiles/clock.tres",
+      "icon": "res://assets/sprites/tiles/timer_objective_icon.jpeg",
+      "animation_set": "default",
+      "score": 10,
+      "spawn_weight": 20,
+      "matchable": true,
+      "spawnable": true,
+      "hidden": false,
+      "special": false
+    }
+  ]
+}

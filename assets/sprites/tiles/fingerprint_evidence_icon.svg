@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#bce879"/>
+      <stop offset="1" stop-color="#4c9e36"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-25%" width="160%" height="170%">
+      <feDropShadow dx="0" dy="8" stdDeviation="7" flood-color="#173c18" flood-opacity=".5"/>
+    </filter>
+  </defs>
+  <rect x="9" y="9" width="238" height="238" rx="42" fill="url(#tile)" stroke="#f5ffdc" stroke-width="7"/>
+  <path d="M24 29Q34 17 52 17h150L34 205q-12 5-17-8z" fill="#fff" opacity=".14"/>
+  <g fill="none" stroke="#fff4d8" stroke-linecap="round" stroke-width="9" filter="url(#shadow)">
+    <path d="M128 54c-38 0-67 28-67 65 0 24 6 44 15 64"/>
+    <path d="M128 72c-28 0-49 20-49 47 0 23 3 42 12 61"/>
+    <path d="M128 90c-18 0-31 13-31 30 0 28 1 45 8 62"/>
+    <path d="M128 54c38 0 67 28 67 65 0 24-6 44-15 64"/>
+    <path d="M128 72c28 0 49 20 49 47 0 23-3 42-12 61"/>
+    <path d="M128 90c18 0 31 13 31 30 0 28-1 45-8 62"/>
+    <path d="M128 108v31c0 19-2 37-7 53"/>
+    <path d="M54 105c-3 27 1 56 10 78"/>
+    <path d="M202 105c3 27-1 56-10 78"/>
+  </g>
+  <path d="M42 54l5 11 11 5-11 5-5 11-5-11-11-5 11-5z" fill="#fff4a6"/>
+</svg>

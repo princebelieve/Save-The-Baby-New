@@ -25,7 +25,7 @@ class_name PowerupDatabase
 var _powerup_cache: Dictionary = {}
 
 
-const POWERUP_CONFIG_PATH := "configs/powerups.json"
+const POWERUP_CONFIG_PATH := Constants.ConfigPaths.POWERUPS
 
 
 # =========================================================
@@ -62,7 +62,7 @@ func has_powerup(id) -> bool:
 
 func get_powerup_by_enum(type):
 	for powerup in _powerup_cache.values():
-		if powerup.get("type") == type:
+		if powerup.get("enum") == type:
 			return powerup
 
 	return {}
@@ -89,7 +89,7 @@ func get_icon_path(type):
 func get_animation_set(type):
 	var data := get_powerup_by_enum(type)
 
-	return data.get("animations", {})
+	return data.get("animation_set", {})
 
 
 func get_activation_type(type):

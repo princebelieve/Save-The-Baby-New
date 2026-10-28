@@ -17,9 +17,20 @@ signal hover_exited(tile)
 
 var _state: TileState
 var _input_enabled: bool = true
+var _pending_texture: Texture2D
+var _hitbox_size: float = 64.0
+var _visual_size: float = 60.0
 
 @onready var _sprite: Sprite2D = $Sprite2D
-@onready var _animation_player: AnimationPlayer = $AnimationPlayer
+@onready var _animation_player: AnimationPlayer = get_node_or_null("AnimationPlayer")
+@onready var _collision_shape: CollisionShape2D = get_node_or_null("Area2D/CollisionShape2D")
+
+
+func _ready() -> void:
+	if _pending_texture != null:
+		_sprite.texture = _pending_texture
+	_set_hitbox_size()
+	_update_sprite_scale()
 
 
 # =========================================================
@@ -63,6 +74,8 @@ func duplicate_tile_state() -> TileState:
 # =========================================================
 
 func set_grid_position(position: Vector2i) -> void:
+	if _state == null:
+		_state = TileState.new()
 	_state.set_position(position)
 
 
@@ -71,6 +84,8 @@ func get_grid_position() -> Vector2i:
 
 
 func move_to_grid(position: Vector2i) -> void:
+	if _state == null:
+		_state = TileState.new()
 	_state.set_position(position)
 
 
@@ -227,8 +242,37 @@ func is_destroyed() -> bool:
 # =========================================================
 
 func set_texture(texture: Texture2D) -> void:
+	_pending_texture = texture
 	if _sprite:
 		_sprite.texture = texture
+		_update_sprite_scale()
+
+
+func set_visual_size(value: float) -> void:
+	_visual_size = maxf(1.0, value)
+	_update_sprite_scale()
+
+
+func set_hitbox_size(value: float) -> void:
+	_hitbox_size = maxf(1.0, value)
+	if _collision_shape != null:
+		_set_hitbox_size()
+
+
+func _set_hitbox_size() -> void:
+	if _collision_shape != null:
+		var shape := RectangleShape2D.new()
+		shape.size = Vector2(_hitbox_size, _hitbox_size)
+		_collision_shape.shape = shape
+
+
+func _update_sprite_scale() -> void:
+	if _sprite == null or _sprite.texture == null:
+		return
+	var texture_size := _sprite.texture.get_size()
+	var max_dimension := maxf(texture_size.x, texture_size.y)
+	if max_dimension > 0.0:
+		_sprite.scale = Vector2.ONE * (_visual_size / max_dimension)
 
 
 func get_texture() -> Texture2D:
@@ -257,7 +301,9 @@ func is_tile_visible() -> bool:
 # =========================================================
 
 func request_animation(name: String) -> void:
-	SignalBus.animation_manager.play(name, self)
+	var animation_manager = get_tree().get_first_node_in_group("animation_manager")
+	if animation_manager != null:
+		animation_manager.play(name, self)
 
 
 func is_animation_playing() -> bool:
@@ -295,6 +341,12 @@ func _input_event(viewport, event, shape_idx) -> void:
 			else:
 				released.emit(self)
 				clicked.emit(self)
+	elif event is InputEventScreenTouch:
+		if event.pressed:
+			pressed.emit(self)
+		else:
+			released.emit(self)
+			clicked.emit(self)
 
 
 func _mouse_enter() -> void:

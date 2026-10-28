@@ -35,7 +35,7 @@ func initialize() -> void:
 func reload() -> void:
 	_shop_cache.clear()
 
-	var data: Dictionary = ConfigLoader.load("configs/economy.json")
+	var data: Dictionary = ConfigLoader.load(Constants.ConfigPaths.ECONOMY)
 
 	if typeof(data) != TYPE_DICTIONARY:
 		push_error("Shop: Invalid economy config format")

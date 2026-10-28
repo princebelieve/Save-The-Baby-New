@@ -1,201 +1,177 @@
 extends Node
 class_name BoardGenerator
 
-# =========================================================
-# INTERNAL STATE
-# =========================================================
-
-var _tile_factory = null
-var _config = null
-
-
-# =========================================================
-# INITIALIZATION
-# =========================================================
-
-func initialize() -> void:
-	_tile_factory = TileFactory.new()
-	_tile_factory.initialize()
-
-	# Config is optional at this layer; treated as opaque if provided later
-	_config = null
+var _tile_factory: TileFactory
+var _tile_database: TileDatabase
+var _level_tile_definitions: Array[Dictionary] = []
+var _level_tile_weights: Array[float] = []
+var _generated_grid: Dictionary = {}
+var _tile_size: int = 64
 
 
-# =========================================================
-# GENERATION ENTRY POINT
-# =========================================================
-
-func generate(level_data):
-	var width = level_data.width
-	var height = level_data.height
-
-	var board = generate_empty(width, height)
-	fill_board(board)
-
-	_remove_initial_matches(board)
-	ensure_valid_moves(board)
-
-	_validate_board(board)
-
-	return board
+func initialize(tile_factory: TileFactory, tile_database: TileDatabase) -> void:
+	_tile_factory = tile_factory
+	_tile_database = tile_database
 
 
-# =========================================================
-# EMPTY BOARD CREATION
-# =========================================================
+func generate(level_data: Dictionary) -> Dictionary:
+	_generated_grid.clear()
+	_level_tile_definitions.clear()
+	_level_tile_weights.clear()
 
-func generate_empty(width: int, height: int) -> Dictionary:
-	var board = {}
+	var board_data: Dictionary = level_data.get("board", {})
+	var width := int(board_data.get("columns", 0))
+	var height := int(board_data.get("rows", 0))
+	_tile_size = int(board_data.get("tile_size", 64))
+	if width < 3 or height < 3 or _tile_size <= 0:
+		push_error("BoardGenerator: Board dimensions must be at least 3 by 3.")
+		return {}
+
+	_load_level_tile_pool(level_data.get("tile_pool", {}))
+	if _level_tile_definitions.size() < 3:
+		push_error("BoardGenerator: A board requires at least three valid spawnable tile types.")
+		return {}
+
+	var type_grid := _generate_type_grid(width, height)
+	if type_grid.is_empty():
+		push_error("BoardGenerator: Could not generate a playable starting layout.")
+		return {}
 
 	for y in range(height):
 		for x in range(width):
-			board[Vector2i(x, y)] = null
+			var position := Vector2i(x, y)
+			var definition: Dictionary = _definition_for_type(type_grid[position])
+			var tile := _tile_factory.create_tile_at(definition["enum"], position)
+			if tile == null:
+				push_error("BoardGenerator: Failed to create tile '%s'." % definition["id"])
+				return {}
+			_generated_grid[position] = tile
 
-	return board
-
-
-# =========================================================
-# BOARD FILLING
-# =========================================================
-
-func fill_board(board: Dictionary) -> void:
-	for position in board.keys():
-		board[position] = generate_tile(position)
+	return _generated_grid.duplicate()
 
 
-func generate_tile(position: Vector2i):
-	return _create_tile(position)
+func get_generated_grid() -> Dictionary:
+	return _generated_grid.duplicate()
 
 
-# =========================================================
-# VALIDATION: INITIAL BOARD SAFETY
-# =========================================================
-
-func remove_initial_matches(board: Dictionary) -> void:
-	while has_initial_matches(board):
-		for position in board.keys():
-			if _forms_match(board, position):
-				board[position] = _create_tile(position)
+func get_tile_size() -> int:
+	return _tile_size
 
 
-func ensure_valid_moves(board: Dictionary) -> void:
-	while not has_valid_moves(board):
-		_randomize_board(board)
-
-
-func has_initial_matches(board: Dictionary) -> bool:
-	for position in board.keys():
-		if _forms_match(board, position):
-			return true
-	return false
-
-
-func has_valid_moves(board: Dictionary) -> bool:
-	# Lightweight simulation scan
-	for pos in board.keys():
-		var neighbors = _get_swappable_neighbors(board, pos)
-
-		for n in neighbors:
-			if _would_create_match(board, pos, n):
-				return true
-
-	return false
-
-
-# =========================================================
-# INTERNAL TILE CREATION
-# =========================================================
-
-func _create_tile(position: Vector2i):
-	# Delegates actual instantiation to TileFactory
-	if _tile_factory == null:
+func generate_tile(position: Vector2i) -> Tile:
+	if _tile_factory == null or _level_tile_definitions.is_empty():
 		return null
-
-	return _tile_factory.create_tile(position)
-
-
-func _fill_position(board: Dictionary, position: Vector2i):
-	board[position] = _create_tile(position)
+	var definition := _choose_definition()
+	return _tile_factory.create_tile_at(definition["enum"], position)
 
 
-# =========================================================
-# VALIDATION HELPERS
-# =========================================================
+func _load_level_tile_pool(tile_pool) -> void:
+	if typeof(tile_pool) != TYPE_DICTIONARY:
+		return
 
-func _forms_match(board: Dictionary, position: Vector2i) -> bool:
-	var tile = board.get(position, null)
-	if tile == null:
-		return false
+	var ids: Array = tile_pool.get("tiles", [])
+	var weights: Array = tile_pool.get("weights", [])
+	for index in range(ids.size()):
+		var definition: Dictionary = _tile_database.get_tile(str(ids[index]))
+		if definition.is_empty() or not definition.get("spawnable", false):
+			continue
+		_level_tile_definitions.append(definition)
+		var weight := float(definition.get("spawn_weight", 1.0))
+		if index < weights.size():
+			weight = float(weights[index])
+		_level_tile_weights.append(maxf(0.0, weight))
 
-	# Check horizontal
-	var left = board.get(position + Vector2i(-1, 0), null)
-	var right = board.get(position + Vector2i(1, 0), null)
+	if not _level_tile_definitions.is_empty():
+		return
 
-	if left != null and right != null:
-		if left.type == tile.type and right.type == tile.type:
-			return true
+	for definition in _tile_database.get_spawnable_tiles():
+		_level_tile_definitions.append(definition)
+		_level_tile_weights.append(maxf(0.0, float(definition.get("spawn_weight", 1.0))))
 
-	# Check vertical
-	var up = board.get(position + Vector2i(0, -1), null)
-	var down = board.get(position + Vector2i(0, 1), null)
 
-	if up != null and down != null:
-		if up.type == tile.type and down.type == tile.type:
-			return true
+func _choose_definition() -> Dictionary:
+	return RandomGenerator.weighted_choice(_level_tile_definitions, _level_tile_weights)
 
+
+func _definition_for_type(tile_type: int) -> Dictionary:
+	for definition in _level_tile_definitions:
+		if int(definition.get("enum", -1)) == tile_type:
+			return definition
+	return {}
+
+
+func _generate_type_grid(width: int, height: int) -> Dictionary:
+	for _generation_attempt in range(40):
+		var grid: Dictionary = {}
+		for y in range(height):
+			for x in range(width):
+				var position := Vector2i(x, y)
+				var candidates := _weighted_candidate_order()
+				var selected_type := -1
+				for candidate in candidates:
+					if not _would_form_initial_match(grid, position, int(candidate["enum"])):
+						selected_type = int(candidate["enum"])
+						break
+				if selected_type < 0:
+					selected_type = int(_choose_definition()["enum"])
+				grid[position] = selected_type
+		if _has_valid_move(grid, width, height):
+			return grid
+	return {}
+
+
+func _weighted_candidate_order() -> Array:
+	var candidates: Array = []
+	var definitions := _level_tile_definitions.duplicate()
+	var weights := _level_tile_weights.duplicate()
+	while not definitions.is_empty():
+		var chosen: Dictionary = RandomGenerator.weighted_choice(definitions, weights)
+		var index := definitions.find(chosen)
+		candidates.append(chosen)
+		definitions.remove_at(index)
+		weights.remove_at(index)
+	return candidates
+
+
+func _would_form_initial_match(grid: Dictionary, position: Vector2i, tile_type: int) -> bool:
+	if grid.get(position + Vector2i(-1, 0), -1) == tile_type and grid.get(position + Vector2i(-2, 0), -1) == tile_type:
+		return true
+	if grid.get(position + Vector2i(0, -1), -1) == tile_type and grid.get(position + Vector2i(0, -2), -1) == tile_type:
+		return true
 	return false
 
 
-func _get_swappable_neighbors(board: Dictionary, position: Vector2i) -> Array:
-	var results = []
-
-	var offsets = [
-		Vector2i(1, 0),
-		Vector2i(-1, 0),
-		Vector2i(0, 1),
-		Vector2i(0, -1)
-	]
-
-	for o in offsets:
-		var p = position + o
-		if board.has(p):
-			results.append(p)
-
-	return results
-
-
-func _would_create_match(board: Dictionary, a: Vector2i, b: Vector2i) -> bool:
-	var temp_a = board[a]
-	var temp_b = board[b]
-
-	# simulate swap
-	board[a] = temp_b
-	board[b] = temp_a
-
-	var result = _forms_match(board, a) or _forms_match(board, b)
-
-	# revert swap
-	board[a] = temp_a
-	board[b] = temp_b
-
-	return result
+func _has_valid_move(grid: Dictionary, width: int, height: int) -> bool:
+	for y in range(height):
+		for x in range(width):
+			var position := Vector2i(x, y)
+			for offset in [Vector2i.RIGHT, Vector2i.DOWN]:
+				var neighbor: Vector2i = position + offset
+				if not grid.has(neighbor):
+					continue
+				var first_type: int = grid[position]
+				var second_type: int = grid[neighbor]
+				grid[position] = second_type
+				grid[neighbor] = first_type
+				var creates_match := _has_match_at(grid, position, width, height) or _has_match_at(grid, neighbor, width, height)
+				grid[position] = first_type
+				grid[neighbor] = second_type
+				if creates_match:
+					return true
+	return false
 
 
-func _randomize_board(board: Dictionary) -> void:
-	var keys = board.keys()
-
-	for i in range(keys.size()):
-		var j = randi() % keys.size()
-
-		var tmp = board[keys[i]]
-		board[keys[i]] = board[keys[j]]
-		board[keys[j]] = tmp
-
-
-func _validate_board(board: Dictionary) -> void:
-	# Final safety pass (no mutation unless necessary)
-	if has_initial_matches(board):
-		push_warning("BoardGenerator: unresolved initial matches detected")
-
-	if not has_valid_moves(board):
-		push_warning("BoardGenerator: generated board has no valid moves")
+func _has_match_at(grid: Dictionary, position: Vector2i, width: int, height: int) -> bool:
+	var tile_type: int = grid.get(position, -1)
+	if tile_type < 0:
+		return false
+	for direction in [Vector2i.RIGHT, Vector2i.DOWN]:
+		var count := 1
+		for sign_value in [-1, 1]:
+			var cursor := position + direction * sign_value
+			while cursor.x >= 0 and cursor.y >= 0 and cursor.x < width and cursor.y < height and grid.get(cursor, -1) == tile_type:
+				count += 1
+				cursor += direction * sign_value
+		if count >= 3:
+			return true
+	return false

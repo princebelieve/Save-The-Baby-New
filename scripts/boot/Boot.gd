@@ -34,7 +34,15 @@ func load_configuration() -> void:
 
 func create_game_scene() -> void:
 	var packed_scene = ResourceManager.load_scene(Constants.ScenePaths.GAME)
+	if packed_scene == null:
+		DebugLogger.error("Boot: Could not load the game scene.")
+		return
+
 	_game_scene = packed_scene.instantiate()
+	if _game_scene == null:
+		DebugLogger.error("Boot: Could not instantiate the game scene.")
+		return
+
 	get_tree().root.add_child(_game_scene)
 
 

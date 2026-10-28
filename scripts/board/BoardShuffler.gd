@@ -130,8 +130,11 @@ func _randomize(board) -> void:
 		for x in range(board.get_width()):
 			positions.append(Vector2i(x, y))
 
-	# Shuffle positions
-	positions.shuffle()
+	# Clear cells before reassignment so a shuffle never duplicates a tile reference.
+	for position in positions:
+		board.set_tile(position, null)
+
+	RandomGenerator.shuffle(positions)
 
 	# Reassign tiles randomly
 	for i in range(min(tiles.size(), positions.size())):
@@ -139,9 +142,6 @@ func _randomize(board) -> void:
 		var pos = positions[i]
 
 		board.set_tile(pos, tile)
-
-		if tile.has_method("set_grid_position"):
-			tile.set_grid_position(pos)
 
 
 func _validate(board) -> bool:

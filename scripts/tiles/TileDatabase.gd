@@ -20,7 +20,7 @@ func initialize() -> void:
 func reload() -> void:
 	clear()
 
-	_config_data = ConfigLoader.load_config("tiles") # expects configs/tiles.json
+	_config_data = ConfigLoader.load(Constants.ConfigPaths.TILES)
 
 	if _config_data == null:
 		push_error("TileDatabase: Failed to load tiles config.")
@@ -64,7 +64,7 @@ func has_tile(id) -> bool:
 
 func get_tile_by_enum(type) -> Dictionary:
 	for tile in _tile_cache.values():
-		if tile.get("type") == type:
+		if tile.get("enum") == type:
 			return tile
 	return {}
 
@@ -142,7 +142,12 @@ func get_random_spawnable_tile():
 	var pool = get_spawnable_tiles()
 	if pool.is_empty():
 		return null
-	return pool[randi() % pool.size()]
+
+	var weights: Array = []
+	for tile in pool:
+		weights.append(maxf(0.0, float(tile.get("spawn_weight", 1.0))))
+
+	return RandomGenerator.weighted_choice(pool, weights)
 
 
 # =========================================================

@@ -1,0 +1,71 @@
+{
+  "powerups": {
+    "rocket": {
+      "id": "rocket",
+      "enum": 0,
+      "name": "Rocket",
+      "texture": "res://resources/powerups/rocket.tres",
+      "icon": "res://assets/sprites/powerups/rocket_powerup_icon.jpeg",
+      "animation_set": {
+        "create": "create",
+        "activate": "activate",
+        "combine": "combine",
+        "destroy": "destroy"
+      },
+      "activation_type": "targeted_line_clear",
+      "combination_rules": {
+        "rocket": "clear_two_lines",
+        "bomb": "line_blast_area"
+      },
+      "description": "Clears a row or column.",
+      "created_by_match": true,
+      "created_by_booster": false,
+      "combinable": true
+    },
+    "bomb": {
+      "id": "bomb",
+      "enum": 1,
+      "name": "Bomb",
+      "texture": "res://resources/powerups/bomb.tres",
+      "icon": "res://assets/sprites/powerups/bomb_powerup_icon.jpeg",
+      "animation_set": {
+        "create": "create",
+        "activate": "activate",
+        "combine": "combine",
+        "destroy": "destroy"
+      },
+      "activation_type": "area_clear",
+      "combination_rules": {
+        "rocket": "line_blast_area",
+        "bomb": "expanded_area_clear",
+        "thunder": "area_clear_by_type"
+      },
+      "description": "Clears nearby tiles.",
+      "created_by_match": true,
+      "created_by_booster": false,
+      "combinable": true
+    },
+    "thunder": {
+      "id": "thunder",
+      "enum": 2,
+      "name": "Thunder",
+      "texture": "res://resources/powerups/thunder.tres",
+      "icon": "res://assets/sprites/powerups/thunder_powerup_icon.jpeg",
+      "animation_set": {
+        "create": "create",
+        "activate": "activate",
+        "combine": "combine",
+        "destroy": "destroy"
+      },
+      "activation_type": "clear_selected_type",
+      "combination_rules": {
+        "bomb": "area_clear_by_type",
+        "thunder": "clear_all_types"
+      },
+      "description": "Clears all tiles of a selected type.",
+      "created_by_match": true,
+      "created_by_booster": false,
+      "combinable": true
+    }
+  }
+}

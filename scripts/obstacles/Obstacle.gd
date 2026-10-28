@@ -16,9 +16,24 @@ signal clicked(obstacle)
 
 var _state: ObstacleState
 var _behavior: ObstacleBehavior = null
+var _pending_texture: Texture2D
 
 @onready var _sprite: Sprite2D = $Sprite2D
 @onready var _animation_player: AnimationPlayer = $AnimationPlayer
+
+
+func _init() -> void:
+	var sprite := Sprite2D.new()
+	sprite.name = "Sprite2D"
+	add_child(sprite)
+	var animation_player := AnimationPlayer.new()
+	animation_player.name = "AnimationPlayer"
+	add_child(animation_player)
+
+
+func _ready() -> void:
+	if _pending_texture != null:
+		_sprite.texture = _pending_texture
 
 
 # =========================================================
@@ -38,7 +53,8 @@ func reset() -> void:
 		_behavior.reset()
 
 	reset_modulate()
-	_animation_player.stop()
+	if _animation_player != null:
+		_animation_player.stop()
 
 
 # =========================================================
@@ -167,6 +183,7 @@ func set_visible(value: bool) -> void:
 # =========================================================
 
 func set_texture(texture: Texture2D) -> void:
+	_pending_texture = texture
 	if _sprite:
 		_sprite.texture = texture
 

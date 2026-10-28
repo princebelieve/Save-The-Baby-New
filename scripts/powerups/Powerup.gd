@@ -16,9 +16,19 @@ signal clicked(powerup)
 
 var _state: PowerupState
 var _behavior: PowerupBehavior = null
+var _pending_texture: Texture2D
 
 @onready var _sprite: Sprite2D = $Sprite2D
 @onready var _animation_player: AnimationPlayer = $AnimationPlayer
+
+
+func _init() -> void:
+	var sprite := Sprite2D.new()
+	sprite.name = "Sprite2D"
+	add_child(sprite)
+	var animation_player := AnimationPlayer.new()
+	animation_player.name = "AnimationPlayer"
+	add_child(animation_player)
 
 
 # =========================================================
@@ -28,6 +38,8 @@ var _behavior: PowerupBehavior = null
 func _ready() -> void:
 	if _state == null:
 		_state = PowerupState.new()
+	if _pending_texture != null:
+		_sprite.texture = _pending_texture
 
 
 func initialize(type, grid_position: Vector2i) -> void:
@@ -39,15 +51,12 @@ func initialize(type, grid_position: Vector2i) -> void:
 
 func reset() -> void:
 	if _state != null:
-	    _state.reset()
-
-    if _behavior != null:
-	    _behavior.reset()
-
-    reset_modulate()
-
-    if _animation_player != null:
-	    _animation_player.stop()
+		_state.reset()
+	if _behavior != null:
+		_behavior.reset()
+	reset_modulate()
+	if _animation_player != null:
+		_animation_player.stop()
 
 
 # =========================================================
@@ -161,6 +170,7 @@ func set_visible(value: bool) -> void:
 # =========================================================
 
 func set_texture(texture: Texture2D) -> void:
+	_pending_texture = texture
 	if _sprite != null:
 		_sprite.texture = texture
 

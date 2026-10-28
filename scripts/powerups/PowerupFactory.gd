@@ -50,11 +50,7 @@ func initialize(
 
 		Constants.PowerupType.BOMB: BombBehavior,
 
-		Constants.PowerupType.THUNDER: ThunderBehavior,
-
-		Constants.PowerupType.COLOR_BOMB: ColorBombBehavior,
-
-		Constants.PowerupType.LINE_BLAST: LineBlastBehavior
+		Constants.PowerupType.THUNDER: ThunderBehavior
 
 	}
 
@@ -178,21 +174,13 @@ func _assign_texture(powerup: Powerup, type) -> void:
 
 
 func _assign_animation_set(powerup: Powerup, type) -> void:
-	# Animation resources are handled by the animation framework.
-	# PowerupFactory only attaches metadata.
-	pass
+	if _database == null:
+		return
+	powerup.set_meta("animation_set", _database.get_animation_set(type))
 
 
 func _assign_metadata(powerup: Powerup, type) -> void:
 	powerup.set_powerup_type(type)
-    var animation_set = _database.get_animation_set(type)
-
-    if animation_set == null:
-	    return
-
-# V1:
-# Animation metadata only.
-# Playback belongs to PowerupAnimator.
 
 
 func _assign_behavior(powerup: Powerup, type) -> void:

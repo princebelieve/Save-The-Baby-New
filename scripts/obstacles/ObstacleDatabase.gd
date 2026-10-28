@@ -19,18 +19,18 @@ func initialize() -> void:
 func reload() -> void:
 	clear()
 
-	# Loads from ConfigLoader (data layer only)
-	var data = ConfigLoader.load_config("obstacles")
+	var data: Dictionary = ConfigLoader.load(Constants.ConfigPaths.OBSTACLES)
 
-	if data == null:
-		DebugLogger.log_error("ObstacleDatabase: Failed to load obstacles config")
+	if data.is_empty():
+		DebugLogger.error("ObstacleDatabase: Failed to load obstacles config.")
 		return
 
-	if typeof(data) != TYPE_DICTIONARY:
-		DebugLogger.log_error("ObstacleDatabase: Invalid obstacles config format")
+	var entries = data.get("obstacles", {})
+	if typeof(entries) != TYPE_DICTIONARY:
+		DebugLogger.error("ObstacleDatabase: Expected an 'obstacles' dictionary.")
 		return
 
-	_obstacle_cache = data
+	_obstacle_cache = entries
 
 
 func clear() -> void:
@@ -54,7 +54,7 @@ func has_obstacle(id: String) -> bool:
 func get_obstacle_by_enum(type):
 	for key in _obstacle_cache.keys():
 		var entry = _obstacle_cache[key]
-		if entry.has("type") and entry["type"] == type:
+		if entry.has("enum") and entry["enum"] == type:
 			return entry
 	return null
 

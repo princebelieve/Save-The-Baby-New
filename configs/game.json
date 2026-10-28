@@ -1,0 +1,15 @@
+{
+  "game_name": "Save The Baby",
+  "version": "1.0.0",
+  "save_version": 1,
+  "build_number": 1,
+  "target_fps": 60,
+  "target_physics_fps": 60,
+  "max_levels": 0,
+  "max_lives": 5,
+  "max_moves": 99,
+  "minimum_match": 3,
+  "autosave_enabled": true,
+  "vibration_enabled": true,
+  "tutorial_enabled": true
+}

@@ -7,12 +7,13 @@ signal game_restarted
 signal game_quit
 signal game_state_changed(previous_state, current_state)
 
-var _current_state: int = Constants.GameState.NONE
+var _current_state: int = Constants.GameState.BOOT
 var _is_initialized: bool = false
 
 
 func _ready() -> void:
 	initialize()
+	call_deferred("start_game")
 
 
 func initialize() -> void:
@@ -20,16 +21,24 @@ func initialize() -> void:
 		return
 
 	_is_initialized = true
-	_current_state = Constants.GameState.NONE
-
-	SignalBus.animation_manager = get_tree().get_first_node_in_group("animation_manager")
+	_current_state = Constants.GameState.BOOT
 
 
 func start_game() -> void:
 	if is_game_running():
 		return
 
-	set_state(Constants.GameState.RUNNING)
+	var level_manager = get_tree().get_first_node_in_group("level_manager")
+	if level_manager == null:
+		DebugLogger.error("GameManager: No LevelManager is present in the game scene.")
+		return
+
+	if not level_manager.load_level(1):
+		DebugLogger.error("GameManager: Could not load the opening level.")
+		return
+
+	level_manager.start_level()
+	set_state(Constants.GameState.PLAYING)
 
 	game_started.emit()
 	SignalBus.game_started.emit()
@@ -49,19 +58,20 @@ func resume_game() -> void:
 	if not is_game_paused():
 		return
 
-	set_state(Constants.GameState.RUNNING)
+	set_state(Constants.GameState.PLAYING)
 
 	game_resumed.emit()
 	SignalBus.game_resumed.emit()
 
 
 func restart_game() -> void:
-	reset_game()
+	var level_manager = get_tree().get_first_node_in_group("level_manager")
+	if level_manager != null:
+		level_manager.reload_level()
 
 	game_restarted.emit()
 	SignalBus.game_restarted.emit()
 
-	start_game()
 
 
 func quit_game() -> void:
@@ -93,7 +103,7 @@ func is_state(state: int) -> bool:
 
 
 func is_game_running() -> bool:
-	return _current_state == Constants.GameState.RUNNING
+	return _current_state == Constants.GameState.PLAYING
 
 
 func is_game_paused() -> bool:
@@ -101,4 +111,4 @@ func is_game_paused() -> bool:
 
 
 func reset_game() -> void:
-	_current_state = Constants.GameState.NONE
+	_current_state = Constants.GameState.BOOT
