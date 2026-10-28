@@ -28,8 +28,8 @@ JsonLoader="*uid://bosxr5gwvr1tg"
 
 window/size/viewport_width=720
 window/size/viewport_height=1280
-window/size/window_width_override=540
-window/size/window_height_override=960
+window/size/window_width_override=600
+window/size/window_height_override=1067
 window/stretch/mode="canvas_items"
 
 [physics]
@@ -40,3 +40,6 @@ window/stretch/mode="canvas_items"
 
 rendering_device/driver.windows="d3d12"
 renderer/rendering_method="mobile"
+
+[audio]
+default_bus_layout="res://resources/audio/default_bus_layout.tres"

@@ -78,7 +78,7 @@ func _show_launch_screen() -> void:
 	content.add_theme_constant_override("separation", 14)
 	center.add_child(content)
 	var family := TextureRect.new()
-	family.custom_minimum_size = Vector2(320, 485)
+	family.custom_minimum_size = Vector2(440, 400)
 	family.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	family.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	family.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -104,6 +104,9 @@ func _start_opening_story() -> void:
 		_launch_layer.queue_free()
 	_show_story_overlay()
 	if _story_manager != null:
+		var music_id := str(_story.get("background_music", ""))
+		if not music_id.is_empty():
+			SignalBus.play_music.emit(music_id)
 		_story_manager.start_story("opening_story")
 
 
@@ -173,6 +176,7 @@ func _make_texture_button(name: String, button_size: Vector2, folder: String = "
 	button.texture_normal = ResourceManager.load_texture("res://assets/sprites/ui/%s/%s_normal.png" % [folder, name])
 	button.texture_hover = ResourceManager.load_texture("res://assets/sprites/ui/%s/%s_hover.png" % [folder, name])
 	button.texture_pressed = ResourceManager.load_texture("res://assets/sprites/ui/%s/%s_pressed.png" % [folder, name])
+	button.pressed.connect(_play_ui_click)
 	return button
 
 
@@ -180,6 +184,9 @@ func _show_pause_menu() -> void:
 	if _pause_layer != null:
 		return
 	get_tree().paused = true
+	var audio_manager := get_node_or_null("Managers/AudioManager")
+	if audio_manager != null:
+		audio_manager.pause_music()
 	_pause_layer = CanvasLayer.new()
 	_pause_layer.name = "PauseMenuLayer"
 	_pause_layer.layer = 12
@@ -192,44 +199,71 @@ func _show_pause_menu() -> void:
 	var center := CenterContainer.new()
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	veil.add_child(center)
-	var frame := Control.new()
-	frame.custom_minimum_size = Vector2(460, 340)
+	var frame := PanelContainer.new()
+	frame.custom_minimum_size = Vector2(460, 470)
+	var panel_style := StyleBoxFlat.new()
+	panel_style.bg_color = Color("#102338")
+	panel_style.border_color = Color("#d6b66e")
+	panel_style.set_border_width_all(4)
+	panel_style.set_corner_radius_all(28)
+	panel_style.set_content_margin_all(28)
+	frame.add_theme_stylebox_override("panel", panel_style)
 	center.add_child(frame)
-	var art := TextureRect.new()
-	art.texture = ResourceManager.load_texture("res://assets/sprites/ui/screens/pause_screen.png")
-	art.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	frame.add_child(art)
-	var resume := _make_texture_button("play", Vector2(150, 70))
-	resume.anchor_left = 0.3
-	resume.anchor_right = 0.7
-	resume.anchor_top = 0.015
-	resume.anchor_bottom = 0.22
-	resume.pressed.connect(_close_pause_menu)
-	frame.add_child(resume)
 	var actions := VBoxContainer.new()
-	actions.anchor_left = 0.18
-	actions.anchor_right = 0.82
-	actions.anchor_top = 0.37
-	actions.anchor_bottom = 0.94
-	actions.add_theme_constant_override("separation", 5)
+	actions.add_theme_constant_override("separation", 18)
 	frame.add_child(actions)
-	var settings := _make_texture_button("settings", Vector2(190, 70))
+	var heading := _make_label("PAUSED", 34)
+	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	actions.add_child(heading)
+	var resume := _make_menu_button("RESUME")
+	resume.pressed.connect(_close_pause_menu)
+	actions.add_child(resume)
+	var settings := _make_menu_button("SETTINGS")
 	settings.pressed.connect(_show_settings_popup)
 	actions.add_child(settings)
-	var sound := Button.new()
-	sound.text = "SOUND: ON"
-	sound.custom_minimum_size.y = 44
+	var sound := _make_menu_button("SOUND: ON")
 	sound.pressed.connect(_toggle_sound.bind(sound))
 	actions.add_child(sound)
-	var title := _make_texture_button("back", Vector2(190, 70))
+	var title := _make_menu_button("RETURN TO TITLE")
 	title.pressed.connect(_return_to_title)
 	actions.add_child(title)
+	var sound_bus := AudioServer.get_bus_index("Master")
+	if sound_bus != -1 and AudioServer.is_bus_mute(sound_bus):
+		sound.text = "SOUND: OFF"
+
+
+func _make_menu_button(caption: String) -> Button:
+	var button := Button.new()
+	button.text = caption
+	button.custom_minimum_size = Vector2(350, 66)
+	button.add_theme_font_size_override("font_size", 22)
+	button.add_theme_color_override("font_color", Color("#fff3d5"))
+	var normal := StyleBoxFlat.new()
+	normal.bg_color = Color("#21466a")
+	normal.border_color = Color("#d6b66e")
+	normal.set_border_width_all(2)
+	normal.set_corner_radius_all(16)
+	button.add_theme_stylebox_override("normal", normal)
+	var hover := normal.duplicate() as StyleBoxFlat
+	hover.bg_color = Color("#2f628f")
+	button.add_theme_stylebox_override("hover", hover)
+	button.pressed.connect(_play_ui_click)
+	return button
+
+
+func _play_ui_click() -> void:
+	SignalBus.play_sfx.emit("ui_click")
+
+
+func _play_ui_confirm() -> void:
+	SignalBus.play_sfx.emit("ui_confirm")
 
 
 func _close_pause_menu() -> void:
 	get_tree().paused = false
+	var audio_manager := get_node_or_null("Managers/AudioManager")
+	if audio_manager != null:
+		audio_manager.resume_music()
 	if _pause_layer != null:
 		_pause_layer.queue_free()
 	_pause_layer = null
@@ -270,6 +304,8 @@ func _set_master_volume(value: float) -> void:
 
 
 func _return_to_title() -> void:
+	SignalBus.play_sfx.emit("ui_back")
+	SignalBus.stop_music.emit()
 	get_tree().paused = false
 	get_tree().reload_current_scene()
 
@@ -469,6 +505,7 @@ func _present_route_choices(choices: Array) -> void:
 			text_button.custom_minimum_size = Vector2(420, 54)
 			button = text_button
 		button.pressed.connect(_select_route.bind(choice))
+		button.pressed.connect(_play_ui_confirm)
 		button.mouse_entered.connect(_animate_choice_button.bind(button, 1.04))
 		button.mouse_exited.connect(_animate_choice_button.bind(button, 1.0))
 		_choice_box.add_child(button)
@@ -538,6 +575,7 @@ func _on_moves_changed(remaining: int) -> void:
 
 
 func _on_tiles_matched(tile_types: Array) -> void:
+	SignalBus.play_sfx.emit("tile_match")
 	for tile_type in tile_types:
 		if int(tile_type) == Constants.TileType.KEY:
 			_evidence_count += 1
@@ -549,4 +587,5 @@ func _on_tiles_matched(tile_types: Array) -> void:
 
 
 func _on_move_rejected() -> void:
+	SignalBus.play_sfx.emit("invalid_move")
 	_hint_label.text = "That swap makes no match. Try another pair of neighboring pieces."

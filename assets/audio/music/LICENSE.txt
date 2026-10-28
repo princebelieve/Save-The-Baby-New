@@ -1,0 +1,7 @@
+Suspense.ogg is by wipics and is licensed CC0 / public domain.
+Source: https://opengameart.org/content/suspense-0
+
+The sound effects in ../sfx are from Kenney's Interface Sounds pack.
+They are licensed CC0; attribution is not required.
+Source: https://kenney.nl/assets/interface-sounds
+License information is also included in ../sfx/Kenney_License.txt.

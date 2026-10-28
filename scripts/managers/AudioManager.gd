@@ -50,6 +50,7 @@ func initialize() ->void:
 	_initialized = true
 
 	_music_player = AudioStreamPlayer.new()
+	_music_player.bus = "Music"
 	add_child(_music_player)
 
 	_music_player.finished.connect(_on_music_finished)
@@ -68,13 +69,18 @@ func play_music(track) -> void:
 	if track == null:
 		return
 
-	var stream := ResourceManager.load_audio(track)
+	var resolved_track := _resolve_audio_id("music", track)
+	var stream := ResourceManager.load_audio(resolved_track)
 
 	if stream == null:
-		DebugLogger.warning("AudioManager: Unable to load music: %s" % track)
+		DebugLogger.warning("AudioManager: Unable to load music: %s" % resolved_track)
 		return
 
 	_music_player.stop()
+	var music_entries = _audio_config.get("music", {})
+	var entry = music_entries.get(str(track), {}) if typeof(music_entries) == TYPE_DICTIONARY else {}
+	if stream is AudioStreamOggVorbis and typeof(entry) == TYPE_DICTIONARY:
+		stream.loop = bool(entry.get("loop", false))
 	_music_player.stream = stream
 	_music_player.play()
 
@@ -102,14 +108,13 @@ func play_sfx(sound) -> void:
 	if sound == null:
 		return
 
-	var stream := ResourceManager.load_audio(sound)
-
+	var resolved_sound := _resolve_audio_id("sfx", sound)
+	var stream := ResourceManager.load_audio(resolved_sound)
 	if stream == null:
-		DebugLogger.warning("AudioManager: Unable to load sound: %s" % sound)
+		DebugLogger.warning("AudioManager: Unable to load sound: %s" % resolved_sound)
 		return
-
 	var player := AudioStreamPlayer.new()
-
+	player.bus = "SFX"
 	player.stream = stream
 	player.finished.connect(
 		func():
@@ -174,9 +179,6 @@ func _load_audio_configuration() -> void:
 	if ConfigLoader == null:
 		return
 
-	if not ConfigLoader.has(Constants.ConfigPaths.AUDIO):
-		return
-
 	_audio_config = ConfigLoader.get_config(Constants.ConfigPaths.AUDIO)
 
 	if _audio_config.is_empty():
@@ -188,6 +190,19 @@ func _load_audio_configuration() -> void:
 		_master_volume = defaults.get("master", 1.0)
 		_music_volume = defaults.get("music", 1.0)
 		_sfx_volume = defaults.get("sfx", 1.0)
+
+
+func _resolve_audio_id(category: String, value) -> String:
+	var audio_id := str(value)
+	if audio_id.begins_with("res://"):
+		return audio_id
+	var entries = _audio_config.get(category, {})
+	if typeof(entries) == TYPE_DICTIONARY and entries.has(audio_id):
+		var entry = entries[audio_id]
+		if typeof(entry) == TYPE_DICTIONARY:
+			return str(entry.get("path", ""))
+		return str(entry)
+	return audio_id
 
 
 func _apply_bus_volumes() -> void:

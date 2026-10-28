@@ -1,0 +1,24 @@
+{
+  "music": {
+    "suspense_opening": {
+      "path": "res://assets/audio/music/suspense_opening.ogg",
+      "loop": true
+    }
+  },
+  "sfx": {
+    "ui_click": "res://assets/audio/sfx/ui_click.ogg",
+    "ui_confirm": "res://assets/audio/sfx/ui_confirm.ogg",
+    "ui_back": "res://assets/audio/sfx/ui_back.ogg",
+    "tile_match": "res://assets/audio/sfx/tile_match.ogg",
+    "invalid_move": "res://assets/audio/sfx/invalid_move.ogg"
+  },
+  "volume_defaults": {
+    "master": 1.0,
+    "music": 0.65,
+    "sfx": 0.8
+  },
+  "audio_bus_mapping": {
+    "music": "Music",
+    "sfx": "SFX"
+  }
+}
