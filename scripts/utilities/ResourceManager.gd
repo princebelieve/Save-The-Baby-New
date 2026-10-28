@@ -40,8 +40,6 @@ func clear_unused() -> void:
 		if res.get_reference_count() <= 1:
 			_resource_cache.erase(path)
 
-	# Also ask engine to purge unused cache entries
-	ResourceLoader.clear_cache()
 
 
 # =========================================================
@@ -71,9 +69,6 @@ func unload_resource(path: String) -> void:
 		var res = _resource_cache[path]
 		_resource_cache.erase(path)
 
-		# Remove from engine cache so it can be fully freed if unused
-		if res != null:
-			ResourceLoader.remove_from_cache(path)
 
 
 # =========================================================
@@ -83,7 +78,7 @@ func has(path: String) -> bool:
 	return _resource_cache.has(path)
 
 
-func get(path: String) -> Resource:
+func get_resource(path: String) -> Resource:
 	if _resource_cache.has(path):
 		return _resource_cache[path]
 
@@ -95,7 +90,7 @@ func get(path: String) -> Resource:
 # =========================================================
 
 func load_scene(path: String) -> PackedScene:
-	var res = get(path)
+	var res = get_resource(path)
 
 	if res is PackedScene:
 		return res
@@ -105,7 +100,7 @@ func load_scene(path: String) -> PackedScene:
 
 
 func load_texture(path: String) -> Texture2D:
-	var res = get(path)
+	var res = get_resource(path)
 
 	if res is Texture2D:
 		return res
@@ -115,7 +110,7 @@ func load_texture(path: String) -> Texture2D:
 
 
 func load_audio(path: String) -> AudioStream:
-	var res = get(path)
+	var res = get_resource(path)
 
 	if res is AudioStream:
 		return res
@@ -125,7 +120,7 @@ func load_audio(path: String) -> AudioStream:
 
 
 func load_font(path: String) -> Font:
-	var res = get(path)
+	var res = get_resource(path)
 
 	if res is Font:
 		return res
@@ -136,4 +131,4 @@ func load_font(path: String) -> Font:
 
 func load_animation(path: String) -> Resource:
 	# Animation resources can vary (AnimationPlayer libraries, custom resources, etc.)
-	return get(path)
+	return get_resource(path)

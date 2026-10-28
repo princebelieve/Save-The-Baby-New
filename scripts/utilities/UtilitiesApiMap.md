@@ -353,13 +353,13 @@ reload()
 
 clear_cache()
 
-load(path)
+load_config(path)
 
 reload_file(path)
 
 has(path)
 
-get(path)
+get_config(path)
 
 get_value(path,key,default)
 
@@ -394,7 +394,7 @@ unload_resource(path)
 
 has(path)
 
-get(path)
+get_resource(path)
 
 load_scene(path)
 

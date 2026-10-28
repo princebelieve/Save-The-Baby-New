@@ -68,44 +68,44 @@ func get_powerup_by_enum(type):
 	return {}
 
 
-func get_name(type):
-	var data := get_powerup_by_enum(type)
+func get_powerup_name(type):
+	var data: Dictionary = get_powerup_by_enum(type)
 
 	return data.get("name", "")
 
 
 func get_texture_path(type):
-	var data := get_powerup_by_enum(type)
+	var data: Dictionary = get_powerup_by_enum(type)
 
 	return data.get("texture", "")
 
 
 func get_icon_path(type):
-	var data := get_powerup_by_enum(type)
+	var data: Dictionary = get_powerup_by_enum(type)
 
 	return data.get("icon", "")
 
 
 func get_animation_set(type):
-	var data := get_powerup_by_enum(type)
+	var data: Dictionary = get_powerup_by_enum(type)
 
 	return data.get("animation_set", {})
 
 
 func get_activation_type(type):
-	var data := get_powerup_by_enum(type)
+	var data: Dictionary = get_powerup_by_enum(type)
 
 	return data.get("activation_type", null)
 
 
 func get_combination_rules(type):
-	var data := get_powerup_by_enum(type)
+	var data: Dictionary = get_powerup_by_enum(type)
 
 	return data.get("combination_rules", {})
 
 
 func get_description(type):
-	var data := get_powerup_by_enum(type)
+	var data: Dictionary = get_powerup_by_enum(type)
 
 	return data.get("description", "")
 
@@ -153,7 +153,7 @@ func get_combinable() -> Array:
 # =========================================================
 
 func _load_database() -> void:
-	var data := ConfigLoader.get(POWERUP_CONFIG_PATH)
+	var data: Dictionary = ConfigLoader.get_config(POWERUP_CONFIG_PATH)
 
 	if data.is_empty():
 		DebugLogger.error("PowerupDatabase: Failed loading powerup config.")

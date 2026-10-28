@@ -48,7 +48,7 @@ func initialize(
 
 		Constants.PowerupType.ROCKET: RocketBehavior,
 
-		Constants.PowerupType.BOMB: BombBehavior,
+		Constants.PowerupType.BOMB: PowerupBombBehavior,
 
 		Constants.PowerupType.THUNDER: ThunderBehavior
 
@@ -162,7 +162,7 @@ func _assign_texture(powerup: Powerup, type) -> void:
 	if _database == null:
 		return
 
-	var path := _database.get_texture_path(type)
+	var path: String = _database.get_texture_path(type)
 
 	if path.is_empty():
 		return
@@ -190,12 +190,12 @@ func _assign_behavior(powerup: Powerup, type) -> void:
 	if not _behavior_map.has(type):
 		return
 
-	var behavior_class = _behavior_map[type]
+	var behavior_class: Script = _behavior_map[type]
 
 	if behavior_class == null:
 		return
 
-	var behavior := behavior_class.new()
+	var behavior: PowerupBehavior = behavior_class.new()
 
 	behavior.initialize(powerup)
 

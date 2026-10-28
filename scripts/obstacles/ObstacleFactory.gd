@@ -25,7 +25,7 @@ func initialize(database: ObstacleDatabase, animation_manager: ObstacleAnimator 
 		Constants.ObstacleType.CHAIN: ChainBehavior,
 		Constants.ObstacleType.LOCK: LockBehavior,
 		Constants.ObstacleType.TAPE: TapeBehavior,
-		Constants.ObstacleType.BOMB: BombBehavior,
+		Constants.ObstacleType.BOMB: ObstacleBombBehavior,
 		Constants.ObstacleType.MISSILE: MissileBehavior,
 		Constants.ObstacleType.ELECTRIC_TRAP: ElectricTrapBehavior
 	}
@@ -127,7 +127,7 @@ func _assign_metadata(obstacle: Obstacle, type) -> void:
 # =========================================================
 
 func _assign_texture(obstacle: Obstacle, type) -> void:
-	var path := _database.get_texture_path(type)
+	var path: String = _database.get_texture_path(type)
 	if path == "":
 		return
 
@@ -165,7 +165,7 @@ func _assign_behavior(obstacle: Obstacle, type) -> void:
 	if behavior_class == null:
 		return
 
-	var behavior = behavior_class.new()
+	var behavior: ObstacleBehavior = behavior_class.new()
 	behavior.initialize(obstacle)
 
 	obstacle.set_behavior(behavior)

@@ -9,6 +9,7 @@ extends Node
 
 # Optional internal reuse of parsed data (safe cache)
 var _cache: Dictionary = {}
+var _file_helper: FileHelper = FileHelper.new()
 
 # =========================================================
 # INITIALIZATION
@@ -93,7 +94,7 @@ func save_file(path: String, data) -> bool:
 # =========================================================
 
 func file_exists(path: String) -> bool:
-	return FileHelper.file_exists(path)
+	return _file_helper.file_exists(path)
 
 
 func validate_json(path: String) -> bool:

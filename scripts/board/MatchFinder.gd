@@ -23,9 +23,9 @@ func find_match_from_tile(board, tile) -> Match:
 
 	var matches := find_all_matches(board)
 
-	for match in matches:
-		if match.contains(tile):
-			return match
+	for found_match in matches:
+		if found_match.contains(tile):
+			return found_match
 
 	return null
 
@@ -148,12 +148,12 @@ func _collect_match(tile_list: Array, matches: Array) -> void:
 	if tile_list.size() < 3:
 		return
 
-	var match := Match.new()
+	var found_match := Match.new()
 
-	match.initialize()
+	found_match.initialize()
 
 	for tile in tile_list:
-		match.add_tile(tile)
+		found_match.add_tile(tile)
 
-	if match.is_valid():
-		matches.append(match)
+	if found_match.is_valid():
+		matches.append(found_match)

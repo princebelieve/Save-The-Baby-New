@@ -20,7 +20,7 @@ func initialize() -> void:
 func reload() -> void:
 	clear()
 
-	_config_data = ConfigLoader.load(Constants.ConfigPaths.TILES)
+	_config_data = ConfigLoader.load_config(Constants.ConfigPaths.TILES)
 
 	if _config_data == null:
 		push_error("TileDatabase: Failed to load tiles config.")

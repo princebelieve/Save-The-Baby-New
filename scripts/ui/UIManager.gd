@@ -44,10 +44,10 @@ func initialize() -> void:
 		pause_menu.initialize(self)
 
 	if victory_screen:
-		victory_screen.initialize()
+		victory_screen.initialize(self)
 
 	if game_over_screen:
-		game_over_screen.initialize()
+		game_over_screen.initialize(self)
 
 	if loading_screen:
 		loading_screen.initialize()

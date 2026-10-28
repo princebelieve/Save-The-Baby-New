@@ -202,7 +202,7 @@ has_powerup(id)
 
 get_powerup_by_enum(type)
 
-get_name(type)
+get_powerup_name(type)
 
 get_texture_path(type)
 

@@ -1,5 +1,5 @@
 extends PowerupBehavior
-class_name BombBehavior
+class_name PowerupBombBehavior
 
 
 # =========================================================

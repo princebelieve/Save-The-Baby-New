@@ -156,14 +156,6 @@ func clear_message() -> void:
 	pass
 
 
-func show() -> void:
-	visible = true
-
-
-func hide() -> void:
-	visible = false
-
-
 func reset() -> void:
 	_moves = 0
 	_score = 0

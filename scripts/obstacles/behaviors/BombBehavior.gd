@@ -1,5 +1,5 @@
 extends ObstacleBehavior
-class_name BombBehavior
+class_name ObstacleBombBehavior
 
 # =========================================================
 # LIFECYCLE

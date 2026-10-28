@@ -26,7 +26,7 @@ func calculate_fall(board) -> Dictionary:
 	if board == null:
 		return fall_map
 	for x in range(board.get_width()):
-		var next_y := board.get_height() - 1
+		var next_y: int = board.get_height() - 1
 		for y in range(board.get_height() - 1, -1, -1):
 			var from_position := Vector2i(x, y)
 			if board.get_tile(from_position) == null:

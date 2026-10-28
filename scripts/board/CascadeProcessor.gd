@@ -22,7 +22,7 @@ func process(board) -> void:
 	for _cycle in range(100):
 		if _should_stop:
 			break
-		var matches := _match_finder.find_all_matches(board)
+		var matches: Array = _match_finder.find_all_matches(board)
 		if matches.is_empty():
 			break
 		for found_match in matches:
@@ -37,7 +37,7 @@ func has_cascade(board) -> bool:
 	return board != null and _match_finder != null and _match_finder.has_matches(board)
 
 
-func is_processing() -> bool:
+func is_cascade_processing() -> bool:
 	return _is_processing
 
 

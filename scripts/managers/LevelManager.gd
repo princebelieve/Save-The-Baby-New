@@ -97,7 +97,7 @@ func get_level_data() -> Dictionary:
 
 
 func is_last_level() -> bool:
-	var game_config := ConfigLoader.load(Constants.ConfigPaths.GAME)
+	var game_config := ConfigLoader.load_config(Constants.ConfigPaths.GAME)
 
 	if game_config.is_empty():
 		return false

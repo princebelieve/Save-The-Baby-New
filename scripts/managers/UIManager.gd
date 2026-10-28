@@ -1,5 +1,5 @@
 extends Node
-class_name UIManager
+class_name UIManagerService
 
 # =========================================================
 # SIGNALS

@@ -28,7 +28,7 @@ func toggle() -> void:
 		show_menu()
 
 
-func is_visible() -> bool:
+func is_menu_visible() -> bool:
 	return _is_visible
 
 

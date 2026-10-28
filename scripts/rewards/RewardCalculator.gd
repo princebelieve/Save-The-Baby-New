@@ -110,7 +110,9 @@ func calculate_reward_set(type: String, data) -> Array:
 		_:
 			return []
 
-	return _validator.validate_reward_list(rewards)
+	if not _validator.validate_reward_list(rewards):
+		return []
+	return rewards
 
 
 # =========================================================

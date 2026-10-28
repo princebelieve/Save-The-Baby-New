@@ -29,7 +29,7 @@ func initialize() -> void:
 
 func reload() -> void:
 	clear()
-	_reward_config = ConfigLoader.get(Constants.ConfigPaths.REWARDS)
+	_reward_config = ConfigLoader.get_config(Constants.ConfigPaths.REWARDS)
 
 
 func clear() -> void:

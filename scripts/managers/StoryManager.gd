@@ -73,7 +73,7 @@ func start_story(id: String) -> void:
 
 
 func end_story() -> void:
-	var story_id := _current_story.get("story_id", "")
+	var story_id: String = str(_current_story.get("story_id", ""))
 
 	story_finished.emit(story_id)
 	SignalBus.story_finished.emit(story_id)

@@ -55,6 +55,8 @@ func initialize() -> void:
 
 	_save_data = SaveData.new()
 	_save_data.initialize()
+	_save_data.set_save_version(str(Constants.SAVE_VERSION))
+	_save_data.set_timestamp(TimeHelper.current_unix_time())
 
 	_is_initialized = true
 
@@ -79,6 +81,8 @@ func _process(delta: float) -> void:
 
 func new_game() -> void:
 	_save_data.reset()
+	_save_data.set_save_version(str(Constants.SAVE_VERSION))
+	_save_data.set_timestamp(TimeHelper.current_unix_time())
 
 
 # ------------------------------------------------------------------
@@ -86,6 +90,7 @@ func new_game() -> void:
 # ------------------------------------------------------------------
 
 func save_game() -> bool:
+	_save_data.set_timestamp(TimeHelper.current_unix_time())
 
 	emit_signal("save_requested")
 

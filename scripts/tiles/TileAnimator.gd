@@ -260,7 +260,9 @@ func _finish_animation(tile: Tile, tween: Tween) -> void:
 	if tween == null:
 		return
 
-	tween.finished.connect(func():
-		if _active_tweens.get(tile) == tween:
-			_active_tweens.erase(tile)
-	)
+	tween.finished.connect(_on_tween_finished.bind(tile, tween))
+
+
+func _on_tween_finished(tile: Tile, tween: Tween) -> void:
+	if _active_tweens.get(tile) == tween:
+		_active_tweens.erase(tile)

@@ -81,16 +81,6 @@ func hide_spinner() -> void:
 # VISIBILITY
 # =========================================================
 
-func show() -> void:
-	_is_visible = true
-	visible = true
-
-
-func hide() -> void:
-	_is_visible = false
-	visible = false
-
-
 # =========================================================
 # UTILITY
 # =========================================================

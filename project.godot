@@ -15,14 +15,6 @@ run/main_scene="uid://d4l6yynhehsfw"
 config/features=PackedStringArray("4.6", "Mobile")
 config/icon="res://icon.svg"
 
-[display]
-
-window/size/viewport_width=720
-window/size/viewport_height=1280
-window/size/window_width_override=720
-window/size/window_height_override=1280
-window/stretch/mode="canvas_items"
-
 [autoload]
 
 SignalBus="*uid://b40t173wb88dw"
@@ -31,6 +23,14 @@ RandomGenerator="*uid://uxhwmradss1c"
 ConfigLoader="*uid://cu8j86nxy8kq0"
 ResourceManager="*uid://dvkv8hfsbjwme"
 JsonLoader="*uid://bosxr5gwvr1tg"
+
+[display]
+
+window/size/viewport_width=720
+window/size/viewport_height=1280
+window/size/window_width_override=720
+window/size/window_height_override=1280
+window/stretch/mode="canvas_items"
 
 [physics]
 

@@ -217,7 +217,7 @@ has_obstacle(id)
 
 get_obstacle_by_enum(type)
 
-get_name(type)
+get_obstacle_name(type)
 
 get_texture_path(type)
 

@@ -168,7 +168,7 @@ func _has_match_at(grid: Dictionary, position: Vector2i, width: int, height: int
 	for direction in [Vector2i.RIGHT, Vector2i.DOWN]:
 		var count := 1
 		for sign_value in [-1, 1]:
-			var cursor := position + direction * sign_value
+			var cursor: Vector2i = position + direction * sign_value
 			while cursor.x >= 0 and cursor.y >= 0 and cursor.x < width and cursor.y < height and grid.get(cursor, -1) == tile_type:
 				count += 1
 				cursor += direction * sign_value

@@ -306,7 +306,7 @@ process(board)
 
 has_cascade(board)
 
-is_processing()
+is_cascade_processing()
 
 stop()
 Internal

@@ -16,12 +16,12 @@ Rules:
 # CURRENT TIME
 # ----------------------------------------------------
 
-func current_unix_time() -> int:
+static func current_unix_time() -> int:
 	# Returns current system time in seconds (UTC-based Unix timestamp)
 	return Time.get_unix_time_from_system()
 
 
-func current_datetime() -> Dictionary:
+static func current_datetime() -> Dictionary:
 	# Returns full system datetime breakdown as Dictionary
 	# Example keys: year, month, day, hour, minute, second
 	return Time.get_datetime_dict_from_system()
@@ -31,22 +31,22 @@ func current_datetime() -> Dictionary:
 # DIFFERENCES (expects Unix timestamps)
 # ----------------------------------------------------
 
-func seconds_between(a: int, b: int) -> int:
+static func seconds_between(a: int, b: int) -> int:
 	# Absolute difference in seconds
 	return abs(a - b)
 
 
-func minutes_between(a: int, b: int) -> int:
+static func minutes_between(a: int, b: int) -> int:
 	# Converts seconds difference into minutes
 	return int(abs(a - b) / 60)
 
 
-func hours_between(a: int, b: int) -> int:
+static func hours_between(a: int, b: int) -> int:
 	# Converts seconds difference into hours
 	return int(abs(a - b) / 3600)
 
 
-func days_between(a: int, b: int) -> int:
+static func days_between(a: int, b: int) -> int:
 	# Converts seconds difference into days
 	return int(abs(a - b) / 86400)
 
@@ -55,7 +55,7 @@ func days_between(a: int, b: int) -> int:
 # FORMATTING
 # ----------------------------------------------------
 
-func format_duration(seconds: int) -> String:
+static func format_duration(seconds: int) -> String:
 	"""
 	Converts raw seconds into a human-readable format.
 
@@ -64,10 +64,10 @@ func format_duration(seconds: int) -> String:
 	- 3600 -> "01:00:00"
 	"""
 
-	var clamped := max(0, seconds)
+	var clamped: int = maxi(0, seconds)
 
-	var hrs := clamped / 3600
-	var mins := (clamped % 3600) / 60
-	var secs := clamped % 60
+	var hrs: int = clamped / 3600
+	var mins: int = (clamped % 3600) / 60
+	var secs: int = clamped % 60
 
 	return "%02d:%02d:%02d" % [hrs, mins, secs]

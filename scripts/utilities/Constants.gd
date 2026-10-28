@@ -68,6 +68,10 @@ class LevelPaths:
 	const FILE_PREFIX: String = "level"
 	const FILE_EXTENSION: String = ".json"
 
+class StoryPaths:
+	const DIRECTORY: String = "res://stories/"
+	const FILE_EXTENSION: String = ".json"
+
 # =========================================================
 # SAVE PATHS
 # =========================================================

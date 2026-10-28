@@ -32,7 +32,7 @@ func clear_cache() -> void:
 # LOADING
 # =========================================================
 
-func load(path: String) -> Dictionary:
+func load_config(path: String) -> Dictionary:
 	if _cache.has(path):
 		return _cache[path]
 
@@ -48,7 +48,7 @@ func load(path: String) -> Dictionary:
 
 func reload_file(path: String) -> Dictionary:
 	_cache.erase(path)
-	return load(path)
+	return load_config(path)
 
 
 # =========================================================
@@ -59,15 +59,15 @@ func has(path: String) -> bool:
 	return _cache.has(path)
 
 
-func get(path: String) -> Dictionary:
+func get_config(path: String) -> Dictionary:
 	if _cache.has(path):
 		return _cache[path]
 
-	return load(path)
+	return load_config(path)
 
 
 func get_value(path: String, key: String, default = null):
-	var data = get(path)
+	var data: Dictionary = get_config(path)
 
 	if typeof(data) != TYPE_DICTIONARY:
 		return default
@@ -79,7 +79,7 @@ func get_value(path: String, key: String, default = null):
 
 
 func get_section(path: String, section: String) -> Dictionary:
-	var data = get(path)
+	var data: Dictionary = get_config(path)
 
 	if typeof(data) != TYPE_DICTIONARY:
 		return {}

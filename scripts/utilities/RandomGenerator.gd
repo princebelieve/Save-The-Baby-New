@@ -76,7 +76,7 @@ func pick_multiple(array: Array, count: int) -> Array:
 
 	shuffle(copy)
 
-	var limit := min(count, copy.size())
+	var limit: int = mini(count, copy.size())
 	for i in range(limit):
 		result.append(copy[i])
 
@@ -91,7 +91,7 @@ func weighted_choice(items: Array, weights: Array):
 	if items.is_empty() or weights.is_empty():
 		return null
 
-	var size := min(items.size(), weights.size())
+	var size: int = mini(items.size(), weights.size())
 	if size == 0:
 		return null
 

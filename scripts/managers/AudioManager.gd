@@ -177,7 +177,7 @@ func _load_audio_configuration() -> void:
 	if not ConfigLoader.has(Constants.ConfigPaths.AUDIO):
 		return
 
-	_audio_config = ConfigLoader.get(Constants.ConfigPaths.AUDIO)
+	_audio_config = ConfigLoader.get_config(Constants.ConfigPaths.AUDIO)
 
 	if _audio_config.is_empty():
 		return

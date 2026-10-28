@@ -153,18 +153,6 @@ func is_active() -> bool:
 # VISIBILITY
 # =========================================================
 
-func show() -> void:
-	visible = true
-
-
-func hide() -> void:
-	visible = false
-
-
-func set_visible(value: bool) -> void:
-	visible = value
-
-
 # =========================================================
 # VISUAL
 # =========================================================
@@ -180,10 +168,6 @@ func get_texture() -> Texture2D:
 		return null
 
 	return _sprite.texture
-
-
-func set_modulate(color: Color) -> void:
-	modulate = color
 
 
 func reset_modulate() -> void:

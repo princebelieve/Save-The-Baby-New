@@ -43,7 +43,7 @@ func create_game_scene() -> void:
 		DebugLogger.error("Boot: Could not instantiate the game scene.")
 		return
 
-	get_tree().root.add_child(_game_scene)
+	get_tree().root.add_child.call_deferred(_game_scene)
 
 
 func finish_boot() -> void:

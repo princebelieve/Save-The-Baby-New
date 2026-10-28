@@ -166,18 +166,6 @@ func is_locked() -> bool:
 # VISIBILITY
 # =========================================================
 
-func show() -> void:
-	visible = true
-
-
-func hide() -> void:
-	visible = false
-
-
-func set_visible(value: bool) -> void:
-	visible = value
-
-
 # =========================================================
 # VISUAL
 # =========================================================
@@ -192,11 +180,6 @@ func get_texture() -> Texture2D:
 	if _sprite:
 		return _sprite.texture
 	return null
-
-
-func set_modulate(color: Color) -> void:
-	if _sprite:
-		_sprite.modulate = color
 
 
 func reset_modulate() -> void:

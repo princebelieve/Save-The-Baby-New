@@ -1,5 +1,5 @@
 extends Node
-class_name AnimationLibrary
+class_name GameAnimationLibrary
 
 # =========================================================
 # PURPOSE

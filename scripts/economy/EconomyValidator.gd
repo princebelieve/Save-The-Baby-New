@@ -31,11 +31,11 @@ func can_afford(inventory: Object, purchase: Object) -> bool:
 	if inventory == null or purchase == null:
 		return false
 
-	var currency := purchase.get_currency()
-	var price := purchase.get_price()
-	var quantity := purchase.get_quantity()
+	var currency: String = purchase.get_currency()
+	var price: int = purchase.get_price()
+	var quantity: int = purchase.get_quantity()
 
-	var total_cost := price * quantity
+	var total_cost: int = price * quantity
 
 	match currency:
 		"coins":
@@ -86,7 +86,7 @@ func validate_purchase(purchase: Object) -> bool:
 	if purchase.get_quantity() <= 0:
 		return false
 
-	var currency := purchase.get_currency()
+	var currency: String = purchase.get_currency()
 
 	return currency == "coins" \
 		or currency == "stars" \

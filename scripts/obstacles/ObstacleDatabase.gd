@@ -19,7 +19,7 @@ func initialize() -> void:
 func reload() -> void:
 	clear()
 
-	var data: Dictionary = ConfigLoader.load(Constants.ConfigPaths.OBSTACLES)
+	var data: Dictionary = ConfigLoader.load_config(Constants.ConfigPaths.OBSTACLES)
 
 	if data.is_empty():
 		DebugLogger.error("ObstacleDatabase: Failed to load obstacles config.")
@@ -59,7 +59,7 @@ func get_obstacle_by_enum(type):
 	return null
 
 
-func get_name(type):
+func get_obstacle_name(type):
 	var entry = get_obstacle_by_enum(type)
 	if entry == null:
 		return ""
