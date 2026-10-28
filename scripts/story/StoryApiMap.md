@@ -120,6 +120,8 @@ end_story()
 
 skip_story()
 Navigation
+next_dialogue()
+previous_dialogue()
 goto_scene(scene_id)
 
 goto_next_scene()
@@ -131,6 +133,10 @@ record_choice(choice_id)
 get_story_progress()
 
 set_story_progress(progress)
+
+get_story_data() -> Dictionary
+
+get_current_dialogue() -> Dictionary
 
 is_story_finished()
 Integration

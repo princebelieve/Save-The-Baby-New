@@ -6,9 +6,10 @@ func initialize() -> void:
 	pass
 
 
-func apply_gravity(board) -> void:
+func apply_gravity(board) -> Array:
 	if board == null:
-		return
+		return []
+	var movements: Array = []
 	for x in range(board.get_width()):
 		var column: Array = []
 		for y in range(board.get_height() - 1, -1, -1):
@@ -18,7 +19,13 @@ func apply_gravity(board) -> void:
 		for y in range(board.get_height()):
 			board.set_tile(Vector2i(x, y), null)
 		for index in range(column.size()):
-			board.set_tile(Vector2i(x, board.get_height() - 1 - index), column[index])
+			var destination := Vector2i(x, board.get_height() - 1 - index)
+			var tile: Tile = column[index]
+			var old_position := tile.position
+			board.set_tile(destination, tile)
+			if old_position != tile.position:
+				movements.append({"tile": tile, "from": old_position, "to": tile.position})
+	return movements
 
 
 func calculate_fall(board) -> Dictionary:

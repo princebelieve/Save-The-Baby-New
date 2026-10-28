@@ -1,11 +1,18 @@
 extends Node2D
 class_name Board
 
+signal moves_changed(remaining_moves: int)
+signal move_rejected
+signal match_collected(tile_types: Array)
+
 var _grid: Dictionary = {}
 var _locked: bool = false
 var _level_data: Dictionary = {}
 var _tile_size: int = 64
 var _drag_start: Tile
+var _tap_selection: Tile
+var _press_screen_position: Vector2 = Vector2.ZERO
+var _remaining_moves: int = 0
 
 var _tile_database: TileDatabase
 var _tile_factory: TileFactory
@@ -21,6 +28,8 @@ var _board_shuffler: BoardShuffler
 func initialize(level_data: Dictionary) -> bool:
 	_level_data = level_data.duplicate(true)
 	_locked = false
+	_tap_selection = null
+	_remaining_moves = int(_level_data.get("moves", {}).get("total", 0))
 	_grid.clear()
 	_clear_systems()
 	_create_systems()
@@ -38,12 +47,16 @@ func initialize(level_data: Dictionary) -> bool:
 	for position in _grid:
 		var tile: Tile = _grid[position]
 		_attach_tile(tile, position)
+		tile.scale = Vector2.ONE * 0.72
+		var spawn_tween := create_tween()
+		spawn_tween.tween_property(tile, "scale", Vector2.ONE, 0.22).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 	var viewport_size := get_viewport_rect().size
 	position = Vector2(
 		(viewport_size.x - get_width() * _tile_size) * 0.5,
 		maxf(120.0, (viewport_size.y - get_height() * _tile_size) * 0.45)
 	)
+	moves_changed.emit(_remaining_moves)
 	return true
 
 
@@ -131,6 +144,10 @@ func get_size() -> Vector2i:
 	return Vector2i(get_width(), get_height())
 
 
+func get_remaining_moves() -> int:
+	return _remaining_moves
+
+
 func is_inside(position: Vector2i) -> bool:
 	return position.x >= 0 and position.y >= 0 and position.x < get_width() and position.y < get_height()
 
@@ -141,9 +158,14 @@ func set_tile(position: Vector2i, tile) -> void:
 	if tile == null:
 		_grid.erase(position)
 		return
+	var is_new_tile: bool = tile.get_parent() == null
 	_grid[position] = tile
 	tile.set_grid_position(position)
 	_attach_tile(tile, position)
+	if is_new_tile:
+		tile.scale = Vector2.ONE * 0.45
+		var spawn_tween := create_tween()
+		spawn_tween.tween_property(tile, "scale", Vector2.ONE, 0.18).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 
 func get_tile(position: Vector2i):
@@ -173,11 +195,80 @@ func swap_tiles(position_a: Vector2i, position_b: Vector2i) -> bool:
 	if tile_a == null or tile_b == null:
 		return false
 	if not _move_validator.is_valid_swipe(tile_a, tile_b):
+		move_rejected.emit()
+		_animate_invalid_move(tile_a, tile_b)
 		return false
-	set_tile(position_a, tile_b)
-	set_tile(position_b, tile_a)
-	update()
+	_locked = true
+	_grid[position_a] = tile_b
+	_grid[position_b] = tile_a
+	tile_a.set_grid_position(position_b)
+	tile_b.set_grid_position(position_a)
+	_animate_swap_then_resolve(tile_a, tile_b)
 	return true
+
+
+func _animate_swap_then_resolve(tile_a: Tile, tile_b: Tile) -> void:
+	var destination_a := _cell_center(tile_a.get_grid_position())
+	var destination_b := _cell_center(tile_b.get_grid_position())
+	var tween := create_tween().set_parallel(true)
+	tween.tween_property(tile_a, "position", destination_a, 0.16).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(tile_b, "position", destination_b, 0.16).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	await tween.finished
+	_remaining_moves = maxi(0, _remaining_moves - 1)
+	moves_changed.emit(_remaining_moves)
+	SignalBus.moves_changed.emit(_remaining_moves)
+	SignalBus.move_used.emit(_remaining_moves)
+	await _cascade_processor.process_animated(self)
+	_locked = false
+	if _board_shuffler != null and _board_shuffler.needs_shuffle(self):
+		_board_shuffler.shuffle(self)
+
+
+func _animate_invalid_move(tile_a: Tile, tile_b: Tile) -> void:
+	var original_a := tile_a.position
+	var original_b := tile_b.position
+	var offset := Vector2(5.0, 0.0) if absf(original_a.x - original_b.x) > absf(original_a.y - original_b.y) else Vector2(0.0, 5.0)
+	var tween := create_tween().set_parallel(true)
+	tween.tween_property(tile_a, "position", original_a + offset, 0.045)
+	tween.tween_property(tile_b, "position", original_b + offset, 0.045)
+	tween.chain().tween_property(tile_a, "position", original_a - offset, 0.045)
+	tween.parallel().tween_property(tile_b, "position", original_b - offset, 0.045)
+	tween.chain().tween_property(tile_a, "position", original_a, 0.045)
+	tween.parallel().tween_property(tile_b, "position", original_b, 0.045)
+
+
+func _cell_center(grid_position: Vector2i) -> Vector2:
+	return Vector2((grid_position.x + 0.5) * _tile_size, (grid_position.y + 0.5) * _tile_size)
+
+
+func notify_match_tiles(tiles: Array) -> void:
+	var tile_types: Array = []
+	for tile in tiles:
+		if tile != null:
+			tile_types.append(tile.get_tile_type())
+	match_collected.emit(tile_types)
+	SignalBus.matches_found.emit(tiles)
+
+
+func animate_match_tiles(tiles: Array) -> void:
+	var tween := create_tween().set_parallel(true)
+	for tile in tiles:
+		if is_instance_valid(tile):
+			tween.tween_property(tile, "scale", Vector2.ZERO, 0.14).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
+			tween.tween_property(tile, "modulate:a", 0.0, 0.14)
+	await tween.finished
+
+
+func animate_falling_tiles(movements: Array) -> void:
+	if movements.is_empty():
+		return
+	var tween := create_tween().set_parallel(true)
+	for movement in movements:
+		var tile: Tile = movement["tile"]
+		if is_instance_valid(tile):
+			tile.position = movement["from"]
+			tween.tween_property(tile, "position", movement["to"], 0.18).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
+	await tween.finished
 
 
 func get_all_tiles() -> Array:
@@ -249,27 +340,6 @@ func _attach_tile(tile: Tile, grid_position: Vector2i) -> void:
 		add_child(tile)
 	tile.set_hitbox_size(_tile_size)
 	_set_tile_visual_position(tile, grid_position)
-	var pressed_callback := Callable(self, "_on_tile_pressed")
-	var released_callback := Callable(self, "_on_tile_released")
-	if not tile.pressed.is_connected(pressed_callback):
-		tile.pressed.connect(pressed_callback)
-	if not tile.released.is_connected(released_callback):
-		tile.released.connect(released_callback)
-
-
-func _on_tile_pressed(tile: Tile) -> void:
-	if not _locked:
-		_drag_start = tile
-
-
-func _on_tile_released(tile: Tile) -> void:
-	if _locked or _drag_start == null:
-		_drag_start = null
-		return
-	var start := _drag_start
-	_drag_start = null
-	if start != tile:
-		swap_tiles(start.get_grid_position(), tile.get_grid_position())
 
 
 func _input(event: InputEvent) -> void:
@@ -277,18 +347,38 @@ func _input(event: InputEvent) -> void:
 		return
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		if event.pressed:
-			_drag_start = _tile_at_screen_position(event.position)
+			_begin_pointer_gesture(event.position)
 		else:
-			_finish_swipe(_tile_at_screen_position(event.position))
+			_finish_pointer_gesture(event.position)
 	elif event is InputEventScreenTouch:
 		if event.pressed:
-			_drag_start = _tile_at_screen_position(event.position)
+			_begin_pointer_gesture(event.position)
 		else:
-			_finish_swipe(_tile_at_screen_position(event.position))
+			_finish_pointer_gesture(event.position)
+
+
+func _begin_pointer_gesture(screen_position: Vector2) -> void:
+	_drag_start = _tile_at_screen_position(screen_position)
+	_press_screen_position = screen_position
+	if _drag_start == null:
+		return
+	if _tap_selection != null and _tap_selection != _drag_start:
+		var first_position := _tap_selection.get_grid_position()
+		var second_position := _drag_start.get_grid_position()
+		if absi(first_position.x - second_position.x) + absi(first_position.y - second_position.y) == 1:
+			swap_tiles(first_position, second_position)
+			_tap_selection.reset_tile_modulate()
+			_tap_selection = null
+			_drag_start = null
+			return
+	if _tap_selection != null and is_instance_valid(_tap_selection):
+		_tap_selection.reset_tile_modulate()
+	_tap_selection = _drag_start
+	_tap_selection.set_tile_modulate(Color(1.18, 1.18, 0.85, 1.0))
 
 
 func _tile_at_screen_position(screen_position: Vector2) -> Tile:
-	var local_position := to_local(screen_position)
+	var local_position: Vector2 = get_global_transform_with_canvas().affine_inverse() * screen_position
 	var grid_position := Vector2i(
 		int(floor(local_position.x / _tile_size)),
 		int(floor(local_position.y / _tile_size))
@@ -296,8 +386,40 @@ func _tile_at_screen_position(screen_position: Vector2) -> Tile:
 	return get_tile(grid_position)
 
 
-func _finish_swipe(target: Tile) -> void:
+func _finish_swipe(target: Tile, drag_delta: Vector2) -> void:
 	var start := _drag_start
 	_drag_start = null
-	if start != null and target != null and start != target:
+	if start == null:
+		return
+	if target != null and start != target:
+		start.reset_tile_modulate()
+		if _tap_selection != null and is_instance_valid(_tap_selection):
+			_tap_selection.reset_tile_modulate()
+		_tap_selection = null
 		swap_tiles(start.get_grid_position(), target.get_grid_position())
+		return
+	if drag_delta.length() >= 18.0:
+		var offset: Vector2i
+		if absf(drag_delta.x) > absf(drag_delta.y):
+			offset = Vector2i.RIGHT if drag_delta.x > 0 else Vector2i.LEFT
+		else:
+			offset = Vector2i.DOWN if drag_delta.y > 0 else Vector2i.UP
+		var destination := start.get_grid_position() + offset
+		if is_inside(destination):
+			start.reset_tile_modulate()
+			_tap_selection = null
+			swap_tiles(start.get_grid_position(), destination)
+
+
+func _finish_pointer_gesture(screen_position: Vector2) -> void:
+	var release_tile := _tile_at_screen_position(screen_position)
+	if _drag_start != null and release_tile == _drag_start:
+		var delta := screen_position - _press_screen_position
+		if delta.length() >= 18.0:
+			var direction: Vector2i
+			if absf(delta.x) > absf(delta.y):
+				direction = Vector2i.RIGHT if delta.x > 0 else Vector2i.LEFT
+			else:
+				direction = Vector2i.DOWN if delta.y > 0 else Vector2i.UP
+			release_tile = get_tile(_drag_start.get_grid_position() + direction)
+	_finish_swipe(release_tile, screen_position - _press_screen_position)

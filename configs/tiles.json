@@ -33,7 +33,7 @@
       "enum": 2,
       "name": "Fingerprint",
       "texture": "res://resources/tiles/fingerprint.tres",
-      "icon": "res://assets/sprites/tiles/fingerprint_evidence_icon.svg",
+      "icon": "res://assets/sprites/tiles/fingerprint_evidence_icon.jpeg",
       "animation_set": "default",
       "score": 10,
       "spawn_weight": 20,

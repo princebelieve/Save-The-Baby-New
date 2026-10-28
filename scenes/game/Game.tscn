@@ -3,8 +3,11 @@
 [ext_resource type="Script" path="res://scripts/managers/LevelManager.gd" id="1_level"]
 [ext_resource type="Script" path="res://scripts/managers/BoardManager.gd" id="2_board"]
 [ext_resource type="Script" path="res://scripts/managers/GameManager.gd" id="3_game"]
+[ext_resource type="Script" path="res://scripts/game/Game.gd" id="4_gameplay"]
+[ext_resource type="Script" path="res://scripts/managers/StoryManager.gd" id="5_story"]
 
 [node name="Game" type="Node2D"]
+script = ExtResource("4_gameplay")
 
 [node name="BackgroundLayer" type="CanvasLayer" parent="."]
 layer = -1
@@ -22,6 +25,7 @@ color = Color(0.055, 0.11, 0.13, 1)
 [node name="HUD" type="CanvasLayer" parent="."]
 
 [node name="LevelTitle" type="Label" parent="HUD"]
+visible = false
 offset_left = 24.0
 offset_top = 36.0
 offset_right = 696.0
@@ -42,3 +46,6 @@ script = ExtResource("2_board")
 
 [node name="GameManager" type="Node" parent="Managers"]
 script = ExtResource("3_game")
+
+[node name="StoryManager" type="Node" parent="Managers"]
+script = ExtResource("5_story")

@@ -3,7 +3,7 @@
 ## 1. Product vision
 
 Save The Baby is a story-led Match-3 adventure built around David’s continuing effort to rescue Ethan from Victor. The first 50 levels are the opening stretch of the campaign, not the whole game or a fixed endpoint. The campaign is designed to keep growing through new chapters, locations, mechanics, events, and level packs, as in long-running puzzle adventures.
-
+ 
 The game should feel approachable in a single level and rewarding over a long progression: clear goals, satisfying matches and cascades, expressive powerups, steadily introduced hazards, story scenes with meaningful context, and rewards that make progress visible.
 
 The project also aims to build a reusable Match-3 engine. Save The Baby is its first game. The engine and content pipeline should support extensive future content without requiring an engine rewrite for every new level or chapter.

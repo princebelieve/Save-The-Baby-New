@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://baig1lv30my33"
-path="res://.godot/imported/fingerprint_evidence_icon.svg-23392e596eb7c2cc436254b80c36e91f.ctex"
+uid="uid://cdtrl0wnmvfko"
+path="res://.godot/imported/continue_pressed.png-ef0d81b37ba851520febc8d846f6b5ea.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/tiles/fingerprint_evidence_icon.svg"
-dest_files=["res://.godot/imported/fingerprint_evidence_icon.svg-23392e596eb7c2cc436254b80c36e91f.ctex"]
+source_file="res://assets/sprites/ui/story_buttons/continue_pressed.png"
+dest_files=["res://.godot/imported/continue_pressed.png-ef0d81b37ba851520febc8d846f6b5ea.ctex"]
 
 [params]
 
@@ -38,6 +38,3 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
-svg/scale=1.0
-editor/scale_with_editor_scale=false
-editor/convert_colors_with_editor_theme=false

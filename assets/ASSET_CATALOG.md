@@ -40,6 +40,16 @@ Managers and databases obtain asset paths from configuration and pass those path
 | `sprites/backgrounds/factory_map_section.jpeg` | Factory map/location section |
 | `sprites/props/foliage_boulder_map_prop.jpeg` | Foliage-covered boulder map prop |
 | `sprites/ui/game_logo.jpeg` | Save The Baby logo |
+| `sprites/ui/ui_button_states_atlas.jpeg` | Play, pause, settings, and back button states source atlas |
+| `sprites/ui/gameplay_hud_atlas.jpeg` | Moves, score, star goal, coin, life, and booster HUD source atlas |
+| `sprites/ui/menu_states_atlas.jpeg` | Pause, win, fail, and reward screen source atlas |
+| `sprites/ui/alternate_hud_panels_atlas.jpeg` | Alternate moves, score, and star meter panel source atlas |
+| `sprites/ui/navigation_button_states_atlas.jpeg` | Navigation and story button source atlas added 2026-10-28 |
+| `sprites/ui/buttons/` | Transparent Play, Pause, Settings, and Back button sprites, each with normal, hover, and pressed states. Play and Pause are used by the launch and gameplay screens. |
+| `sprites/ui/story_buttons/` | Transparent Play, Save, Next, Previous, Continue, and Skip states extracted from the added navigation atlas. Continue, Next, Previous, and Skip are used in the opening story flow; Save awaits integration with persistent progress. The combined Settings/Back art was excluded; the separate Settings and Back buttons from `buttons/` are used in the pause menu. |
+| `sprites/ui/story_choices/` | Three transparent choice buttons cropped from the supplied story UI reference and used for Call the police, Trace Victor’s signal, and Go after Victor alone. |
+| `sprites/ui/panels/` | Transparent moves, score, star goal, coins, life, and booster panels/icons extracted from the HUD sheet. Moves and score panels are used for live gameplay counters. |
+| `sprites/ui/screens/` | Transparent pause, victory, failure, and rewards panels extracted from the menu sheet. The pause panel is used by the in-game pause menu. |
 | `sprites/backgrounds/garden_map_tile.jpeg` | Garden map/environment tile |
 | `sprites/backgrounds/grass_board_background.jpeg` | Grass board/terrain background |
 | `sprites/backgrounds/grass_terrain_texture.jpeg` | Grass terrain texture |
@@ -48,7 +58,7 @@ Managers and databases obtain asset paths from configuration and pass those path
 | `sprites/backgrounds/iron_gate_map_tile.jpeg` | Iron gate map/environment tile |
 | `sprites/tiles/key_objective_icon.jpeg` | Key objective icon |
 | `sprites/tiles/phone_evidence_icon.svg` | Phone evidence match tile icon |
-| `sprites/tiles/fingerprint_evidence_icon.svg` | Fingerprint evidence match tile icon |
+| `sprites/tiles/fingerprint_evidence_icon.jpeg` | Fingerprint evidence match tile icon (new raster source replacing the temporary SVG) |
 | `sprites/ui/level_badge.jpeg` | Level marker/badge |
 | `sprites/backgrounds/level_map_landscape.jpeg` | Campaign map landscape background |
 | `sprites/ui/level_node_empty.jpeg` | Empty level node |

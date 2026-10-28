@@ -33,6 +33,36 @@ func process(board) -> void:
 	_is_processing = false
 
 
+func process_animated(board) -> void:
+	if board == null or _match_finder == null:
+		return
+	_is_processing = true
+	_should_stop = false
+	for _cycle in range(100):
+		if _should_stop:
+			break
+		var matches: Array = _match_finder.find_all_matches(board)
+		if matches.is_empty():
+			break
+		var matched_tiles: Array = []
+		var matched_positions: Dictionary = {}
+		for found_match in matches:
+			var tiles: Array = found_match.get_tiles()
+			for tile in tiles:
+				var grid_position: Vector2i = tile.get_grid_position()
+				if not matched_positions.has(grid_position):
+					matched_positions[grid_position] = tile
+					matched_tiles.append(tile)
+		board.notify_match_tiles(matched_tiles)
+		await board.animate_match_tiles(matched_tiles)
+		for grid_position in matched_positions:
+			board.remove_tile(grid_position)
+		var movements: Array = _gravity_solver.apply_gravity(board)
+		await board.animate_falling_tiles(movements)
+		_refill_system.refill(board)
+	_is_processing = false
+
+
 func has_cascade(board) -> bool:
 	return board != null and _match_finder != null and _match_finder.has_matches(board)
 

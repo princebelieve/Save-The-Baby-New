@@ -154,6 +154,13 @@ func next_dialogue() -> void:
 	play_dialogue(dialogues[_current_dialogue])
 
 
+func previous_dialogue() -> void:
+	if _current_story.is_empty() or _current_dialogue <= 0:
+		return
+	_current_dialogue -= 2
+	next_dialogue()
+
+
 func play_dialogue(dialogue: Dictionary) -> void:
 	var index := _current_dialogue
 
@@ -208,6 +215,18 @@ func get_story_progress() -> Dictionary:
 		"dialogue": _current_dialogue,
 		"total_dialogues": total_dialogues
 	}
+
+
+func get_story_data() -> Dictionary:
+	return _current_story.duplicate(true)
+
+
+func get_current_dialogue() -> Dictionary:
+	var scene := _get_current_scene()
+	var dialogues: Array = scene.get("dialogues", [])
+	if _current_dialogue < 0 or _current_dialogue >= dialogues.size():
+		return {}
+	return dialogues[_current_dialogue].duplicate(true)
 
 
 func set_story_progress(progress: Dictionary) -> void:
