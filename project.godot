@@ -15,6 +15,10 @@ run/main_scene="uid://d4l6yynhehsfw"
 config/features=PackedStringArray("4.6", "Mobile")
 config/icon="res://icon.svg"
 
+[audio]
+
+default_bus_layout="res://resources/audio/default_bus_layout.tres"
+
 [autoload]
 
 SignalBus="*uid://b40t173wb88dw"
@@ -40,6 +44,3 @@ window/stretch/mode="canvas_items"
 
 rendering_device/driver.windows="d3d12"
 renderer/rendering_method="mobile"
-
-[audio]
-default_bus_layout="res://resources/audio/default_bus_layout.tres"

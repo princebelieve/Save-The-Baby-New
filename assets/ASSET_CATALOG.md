@@ -12,7 +12,7 @@ The utilities API does not prescribe image basenames. `Constants.ResourcePaths` 
 - `sprites/obstacles/`
 - `audio/music/` and `audio/sfx/` (reserved for audio assets; none are present yet)
 
-Managers and databases obtain asset paths from configuration and pass those paths to `ResourceManager`; `ResourceManager` loads/caches the resource and does not infer filenames. Story art, characters, map backgrounds, and props have no dedicated path constants and should likewise be referenced by their explicit paths in configuration/story data. The current tile, powerup, and obstacle configs reference their textures and icons below through `.tres` texture resources. Story art, audio, UI themes, and fonts still need their own content data as those systems enter implementation.
+Managers and databases obtain asset paths from configuration and pass those paths to `ResourceManager`; `ResourceManager` loads/caches the resource and does not infer filenames. Story art, characters, map backgrounds, and props have no dedicated path constants and should likewise be referenced by their explicit paths in configuration/story data. The current tile, powerup, and obstacle configs reference their textures and icons below through `.tres` texture resources. `configs/audio.json` maps the current music and sound effects. Additional audio cues, UI themes, and fonts can be added through their existing configuration contracts as those systems expand.
 
 | File | Intended use |
 |---|---|
@@ -98,15 +98,17 @@ Managers and databases obtain asset paths from configuration and pass those path
 | `sprites/obstacles/wooden_gate_board_tile.jpeg` | Gate board/environment tile |
 | `sprites/props/wooden_signpost.jpeg` | Campaign map signpost |
 
-## Art still needed for the first playable game
+## Asset usability and integration gaps
 
-- A coordinated set of ordinary matchable tile symbols, in a transparent sprite format and consistent scale.
-- Clean production versions of any mission or obstacle icon that currently has a flattened background, plus visual state/damage variants where needed.
-- Opening, police-station, signal-tracing, factory, and rescue story backgrounds; character expressions/poses for David, Amara, Ethan, Victor, the detective, and the technical specialist.
-- UI art for gameplay HUD, menus, shop/reward panels, buttons, boosters, lives/coins, and responsive campaign map states.
-- Animation frames or reusable effects for swaps, matches, cascades, powerups, obstacles, story transitions, victory, and failure.
-- Audio assets for music, UI, matches, special effects, story, victory, and failure.
+- The project already contains a broad starter art set: 125 sprite files across backgrounds, characters, obstacles, powerups, props, tiles, and UI. These files are available to implement; they are not all wired to screens or gameplay yet.
+- `campaign_map_ui_reference.jpeg` is a baked composite concept with fixed chapter labels and level markers. Use it as a layout reference, not as the live scalable campaign map. The location backgrounds and map props can support a separately coded map once level progress and unlock data are available.
+- Several map badges, portraits, and scene images are JPEGs with white or black matte backgrounds. They work as full-card illustrations or backgrounds, but they are not transparent cutouts for arbitrary layering. The separate PNG button states and extracted UI panels are better suited to live controls.
+- Static portraits for David, Amara, Ethan, Victor, and the detective are present. Animated character poses, additional expressions, and dedicated scene art for later story locations can be authored as those scenes are built.
+- UI assets are present for the title, gameplay counters, buttons, pause, victory, failure, rewards, and level markers. The current game uses only part of this set; the remaining pieces need screen behavior and data wiring.
+- Tile, powerup, and obstacle icons are present. Gameplay still needs complete obstacle/powerup behavior, distinct damage states where appropriate, and animation feedback that uses these assets.
+- The animation folder and AnimationManager provide generic requests, sequencing, tween helpers, and animation identifiers. The specific effects for UI transitions, story portraits, powerups, and obstacles still need implementation in their respective consumers.
+- Audio currently includes an opening suspense track and five sound effects. Additional match/cascade, powerup, obstacle, victory, failure, and story cues remain useful as those events are implemented.
 
-Create these in the corresponding implementation phase, matching the established visual direction. Do not treat the reference/mockup images in this catalog as final production UI without reviewing their quality and licenses.
+Use existing assets where they fit, and add only the specific states or cues that the implemented screens need. Do not treat the reference/mockup images in this catalog as final production UI without reviewing their quality and licenses.
 
 

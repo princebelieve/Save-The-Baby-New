@@ -16,6 +16,8 @@ var _story_previous_button: TextureButton
 var _launch_layer: CanvasLayer
 var _story_portrait: TextureRect
 var _pause_layer: CanvasLayer
+var _briefing_layer: CanvasLayer
+var _chosen_route_label: String = "Go after Victor alone"
 var _dialogue_tween: Tween
 var _is_dialogue_typing: bool = false
 var _choice_box: VBoxContainer
@@ -544,11 +546,160 @@ func _on_route_selected(choice: Dictionary) -> void:
 	_story_continue_button.texture_pressed = ResourceManager.load_texture("res://assets/sprites/ui/story_buttons/next_pressed.png")
 	_story_continue_button.show()
 	_story_continue_button.pressed.disconnect(_advance_story)
-	_story_continue_button.pressed.connect(_begin_level.bind(route_id), CONNECT_ONE_SHOT)
+	_chosen_route_label = str(choice.get("label", "Begin the search"))
+	_story_continue_button.pressed.connect(_show_level_briefing.bind(route_id), CONNECT_ONE_SHOT)
 	set_meta("chosen_route", route_id)
 
 
+func _show_level_briefing(route_id: String) -> void:
+	if _story_layer != null and is_instance_valid(_story_layer):
+		_story_layer.queue_free()
+		_story_layer = null
+
+	var level_manager := get_node_or_null("Managers/LevelManager")
+	var level_data: Dictionary = level_manager.get_level_data() if level_manager != null else {}
+	if level_data.is_empty():
+		DebugLogger.error("Game: Cannot show briefing because no level data is loaded.")
+		return
+
+	_briefing_layer = CanvasLayer.new()
+	_briefing_layer.name = "LevelBriefing"
+	_briefing_layer.layer = 10
+	add_child(_briefing_layer)
+	var veil := ColorRect.new()
+	veil.color = Color(0.008, 0.02, 0.035, 0.78)
+	veil.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_briefing_layer.add_child(veil)
+	var center := CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	veil.add_child(center)
+
+	var panel := PanelContainer.new()
+	panel.name = "MissionCard"
+	panel.custom_minimum_size = Vector2(minf(590.0, get_viewport_rect().size.x * 0.9), minf(790.0, get_viewport_rect().size.y * 0.88))
+	var panel_style := StyleBoxFlat.new()
+	panel_style.bg_color = Color("#102238")
+	panel_style.border_color = Color("#d0ac67")
+	panel_style.set_border_width_all(3)
+	panel_style.set_corner_radius_all(24)
+	panel_style.set_content_margin_all(28)
+	panel_style.shadow_color = Color(0, 0, 0, 0.55)
+	panel_style.shadow_size = 16
+	panel.add_theme_stylebox_override("panel", panel_style)
+	center.add_child(panel)
+	panel.modulate.a = 0.0
+	panel.scale = Vector2(0.94, 0.94)
+	var entrance := create_tween().set_parallel(true)
+	entrance.tween_property(panel, "modulate:a", 1.0, 0.28)
+	entrance.tween_property(panel, "scale", Vector2.ONE, 0.34).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+	var content := VBoxContainer.new()
+	content.alignment = BoxContainer.ALIGNMENT_CENTER
+	content.add_theme_constant_override("separation", 16)
+	panel.add_child(content)
+	var level_id := int(level_data.get("level_id", 1))
+	var level_title := _make_label("INVESTIGATION %02d" % level_id, 18)
+	level_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	content.add_child(level_title)
+	var title := _make_label(str(level_data.get("name", "The First Clue")), 30)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	content.add_child(title)
+
+	var portrait := TextureRect.new()
+	portrait.custom_minimum_size = Vector2(154, 154)
+	portrait.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	portrait.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+	portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	var portrait_paths := {
+		"police": "res://assets/sprites/characters/detective_portrait.jpeg",
+		"signal": "res://assets/sprites/characters/amara_police_portrait.jpeg",
+		"alone": "res://assets/sprites/characters/david_portrait.jpeg"
+	}
+	portrait.texture = ResourceManager.load_texture(str(portrait_paths.get(route_id, portrait_paths["alone"])))
+	content.add_child(portrait)
+	var route_label := _make_label("APPROACH  •  " + _chosen_route_label.to_upper(), 17)
+	route_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	content.add_child(route_label)
+	var description := _make_label(str(level_data.get("description", "")), 19)
+	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	description.custom_minimum_size.x = 480
+	description.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	content.add_child(description)
+
+	var objective := _get_primary_objective(level_data)
+	var objective_panel := PanelContainer.new()
+	var objective_style := StyleBoxFlat.new()
+	objective_style.bg_color = Color("#1b3952")
+	objective_style.border_color = Color("#bb985d")
+	objective_style.set_border_width_all(2)
+	objective_style.set_corner_radius_all(16)
+	objective_style.set_content_margin_all(14)
+	objective_panel.add_theme_stylebox_override("panel", objective_style)
+	content.add_child(objective_panel)
+	var objective_row := HBoxContainer.new()
+	objective_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	objective_row.add_theme_constant_override("separation", 16)
+	objective_panel.add_child(objective_row)
+	var objective_icon := TextureRect.new()
+	objective_icon.custom_minimum_size = Vector2(82, 82)
+	objective_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	objective_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	objective_icon.texture = ResourceManager.load_texture(_objective_icon_path(str(objective.get("target", ""))))
+	objective_row.add_child(objective_icon)
+	var objective_copy := VBoxContainer.new()
+	objective_copy.alignment = BoxContainer.ALIGNMENT_CENTER
+	var objective_heading := _make_label("MISSION OBJECTIVE", 15)
+	objective_copy.add_child(objective_heading)
+	var objective_text := _make_label(_format_objective(objective), 22)
+	objective_copy.add_child(objective_text)
+	objective_row.add_child(objective_copy)
+
+	var moves_total := int(level_data.get("moves", {}).get("total", 0))
+	var moves := _make_label("MAKE YOUR MOVES COUNT  •  %d MOVES" % moves_total, 18)
+	moves.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	content.add_child(moves)
+	var settings: Dictionary = level_data.get("settings", {})
+	if not bool(settings.get("allow_boosters", false)):
+		var booster_note := _make_label("BOOSTERS UNLOCK ON A LATER INVESTIGATION", 14)
+		booster_note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		content.add_child(booster_note)
+
+	var play := _make_texture_button("play", Vector2(250, 112))
+	play.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	play.pressed.connect(_play_ui_confirm)
+	play.pressed.connect(_begin_level.bind(route_id), CONNECT_ONE_SHOT)
+	content.add_child(play)
+
+
+func _get_primary_objective(level_data: Dictionary) -> Dictionary:
+	var objectives = level_data.get("objectives", [])
+	if typeof(objectives) == TYPE_ARRAY and not objectives.is_empty() and typeof(objectives[0]) == TYPE_DICTIONARY:
+		return objectives[0]
+	return {}
+
+
+func _format_objective(objective: Dictionary) -> String:
+	var target := str(objective.get("target", "evidence")).replace("_", " ").to_lower().capitalize()
+	var amount := int(objective.get("amount", 1))
+	return "Collect %d %s" % [amount, target]
+
+
+func _objective_icon_path(target: String) -> String:
+	var icons := {
+		"KEY": "key_objective_icon.jpeg",
+		"PHONE": "phone_evidence_icon.svg",
+		"FINGERPRINT": "fingerprint_evidence_icon.jpeg",
+		"RECORDER": "recorder_evidence_icon.jpeg",
+		"CLOCK": "timer_objective_icon.jpeg"
+	}
+	var file_name := str(icons.get(target.to_upper(), "evidence_document_icon.jpeg"))
+	return "res://assets/sprites/tiles/" + file_name
+
+
 func _begin_level(_route_id: String) -> void:
+	if _briefing_layer != null and is_instance_valid(_briefing_layer):
+		_briefing_layer.queue_free()
+	_briefing_layer = null
 	if _story_manager != null:
 		_story_manager.end_story()
 	_story_layer.queue_free()

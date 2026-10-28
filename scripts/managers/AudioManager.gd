@@ -26,6 +26,8 @@ var _music_player: AudioStreamPlayer
 var _sfx_players: Dictionary = {}
 
 var _audio_config: Dictionary = {}
+var _music_bus_name: String = "Music"
+var _sfx_bus_name: String = "SFX"
 
 var _master_volume: float = 1.0
 var _music_volume: float = 1.0
@@ -50,12 +52,12 @@ func initialize() ->void:
 	_initialized = true
 
 	_music_player = AudioStreamPlayer.new()
-	_music_player.bus = "Music"
 	add_child(_music_player)
 
 	_music_player.finished.connect(_on_music_finished)
 
 	_load_audio_configuration()
+	_music_player.bus = _music_bus_name
 	_apply_bus_volumes()
 
 	_connect_signal_bus()
@@ -114,7 +116,7 @@ func play_sfx(sound) -> void:
 		DebugLogger.warning("AudioManager: Unable to load sound: %s" % resolved_sound)
 		return
 	var player := AudioStreamPlayer.new()
-	player.bus = "SFX"
+	player.bus = _sfx_bus_name
 	player.stream = stream
 	player.finished.connect(
 		func():
@@ -129,9 +131,6 @@ func play_sfx(sound) -> void:
 	player.play()
 
 	emit_signal("sound_played", sound)
-
-	if SignalBus:
-		SignalBus.emit_signal("sound_played", sound)
 
 
 func stop_sfx(sound) -> void:
@@ -191,6 +190,11 @@ func _load_audio_configuration() -> void:
 		_music_volume = defaults.get("music", 1.0)
 		_sfx_volume = defaults.get("sfx", 1.0)
 
+	var bus_mapping = _audio_config.get("audio_bus_mapping", {})
+	if typeof(bus_mapping) == TYPE_DICTIONARY:
+		_music_bus_name = str(bus_mapping.get("music", _music_bus_name))
+		_sfx_bus_name = str(bus_mapping.get("sfx", _sfx_bus_name))
+
 
 func _resolve_audio_id(category: String, value) -> String:
 	var audio_id := str(value)
@@ -222,14 +226,14 @@ func _apply_bus_volumes() -> void:
 			_linear_to_db(master)
 		)
 
-	var music_bus := AudioServer.get_bus_index("Music")
+	var music_bus := AudioServer.get_bus_index(_music_bus_name)
 	if music_bus != -1:
 		AudioServer.set_bus_volume_db(
 			music_bus,
 			_linear_to_db(master * music)
 		)
 
-	var sfx_bus := AudioServer.get_bus_index("SFX")
+	var sfx_bus := AudioServer.get_bus_index(_sfx_bus_name)
 	if sfx_bus != -1:
 		AudioServer.set_bus_volume_db(
 			sfx_bus,
