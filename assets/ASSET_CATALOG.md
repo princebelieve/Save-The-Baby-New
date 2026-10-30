@@ -1,6 +1,6 @@
-﻿# Asset catalog
+# Asset catalog
 
-Canonical names for the image files currently in `assets/`. Names describe their intended game role. Many of the files are JPEGs, so apparent transparency/checkerboard backgrounds are flattened and may need cleanup before sprite use. The existing collection is a starter library; required additions are listed in `GAME_PLAN.md`.
+Canonical names for the image files currently in `assets/`. Names describe their intended game role. Many files are JPEGs with flattened backgrounds; transparent `*_cutout.png` derivatives are used when an image needs to layer over a scene.
 
 ## API compatibility
 
@@ -10,7 +10,7 @@ The utilities API does not prescribe image basenames. `Constants.ResourcePaths` 
 - `sprites/ui/`
 - `sprites/powerups/`
 - `sprites/obstacles/`
-- `audio/music/` and `audio/sfx/` (reserved for audio assets; none are present yet)
+- `audio/music/` and `audio/sfx/`
 
 Managers and databases obtain asset paths from configuration and pass those paths to `ResourceManager`; `ResourceManager` loads/caches the resource and does not infer filenames. Story art, characters, map backgrounds, and props have no dedicated path constants and should likewise be referenced by their explicit paths in configuration/story data. The current tile, powerup, and obstacle configs reference their textures and icons below through `.tres` texture resources. `configs/audio.json` maps the current music and sound effects. Additional audio cues, UI themes, and fonts can be added through their existing configuration contracts as those systems expand.
 
@@ -40,6 +40,12 @@ Managers and databases obtain asset paths from configuration and pass those path
 | `sprites/backgrounds/factory_map_section.jpeg` | Factory map/location section |
 | `sprites/props/foliage_boulder_map_prop.jpeg` | Foliage-covered boulder map prop |
 | `sprites/ui/game_logo.jpeg` | Save The Baby logo |
+| `sprites/backgrounds/title_woodgrain_texture.jpeg` | Clean blue wood texture used on the launch screen |
+| `references/launch_concepts/phone_mockup_title_gold_empty.jpeg` | Gold-title phone mockup concept; reference only |
+| `references/launch_concepts/phone_mockup_title_dark_empty.jpeg` | Dark-title phone mockup concept; reference only |
+| `references/launch_concepts/closeup_gold_wordmark.jpeg` | Gold wordmark close-up; reference only |
+| `references/launch_concepts/phone_mockup_wood_wordmark.jpeg` | Colorful wood-wordmark phone mockup; reference only |
+| `references/launch_concepts/wood_screen_android_navbar.jpeg` | Wood-screen phone mockup with Android navigation; reference only |
 | `sprites/ui/ui_button_states_atlas.jpeg` | Play, pause, settings, and back button states source atlas |
 | `sprites/ui/gameplay_hud_atlas.jpeg` | Moves, score, star goal, coin, life, and booster HUD source atlas |
 | `sprites/ui/menu_states_atlas.jpeg` | Pause, win, fail, and reward screen source atlas |
@@ -47,7 +53,7 @@ Managers and databases obtain asset paths from configuration and pass those path
 | `sprites/ui/navigation_button_states_atlas.jpeg` | Navigation and story button source atlas added 2026-10-28 |
 | `sprites/ui/buttons/` | Transparent Play, Pause, Settings, and Back button sprites, each with normal, hover, and pressed states. Play and Pause are used by the launch and gameplay screens. |
 | `sprites/ui/story_buttons/` | Transparent Play, Save, Next, Previous, Continue, and Skip states extracted from the added navigation atlas. Continue, Next, Previous, and Skip are used in the opening story flow; Save awaits integration with persistent progress. The combined Settings/Back art was excluded; the separate Settings and Back buttons from `buttons/` are used in the pause menu. |
-| `sprites/ui/story_choices/` | Three transparent choice buttons cropped from the supplied story UI reference and used for Call the police, Trace Victor’s signal, and Go after Victor alone. |
+| `sprites/ui/story_choices/` | Three transparent choice buttons cropped from the supplied story UI reference and used for Call the police, Trace VictorÃ¢â‚¬â„¢s signal, and Go after Victor alone. |
 | `sprites/ui/panels/` | Transparent moves, score, star goal, coins, life, and booster panels/icons extracted from the HUD sheet. Moves and score panels are used for live gameplay counters. |
 | `sprites/ui/screens/` | Transparent pause, victory, failure, and rewards panels extracted from the menu sheet. The pause panel is used by the in-game pause menu. |
 | `sprites/backgrounds/garden_map_tile.jpeg` | Garden map/environment tile |
@@ -98,16 +104,18 @@ Managers and databases obtain asset paths from configuration and pass those path
 | `sprites/obstacles/wooden_gate_board_tile.jpeg` | Gate board/environment tile |
 | `sprites/props/wooden_signpost.jpeg` | Campaign map signpost |
 
-## Asset usability and integration gaps
+## Asset use and remaining work
 
-- The project already contains a broad starter art set: 125 sprite files across backgrounds, characters, obstacles, powerups, props, tiles, and UI. These files are available to implement; they are not all wired to screens or gameplay yet.
-- `campaign_map_ui_reference.jpeg` is a baked composite concept with fixed chapter labels and level markers. Use it as a layout reference, not as the live scalable campaign map. The location backgrounds and map props can support a separately coded map once level progress and unlock data are available.
-- Several map badges, portraits, and scene images are JPEGs with white or black matte backgrounds. They work as full-card illustrations or backgrounds, but they are not transparent cutouts for arbitrary layering. The separate PNG button states and extracted UI panels are better suited to live controls.
+- The project contains a broad art set across backgrounds, characters, obstacles, powerups, props, tiles, and UI. The live launch/story/map/gameplay screens use the corresponding supplied art; the board uses tile, booster, and obstacle assets.
+- `campaign_map_ui_reference.jpeg` is a baked composite with fixed chapter labels and level markers. The live map is assembled from repeated grass terrain, location sections, signposts, level nodes, and landmarks so its labels and level selection remain data-driven.
+- The campaign route follows the reference art: Amara's Home (001Ã¢â‚¬â€œ008), Village Road (009Ã¢â‚¬â€œ015), Technician's Office (016Ã¢â‚¬â€œ022), Police Station (023Ã¢â‚¬â€œ030), Forest Path (031Ã¢â‚¬â€œ040), and Victor's Factory (041Ã¢â‚¬â€œ050). Guided tutorials occur only when a new mechanic is introduced; the rest of each chapter is normal play and practice. Booster inventory and special-match powerups are disabled in levels 001–040, then Rocket unlocks at 041, Bomb at 044, and Thunder at 047.
+- White-matte JPEG source art remains preserved. Separate `*_cutout.png` derivatives remove the connected white matte for layering map locations, bridges, foliage, signposts, level nodes, and the wooden dialogue frame.
+- `wooden_dialogue_panel_cutout.png` is used as the illustrated frame behind story speaker and dialogue text. `wooden_signpost_cutout.png` carries the live campaign chapter title and level range.
 - Static portraits for David, Amara, Ethan, Victor, and the detective are present. Animated character poses, additional expressions, and dedicated scene art for later story locations can be authored as those scenes are built.
-- UI assets are present for the title, gameplay counters, buttons, pause, victory, failure, rewards, and level markers. The current game uses only part of this set; the remaining pieces need screen behavior and data wiring.
-- Tile, powerup, and obstacle icons are present. Gameplay still needs complete obstacle/powerup behavior, distinct damage states where appropriate, and animation feedback that uses these assets.
-- The animation folder and AnimationManager provide generic requests, sequencing, tween helpers, and animation identifiers. The specific effects for UI transitions, story portraits, powerups, and obstacles still need implementation in their respective consumers.
-- Audio currently includes an opening suspense track and five sound effects. Additional match/cascade, powerup, obstacle, victory, failure, and story cues remain useful as those events are implemented.
+- UI assets are used for the title, counters, buttons, pause, victory, failure, rewards, story choices, and level markers. Some atlas elements remain source art for future refinements.
+- Rocket, bomb, and thunder boosters clear configured patterns. Matches of four, five, and intersecting shapes create corresponding special tiles. Configured obstacles appear on the board, take adjacent-match damage, animate on damage/destruction, and count toward obstacle objectives where configured.
+- Match/cascade, powerup, invalid move, interface, and level result events have animation/audio feedback. Thunder crack and rumble are original procedurally generated WAV files; other cues use the projectÃ¢â‚¬â„¢s existing sound files.
+- Remaining work includes distinct mechanics for every obstacle type, combination rules, full booster inventory/save/reward economy, more expressive character animation, sound polish, and visual verification on actual phone dimensions.
 
 Use existing assets where they fit, and add only the specific states or cues that the implemented screens need. Do not treat the reference/mockup images in this catalog as final production UI without reviewing their quality and licenses.
 

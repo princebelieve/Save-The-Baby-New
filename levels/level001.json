@@ -1,76 +1,108 @@
 {
-  "level_id": 1,
-  "name": "The First Clue",
-  "description": "Learn to swipe, match, and gather evidence for Ethan's rescue.",
-  "difficulty": "TUTORIAL",
-  "board": {
-    "rows": 8,
-    "columns": 8,
-    "tile_size": 68,
-    "spawn_points": [],
-    "blocked_cells": [],
-    "locked_cells": []
-  },
-  "moves": {
-    "total": 30
-  },
-  "objectives": [
-    {
-      "type": "COLLECT_ITEMS",
-      "target": "KEY",
-      "amount": 10
-    }
-  ],
-  "tile_pool": {
-    "tiles": ["key", "phone", "fingerprint", "recorder", "clock"],
-    "weights": [20, 20, 20, 20, 20]
-  },
-  "powerups": {
-    "enabled": false,
-    "available": []
-  },
-  "obstacles": {
-    "items": []
-  },
-  "rewards": {
-    "coins": 0,
-    "stars": 0,
-    "first_try_bonus": 0,
-    "perfect_bonus": 0,
-    "powerups": []
-  },
-  "tutorial": {
-    "enabled": true,
-    "steps": [
-      {
-        "message": "Swipe between two neighboring pieces to make a match of three or more.",
-        "highlight": []
-      }
-    ]
-  },
-  "story": {
-    "before_level": "",
-    "after_level": "",
-    "first_clear": "",
-    "return_to_map": false
-  },
-  "audio": {
-    "music": "",
-    "victory": "",
-    "game_over": ""
-  },
-  "background": {
-    "image": "res://assets/sprites/backgrounds/grass_board_background.jpeg",
-    "parallax": false
-  },
-  "settings": {
-    "time_limit": 0,
-    "allow_shuffle": true,
-    "allow_boosters": false
-  },
-  "metadata": {
-    "version": 1,
-    "author": "Save The Baby",
-    "notes": "Initial playable board vertical slice."
-  }
+    "level_id":  1,
+    "name":  "The First Clue",
+    "description":  "Learn to swipe, match, and gather evidence for Ethan\u0027s rescue.",
+    "difficulty":  "TUTORIAL",
+    "board":  {
+                  "rows":  8,
+                  "columns":  8,
+                  "tile_size":  68,
+                  "spawn_points":  [
+
+                                   ],
+                  "blocked_cells":  [
+
+                                    ],
+                  "locked_cells":  [
+
+                                   ]
+              },
+    "moves":  {
+                  "total":  30
+              },
+    "objectives":  [
+                       {
+                           "type":  "COLLECT_ITEMS",
+                           "target":  "KEY",
+                           "amount":  7
+                       }
+                   ],
+    "tile_pool":  {
+                      "tiles":  [
+                                    "key",
+                                    "phone",
+                                    "fingerprint",
+                                    "recorder",
+                                    "clock"
+                                ],
+                      "weights":  [
+                                      20,
+                                      20,
+                                      20,
+                                      20,
+                                      20
+                                  ]
+                  },
+    "powerups":  {
+                     "enabled":  false,
+                     "available":  [
+
+                                   ]
+                 },
+    "obstacles":  {
+                      "items":  [
+
+                                ]
+                  },
+    "rewards":  {
+                    "coins":  0,
+                    "stars":  0,
+                    "first_try_bonus":  0,
+                    "perfect_bonus":  0,
+                    "powerups":  [
+
+                                 ]
+                },
+    "tutorial":  {
+                     "enabled":  true,
+                     "steps":  [
+                                   {
+                                       "message":  "Amara found a key by the fence. Drag between the glowing key pieces to match; this match adds key evidence to the case.",
+                                       "highlight":  [
+
+                                                     ]
+                                   }
+                               ]
+                 },
+    "story":  {
+                  "before_level":  "chapter01",
+                  "after_level":  "",
+                  "first_clear":  "",
+                  "return_to_map":  false
+              },
+    "audio":  {
+                  "music":  "",
+                  "victory":  "",
+                  "game_over":  ""
+              },
+    "background":  {
+                       "image":  "res://assets/sprites/backgrounds/grass_board_background.jpeg",
+                       "parallax":  false
+                   },
+    "settings":  {
+                     "time_limit":  0,
+                     "allow_shuffle":  true,
+                     "allow_boosters":  false
+                 },
+    "metadata":  {
+                     "version":  1,
+                     "author":  "Save The Baby",
+                     "notes":  "First tutorial level in Chapter 1. Teaches swipe-to-swap and evidence collection.",
+                     "chapter_id":  1,
+                     "chapter_title":  "Amara\u0027s Home",
+                     "chapter_start_level":  1,
+                     "chapter_end_level":  8,
+                     "map_background":  "garden_map_tile_cutout.png",
+                     "map_landmark":  "tree_bush_topdown_cutout.png"
+                 }
 }

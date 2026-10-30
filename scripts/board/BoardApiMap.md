@@ -89,6 +89,38 @@ remove_tile(position)
 has_tile(position)
 
 swap_tiles(position_a, position_b)
+
+Tutorial and powerup interaction
+find_valid_swap() -> Array[Vector2i]
+
+find_valid_swap_near_obstacle() -> Array[Vector2i]
+
+set_required_swap(positions)
+
+clear_required_swap()
+
+set_booster_mode(kind)
+
+cancel_booster_mode()
+
+use_booster_at(kind, position) -> bool
+
+create_powerup_for_match(matches) -> Tile
+
+Signals consumed by Game
+moves_changed(remaining_moves)
+
+move_rejected
+
+turn_resolved
+
+booster_used(kind)
+
+obstacles_cleared(amount)
+
+match_collected(tile_types)
+
+Board emits turn_resolved after a player's swap or booster and all resulting cascades finish. Game owns objectives/tutorial progression and level win/fail; Board only reports the resolved action and obstacle/powerup outcomes.
 Grid
 get_all_tiles()
 

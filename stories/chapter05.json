@@ -1,0 +1,47 @@
+{
+    "story_id":  "chapter05",
+    "title":  "The Forest Path",
+    "background_music":  "suspense_opening",
+    "default_background":  "res://assets/sprites/backgrounds/river_waterfall_map_tile.jpeg",
+    "portrait":  "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+    "characters":  [
+                       "david",
+                       "amara",
+                       "ethan",
+                       "victor"
+                   ],
+    "scenes":  [
+                   {
+                       "scene_id":  "chapter_05_intro",
+                       "choices":  [
+
+                                   ],
+                       "dialogues":  [
+                                         {
+                                             "speaker":  "Amara",
+                                             "portrait":  "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+                                             "text":  "There is a small shoe print in the mud. Ethan wore those shoes when I last saw him.",
+                                             "animation":  "fade"
+                                         },
+                                         {
+                                             "speaker":  "David",
+                                             "portrait":  "res://assets/sprites/characters/david_portrait_cutout.png",
+                                             "text":  "He was here. Victor is trying to hide the path, but he cannot erase every sign that Ethan passed through.",
+                                             "animation":  "fade"
+                                         },
+                                         {
+                                             "speaker":  "Victor",
+                                             "portrait":  "res://assets/sprites/characters/victor_portrait_dark_cutout.png",
+                                             "text":  "You are closer than I expected, David. Keep following the trail. It only gets harder from here.",
+                                             "animation":  "fade"
+                                         }
+                                     ]
+                   }
+               ],
+    "metadata":  {
+                     "version":  1,
+                     "chapter":  5,
+                     "campaign_levels":  "031-040",
+                     "tutorial_chapter":  true
+                 }
+}

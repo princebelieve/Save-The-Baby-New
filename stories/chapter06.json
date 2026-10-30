@@ -1,0 +1,47 @@
+{
+    "story_id":  "chapter06",
+    "title":  "Victor’s Factory",
+    "background_music":  "suspense_opening",
+    "default_background":  "res://assets/sprites/backgrounds/factory_cage_art.jpeg",
+    "portrait":  "res://assets/sprites/characters/victor_portrait_dark_cutout.png",
+    "characters":  [
+                       "david",
+                       "amara",
+                       "ethan",
+                       "victor"
+                   ],
+    "scenes":  [
+                   {
+                       "scene_id":  "chapter_06_intro",
+                       "choices":  [
+
+                                   ],
+                       "dialogues":  [
+                                         {
+                                             "speaker":  "David",
+                                             "portrait":  "res://assets/sprites/characters/david_portrait_cutout.png",
+                                             "text":  "The factory lights are on. Victor brought Ethan here, and the outer gate is still warm.",
+                                             "animation":  "fade"
+                                         },
+                                         {
+                                             "speaker":  "Amara",
+                                             "portrait":  "res://assets/sprites/characters/amara_police_portrait_cutout.png",
+                                             "text":  "I can hear Ethan inside. We have one chance to reach him before Victor moves him again.",
+                                             "animation":  "fade"
+                                         },
+                                         {
+                                             "speaker":  "Victor",
+                                             "portrait":  "res://assets/sprites/characters/victor_portrait_dark_cutout.png",
+                                             "text":  "You found the door. Now prove you can get through it. I will be waiting on the other side.",
+                                             "animation":  "fade"
+                                         }
+                                     ]
+                   }
+               ],
+    "metadata":  {
+                     "version":  1,
+                     "chapter":  6,
+                     "campaign_levels":  "041-050",
+                     "tutorial_chapter":  false
+                 }
+}

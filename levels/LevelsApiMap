@@ -218,11 +218,15 @@ Each tutorial step
 
 {
     "message":"Swipe these tiles.",
-    "highlight":[
-        { "x":3,"y":4 },
-        { "x":4,"y":4 }
-    ]
+    "mechanic":"damage_obstacle"
 }
+
+The optional `mechanic` value supports `damage_obstacle` or `create_rocket`.
+Use `booster` instead when the player must select an inventory booster and then
+target a board piece. These fields are mutually exclusive. A booster tutorial
+requires the named item in `powerups.available`, `powerups.enabled`, and
+`settings.allow_boosters` to be true. Spotlight cells are chosen from the live
+board and objective; tutorial steps do not accept manually authored coordinates.
 story
 
 Story integration.
@@ -273,60 +277,48 @@ Internal information.
 {
     "version":1,
     "author":"Save The Baby",
-    "notes":""
+    "notes":"",
+    "chapter_id":1,
+    "chapter_title":"Amara's Home",
+    "chapter_start_level":1,
+    "chapter_end_level":8,
+    "map_background":"garden_map_tile_cutout.png",
+    "map_landmark":"tree_bush_topdown_cutout.png"
 }
-Level Progression Responsibilities
-level001.json
 
-Purpose
+The chapter fields group levels and identify the location art and landmark used
+by the live campaign map. Keep them consistent within each chapter range below.
+Campaign chapters and level progression
 
-First tutorial level
-Teach swipe-to-swap
-No obstacles
-Very easy objectives
-level002.json
+The campaign-map art divides the opening 50 levels into six locations. Keep these
+ranges stable so chapter signs, level data, story scenes, and map presentation agree.
 
-Purpose
+Chapter 1 — Amara's Home: levels 001–008
+Chapter 2 — Village Road: levels 009–015
+Chapter 3 — Technician's Office: levels 016–022
+Chapter 4 — Police Station: levels 023–030
+Chapter 5 — Forest Path: levels 031–040
+Chapter 6 — Victor's Factory: levels 041–050
 
-Continue tutorial
-Introduce simple matching
-Reinforce board mechanics
-Levels 003–010
+The tutorial appears when each mechanic first matters, then practice levels let
+the player use it without repeating the popup. Current lessons are:
 
-Purpose
+- Level 001: guided key match, move and goal counters, pause and sound controls,
+  and Amara's evidence case file.
+- Level 009: damage an obstacle by matching beside it.
+- Level 016: make a four-piece match, create a rocket, then swap it to fire.
+- Level 023: clear a padlock through adjacent matches.
+- Level 031: weaken a hazard through nearby matches.
+- Levels 041, 044, and 047: use the rocket, bomb, and thunder boosters.
 
-Complete tutorial
-Introduce objectives
-Increase board complexity gradually
-Levels 011–020
+Chapter 6 consolidates the taught systems and leads to the level 050 rescue
+confrontation.
 
-Purpose
-
-Introduce basic obstacles
-Require more strategic play
-Levels 021–035
-
-Purpose
-
-Introduce powerup combinations
-More complex board layouts
-Multi-objective levels
-Levels 036–049
-
-Purpose
-
-Advanced mechanics
-Mixed obstacles
-Higher difficulty
-Complex objective combinations
-level050.json
-
-Purpose
-
-Boss level
-Final challenge of Version 1
-Story climax
-Leads directly to ending.json
+Every level file is authored content, not an implicit placeholder. The campaign
+map shows the levels defined by these files. Adding a planned node requires its
+schema-complete level JSON and corresponding tutorial/story content. The opening
+50 levels are the first campaign pack; later content continues at level051 and
+must not impose a maximum campaign length.
 Level Flow
 level001.json
       │
@@ -339,15 +331,14 @@ level002.json
       ▼
 level050.json
 Frozen Responsibilities
-File(s)	Responsibility
-level001.json	First tutorial level
-level002.json	Continue tutorial
-level003–010.json	Complete tutorial and introduce objectives
-level011–020.json	Introduce obstacles
-level021–035.json	Introduce powerups and combinations
-level036–049.json	Advanced gameplay and difficulty
-level050.json	Boss level and campaign finale
-
+File(s)    Responsibility
+level001-008.json    Chapter 1: Amara's Home; level001 introduces the board and case file
+level009-015.json    Chapter 2: Village Road; level009 introduces obstacles
+level016-022.json    Chapter 3: Technician's Office; level016 introduces rocket creation
+level023-030.json    Chapter 4: Police Station; level023 introduces padlocks
+level031-040.json    Chapter 5: Forest Path; level031 introduces hazards
+level041-049.json    Chapter 6 challenge and story resolution setup
+level050.json    Rescue confrontation and opening-campaign finale
 This freezes the JSON schema and responsibilities for every file under:
 
 levels/

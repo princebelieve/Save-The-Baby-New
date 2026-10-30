@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dpx6m5834syc7"
-path="res://.godot/imported/image_69f1876a.jpg-5e2c9d753890b41472c5b46dc33a4f15.ctex"
+uid="uid://b57xbxuvitdh"
+path="res://.godot/imported/amara_and_ethan_portrait_cutout.png-810fe3658ac9b5c8fc717a406ff243ce.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/image_69f1876a.jpg"
-dest_files=["res://.godot/imported/image_69f1876a.jpg-5e2c9d753890b41472c5b46dc33a4f15.ctex"]
+source_file="res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png"
+dest_files=["res://.godot/imported/amara_and_ethan_portrait_cutout.png-810fe3658ac9b5c8fc717a406ff243ce.ctex"]
 
 [params]
 

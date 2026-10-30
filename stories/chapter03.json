@@ -1,0 +1,47 @@
+{
+    "story_id":  "chapter03",
+    "title":  "The Technician’s Office",
+    "background_music":  "suspense_opening",
+    "default_background":  "res://assets/sprites/backgrounds/factory_map_section.jpeg",
+    "portrait":  "res://assets/sprites/characters/detective_portrait_cutout.png",
+    "characters":  [
+                       "david",
+                       "amara",
+                       "ethan",
+                       "victor"
+                   ],
+    "scenes":  [
+                   {
+                       "scene_id":  "chapter_03_intro",
+                       "choices":  [
+
+                                   ],
+                       "dialogues":  [
+                                         {
+                                             "speaker":  "Detective Morris",
+                                             "portrait":  "res://assets/sprites/characters/detective_portrait_cutout.png",
+                                             "text":  "The workshop owner found a receiver hidden under his bench. Its last signal came from an industrial property outside town.",
+                                             "animation":  "fade"
+                                         },
+                                         {
+                                             "speaker":  "David",
+                                             "portrait":  "res://assets/sprites/characters/david_portrait_cutout.png",
+                                             "text":  "Victor used the workshop to hide his trail. That receiver is still warm.",
+                                             "animation":  "fade"
+                                         },
+                                         {
+                                             "speaker":  "Amara",
+                                             "portrait":  "res://assets/sprites/characters/amara_police_portrait_cutout.png",
+                                             "text":  "Then Ethan may be close. David, listen: someone just tried to call from the receiver.",
+                                             "animation":  "fade"
+                                         }
+                                     ]
+                   }
+               ],
+    "metadata":  {
+                     "version":  1,
+                     "chapter":  3,
+                     "campaign_levels":  "016-022",
+                     "tutorial_chapter":  true
+                 }
+}

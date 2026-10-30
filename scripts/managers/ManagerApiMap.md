@@ -264,6 +264,18 @@ set_music_volume(value)
 
 set_sfx_volume(value)
 
+set_music_enabled(enabled)
+
+is_music_enabled()
+
+set_sfx_enabled(enabled)
+
+is_sfx_enabled()
+
+get_music_volume()
+
+get_sfx_volume()
+
 mute()
 
 unmute()

@@ -53,7 +53,11 @@ func process_animated(board) -> void:
 				if not matched_positions.has(grid_position):
 					matched_positions[grid_position] = tile
 					matched_tiles.append(tile)
+		var preserved_powerup: Tile = board.create_powerup_for_match(matches)
 		board.notify_match_tiles(matched_tiles)
+		if preserved_powerup != null:
+			matched_positions.erase(preserved_powerup.get_grid_position())
+			matched_tiles.erase(preserved_powerup)
 		await board.animate_match_tiles(matched_tiles)
 		for grid_position in matched_positions:
 			board.remove_tile(grid_position)

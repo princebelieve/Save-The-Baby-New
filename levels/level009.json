@@ -1,0 +1,114 @@
+{
+    "story":  {
+                  "return_to_map":  true,
+                  "after_level":  "",
+                  "before_level":  "chapter02",
+                  "first_clear":  ""
+              },
+    "metadata":  {
+                     "chapter_end_level":  15,
+                     "map_landmark":  "wooden_bridge_cutout.png",
+                     "version":  1,
+                     "notes":  "Chapter 2: Village Road. Tutorial progression follows the campaign-map route.",
+                     "author":  "Save The Baby",
+                     "chapter_title":  "Village Road",
+                     "map_background":  "level_map_landscape_cutout.png",
+                     "chapter_start_level":  9,
+                     "chapter_id":  2
+                 },
+    "board":  {
+                  "columns":  8,
+                  "spawn_points":  [
+
+                                   ],
+                  "tile_size":  64,
+                  "locked_cells":  [
+
+                                   ],
+                  "blocked_cells":  [
+
+                                    ],
+                  "rows":  8
+              },
+    "powerups":  {
+                     "available":  [
+
+                                   ],
+                     "enabled":  false
+                 },
+    "tile_pool":  {
+                      "weights":  [
+                                      20,
+                                      20,
+                                      20,
+                                      20,
+                                      20
+                                  ],
+                      "tiles":  [
+                                    "key",
+                                    "phone",
+                                    "fingerprint",
+                                    "recorder",
+                                    "clock"
+                                ]
+                  },
+    "difficulty":  "TUTORIAL",
+    "objectives":  [
+                       {
+                           "amount":  7,
+                           "target":  "PHONE",
+                           "type":  "COLLECT_ITEMS"
+                       }
+                   ],
+    "audio":  {
+                  "music":  "",
+                  "victory":  "",
+                  "game_over":  ""
+              },
+    "level_id":  9,
+    "settings":  {
+                     "allow_shuffle":  true,
+                     "allow_boosters":  false,
+                     "time_limit":  0
+                 },
+    "description":  "Follow David\u0027s trail through Village Road and gather the evidence that can lead to Ethan.",
+    "tutorial":  {
+                     "steps":  [
+                                   {
+                                       "message":  "David: Tape blocks the footprints. Match the glowing pair beside it to damage a layer and reopen the trail.",
+                                       "mechanic":  "damage_obstacle",
+                                       "highlight":  [
+
+                                                     ]
+                                   }
+                               ],
+                     "enabled":  true
+                 },
+    "obstacles":  {
+                      "items":  [
+                                    {
+                                        "y":  3,
+                                        "health":  1,
+                                        "type":  "tape",
+                                        "x":  2
+                                    }
+                                ]
+                  },
+    "background":  {
+                       "parallax":  false,
+                       "image":  "res://assets/sprites/backgrounds/grass_board_background.jpeg"
+                   },
+    "moves":  {
+                  "total":  29
+              },
+    "rewards":  {
+                    "powerups":  [
+
+                                 ],
+                    "perfect_bonus":  20,
+                    "coins":  20,
+                    "stars":  3,
+                    "first_try_bonus":  10
+                },
+    "name":  "The Village Turn"
+}

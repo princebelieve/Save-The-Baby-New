@@ -1,0 +1,47 @@
+{
+    "story_id":  "chapter02",
+    "title":  "Across the Village Road",
+    "background_music":  "suspense_opening",
+    "default_background":  "res://assets/sprites/backgrounds/level_map_landscape.jpeg",
+    "portrait":  "res://assets/sprites/characters/david_portrait_cutout.png",
+    "characters":  [
+                       "david",
+                       "amara",
+                       "ethan",
+                       "victor"
+                   ],
+    "scenes":  [
+                   {
+                       "scene_id":  "chapter_02_intro",
+                       "choices":  [
+
+                                   ],
+                       "dialogues":  [
+                                         {
+                                             "speaker":  "David",
+                                             "portrait":  "res://assets/sprites/characters/david_portrait_cutout.png",
+                                             "text":  "The tire tracks cross the old bridge. They are fresh, but the rain is already washing them away.",
+                                             "animation":  "fade"
+                                         },
+                                         {
+                                             "speaker":  "Amara",
+                                             "portrait":  "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+                                             "text":  "A neighbor saw a van stop by the river. He heard a phone ring, then the driver turned toward the workshop road.",
+                                             "animation":  "fade"
+                                         },
+                                         {
+                                             "speaker":  "David",
+                                             "portrait":  "res://assets/sprites/characters/david_portrait_cutout.png",
+                                             "text":  "Victor wants us chasing scraps. We keep gathering evidence, and we do not let the trail split us apart.",
+                                             "animation":  "fade"
+                                         }
+                                     ]
+                   }
+               ],
+    "metadata":  {
+                     "version":  1,
+                     "chapter":  2,
+                     "campaign_levels":  "009-015",
+                     "tutorial_chapter":  true
+                 }
+}

@@ -1,0 +1,47 @@
+{
+    "story_id":  "chapter04",
+    "title":  "The Police Station",
+    "background_music":  "suspense_opening",
+    "default_background":  "res://assets/sprites/backgrounds/riverside_landscape.jpeg",
+    "portrait":  "res://assets/sprites/characters/detective_portrait_cutout.png",
+    "characters":  [
+                       "david",
+                       "amara",
+                       "ethan",
+                       "victor"
+                   ],
+    "scenes":  [
+                   {
+                       "scene_id":  "chapter_04_intro",
+                       "choices":  [
+
+                                   ],
+                       "dialogues":  [
+                                         {
+                                             "speaker":  "Detective Morris",
+                                             "portrait":  "res://assets/sprites/characters/detective_portrait_cutout.png",
+                                             "text":  "The number plate was stolen, but the station camera caught the van heading north. We have a direction, not a location.",
+                                             "animation":  "fade"
+                                         },
+                                         {
+                                             "speaker":  "David",
+                                             "portrait":  "res://assets/sprites/characters/david_portrait_cutout.png",
+                                             "text":  "Victor expected the police to arrive. He left the camera running so we would see the road he wanted us to take.",
+                                             "animation":  "fade"
+                                         },
+                                         {
+                                             "speaker":  "Detective Morris",
+                                             "portrait":  "res://assets/sprites/characters/detective_portrait_cutout.png",
+                                             "text":  "The second camera shows the van turning toward the forest. I am sending the image now. Move carefully.",
+                                             "animation":  "fade"
+                                         }
+                                     ]
+                   }
+               ],
+    "metadata":  {
+                     "version":  1,
+                     "chapter":  4,
+                     "campaign_levels":  "023-030",
+                     "tutorial_chapter":  true
+                 }
+}

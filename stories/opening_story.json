@@ -1,49 +1,58 @@
 {
-  "story_id": "opening_story",
-  "title": "The Night Ethan Vanished",
-  "background_music": "suspense_opening",
-  "default_background": "res://assets/sprites/backgrounds/riverside_landscape.jpeg",
-  "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait.jpeg",
-  "characters": ["david", "amara", "victor"],
-  "scenes": [
-    {
-      "scene_id": "the_call",
-      "dialogues": [
-        {
-          "speaker": "Late that night",
-          "text": "Rain rattled the windows. David had just put away Ethan’s drawing when the phone rang. Amara’s voice broke through the silence."
-        },
-        {
-          "speaker": "Amara",
-          "text": "Victor took Ethan. The back door is open, and I found a trail of clues—but he’s already had a head start."
-        },
-        {
-          "speaker": "Unknown number",
-          "text": "A message appeared on David’s phone: “Look for me if you want. Every minute costs you.” Then the number went dead."
-        }
-      ],
-      "choices": [
-        {
-          "id": "police",
-          "label": "Call the police",
-          "response": "David calls Detective Morris. The police will secure the scene while he follows the evidence Victor left behind."
-        },
-        {
-          "id": "signal",
-          "label": "Trace Victor’s signal",
-          "response": "David asks Amara to trace the message. A weak signal points toward the industrial district—and a device that may still be nearby."
-        },
-        {
-          "id": "alone",
-          "label": "Go after Victor alone",
-          "response": "David pockets the phone and follows the muddy prints himself. Victor knows he is coming; the trail is a trap as much as a clue."
-        }
-      ]
-    }
-  ],
-  "metadata": {
-    "version": 1,
-    "chapter": "The First Clue",
-    "notes": "Opening suspense scene and choice for the first playable investigation."
-  }
+    "story_id":  "opening_story",
+    "title":  "The Night Ethan Vanished",
+    "background_music":  "suspense_opening",
+    "default_background":  "res://assets/sprites/backgrounds/riverside_landscape.jpeg",
+    "portrait":  "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+    "characters":  [
+                       "david",
+                       "amara",
+                       "victor"
+                   ],
+    "scenes":  [
+                   {
+                       "scene_id":  "the_call",
+                       "dialogues":  [
+                                         {
+                                             "speaker":  "Late that night",
+                                             "text":  "Rain rattled the windows. David was sorting drawings made by his young son, Ethan, when Amara called. Ethan\u0027s mother was whispering.",
+                                             "portrait":  "res://assets/sprites/characters/david_portrait_cutout.png"
+                                         },
+                                         {
+                                             "speaker":  "Amara",
+                                             "text":  "David, I\u0027m Ethan\u0027s mother. Victor has taken him. I\u0027m at the garden gate; the back door is open, and he left a trail. We have to follow it before dawn."
+                                         },
+                                         {
+                                             "speaker":  "Victor",
+                                             "portrait":  "res://assets/sprites/characters/victor_portrait_dark_cutout.png",
+                                             "text":  "A video flickers on David\u0027s phone. Victor looks into the camera: \u0027You have until dawn. Follow the trail I left, and come alone—or Ethan disappears for good.\u0027 The screen goes black."
+                                         }
+                                     ],
+                       "choices":  [
+                                       {
+                                           "id":  "police",
+                                           "label":  "Call the police",
+                                           "impact":  "Detective Morris leads the missing-child case. Calling him brings police to the house, but takes time to organize.",
+                                           "response":  "David calls Detective Morris, the officer leading the missing-child investigation. Morris secures the house and coordinates the search."
+                                       },
+                                       {
+                                           "id":  "signal",
+                                           "label":  "Trace Victor’s signal",
+                                           "impact":  "Amara traces the phone signal toward the industrial district. David gets a faster lead, but has no police support.",
+                                           "response":  "Amara traces the message. A weak signal points toward the industrial district, where a device may still be nearby."
+                                       },
+                                       {
+                                           "id":  "alone",
+                                           "label":  "Go after Victor alone",
+                                           "impact":  "David follows the prints immediately. He moves fastest, but has no backup if Victor is waiting.",
+                                           "response":  "David pockets the phone and follows the muddy prints himself. Victor knows he is coming; the trail may be a trap."
+                                       }
+                                   ]
+                   }
+               ],
+    "metadata":  {
+                     "version":  1,
+                     "chapter":  "The First Clue",
+                     "notes":  "Opening suspense scene and choice for the first playable investigation."
+                 }
 }

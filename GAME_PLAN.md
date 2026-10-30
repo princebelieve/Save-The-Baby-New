@@ -1,8 +1,8 @@
-# Save The Baby — Game and Production Plan
+# Save The Baby â€” Game and Production Plan
 
 ## 1. Product vision
 
-Save The Baby is a story-led Match-3 adventure built around David’s continuing effort to rescue Ethan from Victor. The first 50 levels are the opening stretch of the campaign, not the whole game or a fixed endpoint. The campaign is designed to keep growing through new chapters, locations, mechanics, events, and level packs, as in long-running puzzle adventures.
+Save The Baby is a story-led Match-3 adventure built around Davidâ€™s continuing effort to rescue Ethan from Victor. The first 50 levels are the opening stretch of the campaign, not the whole game or a fixed endpoint. The campaign is designed to keep growing through new chapters, locations, mechanics, events, and level packs, as in long-running puzzle adventures.
  
 The game should feel approachable in a single level and rewarding over a long progression: clear goals, satisfying matches and cascades, expressive powerups, steadily introduced hazards, story scenes with meaningful context, and rewards that make progress visible.
 
@@ -10,14 +10,14 @@ The project also aims to build a reusable Match-3 engine. Save The Baby is its f
 
 ## 2. Player promise and core loop
 
-The player follows David as he investigates Victor’s kidnapping, gathers evidence, faces Victor’s traps, reaches the factory, and works toward rescuing Ethan. The opening offers three approaches—call the police, trace the signal, or go alone. These choices shape scenes, dialogue, presentation, and the kind of investigation or hazards emphasized. They are not three permanently separate 50-level campaigns. The main campaign can reconverge at shared story milestones, while later chapters can revisit the consequences of earlier choices.
+The player follows David as he investigates Victorâ€™s kidnapping, gathers evidence, faces Victorâ€™s traps, reaches the factory, and works toward rescuing Ethan. The opening offers three approachesâ€”call the police, trace the signal, or go alone. These choices shape scenes, dialogue, presentation, and the kind of investigation or hazards emphasized. They are not three permanently separate 50-level campaigns. The main campaign can reconverge at shared story milestones, while later chapters can revisit the consequences of earlier choices.
 
 The repeatable level loop is:
 
 1. Enter a level with a story or mission context and a set of objectives.
 2. Swipe between adjacent tiles to make a legal swap.
 3. Match three or more pieces, trigger special pieces and cascades, and resolve gravity/refills.
-4. Make progress toward the level’s objectives within its move or timer limit.
+4. Make progress toward the levelâ€™s objectives within its move or timer limit.
 5. Win or fail; award configured results, update progress and save, then offer retry, map progression, or the next story beat.
 
 Level goals can include collecting evidence and mission items, clearing obstacles, opening routes, defusing threats, earning a target score, or completing a rescue-related objective. A level may combine objective types when it remains understandable and fair.
@@ -26,7 +26,7 @@ Level goals can include collecting evidence and mission items, clearing obstacle
 
 ### Opening campaign (Version 1.0)
 
-Version 1.0 targets approximately 50 carefully authored levels as the first substantial release, plus the opening story, the first chapter’s resolution at Victor’s factory, a rescue sequence, and a boss-style confrontation. Fifty is a launch milestone and a starting content pack. It is not a maximum level count, a limit on future chapters, or a promise that every later update needs an engine change.
+Version 1.0 targets 50 carefully authored levels as the opening campaign pack, with the rescue story reaching Victorâ€™s factory and a boss-style confrontation at level 050. The map presents six locations: Amaraâ€™s Home (001â€“008), Village Road (009â€“015), Technicianâ€™s Office (016â€“022), Police Station (023â€“030), Forest Path (031â€“040), and Victorâ€™s Factory (041â€“050). Use a small number of guided tutorials at the moment each mechanic appears, then give players regular practice levels; a chapter is not itself a tutorial. Introduce boosters after Chapter 5 and unlock them in stages. Fifty is a launch milestone, not a maximum level count; future chapters and level packs continue the quest.
 
 The three opening approaches establish distinct story presentation and can change selected scenes, dialogue, evidence framing, and level dressing. The first release should keep the playable campaign achievable by sharing the central progression and introducing controlled variations, rather than multiplying the initial content workload into three complete 50-level tracks.
 
@@ -71,7 +71,7 @@ Ads are a planned part of the product, including rewarded ads and, if the final 
 
 ## 6. Story and choices
 
-The first story arc begins with Victor kidnapping Ethan and Amara asking David for help. David chooses to call the police, trace Victor’s signal, or go alone. Each approach receives suitable scenes and dialogue and can affect presentation or selected mission framing. The story proceeds through investigation, leads to Victor’s factory, and culminates in a confrontation and rescue. Story scenes recur at campaign milestones, rather than interrupting every few levels without regard to pacing.
+The first story arc begins with Victor kidnapping Ethan and Amara asking David for help. David chooses to call the police, trace Victorâ€™s signal, or go alone. Each approach receives suitable scenes and dialogue and can affect presentation or selected mission framing. The story proceeds through investigation, leads to Victorâ€™s factory, and culminates in a confrontation and rescue. Story scenes recur at campaign milestones, rather than interrupting every few levels without regard to pacing.
 
 Dialogue, portraits, backgrounds, choices, conditions, sound, and transitions should be content-driven. Choice state must be saved and available to story conditions. Branches may diverge and reconverge; the system must support either without hardcoding a single three-track structure. Later chapters can build on prior decisions and introduce new branches.
 
@@ -119,7 +119,7 @@ Load level definitions, moves/timers, objectives, win/fail states, restart/next-
 
 ### E. Powerups and obstacles
 
-Implement configured powerup creation, activation, combinations, obstacle health/interactions and readable feedback. Add mechanics incrementally and author introductory/tutorial levels alongside them.
+The opening campaign includes a playable starter set: rocket, bomb, and thunder boosters; rocket/bomb/thunder special tiles from 4+, intersecting, and 5+ matches; configured obstacle placement and adjacent-match damage; animated activation/destruction; and thunder audio cues. These are current gameplay requirements, not deferred work. The starter implementation still needs full combination rules, obstacle-specific behaviors (for example timed bomb countdowns and key-only locks), balance, and visual/device review. Introduce core matching and environment mechanics through selected tutorial levels and practice within Chapters 1–5. Unlock boosters after Chapter 5, with guided booster introductions in Chapter 6.
 
 ### F. Story and campaign progression
 
@@ -131,7 +131,7 @@ Deliver boot/menu/map/gameplay/pause/victory/failure/reward/settings/shop screen
 
 ### H. Content and polish
 
-Author and balance the opening ~50 levels and first chapter. Complete tutorials, audio, effects, animation, localization-ready text handling, performance, crash/regression, and device-size work. Expand art/audio coverage as defined by the asset backlog.
+Author and balance the opening 50 levels across all six campaign locations. Chapters 1â€“5 teach the core and newly introduced mechanics through tutorial levels and practice; Chapter 6 brings those mechanics together for the factory confrontation and rescue. Complete tutorials, audio, effects, animation, localization-ready text handling, performance, crash/regression, and device-size work. Expand art/audio coverage as defined by the asset backlog.
 
 ### I. Monetization and online services
 
@@ -145,9 +145,9 @@ Prepare Android and Windows release candidates, store materials, privacy/consent
 
 The current `assets` collection contains character portraits, a logo/title treatment, puzzle/special/obstacle icons, map and terrain pieces, environment illustrations, and UI frames. Its canonical filenames are being assigned by in-game role. Several files are JPEGs with backgrounds flattened into the image, even where the thumbnail resembles transparency; they may need cleanup or PNG replacement before use as sprites. The assets are a useful starting library, not proof that all production art is complete.
 
-The next art needs are a consistent set of ordinary matchable tiles, complete and readable state variants for mission objects/obstacles, story backgrounds for the opening and factory sequence, missing character expressions/poses, gameplay/map/menu screen elements, and matching animation/effect frames. Produce or commission these as their scenes and mechanics are implemented, using the current art style as reference. Do not duplicate an asset unless a distinct visual state or size is needed.
+The game uses supplied board, story, launch, map, counter, button, and dialogue art, with transparent cutouts where white/black matte backgrounds prevented layering. Current gameplay uses the available rocket, bomb, thunder, and obstacle artwork. The clean wood-grain art from the new title assets backs the launch logo; the phone mockups are retained as design references. Further art work is for distinct damage/activation states and expressive character animation, not a prerequisite for these playable mechanics.
 
-Audio needs include menu/game/story music, match and cascade feedback, powerup/obstacle sounds, dialogue/voice only if produced, and victory/failure/reward cues. Audio and volume settings are configurable and saved.
+Audio currently uses the supplied music and UI/match sound effects, plus generated thunder crack and rumble WAV cues. Additional distinct obstacle, cascade, victory/failure, and story cues and saved audio preferences remain polish work.
 
 ## 12. Version boundaries
 

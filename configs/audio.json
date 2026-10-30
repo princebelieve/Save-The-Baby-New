@@ -10,7 +10,13 @@
     "ui_confirm": "res://assets/audio/sfx/ui_confirm.ogg",
     "ui_back": "res://assets/audio/sfx/ui_back.ogg",
     "tile_match": "res://assets/audio/sfx/tile_match.ogg",
-    "invalid_move": "res://assets/audio/sfx/invalid_move.ogg"
+    "invalid_move": "res://assets/audio/sfx/invalid_move.ogg",
+    "booster_select": "res://assets/audio/sfx/ui_click.ogg",
+    "powerup_activate": "res://assets/audio/sfx/ui_confirm.ogg",
+    "thunder_crack": "res://assets/audio/sfx/thunder_crack.wav",
+    "thunder_roll": "res://assets/audio/sfx/thunder_roll.wav",
+    "level_victory": "res://assets/audio/sfx/ui_confirm.ogg",
+    "level_failure": "res://assets/audio/sfx/invalid_move.ogg"
   },
   "volume_defaults": {
     "master": 1.0,

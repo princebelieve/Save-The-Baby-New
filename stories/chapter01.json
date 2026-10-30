@@ -1,0 +1,47 @@
+{
+    "story_id":  "chapter01",
+    "title":  "Amara’s Garden",
+    "background_music":  "suspense_opening",
+    "default_background":  "res://assets/sprites/backgrounds/garden_map_tile.jpeg",
+    "portrait":  "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+    "characters":  [
+                       "david",
+                       "amara",
+                       "ethan",
+                       "victor"
+                   ],
+    "scenes":  [
+                   {
+                       "scene_id":  "chapter_01_intro",
+                       "choices":  [
+
+                                   ],
+                       "dialogues":  [
+                                         {
+                                             "speaker":  "Amara",
+                                             "portrait":  "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+                                             "text":  "The mud ends here, David. Victor knew I would follow, but he missed one thing: I heard the gate slam before the car reached the road.",
+                                             "animation":  "fade"
+                                         },
+                                         {
+                                             "speaker":  "David",
+                                             "portrait":  "res://assets/sprites/characters/david_portrait_cutout.png",
+                                             "text":  "Then the gate is our first clue. We will search every footprint until we know which way he took Ethan.",
+                                             "animation":  "fade"
+                                         },
+                                         {
+                                             "speaker":  "Amara",
+                                             "portrait":  "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+                                             "text":  "I found a key near the fence. If it belongs to Victor, it may tell us what he opened before he left.",
+                                             "animation":  "fade"
+                                         }
+                                     ]
+                   }
+               ],
+    "metadata":  {
+                     "version":  1,
+                     "chapter":  1,
+                     "campaign_levels":  "001-008",
+                     "tutorial_chapter":  true
+                 }
+}

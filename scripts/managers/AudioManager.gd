@@ -32,6 +32,8 @@ var _sfx_bus_name: String = "SFX"
 var _master_volume: float = 1.0
 var _music_volume: float = 1.0
 var _sfx_volume: float = 1.0
+var _music_enabled := true
+var _sfx_enabled := true
 
 var _muted: bool = false
 var _initialized: bool = false
@@ -160,6 +162,32 @@ func set_sfx_volume(value) -> void:
 	_apply_bus_volumes()
 
 
+func set_music_enabled(enabled: bool) -> void:
+	_music_enabled = enabled
+	_apply_bus_volumes()
+
+
+func is_music_enabled() -> bool:
+	return _music_enabled
+
+
+func set_sfx_enabled(enabled: bool) -> void:
+	_sfx_enabled = enabled
+	_apply_bus_volumes()
+
+
+func is_sfx_enabled() -> bool:
+	return _sfx_enabled
+
+
+func get_music_volume() -> float:
+	return _music_volume
+
+
+func get_sfx_volume() -> float:
+	return _sfx_volume
+
+
 func mute() -> void:
 	_muted = true
 	_apply_bus_volumes()
@@ -211,8 +239,8 @@ func _resolve_audio_id(category: String, value) -> String:
 
 func _apply_bus_volumes() -> void:
 	var master := _master_volume
-	var music := _music_volume
-	var sfx := _sfx_volume
+	var music := _music_volume if _music_enabled else 0.0
+	var sfx := _sfx_volume if _sfx_enabled else 0.0
 
 	if _muted:
 		master = 0.0
