@@ -87,6 +87,7 @@ func play_music(track) -> void:
 		stream.loop = bool(entry.get("loop", false))
 	_music_player.stream = stream
 	_music_player.play()
+	_music_player.stream_paused = _muted or not _music_enabled
 
 	emit_signal("music_changed", track)
 
@@ -104,12 +105,12 @@ func pause_music() -> void:
 
 
 func resume_music() -> void:
-	if _music_player.stream_paused:
-		_music_player.stream_paused = false
+	if _music_player != null and _music_player.playing:
+		_music_player.stream_paused = _muted or not _music_enabled
 
 
 func play_sfx(sound) -> void:
-	if sound == null:
+	if sound == null or _muted or not _sfx_enabled:
 		return
 
 	var resolved_sound := _resolve_audio_id("sfx", sound)
@@ -164,6 +165,8 @@ func set_sfx_volume(value) -> void:
 
 func set_music_enabled(enabled: bool) -> void:
 	_music_enabled = enabled
+	if _music_player != null and _music_player.playing:
+		_music_player.stream_paused = _muted or not _music_enabled
 	_apply_bus_volumes()
 
 
@@ -173,6 +176,8 @@ func is_music_enabled() -> bool:
 
 func set_sfx_enabled(enabled: bool) -> void:
 	_sfx_enabled = enabled
+	if not _sfx_enabled:
+		_stop_all_sfx()
 	_apply_bus_volumes()
 
 
@@ -190,11 +195,16 @@ func get_sfx_volume() -> float:
 
 func mute() -> void:
 	_muted = true
+	if _music_player != null and _music_player.playing:
+		_music_player.stream_paused = true
+	_stop_all_sfx()
 	_apply_bus_volumes()
 
 
 func unmute() -> void:
 	_muted = false
+	if _music_player != null and _music_player.playing:
+		_music_player.stream_paused = not _music_enabled
 	_apply_bus_volumes()
 
 
@@ -249,24 +259,34 @@ func _apply_bus_volumes() -> void:
 
 	var master_bus := AudioServer.get_bus_index("Master")
 	if master_bus != -1:
+		AudioServer.set_bus_mute(master_bus, _muted)
 		AudioServer.set_bus_volume_db(
 			master_bus,
 			_linear_to_db(master)
 		)
-
 	var music_bus := AudioServer.get_bus_index(_music_bus_name)
 	if music_bus != -1:
+		AudioServer.set_bus_mute(music_bus, _muted or not _music_enabled)
 		AudioServer.set_bus_volume_db(
 			music_bus,
-			_linear_to_db(master * music)
+			_linear_to_db(music)
 		)
 
 	var sfx_bus := AudioServer.get_bus_index(_sfx_bus_name)
 	if sfx_bus != -1:
+		AudioServer.set_bus_mute(sfx_bus, _muted or not _sfx_enabled)
 		AudioServer.set_bus_volume_db(
 			sfx_bus,
-			_linear_to_db(master * sfx)
+			_linear_to_db(sfx)
 		)
+
+
+func _stop_all_sfx() -> void:
+	for player in _sfx_players.values():
+		if is_instance_valid(player):
+			player.stop()
+			player.queue_free()
+	_sfx_players.clear()
 
 
 func _linear_to_db(value: float) -> float:

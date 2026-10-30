@@ -671,9 +671,9 @@ func _show_audio_settings(parent_layer: Node) -> void:
 		volume.value_changed.connect(_set_audio_volume.bind(bus_kind))
 		settings.add_child(volume)
 		var enabled := CheckButton.new()
-		enabled.text = "Enabled"
 		enabled.button_pressed = audio_manager.is_music_enabled() if bus_kind == "music" else audio_manager.is_sfx_enabled()
-		enabled.toggled.connect(_set_audio_enabled.bind(bus_kind))
+		enabled.text = "Enabled" if enabled.button_pressed else "Disabled"
+		enabled.toggled.connect(_set_audio_enabled.bind(bus_kind, enabled))
 		settings.add_child(enabled)
 	popup.add_child(settings)
 	if _tutorial_active and _tutorial_action == "settings":
@@ -706,10 +706,11 @@ func _set_audio_volume(value: float, kind: String) -> void:
 		audio_manager.set_sfx_enabled(value > 0.0)
 
 
-func _set_audio_enabled(enabled: bool, kind: String) -> void:
+func _set_audio_enabled(enabled: bool, kind: String, indicator: CheckButton) -> void:
 	var audio_manager := get_node_or_null("Managers/AudioManager")
 	if audio_manager == null:
 		return
+	indicator.text = "Enabled" if enabled else "Disabled"
 	if kind == "music":
 		audio_manager.set_music_enabled(enabled)
 	else:
