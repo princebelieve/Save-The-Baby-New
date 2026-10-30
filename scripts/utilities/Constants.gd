@@ -30,7 +30,7 @@ const TARGET_FPS: int = 60
 class ScenePaths:
 	const BOOT: String = "res://scenes/boot/Boot.tscn"
 	const GAME: String = "res://scenes/game/Game.tscn"
-	const BOARD: String = "res://scenes/board/board.tscn"
+	const BOARD: String = "res://scenes/board/Board.tscn"
 	const TILE: String = "res://scenes/board/Tile.tscn"
 	const MAIN_MENU: String = "res://scenes/menu/MainMenu.tscn"
 	const LEVEL_SELECT: String = "res://scenes/menu/LevelSelect.tscn"
