@@ -7,6 +7,8 @@ signal match_collected(tile_types: Array)
 signal turn_resolved
 signal booster_used(kind: String)
 signal obstacles_cleared(amount: int)
+signal special_created(kind: String)
+signal special_activated(kind: String)
 
 var _grid: Dictionary = {}
 var _locked: bool = false
@@ -458,6 +460,7 @@ func create_powerup_for_match(matches: Array) -> Tile:
 		return null
 	center.set_powerup(powerup_type)
 	center.set_meta("powerup_kind", kind)
+	special_created.emit(kind)
 	var icon_path := "res://assets/sprites/powerups/%s_powerup_icon.jpeg" % kind
 	var icon := ResourceManager.load_texture(icon_path)
 	if icon != null:
@@ -587,6 +590,7 @@ func use_booster_at(kind: String, position: Vector2i) -> bool:
 
 func _resolve_special_powerup(powerup_tile: Tile) -> void:
 	var kind := str(powerup_tile.get_meta("powerup_kind", "rocket"))
+	special_activated.emit(kind)
 	var target_type := int(powerup_tile.get_tile_type())
 	var targets: Array = []
 	if kind == "thunder":
@@ -611,6 +615,16 @@ func _resolve_special_powerup(powerup_tile: Tile) -> void:
 	_resolve_external_clear(targets, kind)
 
 
+func play_celebration_shake(intensity: float = 1.0) -> void:
+	var origin := position
+	var strength := 7.0 * clampf(intensity, 0.5, 1.6)
+	var shake := create_tween()
+	shake.tween_property(self, "position", origin + Vector2(strength, 0.0), 0.045)
+	shake.tween_property(self, "position", origin + Vector2(-strength, strength * 0.28), 0.045)
+	shake.tween_property(self, "position", origin + Vector2(strength * 0.72, -strength * 0.28), 0.045)
+	shake.tween_property(self, "position", origin, 0.07).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
+
+
 func _resolve_external_clear(tiles: Array, effect: String) -> void:
 	var unique_tiles: Array = []
 	for tile in tiles:
@@ -623,7 +637,7 @@ func _resolve_external_clear(tiles: Array, effect: String) -> void:
 		SignalBus.play_sfx.emit("thunder_crack")
 		SignalBus.play_sfx.emit("thunder_roll")
 	else:
-		SignalBus.play_sfx.emit("powerup_activate")
+		SignalBus.play_sfx.emit("powerup_" + effect)
 	notify_match_tiles(unique_tiles)
 	var burst := create_tween().set_parallel(true)
 	for tile in unique_tiles:

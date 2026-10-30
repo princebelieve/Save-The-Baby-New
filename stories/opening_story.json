@@ -20,10 +20,12 @@
                                          },
                                          {
                                              "speaker":  "Amara",
-                                             "text":  "David, I\u0027m Ethan\u0027s mother. Victor has taken him. I\u0027m at the garden gate; the back door is open, and he left a trail. We have to follow it before dawn."
+                                             "sfx":  "door_open",
+                                             "text":  "Please, David—save Ethan. Victor has taken my baby. I\u0027m at the garden gate; the back door is open, and he left a trail. We have to follow it before dawn."
                                          },
                                          {
                                              "speaker":  "Victor",
+                                             "sfx":  "door_close",
                                              "portrait":  "res://assets/sprites/characters/victor_portrait_dark_cutout.png",
                                              "text":  "A video flickers on David\u0027s phone. Victor looks into the camera: \u0027You have until dawn. Follow the trail I left, and come alone—or Ethan disappears for good.\u0027 The screen goes black."
                                          }

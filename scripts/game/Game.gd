@@ -1,6 +1,8 @@
 extends Node2D
 class_name Game
 
+const DISPLAY_FONT: FontFile = preload("res://assets/fonts/Baloo2-Variable.ttf")
+
 const OPENING_STORY_PATH := "res://stories/opening_story.json"
 const CAMPAIGN_PROGRESS_PATH := "user://campaign_progress.cfg"
 
@@ -59,6 +61,8 @@ var _campaign_coach_shown := false
 var _campaign_progress := ConfigFile.new()
 var _highest_unlocked_level := 1
 var _completed_levels: Dictionary = {}
+var _match_streak := 0
+var _objective_complete_sound_played := false
 
 
 func _ready() -> void:
@@ -240,6 +244,7 @@ func _start_opening_story() -> void:
 		_launch_layer.queue_free()
 	_show_story_overlay()
 	if _story_manager != null:
+		SignalBus.play_sfx.emit("case_open")
 		var music_id := str(_story.get("background_music", ""))
 		if not music_id.is_empty():
 			SignalBus.play_music.emit(music_id)
@@ -469,6 +474,7 @@ func _make_menu_button(caption: String) -> Button:
 	button.text = caption
 	button.custom_minimum_size = Vector2(350, 66)
 	button.add_theme_font_size_override("font_size", 22)
+	button.add_theme_font_override("font", DISPLAY_FONT)
 	button.add_theme_color_override("font_color", Color("#fff3d5"))
 	var normal := StyleBoxFlat.new()
 	normal.bg_color = Color("#21466a")
@@ -616,6 +622,7 @@ func _show_case_file() -> void:
 
 
 func _close_case_file() -> void:
+	SignalBus.play_sfx.emit("case_close")
 	if _case_file_layer != null and is_instance_valid(_case_file_layer):
 		_case_file_layer.queue_free()
 	_case_file_layer = null
@@ -734,6 +741,9 @@ func _make_label(value: String, font_size: int) -> Label:
 	label.add_theme_color_override("font_outline_color", Color("#182538"))
 	label.add_theme_constant_override("outline_size", 2)
 	label.add_theme_font_size_override("font_size", font_size)
+	if font_size >= 24:
+		label.add_theme_font_override("font", DISPLAY_FONT)
+		label.add_theme_constant_override("outline_size", 4)
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	return label
 
@@ -793,6 +803,8 @@ func _show_story_overlay() -> void:
 	dialogue_panel.anchor_right = 0.955
 	dialogue_panel.anchor_top = 0.565
 	dialogue_panel.anchor_bottom = 0.97
+	dialogue_panel.offset_top = 58.0
+	dialogue_panel.offset_bottom = 58.0
 	var panel_style := StyleBoxFlat.new()
 	panel_style.bg_color = Color(0.025, 0.065, 0.115, 0.97)
 	panel_style.border_color = Color("#d9b86f")
@@ -839,8 +851,10 @@ func _show_story_overlay() -> void:
 	_dialogue_label.text = ""
 	_speaker_label.text = ""
 	dialogue_panel.modulate.a = 0.0
-	var entrance := create_tween()
+	var entrance := create_tween().set_parallel(true)
 	entrance.tween_property(dialogue_panel, "modulate:a", 1.0, 0.28)
+	entrance.tween_property(dialogue_panel, "offset_top", 0.0, 0.38).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	entrance.tween_property(dialogue_panel, "offset_bottom", 0.0, 0.38).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 
 func _make_story_action_button(caption: String, width: float) -> Button:
@@ -848,6 +862,7 @@ func _make_story_action_button(caption: String, width: float) -> Button:
 	button.text = caption
 	button.custom_minimum_size = Vector2(width, 54)
 	button.add_theme_font_size_override("font_size", 18)
+	button.add_theme_font_override("font", DISPLAY_FONT)
 	button.add_theme_color_override("font_color", Color("#fff5db"))
 	var normal := StyleBoxFlat.new()
 	normal.bg_color = Color("#244d70")
@@ -895,6 +910,9 @@ func _on_dialogue_started(_dialogue_id: Variant) -> void:
 	if _story_manager == null:
 		return
 	var line := _story_manager.get_current_dialogue()
+	var story_sound := str(line.get("sfx", ""))
+	if not story_sound.is_empty():
+		SignalBus.play_sfx.emit(story_sound)
 	_speaker_label.text = str(line.get("speaker", ""))
 	_dialogue_label.text = str(line.get("text", ""))
 	var portrait_path := str(line.get("portrait", ""))
@@ -1075,6 +1093,7 @@ func _load_campaign_level_records() -> Array[Dictionary]:
 func _on_campaign_level_selected(level_id: int, route_id: String) -> void:
 	if level_id > _highest_unlocked_level:
 		return
+	SignalBus.play_sfx.emit("door_open")
 	if _tutorial_overlay != null:
 		_tutorial_overlay.hide_tip()
 	if _tutorial_action == "campaign_map_intro":
@@ -1107,6 +1126,7 @@ func _start_campaign_story(story_id: String) -> void:
 		_show_level_briefing(_pending_route_id)
 		return
 	_story = _story_manager.get_story_data()
+	SignalBus.play_sfx.emit("case_open")
 	_story_layer = CanvasLayer.new()
 	_story_layer.name = "CampaignStory"
 	_story_layer.layer = 5
@@ -1126,6 +1146,7 @@ func _on_story_finished(story_id: String) -> void:
 
 
 func _show_level_briefing(route_id: String) -> void:
+	SignalBus.play_sfx.emit("case_open")
 	if _story_layer != null and is_instance_valid(_story_layer):
 		_story_layer.queue_free()
 		_story_layer = null
@@ -1277,6 +1298,7 @@ func _objective_icon_path(target: String) -> String:
 
 
 func _begin_level(_route_id: String) -> void:
+	SignalBus.play_sfx.emit("door_close")
 	var gameplay_hud := get_node_or_null("HUD") as CanvasLayer
 	if gameplay_hud != null:
 		gameplay_hud.visible = true
@@ -1303,6 +1325,7 @@ func _begin_level(_route_id: String) -> void:
 	var objective := _get_primary_objective(level_data)
 	var reward_data: Dictionary = level_data.get("rewards", {})
 	_evidence_count = 0
+	_objective_complete_sound_played = false
 	_evidence_goal = int(objective.get("amount", 10))
 	_objective_target = str(objective.get("target", "KEY")).to_upper()
 	_objective_type = str(objective.get("type", "COLLECT_ITEMS")).to_upper()
@@ -1414,6 +1437,8 @@ func _on_board_created() -> void:
 	_board.match_collected.connect(_on_tiles_matched)
 	_board.move_rejected.connect(_on_move_rejected)
 	_board.turn_resolved.connect(_on_board_turn_resolved)
+	_board.special_created.connect(_on_special_created)
+	_board.special_activated.connect(_on_special_activated)
 	_board.booster_used.connect(_on_booster_used)
 	_board.obstacles_cleared.connect(_on_obstacles_cleared)
 	_board.lock()
@@ -1426,18 +1451,37 @@ func _on_moves_changed(remaining: int) -> void:
 
 
 func _on_tiles_matched(tile_types: Array) -> void:
-	SignalBus.play_sfx.emit("tile_match")
+	_match_streak += 1
+	var objective_match := false
+	var feedback_caption := ""
+	var feedback_sound := ""
+	var shake_board := false
 	var target_enum := int(Constants.TileType.get(_objective_target, -1))
 	for tile_type in tile_types:
 		if _objective_type == "COLLECT_ITEMS" and int(tile_type) == target_enum:
 			_evidence_count += 1
+			objective_match = true
+	SignalBus.play_sfx.emit("clue_collected" if objective_match else "tile_match")
+	if tile_types.size() >= 5 or _match_streak >= 4:
+		feedback_caption = "WONDERFUL!"
+		feedback_sound = "match_wonderful"
+		shake_board = true
+	elif tile_types.size() >= 4 or _match_streak >= 3:
+		feedback_caption = "GREAT!"
+		feedback_sound = "match_great"
+	elif _match_streak >= 2:
+		feedback_caption = "NICE!"
+		feedback_sound = "match_nice"
 	_evidence_count = mini(_evidence_count, _evidence_goal)
 	if _objective_type == "COLLECT_ITEMS":
 		_objective_label.text = "%s\n%d / %d" % [_objective_target.replace("_", " ") + "S", _evidence_count, _evidence_goal]
 	if _evidence_count >= _evidence_goal and _objective_type == "COLLECT_ITEMS":
 		_hint_label.text = "CLUE SECURED | The evidence points toward Victor's route."
+		_play_objective_complete_sound()
 	elif not _tutorial_active:
 		_hint_label.text = "CLUES | %d of %d %s collected" % [_evidence_count, _evidence_goal, _objective_target.replace("_", " ").to_lower()]
+	if not feedback_caption.is_empty():
+		_show_match_feedback(feedback_caption, feedback_sound, shake_board)
 
 
 func _on_move_rejected() -> void:
@@ -1445,7 +1489,65 @@ func _on_move_rejected() -> void:
 	_hint_label.text = "NO MATCH | Swap neighboring pieces to make a set of 3."
 
 
+func _show_match_feedback(caption: String, sound_id: String, shake_board: bool) -> void:
+	SignalBus.play_sfx.emit(sound_id)
+	_hint_label.text = caption
+	_hint_label.add_theme_color_override("font_color", Color("#ffe279"))
+	var feedback_layer := CanvasLayer.new()
+	feedback_layer.name = "MatchFeedback"
+	feedback_layer.layer = 3
+	add_child(feedback_layer)
+	var shout := Label.new()
+	shout.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	shout.position = Vector2(-250.0, -55.0)
+	shout.size = Vector2(500.0, 110.0)
+	shout.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	shout.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	shout.text = caption
+	shout.add_theme_font_override("font", DISPLAY_FONT)
+	shout.add_theme_font_size_override("font_size", 40)
+	shout.add_theme_color_override("font_color", Color("#ffe278"))
+	shout.add_theme_color_override("font_outline_color", Color("#39213f"))
+	shout.add_theme_constant_override("outline_size", 7)
+	shout.add_theme_color_override("font_shadow_color", Color(0.04, 0.04, 0.1, 0.85))
+	shout.add_theme_constant_override("shadow_offset_x", 4)
+	shout.add_theme_constant_override("shadow_offset_y", 6)
+	feedback_layer.add_child(shout)
+	shout.scale = Vector2(0.4, 0.4)
+	shout.modulate.a = 0.0
+	var pop := create_tween().set_parallel(true)
+	pop.tween_property(shout, "modulate:a", 1.0, 0.1)
+	pop.tween_property(shout, "scale", Vector2(1.12, 1.12), 0.26).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	pop.chain().tween_property(shout, "scale", Vector2.ONE, 0.1)
+	pop.finished.connect(
+		func():
+			if not is_instance_valid(feedback_layer):
+				return
+			var fade := create_tween()
+			fade.tween_interval(0.55)
+			fade.tween_property(shout, "modulate:a", 0.0, 0.2)
+			fade.tween_callback(feedback_layer.queue_free)
+	)
+	if shake_board and _board != null:
+		_board.play_celebration_shake(1.0)
+
+
+func _on_special_created(kind: String) -> void:
+	SignalBus.play_sfx.emit("special_created")
+	_hint_label.text = "%s CREATED!" % kind.to_upper()
+	_hint_label.add_theme_color_override("font_color", Color("#8df4ff"))
+	_hint_label.scale = Vector2(0.75, 0.75)
+	var pop := create_tween()
+	pop.tween_property(_hint_label, "scale", Vector2.ONE, 0.24).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+
+func _on_special_activated(kind: String) -> void:
+	if _board != null:
+		_board.play_celebration_shake(1.5 if kind == "thunder" else 0.8)
+
+
 func _on_board_turn_resolved() -> void:
+	_match_streak = 0
 	if _result_layer != null:
 		return
 	var tutorial_result_pending := _tutorial_active and ["guided_swap", "booster_resolving", "activate_special"].has(_tutorial_action)
@@ -1667,6 +1769,14 @@ func _on_obstacles_cleared(amount: int) -> void:
 	_objective_label.text = "OBSTACLES\n%d / %d" % [_evidence_count, _evidence_goal]
 	if _evidence_count >= _evidence_goal:
 		_hint_label.text = "OBJECTIVE COMPLETE | The route is clear."
+		_play_objective_complete_sound()
+
+
+func _play_objective_complete_sound() -> void:
+	if _objective_complete_sound_played:
+		return
+	_objective_complete_sound_played = true
+	SignalBus.play_sfx.emit("objective_achieved")
 
 
 func _evaluate_level_end() -> void:
@@ -1713,6 +1823,7 @@ func _show_level_result(won: bool) -> void:
 	card_style.set_content_margin_all(28)
 	card.add_theme_stylebox_override("panel", card_style)
 	center.add_child(card)
+	card.scale = Vector2(0.72, 0.72)
 	var content := VBoxContainer.new()
 	content.alignment = BoxContainer.ALIGNMENT_CENTER
 	content.add_theme_constant_override("separation", 18)
@@ -1740,8 +1851,9 @@ func _show_level_result(won: bool) -> void:
 	map_button.pressed.connect(_return_to_campaign_map)
 	content.add_child(map_button)
 	card.modulate.a = 0.0
-	var entrance := create_tween()
-	entrance.tween_property(card, "modulate:a", 1.0, 0.28)
+	var entrance := create_tween().set_parallel(true)
+	entrance.tween_property(card, "modulate:a", 1.0, 0.3)
+	entrance.tween_property(card, "scale", Vector2.ONE, 0.42).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	if won:
 		SignalBus.play_sfx.emit("level_victory")
 	else:
@@ -1790,6 +1902,7 @@ func _load_campaign_progress() -> void:
 
 
 func _record_level_completion() -> void:
+	SignalBus.play_sfx.emit("clue_collected")
 	var level_manager := get_node_or_null("Managers/LevelManager")
 	var level_data: Dictionary = level_manager.get_level_data() if level_manager != null else {}
 	var rewards: Dictionary = level_data.get("rewards", {})

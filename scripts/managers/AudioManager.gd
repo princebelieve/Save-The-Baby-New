@@ -23,7 +23,8 @@ signal sound_played(sound)
 #===============================================================================
 
 var _music_player: AudioStreamPlayer
-var _sfx_players: Dictionary = {}
+var _sfx_players: Array[AudioStreamPlayer] = []
+var _sfx_ids_by_player: Dictionary = {}
 
 var _audio_config: Dictionary = {}
 var _music_bus_name: String = "Music"
@@ -123,13 +124,15 @@ func play_sfx(sound) -> void:
 	player.stream = stream
 	player.finished.connect(
 		func():
+			_sfx_players.erase(player)
+			_sfx_ids_by_player.erase(player)
 			player.queue_free()
-			_sfx_players.erase(sound)
 	)
 
 	add_child(player)
 
-	_sfx_players[sound] = player
+	_sfx_players.append(player)
+	_sfx_ids_by_player[player] = sound
 
 	player.play()
 
@@ -137,15 +140,14 @@ func play_sfx(sound) -> void:
 
 
 func stop_sfx(sound) -> void:
-	if not _sfx_players.has(sound):
-		return
-
-	var player: AudioStreamPlayer = _sfx_players[sound]
-
-	player.stop()
-	player.queue_free()
-
-	_sfx_players.erase(sound)
+	for player in _sfx_players.duplicate():
+		if _sfx_ids_by_player.get(player) != sound:
+			continue
+		_sfx_players.erase(player)
+		_sfx_ids_by_player.erase(player)
+		if is_instance_valid(player):
+			player.stop()
+			player.queue_free()
 
 
 func set_master_volume(value) -> void:
@@ -282,11 +284,14 @@ func _apply_bus_volumes() -> void:
 
 
 func _stop_all_sfx() -> void:
-	for player in _sfx_players.values():
+	for player in _sfx_players.duplicate():
+		_sfx_players.erase(player)
+		_sfx_ids_by_player.erase(player)
 		if is_instance_valid(player):
 			player.stop()
 			player.queue_free()
 	_sfx_players.clear()
+	_sfx_ids_by_player.clear()
 
 
 func _linear_to_db(value: float) -> float:

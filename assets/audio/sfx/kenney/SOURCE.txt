@@ -1,0 +1,9 @@
+Kenney RPG Audio pack
+Creator: Kenney (https://kenney.nl)
+Pack: https://kenney.nl/assets/rpg-audio
+License: Creative Commons CC0 1.0 Universal
+License text: https://creativecommons.org/publicdomain/zero/1.0/
+
+Files included in this project are doorOpen_1.ogg, doorClose_1.ogg,
+bookOpen.ogg, bookClose.ogg, and handleCoins.ogg. They are renamed for
+clarity in this project. Attribution is not required under CC0.
