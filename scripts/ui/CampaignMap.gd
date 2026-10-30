@@ -12,13 +12,17 @@ const PROP_DIR := "res://assets/sprites/props/"
 var _route_name := ""
 var _level_records: Array[Dictionary] = []
 var _chapter_records: Array[Dictionary] = []
+var _highest_unlocked_level := 1
+var _completed_levels: Dictionary = {}
 var _map_width := 720.0
 var _chapter_height := 610.0
 
 
-func configure(route_name: String, level_records: Array[Dictionary]) -> void:
+func configure(route_name: String, level_records: Array[Dictionary], highest_unlocked_level: int = 1, completed_levels: Dictionary = {}) -> void:
 	_route_name = route_name
 	_level_records = level_records.duplicate(true)
+	_highest_unlocked_level = maxi(1, highest_unlocked_level)
+	_completed_levels = completed_levels.duplicate(true)
 
 
 func get_level_screen_rect(level_id: int) -> Rect2:
@@ -247,16 +251,24 @@ func _add_chapter_nodes(map: Control, index: int, chapter: Dictionary, levels: A
 		node.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
 		node.position = Vector2(x - 35, y - 35)
 		node.size = Vector2(70, 70)
-		node.pressed.connect(level_selected.emit.bind(level_id))
+		var is_unlocked := level_id <= _highest_unlocked_level
+		node.disabled = not is_unlocked
+		if not is_unlocked:
+			node.texture_normal = ResourceManager.load_texture("res://assets/sprites/ui/locked_level_badge_cutout.png")
+			node.texture_hover = node.texture_normal
+			node.texture_pressed = node.texture_normal
+		else:
+			node.pressed.connect(level_selected.emit.bind(level_id))
 		map.add_child(node)
 		var number := Label.new()
-		number.text = str(level_id)
+		var star_count := int(_completed_levels.get(str(level_id), 0))
+		number.text = "%d\n%s" % [level_id, "★".repeat(mini(3, star_count))] if star_count > 0 else (str(level_id) if is_unlocked else "")
 		number.position = node.position + Vector2(4, 5)
 		number.size = node.size - Vector2(8, 10)
 		number.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		number.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		number.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		number.add_theme_font_size_override("font_size", 24)
+		number.add_theme_font_size_override("font_size", 19 if star_count > 0 else 24)
 		number.add_theme_color_override("font_color", Color("#603515"))
 		number.add_theme_color_override("font_outline_color", Color("#fff4d1"))
 		number.add_theme_constant_override("outline_size", 3)

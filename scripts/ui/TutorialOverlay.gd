@@ -7,11 +7,14 @@ const SHADE := Color(0.015, 0.025, 0.06, 0.78)
 
 var _spotlight := Rect2()
 var _shade_panels: Array[ColorRect] = []
-var _bubble: PanelContainer
+var _bubble: Panel
 var _speaker_portrait: TextureRect
 var _heading: Label
 var _body_label: Label
 var _pointer: Polygon2D
+var _gesture_hand: Polygon2D
+var _gesture_outline: Line2D
+var _gesture_tween: Tween
 var _acknowledge_button: Button
 
 
@@ -25,19 +28,25 @@ func _ready() -> void:
 		add_child(shade)
 		_shade_panels.append(shade)
 	_build_bubble()
+	_build_gesture_hand()
 	hide()
 
 
-func show_tip(message: String, target_rect: Rect2, speaker_name: String = "DAVID", portrait_path: String = "", needs_acknowledgement: bool = false) -> void:
+func show_tip(message: String, target_rect: Rect2, speaker_name: String = "DAVID", portrait_path: String = "", needs_acknowledgement: bool = false, keep_board_bright: bool = false, show_gesture: bool = false) -> void:
 	_spotlight = target_rect
+	for shade in _shade_panels:
+		shade.color = Color(SHADE.r, SHADE.g, SHADE.b, 0.12 if keep_board_bright else SHADE.a)
 	_body_label.text = " ".join(message.strip_edges().split("\n", false))
 	_heading.text = speaker_name.to_upper()
 	_speaker_portrait.texture = ResourceManager.load_texture(portrait_path) if not portrait_path.is_empty() else null
 	_speaker_portrait.visible = _speaker_portrait.texture != null
 	_acknowledge_button.visible = needs_acknowledgement
 	_acknowledge_button.text = "CONTINUE"
+	_gesture_hand.visible = show_gesture
+	_gesture_outline.visible = show_gesture
 	show()
 	_layout_tip()
+	_animate_gesture_hand(keep_board_bright)
 	_bubble.scale = Vector2(0.94, 0.94)
 	_bubble.modulate.a = 0.0
 	var tween := create_tween().set_parallel(true)
@@ -47,6 +56,10 @@ func show_tip(message: String, target_rect: Rect2, speaker_name: String = "DAVID
 
 func hide_tip() -> void:
 	hide()
+	if _gesture_tween != null and _gesture_tween.is_running():
+		_gesture_tween.kill()
+	_gesture_hand.hide()
+	_gesture_outline.hide()
 
 
 func _notification(what: int) -> void:
@@ -55,7 +68,7 @@ func _notification(what: int) -> void:
 
 
 func _build_bubble() -> void:
-	_bubble = PanelContainer.new()
+	_bubble = Panel.new()
 	_bubble.name = "TutorialSpeechBubble"
 	_bubble.mouse_filter = Control.MOUSE_FILTER_STOP
 	_bubble.clip_contents = true
@@ -73,6 +86,11 @@ func _build_bubble() -> void:
 	_bubble.add_theme_stylebox_override("panel", style)
 	add_child(_bubble)
 	var bubble_content := VBoxContainer.new()
+	bubble_content.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	bubble_content.offset_left = 22
+	bubble_content.offset_top = 14
+	bubble_content.offset_right = -22
+	bubble_content.offset_bottom = -14
 	bubble_content.add_theme_constant_override("separation", 6)
 	bubble_content.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_bubble.add_child(bubble_content)
@@ -146,7 +164,7 @@ func _layout_tip() -> void:
 	_set_panel(_shade_panels[3], Vector2(0, hole.end.y), Vector2(viewport.x, viewport.y - hole.end.y))
 
 	var bubble_width := minf(440.0, viewport.x - 36.0)
-	var bubble_height := minf(248.0 if _acknowledge_button.visible else 190.0, viewport.y * (0.21 if _acknowledge_button.visible else 0.17))
+	var bubble_height := minf(236.0 if _acknowledge_button.visible else 194.0, viewport.y * (0.28 if _acknowledge_button.visible else 0.20))
 	_bubble.size = Vector2(bubble_width, bubble_height)
 	_bubble.custom_minimum_size = _bubble.size
 	var bubble_x := clampf(hole.get_center().x - bubble_width * 0.5, 18.0, viewport.x - bubble_width - 18.0)
@@ -165,3 +183,58 @@ func _layout_tip() -> void:
 func _set_panel(panel: ColorRect, panel_position: Vector2, panel_size: Vector2) -> void:
 	panel.position = panel_position
 	panel.size = Vector2(maxf(0.0, panel_size.x), maxf(0.0, panel_size.y))
+
+
+func _build_gesture_hand() -> void:
+	var points := PackedVector2Array([
+		Vector2(11, 0), Vector2(21, 0), Vector2(22, 25), Vector2(26, 18),
+		Vector2(33, 21), Vector2(30, 33), Vector2(24, 44), Vector2(11, 44),
+		Vector2(5, 37), Vector2(0, 30), Vector2(6, 26), Vector2(12, 31)
+	])
+	_gesture_hand = Polygon2D.new()
+	_gesture_hand.polygon = points
+	_gesture_hand.color = Color("#fff6dc")
+	_gesture_hand.z_index = 10
+	_gesture_hand.hide()
+	add_child(_gesture_hand)
+	_gesture_outline = Line2D.new()
+	var closed := points.duplicate()
+	closed.append(points[0])
+	_gesture_outline.points = closed
+	_gesture_outline.width = 3.0
+	_gesture_outline.default_color = Color("#18304a")
+	_gesture_outline.z_index = 9
+	_gesture_outline.hide()
+	add_child(_gesture_outline)
+
+
+func _animate_gesture_hand(swipe: bool) -> void:
+	if not _gesture_hand.visible:
+		return
+	if not swipe:
+		var tap_position := _spotlight.get_center() - Vector2(11, 32)
+		_gesture_hand.position = tap_position
+		_gesture_outline.position = tap_position
+		if _gesture_tween != null and _gesture_tween.is_running():
+			_gesture_tween.kill()
+		_gesture_tween = create_tween().set_loops()
+		_gesture_tween.tween_property(_gesture_hand, "position:y", tap_position.y + 7.0, 0.16).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+		_gesture_tween.parallel().tween_property(_gesture_outline, "position:y", tap_position.y + 7.0, 0.16).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+		_gesture_tween.tween_property(_gesture_hand, "position:y", tap_position.y, 0.16).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		_gesture_tween.parallel().tween_property(_gesture_outline, "position:y", tap_position.y, 0.16).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		_gesture_tween.tween_interval(0.45)
+		return
+	var horizontal := _spotlight.size.x >= _spotlight.size.y
+	var start := _spotlight.position + _spotlight.size * (Vector2(0.25, 0.5) if horizontal else Vector2(0.5, 0.25)) - Vector2(11, 28)
+	var finish := _spotlight.position + _spotlight.size * (Vector2(0.75, 0.5) if horizontal else Vector2(0.5, 0.75)) - Vector2(11, 28)
+	_gesture_hand.position = start
+	_gesture_outline.position = start
+	if _gesture_tween != null and _gesture_tween.is_running():
+		_gesture_tween.kill()
+	_gesture_tween = create_tween().set_loops()
+	_gesture_tween.tween_property(_gesture_hand, "position", finish, 0.42).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_gesture_tween.parallel().tween_property(_gesture_outline, "position", finish, 0.42).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_gesture_tween.tween_interval(0.12)
+	_gesture_tween.tween_property(_gesture_hand, "position", start, 0.42).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_gesture_tween.parallel().tween_property(_gesture_outline, "position", start, 0.42).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_gesture_tween.tween_interval(0.38)

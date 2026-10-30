@@ -1,0 +1,25 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+
+ERROR: Failed to read the root certificate store.
+   at: get_system_ca_certificates (platform/windows/os_windows.cpp:2570)
+[INFO] StoryManager: Loaded story -> opening_story
+[INFO] Loaded level 001.
+[INFO] Started level 001.
+[INFO] StoryManager: Finished -> opening_story
+SCRIPT ERROR: Invalid assignment of property or key 'custom_maximum_size' with value of type 'Vector2' on a base object of type 'PanelContainer'.
+   at: TutorialOverlay._layout_tip (res://scripts/ui/TutorialOverlay.gd:165)
+   GDScript backtrace (most recent call first):
+       [0] _layout_tip (res://scripts/ui/TutorialOverlay.gd:165)
+       [1] show_tip (res://scripts/ui/TutorialOverlay.gd:48)
+       [2] _show_tutorial_tip (res://scripts/game/Game.gd:1625)
+       [3] _begin_level (res://scripts/game/Game.gd:1362)
+       [4] _run_capture (res://logs/capture_ui.gd:11)
+[INFO] Started level 001.
+ERROR: Parameter "t" is null.
+   at: texture_2d_get (./servers/rendering/dummy/storage/texture_storage.h:106)
+   GDScript backtrace (most recent call first):
+       [0] _run_capture (res://logs/capture_ui.gd:14)
+SCRIPT ERROR: Cannot call method 'save_png' on a null value.
+   at: _run_capture (res://logs/capture_ui.gd:15)
+   GDScript backtrace (most recent call first):
+       [0] _run_capture (res://logs/capture_ui.gd:15)

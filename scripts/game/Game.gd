@@ -2,6 +2,7 @@ extends Node2D
 class_name Game
 
 const OPENING_STORY_PATH := "res://stories/opening_story.json"
+const CAMPAIGN_PROGRESS_PATH := "user://campaign_progress.cfg"
 
 var _board_manager: Node
 var _board: Board
@@ -29,8 +30,10 @@ var _is_dialogue_typing: bool = false
 var _choice_box: VBoxContainer
 var _moves_label: Label
 var _objective_label: Label
+var _reward_label: Label
 var _hint_label: Label
 var _pause_button: TextureButton
+var _settings_button: TextureButton
 var _case_file_button: Button
 var _case_file_layer: CanvasLayer
 var _case_file_was_board_locked := false
@@ -53,9 +56,13 @@ var _tutorial_pause_open := false
 var _tutorial_booster_kind := ""
 var _tutorial_target_cell := Vector2i(-1, -1)
 var _campaign_coach_shown := false
+var _campaign_progress := ConfigFile.new()
+var _highest_unlocked_level := 1
+var _completed_levels: Dictionary = {}
 
 
 func _ready() -> void:
+	_load_campaign_progress()
 	_board_manager = get_node_or_null("Managers/BoardManager")
 	if _board_manager != null:
 		if not _board_manager.board_created.is_connected(_on_board_created):
@@ -79,7 +86,7 @@ func _load_game_art() -> void:
 	var art := TextureRect.new()
 	art.name = "InvestigationBackground"
 	art.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	art.texture = ResourceManager.load_texture("res://assets/sprites/backgrounds/riverside_landscape.jpeg")
+	art.texture = _load_full_bleed_background("res://assets/sprites/backgrounds/riverside_landscape.jpeg")
 	art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	background.add_child(art)
@@ -89,13 +96,30 @@ func _load_game_art() -> void:
 	background.add_child(tint)
 
 
+func _load_full_bleed_background(path: String) -> Texture2D:
+	var source := ResourceManager.load_texture(path)
+	if source == null:
+		return null
+	var filename := path.get_file()
+	var crop_regions := {
+		"riverside_landscape.jpeg": Rect2(90, 90, 900, 900),
+		"garden_map_tile.jpeg": Rect2(170, 130, 750, 830)
+	}
+	if not crop_regions.has(filename):
+		return source
+	var cropped := AtlasTexture.new()
+	cropped.atlas = source
+	cropped.region = crop_regions[filename]
+	return cropped
+
+
 func _show_loading_screen() -> void:
 	var layer := CanvasLayer.new()
 	layer.name = "LoadingScreen"
 	layer.layer = 9
 	add_child(layer)
 	var background := TextureRect.new()
-	background.texture = ResourceManager.load_texture("res://assets/sprites/backgrounds/riverside_landscape.jpeg")
+	background.texture = _load_full_bleed_background("res://assets/sprites/backgrounds/riverside_landscape.jpeg")
 	background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	background.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -141,7 +165,7 @@ func _show_launch_screen() -> void:
 	_launch_layer.layer = 10
 	add_child(_launch_layer)
 	var background := TextureRect.new()
-	background.texture = ResourceManager.load_texture("res://assets/sprites/backgrounds/riverside_landscape.jpeg")
+	background.texture = _load_full_bleed_background("res://assets/sprites/backgrounds/riverside_landscape.jpeg")
 	background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	background.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -184,9 +208,10 @@ func _show_launch_screen() -> void:
 	start.size = Vector2(minf(300.0, viewport_size.x * 0.66), 92)
 	start.pressed.connect(_start_opening_story)
 	content.add_child(start)
-	var settings_button := _make_texture_button("settings", Vector2(64, 64))
-	settings_button.position = Vector2(viewport_size.x - 82, 22)
-	settings_button.size = Vector2(64, 64)
+	var settings_size := Vector2(minf(116.0, viewport_size.x * 0.30), 40.0)
+	var settings_button := _make_texture_button("settings", settings_size)
+	settings_button.position = Vector2(viewport_size.x - settings_size.x - 18.0, 18.0)
+	settings_button.size = settings_size
 	settings_button.pressed.connect(_show_title_settings)
 	content.add_child(settings_button)
 	family.modulate.a = 0.0
@@ -201,7 +226,7 @@ func _show_launch_screen() -> void:
 	var button_entrance := create_tween()
 	button_entrance.tween_interval(0.3)
 	button_entrance.tween_property(start, "modulate:a", 1.0, 0.3)
-	var idle := create_tween().set_loops()
+	var idle := _launch_layer.create_tween().set_loops()
 	idle.tween_property(family, "position:y", family.position.y - 7.0, 1.2).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	idle.tween_property(family, "position:y", family.position.y, 1.2).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 
@@ -228,6 +253,7 @@ func _build_gameplay_hud() -> void:
 		hud.name = "HUD"
 		add_child(hud)
 	hud.layer = 2
+	hud.visible = true
 	var top_bar := ColorRect.new()
 	top_bar.name = "MissionTopBar"
 	top_bar.color = Color(0.012, 0.035, 0.055, 0.82)
@@ -246,16 +272,24 @@ func _build_gameplay_hud() -> void:
 	header.alignment = BoxContainer.ALIGNMENT_CENTER
 	header.add_theme_constant_override("separation", 10)
 	hud.add_child(header)
-	_moves_label = _make_hud_panel(header, "moves_panel.png", "MOVES\n30")
-	_objective_label = _make_hud_panel(header, "score_panel.png", "CLUES\n0 / 10")
-	_pause_button = _make_texture_button("pause", Vector2(82, 62))
+	_moves_label = _make_hud_panel(header, "moves_panel.png", "MOVES\n30", Vector2(102, 66))
+	_objective_label = _make_hud_panel(header, "score_panel.png", "GOAL\n0 / 10", Vector2(140, 66))
+	_reward_label = _make_hud_panel(header, "score_panel.png", "REWARD\n0 COINS", Vector2(100, 66))
+	_pause_button = _make_texture_button("pause", Vector2(84, 36))
+	_pause_button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_pause_button.pressed.connect(_show_pause_menu)
 	header.add_child(_pause_button)
+	_settings_button = _make_texture_button("settings", Vector2(84, 36))
+	_settings_button.name = "GameplaySettingsButton"
+	_settings_button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_settings_button.pressed.connect(_show_gameplay_audio_settings)
+	header.add_child(_settings_button)
 	_case_file_button = Button.new()
 	_case_file_button.name = "CaseFileButton"
 	_case_file_button.text = "CASE\nFILE"
-	_case_file_button.custom_minimum_size = Vector2(86, 62)
-	_case_file_button.add_theme_font_size_override("font_size", 15)
+	_case_file_button.custom_minimum_size = Vector2(70, 54)
+	_case_file_button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_case_file_button.add_theme_font_size_override("font_size", 12)
 	_case_file_button.add_theme_color_override("font_color", Color("#fff3d5"))
 	var case_file_style := StyleBoxFlat.new()
 	case_file_style.bg_color = Color("#21466a")
@@ -281,13 +315,14 @@ func _build_gameplay_hud() -> void:
 	add_child(_story_layer)
 
 
-func _make_hud_panel(parent: Control, file_name: String, initial_text: String) -> Label:
+func _make_hud_panel(parent: Control, file_name: String, initial_text: String, requested_size: Vector2 = Vector2.ZERO) -> Label:
 	var panel := TextureRect.new()
 	panel.texture = ResourceManager.load_texture("res://assets/sprites/ui/panels/" + file_name)
 	panel.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	panel.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	panel.custom_minimum_size = Vector2(142, 82) if file_name == "moves_panel.png" else Vector2(196, 82)
+	panel.custom_minimum_size = requested_size if requested_size != Vector2.ZERO else (Vector2(142, 82) if file_name == "moves_panel.png" else Vector2(196, 82))
 	panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	panel.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	parent.add_child(panel)
 	var label := _make_label(initial_text, 22)
 	label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -606,16 +641,24 @@ func _show_settings_popup() -> void:
 	_show_audio_settings(_pause_layer)
 
 
+func _show_gameplay_audio_settings() -> void:
+	if _tutorial_active and _tutorial_action != "settings":
+		return
+	_show_audio_settings(get_node_or_null("HUD"))
+
+
 func _show_audio_settings(parent_layer: Node) -> void:
 	var audio_manager := get_node_or_null("Managers/AudioManager")
 	if audio_manager == null or parent_layer == null:
 		return
 	var popup := AcceptDialog.new()
-	popup.title = "Sound settings"
+	popup.title = "AUDIO SETTINGS"
 	popup.process_mode = Node.PROCESS_MODE_ALWAYS
 	parent_layer.add_child(popup)
+	if _tutorial_active and _tutorial_action == "settings" and _tutorial_overlay != null:
+		_tutorial_overlay.hide_tip()
 	var settings := VBoxContainer.new()
-	settings.custom_minimum_size = Vector2(360, 190)
+	settings.custom_minimum_size = Vector2(minf(420.0, get_viewport_rect().size.x * 0.78), 190)
 	for bus_kind in ["music", "sfx"]:
 		var volume_label := Label.new()
 		volume_label.text = "Background music" if bus_kind == "music" else "Sound effects"
@@ -633,7 +676,22 @@ func _show_audio_settings(parent_layer: Node) -> void:
 		enabled.toggled.connect(_set_audio_enabled.bind(bus_kind))
 		settings.add_child(enabled)
 	popup.add_child(settings)
+	if _tutorial_active and _tutorial_action == "settings":
+		popup.confirmed.connect(_on_tutorial_settings_confirmed, CONNECT_ONE_SHOT)
 	popup.popup_centered()
+
+
+func _on_tutorial_settings_confirmed() -> void:
+	if not _tutorial_active or _tutorial_action != "settings":
+		return
+	_tutorial_action = "pause"
+	_refresh_tutorial_controls()
+	_show_tutorial_tip(
+		"Music and sound effects each have their own volume and on/off controls. Tap Pause to review the menu next.",
+		_button_screen_rect(_pause_button),
+		"DAVID",
+		"res://assets/sprites/characters/david_portrait_cutout.png"
+	)
 
 
 func _set_audio_volume(value: float, kind: String) -> void:
@@ -702,7 +760,7 @@ func _show_story_overlay() -> void:
 		background = TextureRect.new()
 		background.name = "StoryBackground"
 		_story_layer.add_child(background)
-	background.texture = ResourceManager.load_texture(str(_story.get("default_background", "")))
+	background.texture = _load_full_bleed_background(str(_story.get("default_background", "")))
 	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	background.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
@@ -885,9 +943,11 @@ func _present_route_choices(choices: Array) -> void:
 	for choice in choices:
 		var button := Button.new()
 		button.text = "%s\n%s" % [str(choice.get("label", "Choose")).to_upper(), str(choice.get("impact", choice.get("response", "Begin the search.")))]
-		button.custom_minimum_size = Vector2(minf(560.0, get_viewport_rect().size.x * 0.82), 82)
+		button.custom_minimum_size = Vector2(0, 82)
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		button.add_theme_font_size_override("font_size", 17)
+		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		button.add_theme_font_size_override("font_size", 16)
 		button.add_theme_color_override("font_color", Color("#fff7e6"))
 		button.add_theme_color_override("font_hover_color", Color("#ffffff"))
 		button.add_theme_constant_override("h_separation", 12)
@@ -967,7 +1027,7 @@ func _show_campaign_map(route_id: String) -> void:
 		return
 	_campaign_map = campaign_script.new() as Control
 	_campaign_map.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_campaign_map.configure(_chosen_route_label, _load_campaign_level_records())
+	_campaign_map.configure(_chosen_route_label, _load_campaign_level_records(), _highest_unlocked_level, _completed_levels)
 	_campaign_map.level_selected.connect(_on_campaign_level_selected.bind(route_id))
 	_campaign_map.back_requested.connect(_show_launch_screen)
 	_campaign_layer.add_child(_campaign_map)
@@ -1012,6 +1072,8 @@ func _load_campaign_level_records() -> Array[Dictionary]:
 
 
 func _on_campaign_level_selected(level_id: int, route_id: String) -> void:
+	if level_id > _highest_unlocked_level:
+		return
 	if _tutorial_overlay != null:
 		_tutorial_overlay.hide_tip()
 	if _tutorial_action == "campaign_map_intro":
@@ -1214,6 +1276,9 @@ func _objective_icon_path(target: String) -> String:
 
 
 func _begin_level(_route_id: String) -> void:
+	var gameplay_hud := get_node_or_null("HUD") as CanvasLayer
+	if gameplay_hud != null:
+		gameplay_hud.visible = true
 	if _campaign_layer != null and is_instance_valid(_campaign_layer):
 		_campaign_layer.queue_free()
 	_campaign_layer = null
@@ -1235,6 +1300,7 @@ func _begin_level(_route_id: String) -> void:
 	_current_level_id = int(level_data.get("level_id", 1))
 	_current_route_id = _route_id
 	var objective := _get_primary_objective(level_data)
+	var reward_data: Dictionary = level_data.get("rewards", {})
 	_evidence_count = 0
 	_evidence_goal = int(objective.get("amount", 10))
 	_objective_target = str(objective.get("target", "KEY")).to_upper()
@@ -1242,7 +1308,8 @@ func _begin_level(_route_id: String) -> void:
 	if _objective_type == "DESTROY_OBSTACLES":
 		_objective_label.text = "OBSTACLES\n0 / %d" % _evidence_goal
 	else:
-		_objective_label.text = "%s\n0 / %d" % [_objective_target.replace("_", " "), _evidence_goal]
+		_objective_label.text = "%s\n0 / %d" % [_objective_target.replace("_", " ") + "S", _evidence_goal]
+	_reward_label.text = "REWARD\n%d COINS" % int(reward_data.get("coins", 0))
 	_booster_inventory = {
 		"rocket": 1 if available_boosters.has("ROCKET") else 0,
 		"bomb": 1 if available_boosters.has("BOMB") else 0,
@@ -1332,6 +1399,9 @@ func _begin_level(_route_id: String) -> void:
 	if _board != null:
 		if not (_tutorial_active and _tutorial_action == "booster_select"):
 			_board.unlock()
+	var active_hud := get_node_or_null("HUD") as CanvasLayer
+	if active_hud != null:
+		active_hud.visible = true
 
 
 func _on_board_created() -> void:
@@ -1362,7 +1432,7 @@ func _on_tiles_matched(tile_types: Array) -> void:
 			_evidence_count += 1
 	_evidence_count = mini(_evidence_count, _evidence_goal)
 	if _objective_type == "COLLECT_ITEMS":
-		_objective_label.text = "%s\n%d / %d" % [_objective_target.replace("_", " "), _evidence_count, _evidence_goal]
+		_objective_label.text = "%s\n%d / %d" % [_objective_target.replace("_", " ") + "S", _evidence_count, _evidence_goal]
 	if _evidence_count >= _evidence_goal and _objective_type == "COLLECT_ITEMS":
 		_hint_label.text = "CLUE SECURED | The evidence points toward Victor's route."
 	elif not _tutorial_active:
@@ -1404,7 +1474,7 @@ func _show_tutorial_goal_feedback() -> void:
 	if _board != null:
 		_board.lock()
 	var hud_target := _moves_label.get_global_rect().merge(_objective_label.get_global_rect())
-	var message := "That valid match used one move. The left card now shows %d moves; the goal card shows %d of %d keys. Other clue types clear space, but only keys advance this case."
+	var message := "That match used one move and refilled the board. MOVES shows %d turns left; GOAL tracks %d of %d keys. Other symbols clear space but do not add key evidence."
 	_show_tutorial_tip(
 		message % [_moves_remaining, _evidence_count, _evidence_goal],
 		hud_target,
@@ -1483,13 +1553,13 @@ func _on_tutorial_acknowledged() -> void:
 	if not _tutorial_active:
 		return
 	if _tutorial_action == "explain_goal":
-		_tutorial_action = "pause"
+		_tutorial_action = "settings"
 		if _board != null:
 			_board.lock()
 		_refresh_tutorial_controls()
 		_show_tutorial_tip(
-			"This button pauses the board. Tap it now to see how to resume, control the sounds, and open your case file.",
-			_button_screen_rect(_pause_button),
+			"Tap the gear to adjust music and sound effects separately. You can change them again whenever you need.",
+			_button_screen_rect(_settings_button),
 			"DAVID",
 			"res://assets/sprites/characters/david_portrait_cutout.png"
 		)
@@ -1523,6 +1593,8 @@ func _refresh_tutorial_controls() -> void:
 		_pause_button.disabled = _tutorial_active and _tutorial_action != "pause"
 	if _case_file_button != null:
 		_case_file_button.disabled = _tutorial_active and _tutorial_action != "field_guide"
+	if _settings_button != null:
+		_settings_button.disabled = _tutorial_active and _tutorial_action != "settings"
 	for kind in _booster_buttons:
 		var entry: Dictionary = _booster_buttons[kind]
 		var button := entry["button"] as BaseButton
@@ -1578,7 +1650,9 @@ func _show_tutorial_tip(message: String, target_rect: Rect2, speaker: String = "
 		_tutorial_overlay = TutorialOverlay.new()
 		_tutorial_overlay.acknowledged.connect(_on_tutorial_acknowledged)
 		layer.add_child(_tutorial_overlay)
-	_tutorial_overlay.show_tip(message, target_rect, speaker, portrait_path, needs_acknowledgement)
+	var board_action := ["guided_swap", "activate_special", "booster_target"].has(_tutorial_action)
+	var tap_action := board_action or ["campaign_map_intro", "settings", "pause", "field_guide"].has(_tutorial_action)
+	_tutorial_overlay.show_tip(message, target_rect, speaker, portrait_path, needs_acknowledgement, board_action, tap_action)
 
 
 func _button_screen_rect(button: Control) -> Rect2:
@@ -1614,6 +1688,8 @@ func _show_level_result(won: bool) -> void:
 		_board.lock()
 	_tutorial_active = false
 	_tutorial_action = ""
+	if won:
+		_record_level_completion()
 	_result_layer = CanvasLayer.new()
 	_result_layer.name = "LevelResult"
 	_result_layer.layer = 22
@@ -1643,7 +1719,11 @@ func _show_level_result(won: bool) -> void:
 	var heading := _make_label("CLUE SECURED!" if won else "THE TRAIL WENT COLD", 32)
 	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	content.add_child(heading)
-	var detail := _make_label("David is one step closer to Ethan." if won else "The remaining moves ran out. Try the investigation again.", 19)
+	var result_manager := get_node_or_null("Managers/LevelManager")
+	var result_data: Dictionary = result_manager.get_level_data() if result_manager != null else {}
+	var reward_info: Dictionary = result_data.get("rewards", {})
+	var detail_text := "Case %03d is unlocked. +%d coins and %d stars saved." % [mini(_highest_unlocked_level, _current_level_id + 1), int(reward_info.get("coins", 0)), maxi(1, int(reward_info.get("stars", 3)))] if won else "The remaining moves ran out. No case was unlocked. Try the investigation again."
+	var detail := _make_label(detail_text, 19)
 	detail.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	detail.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	content.add_child(detail)
@@ -1695,3 +1775,32 @@ func _return_to_campaign_map() -> void:
 	_dismiss_level_result()
 	get_tree().paused = false
 	_show_campaign_map(_current_route_id)
+
+
+func _load_campaign_progress() -> void:
+	var error := _campaign_progress.load(CAMPAIGN_PROGRESS_PATH)
+	if error != OK:
+		_highest_unlocked_level = 1
+		_completed_levels.clear()
+		return
+	_highest_unlocked_level = maxi(1, int(_campaign_progress.get_value("campaign", "highest_unlocked_level", 1)))
+	var completed: Variant = _campaign_progress.get_value("campaign", "completed_levels", {})
+	_completed_levels = completed if typeof(completed) == TYPE_DICTIONARY else {}
+
+
+func _record_level_completion() -> void:
+	var level_manager := get_node_or_null("Managers/LevelManager")
+	var level_data: Dictionary = level_manager.get_level_data() if level_manager != null else {}
+	var rewards: Dictionary = level_data.get("rewards", {})
+	var stars_earned := maxi(1, int(rewards.get("stars", 3)))
+	var old_stars := int(_completed_levels.get(str(_current_level_id), 0))
+	_completed_levels[str(_current_level_id)] = maxi(stars_earned, old_stars)
+	_highest_unlocked_level = maxi(_highest_unlocked_level, _current_level_id + 1)
+	_campaign_progress.set_value("campaign", "highest_unlocked_level", _highest_unlocked_level)
+	_campaign_progress.set_value("campaign", "completed_levels", _completed_levels)
+	if old_stars == 0:
+		_campaign_progress.set_value("campaign", "coins", int(_campaign_progress.get_value("campaign", "coins", 0)) + int(rewards.get("coins", 0)))
+		_campaign_progress.set_value("campaign", "total_stars", int(_campaign_progress.get_value("campaign", "total_stars", 0)) + stars_earned)
+	var error := _campaign_progress.save(CAMPAIGN_PROGRESS_PATH)
+	if error != OK:
+		push_error("Could not save campaign progress: %s" % error_string(error))

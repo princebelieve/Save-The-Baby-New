@@ -55,8 +55,8 @@
                                 ]
                   },
     "rewards":  {
-                    "coins":  0,
-                    "stars":  0,
+                    "coins":  10,
+                    "stars":  3,
                     "first_try_bonus":  0,
                     "perfect_bonus":  0,
                     "powerups":  [
@@ -67,7 +67,7 @@
                      "enabled":  true,
                      "steps":  [
                                    {
-                                       "message":  "Amara found a key by the fence. Drag between the glowing key pieces to match; this match adds key evidence to the case.",
+                                       "message":  "Amara found a key by the fence. Drag one glowing key onto the other (or tap both). Match three keys in a line to clear them and add to the goal.",
                                        "highlight":  [
 
                                                      ]
