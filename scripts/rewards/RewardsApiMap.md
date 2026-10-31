@@ -45,6 +45,8 @@ initialize()
 
 calculate_level_rewards(result)
 
+calculate_special_move_rewards(kind, created_count)
+
 calculate_bonus_rewards(result)
 
 calculate_story_rewards(story_id)
@@ -130,6 +132,8 @@ initialize()
 grant_reward(reward)
 
 grant_rewards(rewards)
+
+grant_special_move(kind, created_count)
 
 grant_coins(amount)
 

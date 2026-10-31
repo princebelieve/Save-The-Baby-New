@@ -41,31 +41,35 @@ func clear() -> void:
 # =========================================================
 
 func get_level_rewards(level):
-	return _get_entry(level)
+	return _get_table_entry("levels", level)
 
 
 func get_star_rewards(stars):
-	return _get_entry(stars)
+	return _get_table_entry("stars", stars)
 
 
 func get_daily_reward():
-	return _get_entry("daily")
+	return _reward_config.get("daily", [])
 
 
 func get_story_reward(id):
-	return _get_entry(id)
+	return _get_table_entry("stories", id)
 
 
 func get_chest_reward(id):
-	return _get_entry(id)
+	return _get_table_entry("chests", id)
 
 
 func get_bonus_rewards():
-	return _get_entry("bonus")
+	return _reward_config.get("bonus", [])
+
+
+func get_special_move_config() -> Dictionary:
+	return _reward_config.get("special_move", {})
 
 
 func get_random_pool(pool):
-	return _get_entry(pool)
+	return _get_table_entry("random_pools", pool)
 
 
 # =========================================================
@@ -107,5 +111,18 @@ func is_empty() -> bool:
 func _get_entry(id):
 	if id == null:
 		return {}
+	var key := str(id)
+	var levels: Dictionary = _reward_config.get("levels", {})
+	if levels.has(key):
+		return levels[key]
+	var stories: Dictionary = _reward_config.get("stories", {})
+	if stories.has(key):
+		return stories[key]
+	return _reward_config.get(key, {})
 
-	return _reward_config.get(id, {})
+
+func _get_table_entry(table_name: String, id) -> Variant:
+	if id == null:
+		return {}
+	var table: Dictionary = _reward_config.get(table_name, {})
+	return table.get(str(id), table.get(id, {}))

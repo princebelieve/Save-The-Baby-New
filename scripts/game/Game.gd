@@ -7,6 +7,8 @@ const OPENING_STORY_PATH := "res://stories/opening_story.json"
 const CAMPAIGN_PROGRESS_PATH := "user://campaign_progress.cfg"
 
 var _board_manager: Node
+var _economy_manager: EconomyManager
+var _reward_manager: RewardManager
 var _board: Board
 var _story: Dictionary = {}
 var _story_manager: StoryManager
@@ -32,11 +34,15 @@ var _is_dialogue_typing: bool = false
 var _choice_box: VBoxContainer
 var _moves_label: Label
 var _objective_label: Label
+var _objective_title_label: Label
+var _blocker_label: Label
 var _reward_label: Label
+var _lives_label: Label
+var _level_reward_label: Label
+var _star_reward_label: Label
 var _hint_label: Label
 var _pause_button: TextureButton
-var _settings_button: TextureButton
-var _case_file_button: Button
+var _case_file_button: TextureButton
 var _case_file_layer: CanvasLayer
 var _case_file_was_board_locked := false
 var _booster_dock: PanelContainer
@@ -50,7 +56,12 @@ var _moves_remaining: int = 0
 var _current_level_id := 1
 var _current_route_id := "alone"
 var _booster_inventory: Dictionary = {}
+var _obstacles_goal := 0
+var _obstacles_cleared := 0
+var _displayed_coins := 0
+var _coin_count_tween: Tween
 var _selected_booster := ""
+var _booster_confirm: ConfirmationDialog
 var _tutorial_active := false
 var _tutorial_action := ""
 var _tutorial_mechanic := ""
@@ -62,11 +73,28 @@ var _campaign_progress := ConfigFile.new()
 var _highest_unlocked_level := 1
 var _completed_levels: Dictionary = {}
 var _match_streak := 0
+var _special_moves_created := 0
 var _objective_complete_sound_played := false
+var _story_objective_sound_pending := false
 
 
 func _ready() -> void:
 	_load_campaign_progress()
+	_special_moves_created = int(_campaign_progress.get_value("campaign", "special_moves_created", 0))
+	_economy_manager = get_node_or_null("Managers/EconomyManager") as EconomyManager
+	_reward_manager = get_node_or_null("Managers/RewardManager") as RewardManager
+	if _economy_manager != null:
+		var game_config: Dictionary = ConfigLoader.load_config(Constants.ConfigPaths.GAME)
+		_economy_manager.set_coins(int(_campaign_progress.get_value("campaign", "coins", int(game_config.get("starting_coins", 0)))))
+		var initial_lives := int(_campaign_progress.get_value("campaign", "lives", int(game_config.get("max_lives", 5))))
+		_economy_manager.set_lives(initial_lives)
+		var economy_config: Dictionary = ConfigLoader.load_config(Constants.ConfigPaths.ECONOMY)
+		var saved_boosters: Dictionary = _campaign_progress.get_value("campaign", "boosters", {})
+		var starting_boosters: Dictionary = economy_config.get("starting_boosters", {})
+		for kind in ["rocket", "bomb", "thunder"]:
+			var count := int(saved_boosters.get(kind, starting_boosters.get(kind, 0)))
+			_economy_manager.set_booster_count(kind, count)
+		_economy_manager.set_ethan_count(int(_campaign_progress.get_value("campaign", "ethan", economy_config.get("starting_ethan", 0))))
 	_board_manager = get_node_or_null("Managers/BoardManager")
 	if _board_manager != null:
 		if not _board_manager.board_created.is_connected(_on_board_created):
@@ -76,6 +104,14 @@ func _ready() -> void:
 		if _board_manager.get_board() != null:
 			_on_board_created()
 	_build_gameplay_hud()
+	if _economy_manager != null:
+		_economy_manager.coins_changed.connect(_on_coins_changed)
+		_economy_manager.lives_changed.connect(_on_lives_changed)
+		_economy_manager.boosters_changed.connect(_on_boosters_changed)
+		_economy_manager.ethan_changed.connect(_on_ethan_changed)
+		_on_coins_changed(_economy_manager.get_coins())
+		_on_lives_changed(_economy_manager.get_lives())
+		_on_ethan_changed(_economy_manager.get_ethan_count())
 	_load_game_art()
 	_prepare_opening_story()
 	_show_loading_screen()
@@ -96,7 +132,7 @@ func _load_game_art() -> void:
 	background.add_child(art)
 	var tint := ColorRect.new()
 	tint.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	tint.color = Color(0.015, 0.045, 0.055, 0.68)
+	tint.color = Color(0.015, 0.045, 0.055, 0.38)
 	background.add_child(tint)
 
 
@@ -259,59 +295,92 @@ func _build_gameplay_hud() -> void:
 		add_child(hud)
 	hud.layer = 2
 	hud.visible = true
-	var top_bar := ColorRect.new()
-	top_bar.name = "MissionTopBar"
-	top_bar.color = Color(0.012, 0.035, 0.055, 0.82)
-	top_bar.anchor_left = 0.0
-	top_bar.anchor_right = 1.0
-	top_bar.anchor_top = 0.0
-	top_bar.anchor_bottom = 0.155
-	hud.add_child(top_bar)
-
-	var header := HBoxContainer.new()
+	var header := Control.new()
+	var hud_scale := clampf(get_viewport_rect().size.x / 486.0, 0.72, 1.0)
 	header.name = "MissionHeader"
-	header.anchor_left = 0.04
-	header.anchor_right = 0.96
-	header.anchor_top = 0.025
-	header.anchor_bottom = 0.112
-	header.alignment = BoxContainer.ALIGNMENT_CENTER
-	header.add_theme_constant_override("separation", 10)
+	header.anchor_left = 0.0
+	header.anchor_right = 1.0
+	header.anchor_top = 0.0
+	# Objective artwork values are positioned against the full viewport, so this
+	# overlay must occupy the full screen rather than a short header strip.
+	header.anchor_bottom = 1.0
 	hud.add_child(header)
-	_moves_label = _make_hud_panel(header, "moves_panel.png", "MOVES\n30", Vector2(102, 66))
-	_objective_label = _make_hud_panel(header, "score_panel.png", "GOAL\n0 / 10", Vector2(140, 66))
-	_reward_label = _make_hud_panel(header, "score_panel.png", "REWARD\n0 COINS", Vector2(100, 66))
-	_pause_button = _make_texture_button("pause", Vector2(84, 36))
+	_build_dynamic_objective_hud(header)
+	var status_row := HBoxContainer.new()
+	status_row.name = "StatusRow"
+	status_row.anchor_left = 0.035
+	status_row.anchor_right = 0.965
+	status_row.anchor_top = 0.145
+	status_row.anchor_bottom = 0.205
+	status_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	status_row.add_theme_constant_override("separation", 4)
+	var status_backing := Panel.new()
+	status_backing.name = "StatusRowBacking"
+	status_backing.anchor_left = 0.025
+	status_backing.anchor_right = 0.975
+	status_backing.anchor_top = 0.142
+	status_backing.anchor_bottom = 0.216
+	var backing_style := StyleBoxFlat.new()
+	backing_style.bg_color = Color(0.025, 0.08, 0.105, 0.82)
+	backing_style.border_color = Color("#d6b66e")
+	backing_style.set_border_width_all(2)
+	backing_style.set_corner_radius_all(18)
+	backing_style.content_margin_left = 8
+	backing_style.content_margin_right = 8
+	status_backing.add_theme_stylebox_override("panel", backing_style)
+	hud.add_child(status_backing)
+	hud.move_child(status_backing, header.get_index() + 1)
+	hud.add_child(status_row)
+	_star_reward_label = _make_compact_hud_panel(status_row, "StarReward", "☆☆☆", Vector2(96, 48) * hud_scale, roundi(17 * hud_scale), Color("#f4ce49"))
+	_level_reward_label = _make_compact_hud_panel(status_row, "LevelReward", "+0", Vector2(92, 48) * hud_scale, roundi(16 * hud_scale), Color("#e9bd55"))
+	_reward_label = _make_compact_hud_panel(status_row, "CoinCounter", "100", Vector2(100, 48) * hud_scale, roundi(18 * hud_scale), Color("#e9bd55"))
+	_lives_label = _make_compact_hud_panel(status_row, "LifeHearts", "", Vector2(86, 48) * hud_scale, roundi(17 * hud_scale), Color("#f06c9b"))
+	_lives_label.add_theme_color_override("font_color", Color("#71304c"))
+	_pause_button = TextureButton.new()
+	_pause_button.name = "SettingsButton"
+	_pause_button.ignore_texture_size = true
+	_pause_button.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
+	_pause_button.custom_minimum_size = Vector2(52, 52) * hud_scale
+	var pause_icon := _load_hud_asset("res://assets/sprites/ui/hud/pause_button.png")
+	_pause_button.texture_normal = pause_icon
+	_pause_button.texture_hover = pause_icon
+	_pause_button.texture_pressed = pause_icon
+	_pause_button.tooltip_text = "PAUSE AND SETTINGS"
+	_pause_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	_pause_button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_pause_button.pressed.connect(_play_ui_click)
 	_pause_button.pressed.connect(_show_pause_menu)
-	header.add_child(_pause_button)
-	_settings_button = _make_texture_button("settings", Vector2(84, 36))
-	_settings_button.name = "GameplaySettingsButton"
-	_settings_button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_settings_button.pressed.connect(_show_gameplay_audio_settings)
-	header.add_child(_settings_button)
-	_case_file_button = Button.new()
+	status_row.add_child(_pause_button)
+	_case_file_button = TextureButton.new()
 	_case_file_button.name = "CaseFileButton"
-	_case_file_button.text = "CASE\nFILE"
-	_case_file_button.custom_minimum_size = Vector2(70, 54)
+	_case_file_button.ignore_texture_size = true
+	_case_file_button.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
+	_case_file_button.custom_minimum_size = Vector2(104, 54) * hud_scale
 	_case_file_button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_case_file_button.add_theme_font_size_override("font_size", 12)
-	_case_file_button.add_theme_color_override("font_color", Color("#fff3d5"))
-	var case_file_style := StyleBoxFlat.new()
-	case_file_style.bg_color = Color("#21466a")
-	case_file_style.border_color = Color("#d6b66e")
-	case_file_style.set_border_width_all(2)
-	case_file_style.set_corner_radius_all(14)
-	_case_file_button.add_theme_stylebox_override("normal", case_file_style)
+	var case_file_icon := _load_hud_asset("res://assets/casefile_hud.png")
+	var case_file_art := AtlasTexture.new()
+	case_file_art.atlas = case_file_icon
+	case_file_art.region = Rect2(405, 475, 1110, 350)
+	_case_file_button.texture_normal = case_file_art
+	_case_file_button.texture_hover = case_file_art
+	_case_file_button.texture_pressed = case_file_art
+	_case_file_button.tooltip_text = "OPEN CASE FILE"
 	_case_file_button.pressed.connect(_show_case_file)
-	header.add_child(_case_file_button)
+	status_row.add_child(_case_file_button)
 
-	_hint_label = _make_label("INVESTIGATION 01 | THE FIRST CLUE", 16)
-	_hint_label.anchor_left = 0.05
-	_hint_label.anchor_right = 0.95
-	_hint_label.anchor_top = 0.115
-	_hint_label.anchor_bottom = 0.165
+	_hint_label = _make_label("INVESTIGATION 01 | THE FIRST CLUE", 22)
+	_hint_label.anchor_left = 0.08
+	_hint_label.anchor_right = 0.92
+	_hint_label.anchor_top = 0.205
+	_hint_label.anchor_bottom = 0.235
 	_hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_hint_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_hint_label.add_theme_color_override("font_color", Color("#fff3d5"))
+	_hint_label.add_theme_color_override("font_shadow_color", Color("#302012"))
+	_hint_label.add_theme_constant_override("shadow_offset_x", 2)
+	_hint_label.add_theme_constant_override("shadow_offset_y", 2)
 	hud.add_child(_hint_label)
+	_hint_label.hide()
 	_build_booster_dock(hud)
 
 	_story_layer = CanvasLayer.new()
@@ -320,25 +389,233 @@ func _build_gameplay_hud() -> void:
 	add_child(_story_layer)
 
 
-func _make_hud_panel(parent: Control, file_name: String, initial_text: String, requested_size: Vector2 = Vector2.ZERO) -> Label:
-	var panel := TextureRect.new()
-	panel.texture = ResourceManager.load_texture("res://assets/sprites/ui/panels/" + file_name)
-	panel.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	panel.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	panel.custom_minimum_size = requested_size if requested_size != Vector2.ZERO else (Vector2(142, 82) if file_name == "moves_panel.png" else Vector2(196, 82))
+func _build_dynamic_objective_hud(parent: Control) -> void:
+	var art := TextureRect.new()
+	art.name = "DynamicObjectiveArtwork"
+	art.anchor_left = 0.025
+	art.anchor_right = 0.975
+	art.anchor_top = 0.0
+	art.anchor_bottom = 0.145
+	var objective_texture := _load_hud_asset("res://assets/objective_hud_dynamic.png")
+	var cropped_objective := AtlasTexture.new()
+	cropped_objective.atlas = objective_texture
+	# The supplied art has large magenta margins. Crop to the actual pill so it
+	# renders at HUD size rather than shrinking its visible contents.
+	cropped_objective.region = Rect2(205, 210, 2230, 310)
+	art.texture = cropped_objective
+	art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	art.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var chroma := Shader.new()
+	chroma.code = "shader_type canvas_item;\nuniform vec3 key_color = vec3(1.0, 0.0, 1.0);\nvoid fragment() { vec4 c = texture(TEXTURE, UV) * COLOR; if (distance(c.rgb, key_color) < 0.16) { discard; } COLOR = c; }"
+	var material := ShaderMaterial.new()
+	material.shader = chroma
+	art.material = material
+	parent.add_child(art)
+	var values := Control.new()
+	values.name = "ObjectiveValues"
+	values.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	values.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	parent.add_child(values)
+	var screen_scale := get_viewport_rect().size.x * 0.95 / 2230.0
+	_objective_label = _make_label("0", 17)
+	# The artwork's value windows sit below the heading, around source y=335.
+	# Keep the live values inside those cutouts instead of above the pill.
+	_objective_label.position = Vector2(1075, 335) * screen_scale
+	_objective_label.size = Vector2(300, 105) * screen_scale
+	_objective_label.add_theme_font_size_override("font_size", 20)
+	_objective_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_objective_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_objective_label.add_theme_color_override("font_color", Color("#123d9b"))
+	values.add_child(_objective_label)
+	_moves_label = _make_label("0", 17)
+	_moves_label.position = Vector2(1685, 335) * screen_scale
+	_moves_label.size = Vector2(245, 105) * screen_scale
+	_moves_label.add_theme_font_size_override("font_size", 20)
+	_moves_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_moves_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_moves_label.add_theme_color_override("font_color", Color("#123d9b"))
+	values.add_child(_moves_label)
+	_blocker_label = _make_label("", 12)
+	_blocker_label.position = Vector2(1050, 220) * screen_scale
+	_blocker_label.size = Vector2(650, 30) * screen_scale
+	_blocker_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_blocker_label.add_theme_color_override("font_color", Color("#123d9b"))
+	values.add_child(_blocker_label)
+
+
+func _make_compact_hud_panel(parent: Control, panel_name: String, text: String, minimum_size: Vector2, font_size: int, accent: Color) -> Label:
+	var uses_generated_art := panel_name in ["MovesCounter", "CoinCounter", "LifeHearts", "StarReward", "LevelReward"]
+	var panel: Control = Control.new() if uses_generated_art else PanelContainer.new()
+	panel.name = panel_name
+	panel.custom_minimum_size = minimum_size
 	panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	panel.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	var content := Control.new()
+	if uses_generated_art:
+		panel.clip_contents = true
+		var panel_art := TextureRect.new()
+		panel_art.name = "PanelArt"
+		var art_path := "res://assets/moves_template.png"
+		match panel_name:
+			"CoinCounter":
+				art_path = "res://assets/coins_template.png"
+			"LifeHearts":
+				art_path = "res://assets/lives_template.png"
+			"StarReward":
+				art_path = "res://assets/moves_template.png"
+			"LevelReward":
+				art_path = "res://assets/dollar_sack.png"
+		panel_art.texture = _get_cropped_hud_art(panel_name, art_path)
+		if panel_name == "CoinCounter" or panel_name == "LevelReward":
+			panel_art.anchor_left = 0.0
+			panel_art.anchor_right = 0.48
+			panel_art.anchor_top = 0.05
+			panel_art.anchor_bottom = 0.95
+		else:
+			panel_art.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		panel_art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		panel_art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		panel_art.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_apply_hud_chroma_key(panel_art)
+		panel.add_child(panel_art)
+		content.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	else:
+		var style := StyleBoxFlat.new()
+		style.bg_color = Color("#10283d")
+		style.border_color = accent
+		style.set_border_width_all(2)
+		style.set_corner_radius_all(15)
+		style.set_content_margin_all(4)
+		(panel as PanelContainer).add_theme_stylebox_override("panel", style)
+		content.custom_minimum_size = minimum_size - Vector2(8, 8)
 	parent.add_child(panel)
-	var label := _make_label(initial_text, 22)
-	label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	label.add_theme_color_override("font_color", Color("#fff8df"))
-	label.add_theme_color_override("font_shadow_color", Color("#3a1737"))
-	label.add_theme_constant_override("shadow_offset_x", 2)
-	label.add_theme_constant_override("shadow_offset_y", 2)
+	panel.add_child(content)
+	var label := Label.new()
+	label.name = "Value"
+	label.text = text
+	if uses_generated_art:
+		label.anchor_left = 0.48 if panel_name in ["MovesCounter", "CoinCounter", "LevelReward"] else 0.12
+		label.anchor_right = 0.94
+		label.anchor_top = 0.32 if panel_name in ["StarReward", "LevelReward"] else (0.43 if panel_name == "MovesCounter" else 0.24)
+		label.anchor_bottom = 0.80 if panel_name in ["MovesCounter", "StarReward", "LevelReward"] else 0.76
+	else:
+		label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.add_theme_font_size_override("font_size", 17)
-	panel.add_child(label)
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.add_theme_font_override("font", DISPLAY_FONT)
+	label.add_theme_font_size_override("font_size", font_size)
+	label.add_theme_color_override("font_color", Color("#fff5dc"))
+	label.add_theme_color_override("font_shadow_color", Color("#14202c"))
+	label.add_theme_constant_override("shadow_offset_x", 1)
+	label.add_theme_constant_override("shadow_offset_y", 2)
+	if uses_generated_art:
+		label.add_theme_color_override("font_color", Color("#71304c") if panel_name == "LifeHearts" else Color("#60401c"))
+		label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0))
+	content.add_child(label)
+	if panel_name == "CoinCounter":
+		var shop_hitbox := Button.new()
+		shop_hitbox.name = "OpenLifeShop"
+		shop_hitbox.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		shop_hitbox.flat = true
+		shop_hitbox.tooltip_text = "Spend Ethan Coins on lives"
+		shop_hitbox.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+		shop_hitbox.pressed.connect(_show_life_shop)
+		content.add_child(shop_hitbox)
 	return label
+
+
+func _get_cropped_hud_art(panel_name: String, path: String) -> Texture2D:
+	var source := _load_hud_asset(path)
+	if source == null:
+		return null
+	var regions := {
+		"CoinCounter": Rect2(245, 390, 2240, 510),
+		"LifeHearts": Rect2(260, 470, 1400, 400),
+		"StarReward": Rect2(250, 345, 1420, 570),
+		"MovesCounter": Rect2(120, 210, 1680, 760)
+	}
+	if not regions.has(panel_name):
+		return source
+	var cropped := AtlasTexture.new()
+	cropped.atlas = source
+	cropped.region = regions[panel_name]
+	return cropped
+
+
+func _apply_hud_chroma_key(target: TextureRect) -> void:
+	var chroma := Shader.new()
+	chroma.code = "shader_type canvas_item;\nuniform vec3 key_color = vec3(1.0, 0.0, 1.0);\nvoid fragment() { vec4 c = texture(TEXTURE, UV) * COLOR; if (distance(c.rgb, key_color) < 0.16) { discard; } COLOR = c; }"
+	var material := ShaderMaterial.new()
+	material.shader = chroma
+	target.material = material
+
+
+func _build_moves_panel(parent: Control, ui_scale: float) -> Label:
+	return _make_compact_hud_panel(parent, "MovesCounter", "30", Vector2(112, 64) * ui_scale, roundi(24 * ui_scale), Color("#38c8e5"))
+
+
+func _build_objective_panel(parent: Control, ui_scale: float) -> Label:
+	var panel := Control.new()
+	panel.name = "ObjectiveCard"
+	panel.custom_minimum_size = Vector2(150, 88) * ui_scale
+	panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	panel.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	panel.clip_contents = true
+	parent.add_child(panel)
+	var objective_body := PanelContainer.new()
+	objective_body.position = Vector2(4, 42) * ui_scale
+	objective_body.size = Vector2(142, 44) * ui_scale
+	var body_style := StyleBoxFlat.new()
+	body_style.bg_color = Color("#512c7d")
+	body_style.border_color = Color("#e2bf72")
+	body_style.set_border_width_all(maxi(1, roundi(2 * ui_scale)))
+	body_style.set_corner_radius_all(roundi(11 * ui_scale))
+	objective_body.add_theme_stylebox_override("panel", body_style)
+	panel.add_child(objective_body)
+	var title_art := TextureRect.new()
+	title_art.name = "ObjectiveTitleArt"
+	title_art.texture = _load_hud_asset("res://assets/sprites/ui/hud/objective_title.png")
+	title_art.position = Vector2.ZERO
+	title_art.size = Vector2(150, 48) * ui_scale
+	title_art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	title_art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	title_art.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	panel.add_child(title_art)
+	_objective_label = _make_label("0 / 10", roundi(27 * ui_scale))
+	_objective_label.position = Vector2(34, 54) * ui_scale
+	_objective_label.size = Vector2(108, 24) * ui_scale
+	_objective_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	panel.add_child(_objective_label)
+	_blocker_label = _make_label("", roundi(13 * ui_scale))
+	_blocker_label.position = Vector2(0, 78) * ui_scale
+	_blocker_label.size = Vector2(150, 12) * ui_scale
+	_blocker_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_blocker_label.add_theme_color_override("font_color", Color("#ffe279"))
+	panel.add_child(_blocker_label)
+	return _objective_label
+
+
+func _set_objective_icon(target: String) -> void:
+	if _objective_label == null:
+		return
+	var panel := _objective_label.get_parent() as Control
+	var previous := panel.get_node_or_null("ObjectiveIcon")
+	if previous != null:
+		previous.queue_free()
+	var icon := TextureRect.new()
+	icon.name = "ObjectiveIcon"
+	icon.size = Vector2(26, 26) * clampf(panel.custom_minimum_size.x / 150.0, 0.88, 1.0)
+	icon.position = Vector2(7, 55) * clampf(panel.custom_minimum_size.x / 150.0, 0.88, 1.0)
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.texture = ResourceManager.load_texture(_objective_icon_path(target))
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	panel.add_child(icon)
+
+
+func _load_hud_asset(path: String) -> Texture2D:
+	return ResourceManager.load_texture(path)
 
 
 func _build_booster_dock(parent: CanvasLayer) -> void:
@@ -346,8 +623,8 @@ func _build_booster_dock(parent: CanvasLayer) -> void:
 	dock.name = "BoosterDock"
 	dock.anchor_left = 0.08
 	dock.anchor_right = 0.92
-	dock.anchor_top = 0.86
-	dock.anchor_bottom = 0.965
+	dock.anchor_top = 0.80
+	dock.anchor_bottom = 0.91
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color(0.02, 0.055, 0.08, 0.92)
 	style.border_color = Color("#e3c275")
@@ -364,9 +641,10 @@ func _build_booster_dock(parent: CanvasLayer) -> void:
 	var icon_paths := {
 		"rocket": "res://assets/sprites/powerups/rocket_powerup_icon.jpeg",
 		"bomb": "res://assets/sprites/powerups/bomb_powerup_icon.jpeg",
-		"thunder": "res://assets/sprites/powerups/thunder_powerup_icon.jpeg"
+		"thunder": "res://assets/sprites/powerups/thunder_powerup_icon.jpeg",
+		"ethan": "res://assets/sprites/characters/ethan_portrait_cutout.png"
 	}
-	for kind in ["rocket", "bomb", "thunder"]:
+	for kind in ["rocket", "bomb", "thunder", "ethan"]:
 		var wrapper := VBoxContainer.new()
 		wrapper.alignment = BoxContainer.ALIGNMENT_CENTER
 		wrapper.add_theme_constant_override("separation", 0)
@@ -375,17 +653,20 @@ func _build_booster_dock(parent: CanvasLayer) -> void:
 		button.name = "%sPowerup" % kind.capitalize()
 		button.ignore_texture_size = true
 		button.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
-		button.custom_minimum_size = Vector2(62, 56)
+		button.custom_minimum_size = Vector2(78, 70)
 		button.texture_normal = ResourceManager.load_texture(icon_paths[kind])
 		button.texture_hover = button.texture_normal
 		button.texture_pressed = button.texture_normal
 		button.pressed.connect(_on_booster_pressed.bind(kind))
 		wrapper.add_child(button)
-		var count := _make_label("1", 14)
-		count.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		wrapper.add_child(count)
-		_booster_buttons[kind] = {"button": button, "count": count}
-	dock.hide()
+		var name_label := _make_label(kind.to_upper(), 14)
+		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		wrapper.add_child(name_label)
+		var count_label := _make_label("0", 22)
+		count_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		wrapper.add_child(count_label)
+		_booster_buttons[kind] = {"button": button, "count": count_label}
+	dock.show()
 
 
 func _make_texture_button(name: String, button_size: Vector2, folder: String = "buttons") -> TextureButton:
@@ -694,7 +975,7 @@ func _on_tutorial_settings_confirmed() -> void:
 	_tutorial_action = "pause"
 	_refresh_tutorial_controls()
 	_show_tutorial_tip(
-		"Music and sound effects each have their own volume and on/off controls. Tap Pause to review the menu next.",
+		"Music and sound effects each have separate controls. The gear also opens the pause menu so you can resume or leave the investigation.",
 		_button_screen_rect(_pause_button),
 		"DAVID",
 		"res://assets/sprites/characters/david_portrait_cutout.png"
@@ -1093,6 +1374,9 @@ func _load_campaign_level_records() -> Array[Dictionary]:
 func _on_campaign_level_selected(level_id: int, route_id: String) -> void:
 	if level_id > _highest_unlocked_level:
 		return
+	if _economy_manager != null and _economy_manager.get_lives() <= 0:
+		_show_life_shop()
+		return
 	SignalBus.play_sfx.emit("door_open")
 	if _tutorial_overlay != null:
 		_tutorial_overlay.hide_tip()
@@ -1260,7 +1544,12 @@ func _show_level_briefing(route_id: String) -> void:
 	objective_row.add_child(objective_copy)
 
 	var moves_total := int(level_data.get("moves", {}).get("total", 0))
-	var moves := _make_label("MAKE YOUR MOVES COUNT | %d MOVES" % moves_total, 18)
+	var difficulty := str(level_data.get("difficulty", "NORMAL")).replace("_", " ")
+	var difficulty_label := _make_label("DIFFICULTY | " + difficulty, 17)
+	difficulty_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	difficulty_label.add_theme_color_override("font_color", Color("#f2ce7c"))
+	content.add_child(difficulty_label)
+	var moves := _make_label("MATCH THE GOAL | %d MOVES" % moves_total, 18)
 	moves.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	content.add_child(moves)
 	var play := _make_texture_button("play", Vector2(250, 112))
@@ -1297,6 +1586,16 @@ func _objective_icon_path(target: String) -> String:
 	return "res://assets/sprites/tiles/" + file_name
 
 
+func _objective_hud_title() -> String:
+	match _objective_target:
+		"FINGERPRINT":
+			return "PRINT"
+		"RECORDER":
+			return "REC"
+		_:
+			return _objective_target.replace("_", " ")
+
+
 func _begin_level(_route_id: String) -> void:
 	SignalBus.play_sfx.emit("door_close")
 	var gameplay_hud := get_node_or_null("HUD") as CanvasLayer
@@ -1316,29 +1615,27 @@ func _begin_level(_route_id: String) -> void:
 	_story_layer = null
 	var level_manager := get_node_or_null("Managers/LevelManager")
 	var level_data: Dictionary = level_manager.get_level_data() if level_manager != null else {}
-	var booster_config: Dictionary = level_data.get("powerups", {})
-	var available_boosters: Array = booster_config.get("available", [])
-	var boosters_allowed := bool(level_data.get("settings", {}).get("allow_boosters", false)) and bool(booster_config.get("enabled", false))
-	_booster_dock.get_parent().visible = boosters_allowed
+	_booster_dock.visible = true
 	_current_level_id = int(level_data.get("level_id", 1))
 	_current_route_id = _route_id
 	var objective := _get_primary_objective(level_data)
-	var reward_data: Dictionary = level_data.get("rewards", {})
 	_evidence_count = 0
 	_objective_complete_sound_played = false
+	_story_objective_sound_pending = false
 	_evidence_goal = int(objective.get("amount", 10))
+	var level_rewards: Dictionary = level_data.get("rewards", {})
+	_star_reward_label.text = "★ %d" % int(level_rewards.get("stars", 3))
+	_level_reward_label.text = "+%d" % int(level_rewards.get("coins", 0))
+	var obstacle_items: Array = level_data.get("obstacles", {}).get("items", [])
 	_objective_target = str(objective.get("target", "KEY")).to_upper()
 	_objective_type = str(objective.get("type", "COLLECT_ITEMS")).to_upper()
-	if _objective_type == "DESTROY_OBSTACLES":
-		_objective_label.text = "OBSTACLES\n0 / %d" % _evidence_goal
-	else:
-		_objective_label.text = "%s\n0 / %d" % [_objective_target.replace("_", " ") + "S", _evidence_goal]
-	_reward_label.text = "REWARD\n%d COINS" % int(reward_data.get("coins", 0))
-	_booster_inventory = {
-		"rocket": 1 if available_boosters.has("ROCKET") else 0,
-		"bomb": 1 if available_boosters.has("BOMB") else 0,
-		"thunder": 1 if available_boosters.has("THUNDER") else 0
-	}
+	_obstacles_goal = obstacle_items.size() if _objective_type != "DESTROY_OBSTACLES" else 0
+	_obstacles_cleared = 0
+	_update_objective_hud()
+	_reward_label.text = str(_economy_manager.get_coins() if _economy_manager != null else int(_campaign_progress.get_value("campaign", "coins", 0)))
+	for kind in ["rocket", "bomb", "thunder"]:
+		_booster_inventory[kind] = _economy_manager.get_booster_count(kind) if _economy_manager != null else int(_campaign_progress.get_value("campaign", "boosters", {}).get(kind, 0))
+	_booster_inventory["ethan"] = _economy_manager.get_ethan_count() if _economy_manager != null else int(_campaign_progress.get_value("campaign", "ethan", 0))
 	_selected_booster = ""
 	_tutorial_booster_kind = ""
 	_tutorial_mechanic = ""
@@ -1350,7 +1647,7 @@ func _begin_level(_route_id: String) -> void:
 		_board.clear_required_swap()
 	for kind in _booster_buttons:
 		var entry: Dictionary = _booster_buttons[kind]
-		(entry["count"] as Label).text = str(_booster_inventory[kind])
+		(entry["count"] as Label).text = "%s\n%d" % [kind.to_upper(), int(_booster_inventory[kind])]
 		(entry["button"] as BaseButton).disabled = false
 	var tutorial: Dictionary = level_data.get("tutorial", {})
 	var tutorial_steps: Array = tutorial.get("steps", [])
@@ -1372,7 +1669,6 @@ func _begin_level(_route_id: String) -> void:
 				"res://assets/sprites/characters/david_portrait_cutout.png"
 			)
 		else:
-			var obstacle_items: Array = level_data.get("obstacles", {}).get("items", [])
 			var guided_swap: Array[Vector2i] = []
 			var guided_move_hits_obstacle := false
 			var tutorial_mechanic_unavailable := false
@@ -1413,10 +1709,12 @@ func _begin_level(_route_id: String) -> void:
 	else:
 		_tutorial_active = false
 		_tutorial_action = ""
-		_hint_label.text = "INVESTIGATION %02d | %s" % [
-			int(level_data.get("level_id", 1)),
-			str(level_data.get("name", "The Search Continues"))
+		var mission_hint := "MATCH %s | COLLECT %d CLUES IN %d MOVES" % [
+			_objective_target.replace("_", " "), _evidence_goal, int(level_data.get("moves", {}).get("total", 0))
 		]
+		if _obstacles_goal > 0:
+			mission_hint += " | CLEAR %d BLOCKERS" % _obstacles_goal
+		_hint_label.text = mission_hint
 	_refresh_tutorial_controls()
 	if level_manager != null:
 		level_manager.start_level()
@@ -1441,13 +1739,173 @@ func _on_board_created() -> void:
 	_board.special_activated.connect(_on_special_activated)
 	_board.booster_used.connect(_on_booster_used)
 	_board.obstacles_cleared.connect(_on_obstacles_cleared)
+	_board.obstacle_damaged.connect(_on_obstacle_damaged)
+	_board.tiles_matched_with_cells.connect(_animate_matched_tiles)
 	_board.lock()
 	_on_moves_changed(_board.get_remaining_moves())
 
 
 func _on_moves_changed(remaining: int) -> void:
 	_moves_remaining = remaining
-	_moves_label.text = "MOVES\n%d" % remaining
+	_moves_label.text = str(remaining)
+
+
+func _on_coins_changed(coins: int) -> void:
+	if _reward_label != null:
+		var from := _displayed_coins
+		if _coin_count_tween != null and _coin_count_tween.is_running():
+			_coin_count_tween.kill()
+		_coin_count_tween = create_tween()
+		_coin_count_tween.tween_method(_set_displayed_coin_count, from, coins, 0.55)
+	_campaign_progress.set_value("campaign", "coins", coins)
+	_persist_campaign_progress()
+
+
+func _set_displayed_coin_count(value: int) -> void:
+	_displayed_coins = value
+	if _reward_label != null:
+		_reward_label.text = str(value)
+
+
+func _on_lives_changed(lives: int) -> void:
+	if _lives_label != null:
+		_lives_label.text = str(clampi(lives, 0, 5))
+	_campaign_progress.set_value("campaign", "lives", lives)
+	_persist_campaign_progress()
+
+
+func _on_ethan_changed(count: int) -> void:
+	_booster_inventory["ethan"] = count
+	if _booster_buttons.has("ethan"):
+		var count_label := _booster_buttons["ethan"]["count"] as Label
+		count_label.text = str(count)
+		count_label.scale = Vector2(1.15, 1.15)
+		var pop := create_tween()
+		pop.tween_property(count_label, "scale", Vector2.ONE, 0.2).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_campaign_progress.set_value("campaign", "ethan", count)
+	_persist_campaign_progress()
+
+
+func _on_boosters_changed(boosters: Dictionary) -> void:
+	for kind in ["rocket", "bomb", "thunder"]:
+		_booster_inventory[kind] = int(boosters.get(kind, 0))
+		if _booster_buttons.has(kind):
+			var count_label := _booster_buttons[kind]["count"] as Label
+			count_label.text = str(int(_booster_inventory[kind]))
+			count_label.scale = Vector2(1.15, 1.15)
+			var pop := create_tween()
+			pop.tween_property(count_label, "scale", Vector2.ONE, 0.2).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_refresh_tutorial_controls()
+	_save_inventory_progress()
+
+
+func _save_inventory_progress() -> void:
+	var saved: Dictionary = {}
+	for kind in ["rocket", "bomb", "thunder"]:
+		saved[kind] = _economy_manager.get_booster_count(kind) if _economy_manager != null else int(_booster_inventory.get(kind, 0))
+	_campaign_progress.set_value("campaign", "boosters", saved)
+	if _economy_manager != null:
+		_campaign_progress.set_value("campaign", "ethan", _economy_manager.get_ethan_count())
+	_persist_campaign_progress()
+
+
+func _open_booster_shop(kind: String) -> void:
+	if _economy_manager == null:
+		return
+	var item_id := "ethan_assist" if kind == "ethan" else "%s_booster" % kind
+	var item: Dictionary = _economy_manager.get_shop_item(item_id)
+	if item.is_empty():
+		return
+	var amount := int(item.get("amount", 1))
+	var cost := int(item.get("price", 0))
+	var dialog := ConfirmationDialog.new()
+	dialog.title = "FIELD SUPPLIES"
+	dialog.dialog_text = "Buy %s for %d Ethan Coins? You have %d." % [str(item.get("name", kind.capitalize())), cost, _economy_manager.get_coins()]
+	dialog.ok_button_text = "BUY"
+	var layer := CanvasLayer.new()
+	layer.layer = 24
+	layer.process_mode = Node.PROCESS_MODE_ALWAYS
+	add_child(layer)
+	layer.add_child(dialog)
+	dialog.confirmed.connect(func():
+		var purchase := Purchase.new()
+		purchase.initialize()
+		purchase.set_item(item_id)
+		purchase.set_currency(str(item.get("currency", "coins")))
+		purchase.set_price(cost)
+		if _economy_manager.purchase(purchase):
+			if kind == "ethan":
+				_economy_manager.add_ethan(amount)
+			else:
+				_economy_manager.add_booster(kind, amount)
+				_booster_inventory[kind] = _economy_manager.get_booster_count(kind)
+				var entry: Dictionary = _booster_buttons.get(kind, {})
+				if not entry.is_empty():
+					(entry["count"] as Label).text = str(int(_booster_inventory[kind]))
+			_save_inventory_progress()
+		else:
+			_show_shop_notice("You need %d Ethan Coins for this supply." % cost)
+	)
+	dialog.confirmed.connect(layer.queue_free, CONNECT_ONE_SHOT)
+	dialog.canceled.connect(layer.queue_free, CONNECT_ONE_SHOT)
+	dialog.popup_centered()
+
+
+func _update_objective_hud() -> void:
+	if _objective_label == null:
+		return
+	_objective_label.text = "%d / %d" % [mini(_evidence_count, _evidence_goal), _evidence_goal]
+	_blocker_label.text = "BLOCKERS %d / %d" % [_obstacles_cleared, _obstacles_goal] if _obstacles_goal > 0 else ""
+
+
+func _mission_objectives_complete() -> bool:
+	return _evidence_count >= _evidence_goal and _obstacles_cleared >= _obstacles_goal
+
+
+func _animate_matched_tiles(tile_types: Array, cells: Array) -> void:
+	var target_enum := int(Constants.TileType.get(_objective_target, -1))
+	for index in range(mini(tile_types.size(), cells.size())):
+		var tile_type := int(tile_types[index])
+		var character_types: Array = [int(Constants.TileType.ETHAN), int(Constants.TileType.DETECTIVE), int(Constants.TileType.VICTOR)]
+		if tile_type != target_enum and not character_types.has(tile_type):
+			continue
+		var cell: Vector2i = cells[index]
+		var source := _board.get_cell_screen_rect(cell)
+		var panel := _objective_label.get_parent() as Control
+		var target := panel.get_node_or_null("ObjectiveIcon") as Control
+		if [int(Constants.TileType.ETHAN), int(Constants.TileType.DETECTIVE)].has(tile_type) and _booster_buttons.has("ethan"):
+			target = _booster_buttons["ethan"]["button"] as Control
+		elif tile_type == int(Constants.TileType.VICTOR):
+			# Victor matches grant coins directly; don't fly an oversized coin graphic
+			# across the board. The counter updates independently via coins_changed.
+			continue
+		if target == null:
+			target = _objective_label
+		var token := TextureRect.new()
+		var icon_path := _objective_icon_path(_objective_target) if tile_type == target_enum else "res://assets/sprites/characters/ethan_portrait_cutout.png"
+		if tile_type == int(Constants.TileType.DETECTIVE):
+			icon_path = "res://assets/sprites/characters/detective_portrait_cutout.png"
+		elif tile_type == int(Constants.TileType.VICTOR):
+			icon_path = "res://assets/sprites/characters/victor_portrait_badge_cutout.png"
+		token.texture = ResourceManager.load_texture(icon_path)
+		token.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		token.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		token.size = Vector2(30, 30)
+		token.position = source.get_center() - token.size * 0.5
+		get_node("HUD").add_child(token)
+		var tween := create_tween().set_parallel(true)
+		tween.tween_property(token, "position", target.get_global_rect().get_center() - token.size * 0.5, 0.38).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+		tween.tween_property(token, "scale", Vector2(0.55, 0.55), 0.38)
+		tween.tween_property(token, "modulate:a", 0.25, 0.38)
+		tween.finished.connect(token.queue_free)
+
+
+func _persist_campaign_progress() -> void:
+	_campaign_progress.set_value("campaign", "highest_unlocked_level", _highest_unlocked_level)
+	_campaign_progress.set_value("campaign", "completed_levels", _completed_levels)
+	var error := _campaign_progress.save(CAMPAIGN_PROGRESS_PATH)
+	if error != OK:
+		push_error("Could not save campaign progress: %s" % error_string(error))
 
 
 func _on_tiles_matched(tile_types: Array) -> void:
@@ -1456,10 +1914,22 @@ func _on_tiles_matched(tile_types: Array) -> void:
 	var feedback_caption := ""
 	var feedback_sound := ""
 	var shake_board := false
+	var special_reward_text := ""
 	var target_enum := int(Constants.TileType.get(_objective_target, -1))
 	for tile_type in tile_types:
 		if _objective_type == "COLLECT_ITEMS" and int(tile_type) == target_enum:
 			_evidence_count += 1
+			objective_match = true
+		if int(tile_type) == int(Constants.TileType.ETHAN) and _economy_manager != null:
+			_economy_manager.add_ethan(1)
+			special_reward_text = "ETHAN FOUND | +1 RESCUE ASSIST"
+		elif int(tile_type) == int(Constants.TileType.DETECTIVE) and _economy_manager != null:
+			_economy_manager.add_ethan(1)
+			special_reward_text = "DETECTIVE FOUND | +1 RESCUE ASSIST"
+		elif int(tile_type) == int(Constants.TileType.VICTOR) and _economy_manager != null:
+			_economy_manager.add_coins(10)
+			special_reward_text = "VICTOR CAUGHT | +10 ETHAN COINS"
+		if [int(Constants.TileType.ETHAN), int(Constants.TileType.DETECTIVE), int(Constants.TileType.VICTOR)].has(int(tile_type)):
 			objective_match = true
 	SignalBus.play_sfx.emit("clue_collected" if objective_match else "tile_match")
 	if tile_types.size() >= 5 or _match_streak >= 4:
@@ -1473,11 +1943,12 @@ func _on_tiles_matched(tile_types: Array) -> void:
 		feedback_caption = "NICE!"
 		feedback_sound = "match_nice"
 	_evidence_count = mini(_evidence_count, _evidence_goal)
-	if _objective_type == "COLLECT_ITEMS":
-		_objective_label.text = "%s\n%d / %d" % [_objective_target.replace("_", " ") + "S", _evidence_count, _evidence_goal]
-	if _evidence_count >= _evidence_goal and _objective_type == "COLLECT_ITEMS":
+	_update_objective_hud()
+	if _mission_objectives_complete():
 		_hint_label.text = "GOAL REACHED | Wrapping up the investigation..."
 		_play_objective_complete_sound()
+	elif not special_reward_text.is_empty() and not _tutorial_active:
+		_hint_label.text = special_reward_text
 	elif not _tutorial_active:
 		_hint_label.text = "CLUES | %d of %d %s collected" % [_evidence_count, _evidence_goal, _objective_target.replace("_", " ").to_lower()]
 	if not feedback_caption.is_empty():
@@ -1534,7 +2005,35 @@ func _show_match_feedback(caption: String, sound_id: String, shake_board: bool) 
 
 func _on_special_created(kind: String) -> void:
 	SignalBus.play_sfx.emit("special_created")
-	_hint_label.text = "%s CREATED!" % kind.to_upper()
+	_special_moves_created += 1
+	var rewards: Array = []
+	if _reward_manager != null:
+		rewards = _reward_manager.grant_special_move(kind, _special_moves_created)
+	var coin_reward := 0
+	var earned_booster := false
+	var milestone := _reward_manager.get_special_move_milestone() if _reward_manager != null else 0
+	for reward in rewards:
+		if int(reward.get("type", -1)) == int(Constants.RewardType.COINS):
+			coin_reward += int(reward.get("amount", 0))
+		elif int(reward.get("type", -1)) == int(Constants.RewardType.BOOSTER):
+			earned_booster = true
+	if _reward_manager == null and _economy_manager != null:
+		var reward_config: Dictionary = ConfigLoader.load_config(Constants.ConfigPaths.REWARDS).get("special_move", {})
+		coin_reward = maxi(0, int(reward_config.get("coins_per_creation", 0)))
+		_economy_manager.add_coins(coin_reward)
+		milestone = maxi(0, int(reward_config.get("booster_every", 0)))
+		earned_booster = milestone > 0 and _special_moves_created % milestone == 0
+		if earned_booster:
+			_economy_manager.add_booster(kind, maxi(1, int(reward_config.get("milestone_booster_amount", 1))))
+	_campaign_progress.set_value("campaign", "special_moves_created", _special_moves_created)
+	_persist_campaign_progress()
+	var supply_progress := _special_moves_created % milestone if milestone > 0 else 0
+	var reward_note := ""
+	if earned_booster:
+		reward_note = " | AMARA SUPPLY: +1 %s" % kind.to_upper()
+	elif milestone > 0:
+		reward_note = " | SUPPLY %d / %d" % [supply_progress, milestone]
+	_hint_label.text = "SPECIAL MOVE | +%d COINS%s" % [coin_reward, reward_note]
 	_hint_label.add_theme_color_override("font_color", Color("#8df4ff"))
 	_hint_label.scale = Vector2(0.75, 0.75)
 	var pop := create_tween()
@@ -1551,7 +2050,7 @@ func _on_board_turn_resolved() -> void:
 	if _result_layer != null:
 		return
 	var tutorial_result_pending := _tutorial_active and ["guided_swap", "booster_resolving", "activate_special"].has(_tutorial_action)
-	if (_evidence_count >= _evidence_goal or _moves_remaining <= 0) and not tutorial_result_pending:
+	if (_mission_objectives_complete() or _moves_remaining <= 0) and not tutorial_result_pending:
 		_evaluate_level_end()
 		return
 	if _tutorial_active:
@@ -1602,7 +2101,7 @@ func _show_tutorial_obstacle_result() -> void:
 		var cell := Vector2i(int(obstacle.get("x", -1)), int(obstacle.get("y", -1)))
 		target_rect = _board.get_cell_screen_rect(cell)
 		var obstacle_name := str(obstacle.get("type", "obstacle")).replace("_", " ").to_upper()
-		message = "You hit the %s. Matches beside an obstacle remove one layer; clear every layer to open the route. The goal card still tracks the evidence." % obstacle_name
+		message = "You hit the %s. Matches beside it remove one health layer; clear it completely to finish the BLOCKERS mission. Watch its health fly up after each hit." % obstacle_name
 	_tutorial_action = "explain_obstacle"
 	_show_tutorial_tip(message, target_rect, "DAVID", "res://assets/sprites/characters/david_portrait_cutout.png", true)
 
@@ -1633,7 +2132,7 @@ func _show_tutorial_special_result() -> void:
 	_tutorial_action = "explain_special_result"
 	if _board != null:
 		_board.lock()
-	_show_tutorial_tip("The rocket cleared its row and column in one move. Use a special piece when it can clear a blocked path or reach the mission evidence.", _objective_label.get_global_rect(), "DAVID", "res://assets/sprites/characters/david_portrait_cutout.png", true)
+	_show_tutorial_tip("The rocket cleared its row and column in one move. Creating special pieces also earns Ethan Coins; Amara sends a matching booster after the configured milestone. Use specials to clear a blocked path or reach mission evidence.", _objective_label.get_global_rect(), "DAVID", "res://assets/sprites/characters/david_portrait_cutout.png", true)
 
 
 func _show_tutorial_booster_result() -> void:
@@ -1656,13 +2155,13 @@ func _on_tutorial_acknowledged() -> void:
 	if not _tutorial_active:
 		return
 	if _tutorial_action == "explain_goal":
-		_tutorial_action = "settings"
+		_tutorial_action = "pause"
 		if _board != null:
 			_board.lock()
 		_refresh_tutorial_controls()
 		_show_tutorial_tip(
 			"Tap the gear to adjust music and sound effects separately. You can change them again whenever you need.",
-			_button_screen_rect(_settings_button),
+		_button_screen_rect(_pause_button),
 			"DAVID",
 			"res://assets/sprites/characters/david_portrait_cutout.png"
 		)
@@ -1696,21 +2195,24 @@ func _refresh_tutorial_controls() -> void:
 		_pause_button.disabled = _tutorial_active and _tutorial_action != "pause"
 	if _case_file_button != null:
 		_case_file_button.disabled = _tutorial_active and _tutorial_action != "field_guide"
-	if _settings_button != null:
-		_settings_button.disabled = _tutorial_active and _tutorial_action != "settings"
 	for kind in _booster_buttons:
 		var entry: Dictionary = _booster_buttons[kind]
 		var button := entry["button"] as BaseButton
-		var has_stock := int(_booster_inventory.get(kind, 0)) > 0
-		button.visible = has_stock or (_tutorial_active and _tutorial_action == "booster_select" and kind == _tutorial_booster_kind)
+		button.visible = true
 		var tutorial_allows: bool = not _tutorial_active or (_tutorial_action == "booster_select" and kind == _tutorial_booster_kind)
-		button.disabled = not has_stock or not tutorial_allows
+		button.disabled = not tutorial_allows
 
 
 func _on_booster_pressed(kind: String) -> void:
 	if _tutorial_active and not (_tutorial_action == "booster_select" and kind == _tutorial_booster_kind):
 		return
-	if int(_booster_inventory.get(kind, 0)) <= 0 or _board == null:
+	if _board == null:
+		return
+	if int(_booster_inventory.get(kind, 0)) <= 0:
+		_open_booster_shop(kind)
+		return
+	if _selected_booster == kind:
+		_cancel_booster_targeting()
 		return
 	_selected_booster = kind
 	if _tutorial_active:
@@ -1725,16 +2227,73 @@ func _on_booster_pressed(kind: String) -> void:
 		_show_tutorial_tip(message, target_rect, "DAVID", "res://assets/sprites/characters/david_portrait_cutout.png")
 		_refresh_tutorial_controls()
 		return
+	_show_booster_confirmation(kind)
+
+
+func _show_booster_confirmation(kind: String) -> void:
+	var descriptions := {
+		"rocket": "Choose a tile. Rocket clears its full row and column.",
+		"bomb": "Choose a tile. Bomb clears the tiles around it.",
+		"thunder": "Choose a tile. Thunder clears every tile of that type.",
+		"ethan": "Choose a tile. Ethan clears a 5 by 5 rescue area."
+	}
+	var dialog := ConfirmationDialog.new()
+	dialog.name = "BoosterUseConfirmation"
+	dialog.title = "%s | %d available" % [kind.capitalize(), int(_booster_inventory.get(kind, 0))]
+	dialog.dialog_text = "%s\n\nUse one now? After you choose Use, tap a tile on the board to set the target." % descriptions.get(kind, "Choose a board tile to use this booster.")
+	dialog.size = Vector2i(380, 230)
+	dialog.get_ok_button().text = "USE BOOSTER"
+	dialog.get_cancel_button().text = "CANCEL"
+	dialog.get_ok_button().custom_minimum_size = Vector2(160, 48)
+	dialog.get_cancel_button().custom_minimum_size = Vector2(140, 48)
+	dialog.get_ok_button().add_theme_font_size_override("font_size", 20)
+	dialog.get_cancel_button().add_theme_font_size_override("font_size", 20)
+	for dialog_label in dialog.find_children("*", "Label", true, false):
+		dialog_label.add_theme_font_override("font", DISPLAY_FONT)
+		dialog_label.add_theme_font_size_override("font_size", 22)
+	dialog.confirmed.connect(_confirm_booster_use.bind(kind))
+	dialog.confirmed.connect(dialog.queue_free)
+	dialog.canceled.connect(_cancel_booster_dialog)
+	dialog.canceled.connect(dialog.queue_free)
+	add_child(dialog)
+	_booster_confirm = dialog
+	_booster_confirm.popup_centered(Vector2i(380, 230))
+
+
+func _confirm_booster_use(kind: String) -> void:
+	_booster_confirm = null
+	_selected_booster = kind
 	_board.unlock()
 	_board.set_booster_mode(kind)
-	_hint_label.text = "POWERUP | Tap a tile to use %s." % kind.capitalize()
+	_hint_label.text = "TAP A TILE TO USE %s  |  TAP THE BOOSTER AGAIN TO CANCEL" % kind.to_upper()
+
+
+func _cancel_booster_dialog() -> void:
+	_booster_confirm = null
+	_selected_booster = ""
+
+
+func _cancel_booster_targeting() -> void:
+	if _board != null:
+		_board.cancel_booster_mode()
+		_board.lock()
+	_selected_booster = ""
+	_hint_label.text = "BOOSTER CANCELLED | No item was used."
 
 
 func _on_booster_used(kind: String) -> void:
+	_selected_booster = ""
+	_hint_label.text = "%s USED" % kind.to_upper()
 	_booster_inventory[kind] = maxi(0, int(_booster_inventory.get(kind, 0)) - 1)
+	if _economy_manager != null:
+		if kind == "ethan":
+			_economy_manager.use_ethan()
+		else:
+			_economy_manager.use_booster(kind)
+	_save_inventory_progress()
 	var entry: Dictionary = _booster_buttons.get(kind, {})
 	if not entry.is_empty():
-		(entry["count"] as Label).text = str(_booster_inventory[kind])
+		(entry["count"] as Label).text = str(int(_booster_inventory[kind]))
 	_refresh_tutorial_controls()
 	if _tutorial_active and _tutorial_action == "booster_target":
 		_tutorial_action = "booster_resolving"
@@ -1763,26 +2322,87 @@ func _button_screen_rect(button: Control) -> Rect2:
 
 
 func _on_obstacles_cleared(amount: int) -> void:
-	if _objective_type != "DESTROY_OBSTACLES":
-		return
-	_evidence_count = mini(_evidence_goal, _evidence_count + amount)
-	_objective_label.text = "OBSTACLES\n%d / %d" % [_evidence_count, _evidence_goal]
-	if _evidence_count >= _evidence_goal:
-		_hint_label.text = "GOAL REACHED | Wrapping up the investigation..."
+	if _objective_type == "DESTROY_OBSTACLES":
+		_evidence_count = mini(_evidence_goal, _evidence_count + amount)
+	else:
+		_obstacles_cleared = mini(_obstacles_goal, _obstacles_cleared + amount)
+	_update_objective_hud()
+	if _mission_objectives_complete():
+		_hint_label.text = "ALL GOALS REACHED | Wrapping up the investigation..."
 		_play_objective_complete_sound()
+
+
+func _on_obstacle_damaged(cell: Vector2i, remaining_health: int, destroyed: bool) -> void:
+	if _board == null:
+		return
+	var rect := _board.get_cell_screen_rect(cell)
+	var hud := get_node_or_null("HUD") as CanvasLayer
+	if hud == null or rect.size == Vector2.ZERO:
+		return
+	var center := rect.get_center()
+	var particles := CPUParticles2D.new()
+	particles.position = center
+	particles.amount = 18
+	particles.lifetime = 0.48
+	particles.one_shot = true
+	particles.explosiveness = 1.0
+	particles.emission_shape = CPUParticles2D.EMISSION_SHAPE_SPHERE
+	particles.emission_sphere_radius = 9.0
+	particles.direction = Vector2.UP
+	particles.spread = 180.0
+	particles.initial_velocity_min = 48.0
+	particles.initial_velocity_max = 120.0
+	particles.gravity = Vector2(0, 70)
+	particles.scale_amount_min = 2.5
+	particles.scale_amount_max = 5.0
+	particles.color = Color("#ffe279")
+	hud.add_child(particles)
+	particles.emitting = true
+	get_tree().create_timer(0.8).timeout.connect(func():
+		if is_instance_valid(particles):
+			particles.queue_free()
+	)
+	var burst := Label.new()
+	burst.text = "✦  ✦  ✦"
+	burst.position = center - Vector2(42, 16)
+	burst.size = Vector2(84, 32)
+	burst.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	burst.add_theme_font_size_override("font_size", 22)
+	burst.add_theme_color_override("font_color", Color("#ffe279"))
+	hud.add_child(burst)
+	var pop := create_tween().set_parallel(true)
+	pop.tween_property(burst, "position", burst.position - Vector2(0, 30), 0.42)
+	pop.tween_property(burst, "modulate:a", 0.0, 0.42)
+	pop.finished.connect(burst.queue_free)
+	var health := Label.new()
+	health.text = "BROKEN!" if destroyed else "%d LEFT" % remaining_health
+	health.position = center - Vector2(48, 2)
+	health.size = Vector2(96, 28)
+	health.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	health.add_theme_font_size_override("font_size", 16)
+	health.add_theme_color_override("font_color", Color("#fff2c7"))
+	health.add_theme_color_override("font_outline_color", Color("#182c43"))
+	health.add_theme_constant_override("outline_size", 3)
+	hud.add_child(health)
+	var fly := create_tween().set_parallel(true)
+	fly.tween_property(health, "position", health.position - Vector2(0, 38), 0.55)
+	fly.tween_property(health, "modulate:a", 0.0, 0.55)
+	fly.finished.connect(health.queue_free)
 
 
 func _play_objective_complete_sound() -> void:
 	if _objective_complete_sound_played:
 		return
 	_objective_complete_sound_played = true
-	SignalBus.play_sfx.emit("objective_achieved")
+	var level_manager := get_node_or_null("Managers/LevelManager")
+	var level_data: Dictionary = level_manager.get_level_data() if level_manager != null else {}
+	_story_objective_sound_pending = _is_story_final_level(level_data)
 
 
 func _evaluate_level_end() -> void:
 	if _result_layer != null or _current_level_id <= 0:
 		return
-	if _evidence_count >= _evidence_goal:
+	if _mission_objectives_complete():
 		var level_manager := get_node_or_null("Managers/LevelManager")
 		if level_manager != null:
 			level_manager.complete_level()
@@ -1791,6 +2411,8 @@ func _evaluate_level_end() -> void:
 		var level_manager := get_node_or_null("Managers/LevelManager")
 		if level_manager != null:
 			level_manager.fail_level()
+		if _economy_manager != null:
+			_economy_manager.lose_life(1)
 		_show_level_result(false)
 
 
@@ -1799,8 +2421,9 @@ func _show_level_result(won: bool) -> void:
 		_board.lock()
 	_tutorial_active = false
 	_tutorial_action = ""
+	var first_clear := false
 	if won:
-		_record_level_completion()
+		first_clear = _record_level_completion()
 	_result_layer = CanvasLayer.new()
 	_result_layer.name = "LevelResult"
 	_result_layer.layer = 22
@@ -1839,7 +2462,17 @@ func _show_level_result(won: bool) -> void:
 		story_complete.add_theme_color_override("font_color", Color("#ffe279"))
 		content.add_child(story_complete)
 	var reward_info: Dictionary = result_data.get("rewards", {})
-	var detail_text := ("Story objective achieved. Case %03d is unlocked. +%d coins and %d stars saved." if _is_story_final_level(result_data) else "Case %03d is unlocked. +%d coins and %d stars saved.") % [mini(_highest_unlocked_level, _current_level_id + 1), int(reward_info.get("coins", 0)), maxi(1, int(reward_info.get("stars", 3)))] if won else "The remaining moves ran out. No case was unlocked. Try the investigation again."
+	var detail_text: String
+	if not won:
+		detail_text = "The remaining moves ran out. You lost one life. Try again or visit the Life Shop."
+	elif first_clear:
+		detail_text = "Case %03d unlocked. +%d Ethan Coins and %d stars added." % [mini(_highest_unlocked_level, _current_level_id + 1), int(reward_info.get("coins", 0)), maxi(1, int(reward_info.get("stars", 3)))]
+	else:
+		detail_text = "Case %03d unlocked. First-clear rewards were already collected." % mini(_highest_unlocked_level, _current_level_id + 1)
+	if won and _is_story_final_level(result_data):
+		detail_text = "Story objective achieved. " + detail_text
+		if first_clear:
+			detail_text += " A chapter booster was added to your field kit."
 	var detail := _make_label(detail_text, 19)
 	detail.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	detail.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -1849,9 +2482,13 @@ func _show_level_result(won: bool) -> void:
 		next.pressed.connect(_next_level_after_win)
 		content.add_child(next)
 	else:
-		var retry := _make_menu_button("RETRY LEVEL")
-		retry.pressed.connect(_retry_current_level)
-		content.add_child(retry)
+		if _economy_manager == null or _economy_manager.get_lives() > 0:
+			var retry := _make_menu_button("RETRY LEVEL")
+			retry.pressed.connect(_retry_current_level)
+			content.add_child(retry)
+		var life_shop := _make_menu_button("LIFE SHOP")
+		life_shop.pressed.connect(_show_life_shop)
+		content.add_child(life_shop)
 	var map_button := _make_menu_button("CAMPAIGN MAP")
 	map_button.pressed.connect(_return_to_campaign_map)
 	content.add_child(map_button)
@@ -1861,8 +2498,73 @@ func _show_level_result(won: bool) -> void:
 	entrance.tween_property(card, "scale", Vector2.ONE, 0.42).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	if won:
 		SignalBus.play_sfx.emit("level_victory")
+		if _story_objective_sound_pending:
+			_story_objective_sound_pending = false
+			_play_story_objective_sound_after_mission()
 	else:
 		SignalBus.play_sfx.emit("level_failure")
+
+
+func _play_story_objective_sound_after_mission() -> void:
+	await get_tree().create_timer(2.0).timeout
+	if _result_layer != null and is_instance_valid(_result_layer):
+		SignalBus.play_sfx.emit("objective_achieved")
+
+
+func _show_life_shop() -> void:
+	if _economy_manager == null:
+		return
+	var item: Dictionary = _economy_manager.get_shop_item("life_refill")
+	var price := int(item.get("price", 300))
+	var amount := int(item.get("amount", 5))
+	var game_config: Dictionary = ConfigLoader.load_config(Constants.ConfigPaths.GAME)
+	var maximum_lives := int(game_config.get("max_lives", 5))
+	if _economy_manager.get_lives() >= maximum_lives:
+		_show_shop_notice("Your life meter is already full.")
+		return
+	var purchase_dialog := ConfirmationDialog.new()
+	purchase_dialog.title = "LIFE SHOP"
+	purchase_dialog.dialog_text = "Refill %d lives for %d Ethan Coins? You have %d." % [amount, price, _economy_manager.get_coins()]
+	purchase_dialog.ok_button_text = "BUY LIVES"
+	var shop_layer := CanvasLayer.new()
+	shop_layer.layer = 24
+	shop_layer.process_mode = Node.PROCESS_MODE_ALWAYS
+	add_child(shop_layer)
+	shop_layer.add_child(purchase_dialog)
+	purchase_dialog.confirmed.connect(func():
+		var purchase := Purchase.new()
+		purchase.initialize()
+		purchase.set_item("life_refill")
+		purchase.set_currency(str(item.get("currency", "coins")))
+		purchase.set_price(price)
+		if _economy_manager.purchase(purchase):
+			_economy_manager.add_life(amount)
+			var result_was_open := _result_layer != null
+			if result_was_open:
+				_dismiss_level_result()
+				get_tree().paused = false
+				_show_campaign_map(_current_route_id)
+				_show_shop_notice("Lives restored. Choose a case from the campaign map.")
+		else:
+			_show_shop_notice("You need %d Ethan Coins for this refill." % price)
+	)
+	purchase_dialog.confirmed.connect(shop_layer.queue_free, CONNECT_ONE_SHOT)
+	purchase_dialog.canceled.connect(shop_layer.queue_free, CONNECT_ONE_SHOT)
+	purchase_dialog.popup_centered()
+
+
+func _show_shop_notice(message: String) -> void:
+	var notice := AcceptDialog.new()
+	notice.title = "ETHAN COINS"
+	notice.dialog_text = message
+	var notice_layer := CanvasLayer.new()
+	notice_layer.layer = 25
+	notice_layer.process_mode = Node.PROCESS_MODE_ALWAYS
+	add_child(notice_layer)
+	notice_layer.add_child(notice)
+	notice.confirmed.connect(notice_layer.queue_free)
+	notice.canceled.connect(notice_layer.queue_free)
+	notice.popup_centered()
 
 
 func _is_story_final_level(level_data: Dictionary) -> bool:
@@ -1911,8 +2613,7 @@ func _load_campaign_progress() -> void:
 	_completed_levels = completed if typeof(completed) == TYPE_DICTIONARY else {}
 
 
-func _record_level_completion() -> void:
-	SignalBus.play_sfx.emit("clue_collected")
+func _record_level_completion() -> bool:
 	var level_manager := get_node_or_null("Managers/LevelManager")
 	var level_data: Dictionary = level_manager.get_level_data() if level_manager != null else {}
 	var rewards: Dictionary = level_data.get("rewards", {})
@@ -1920,11 +2621,13 @@ func _record_level_completion() -> void:
 	var old_stars := int(_completed_levels.get(str(_current_level_id), 0))
 	_completed_levels[str(_current_level_id)] = maxi(stars_earned, old_stars)
 	_highest_unlocked_level = maxi(_highest_unlocked_level, _current_level_id + 1)
-	_campaign_progress.set_value("campaign", "highest_unlocked_level", _highest_unlocked_level)
-	_campaign_progress.set_value("campaign", "completed_levels", _completed_levels)
 	if old_stars == 0:
-		_campaign_progress.set_value("campaign", "coins", int(_campaign_progress.get_value("campaign", "coins", 0)) + int(rewards.get("coins", 0)))
+		if _reward_manager != null:
+			_reward_manager.calculate_level_rewards({"level": _current_level_id})
+			_reward_manager.claim_rewards()
+		elif _economy_manager != null:
+			_economy_manager.add_coins(int(rewards.get("coins", 0)))
+			_economy_manager.add_stars(stars_earned)
 		_campaign_progress.set_value("campaign", "total_stars", int(_campaign_progress.get_value("campaign", "total_stars", 0)) + stars_earned)
-	var error := _campaign_progress.save(CAMPAIGN_PROGRESS_PATH)
-	if error != OK:
-		push_error("Could not save campaign progress: %s" % error_string(error))
+	_persist_campaign_progress()
+	return old_stars == 0

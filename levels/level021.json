@@ -1,125 +1,120 @@
 {
-    "story":  {
-                  "return_to_map":  true,
-                  "after_level":  "",
-                  "before_level":  "",
-                  "first_clear":  ""
-              },
-    "metadata":  {
-                     "chapter_end_level":  22,
-                     "map_landmark":  "wooden_fence_cutout.png",
-                     "version":  1,
-                     "notes":  "Chapter 3: Technician\u0027s Office. Tutorial progression follows the campaign-map route.",
-                     "author":  "Save The Baby",
-                     "chapter_title":  "Technician\u0027s Office",
-                     "map_background":  "river_map_section_cutout.png",
-                     "chapter_start_level":  16,
-                     "chapter_id":  3
-                 },
-    "board":  {
-                  "columns":  8,
-                  "spawn_points":  [
-
-                                   ],
-                  "tile_size":  64,
-                  "locked_cells":  [
-
-                                   ],
-                  "blocked_cells":  [
-
-                                    ],
-                  "rows":  8
-              },
-    "powerups":  {
-                     "available":  [
-
-                                   ],
-                     "enabled":  false
-                 },
-    "tile_pool":  {
-                      "weights":  [
-                                      20,
-                                      20,
-                                      20,
-                                      20,
-                                      20
-                                  ],
-                      "tiles":  [
-                                    "key",
-                                    "phone",
-                                    "fingerprint",
-                                    "recorder",
-                                    "clock"
-                                ]
-                  },
-    "difficulty":  "TUTORIAL",
-    "objectives":  [
-                       {
-                           "amount":  9,
-                           "target":  "FINGERPRINT",
-                           "type":  "COLLECT_ITEMS"
-                       }
-                   ],
-    "audio":  {
-                  "music":  "",
-                  "victory":  "",
-                  "game_over":  ""
-              },
-    "level_id":  21,
-    "settings":  {
-                     "allow_shuffle":  true,
-                     "allow_boosters":  false,
-                     "time_limit":  0
-                 },
-    "description":  "Follow David\u0027s trail through Technician\u0027s Office and gather the evidence that can lead to Ethan.",
-    "tutorial":  {
-                     "steps":  [
-                                   {
-                                       "message":  "Swipe the glowing pair to match beside the highlighted obstacle. Matches next to it damage it; other moves are locked.",
-                                       "highlight":  [
-
-                                                     ]
-                                   }
-                               ],
-                     "enabled":  false
-                 },
-    "obstacles":  {
-                      "items":  [
-                                    {
-                                        "y":  1,
-                                        "health":  2,
-                                        "type":  "chain",
-                                        "x":  5
-                                    },
-                                    {
-                                        "y":  5,
-                                        "health":  2,
-                                        "type":  "chain",
-                                        "x":  5
-                                    },
-                                    {
-                                        "y":  5,
-                                        "health":  2,
-                                        "type":  "chain",
-                                        "x":  2
-                                    }
-                                ]
-                  },
-    "background":  {
-                       "parallax":  false,
-                       "image":  "res://assets/sprites/backgrounds/dirt_board_background.jpeg"
-                   },
-    "moves":  {
-                  "total":  26
-              },
-    "rewards":  {
-                    "powerups":  [
-
-                                 ],
-                    "perfect_bonus":  20,
-                    "coins":  30,
-                    "stars":  3,
-                    "first_try_bonus":  10
-                },
-    "name":  "A Trace on the Console"
+    "story": {
+        "return_to_map": true,
+        "after_level": "",
+        "before_level": "",
+        "first_clear": ""
+    },
+    "metadata": {
+        "chapter_end_level": 22,
+        "map_landmark": "wooden_fence_cutout.png",
+        "version": 1,
+        "notes": "Chapter 3: Technician's Office. Tutorial progression follows the campaign-map route.",
+        "author": "Save The Baby",
+        "chapter_title": "Technician's Office",
+        "map_background": "river_map_section_cutout.png",
+        "chapter_start_level": 16,
+        "chapter_id": 3,
+        "map_props": [
+            "tree_bush_topdown_cutout.png",
+            "wooden_bridge_cutout.png"
+        ]
+    },
+    "board": {
+        "columns": 8,
+        "spawn_points": [],
+        "tile_size": 64,
+        "locked_cells": [],
+        "blocked_cells": [],
+        "rows": 8
+    },
+    "powerups": {
+        "enabled": true,
+        "available": [
+            "ROCKET",
+            "BOMB"
+        ]
+    },
+    "tile_pool": {
+        "weights": [
+            21.25,
+            21.25,
+            15.0,
+            21.25,
+            21.25
+        ],
+        "tiles": [
+            "key",
+            "phone",
+            "fingerprint",
+            "recorder",
+            "clock"
+        ]
+    },
+    "difficulty": "HARD",
+    "objectives": [
+        {
+            "amount": 10,
+            "target": "FINGERPRINT",
+            "type": "COLLECT_ITEMS"
+        }
+    ],
+    "audio": {
+        "music": "",
+        "victory": "",
+        "game_over": ""
+    },
+    "level_id": 21,
+    "settings": {
+        "allow_shuffle": true,
+        "allow_boosters": true,
+        "time_limit": 0
+    },
+    "description": "Follow David's trail through Technician's Office and gather the evidence that can lead to Ethan.",
+    "tutorial": {
+        "steps": [
+            {
+                "message": "Swipe the glowing pair to match beside the highlighted obstacle. Matches next to it damage it; other moves are locked.",
+                "highlight": []
+            }
+        ],
+        "enabled": false
+    },
+    "obstacles": {
+        "items": [
+            {
+                "y": 1,
+                "health": 2,
+                "type": "chain",
+                "x": 5
+            },
+            {
+                "y": 5,
+                "health": 2,
+                "type": "chain",
+                "x": 5
+            },
+            {
+                "y": 5,
+                "health": 2,
+                "type": "chain",
+                "x": 2
+            }
+        ]
+    },
+    "background": {
+        "parallax": false,
+        "image": "res://assets/sprites/backgrounds/dirt_board_background.jpeg"
+    },
+    "moves": {
+        "total": 21
+    },
+    "rewards": {
+        "powerups": [],
+        "perfect_bonus": 20,
+        "coins": 30,
+        "stars": 3,
+        "first_try_bonus": 10
+    },
+    "name": "A Trace on the Console"
 }

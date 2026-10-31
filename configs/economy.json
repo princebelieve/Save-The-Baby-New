@@ -1,0 +1,49 @@
+{
+  "items": {
+    "life_refill": {
+      "name": "Life refill",
+      "category": "lives",
+      "currency": "coins",
+      "price": 100,
+      "amount": 5
+    },
+    "rocket_booster": {
+      "name": "Rocket booster",
+      "category": "boosters",
+      "currency": "coins",
+      "price": 35,
+      "booster": "rocket",
+      "amount": 1
+    },
+    "bomb_booster": {
+      "name": "Bomb booster",
+      "category": "boosters",
+      "currency": "coins",
+      "price": 50,
+      "booster": "bomb",
+      "amount": 1
+    },
+    "thunder_booster": {
+      "name": "Thunder booster",
+      "category": "boosters",
+      "currency": "coins",
+      "price": 70,
+      "booster": "thunder",
+      "amount": 1
+    },
+    "ethan_assist": {
+      "name": "Ethan rescue assist",
+      "description": "Choose a tile. Ethan clears a 5 by 5 rescue area.",
+      "category": "special",
+      "currency": "coins",
+      "price": 90,
+      "amount": 1
+    }
+  },
+  "starting_boosters": {
+    "rocket": 1,
+    "bomb": 1,
+    "thunder": 0
+  },
+  "starting_ethan": 0
+}

@@ -18,8 +18,9 @@
         "bomb": "line_blast_area"
       },
       "description": "Clears a row or column.",
+      "booster_description": "Choose a tile. Rocket clears its full row and column.",
       "created_by_match": true,
-      "created_by_booster": false,
+      "created_by_booster": true,
       "combinable": true
     },
     "bomb": {
@@ -41,8 +42,9 @@
         "thunder": "area_clear_by_type"
       },
       "description": "Clears nearby tiles.",
+      "booster_description": "Choose a tile. Bomb clears the tiles around it.",
       "created_by_match": true,
-      "created_by_booster": false,
+      "created_by_booster": true,
       "combinable": true
     },
     "thunder": {
@@ -63,8 +65,9 @@
         "thunder": "clear_all_types"
       },
       "description": "Clears all tiles of a selected type.",
+      "booster_description": "Choose a tile. Thunder clears every tile of that type.",
       "created_by_match": true,
-      "created_by_booster": false,
+      "created_by_booster": true,
       "combinable": true
     }
   }

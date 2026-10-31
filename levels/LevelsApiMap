@@ -283,11 +283,13 @@ Internal information.
     "chapter_start_level":1,
     "chapter_end_level":8,
     "map_background":"garden_map_tile_cutout.png",
-    "map_landmark":"tree_bush_topdown_cutout.png"
+    "map_landmark":"tree_bush_topdown_cutout.png",
+    "map_props":["bush_topdown_variant_cutout.png","wooden_fence_cutout.png"]
 }
 
-The chapter fields group levels and identify the location art and landmark used
-by the live campaign map. Keep them consistent within each chapter range below.
+The chapter fields group levels and identify the location art, landmark, and
+decorative props used by the live campaign map. Keep them consistent within
+each chapter range. Prop filenames resolve inside assets/sprites/props/.
 Campaign chapters and level progression
 
 The campaign-map art divides the opening 50 levels into six locations. Keep these

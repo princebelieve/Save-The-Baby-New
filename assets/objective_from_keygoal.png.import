@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cxyr0dwy3kimx"
-path="res://.godot/imported/booster_panel.png-3cbb475e44a7bf5f0f845aed19d6c4e7.ctex"
+uid="uid://bcyky5u6lny5i"
+path="res://.godot/imported/objective_from_keygoal.png-a6afc85db011bbc23b58fd726771130d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/ui/panels/booster_panel.png"
-dest_files=["res://.godot/imported/booster_panel.png-3cbb475e44a7bf5f0f845aed19d6c4e7.ctex"]
+source_file="res://assets/objective_from_keygoal.png"
+dest_files=["res://.godot/imported/objective_from_keygoal.png-a6afc85db011bbc23b58fd726771130d.ctex"]
 
 [params]
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c6illeii3ngoy"
-path="res://.godot/imported/coins_panel.png-e6a4ab675536fa739c435ea32dada474.ctex"
+uid="uid://dsuv2wbjujb1j"
+path="res://.godot/imported/key_goal_template.png-30ddc275c93a0f7d0d94b0e855802c03.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/ui/panels/coins_panel.png"
-dest_files=["res://.godot/imported/coins_panel.png-e6a4ab675536fa739c435ea32dada474.ctex"]
+source_file="res://assets/key_goal_template.png"
+dest_files=["res://.godot/imported/key_goal_template.png-30ddc275c93a0f7d0d94b0e855802c03.ctex"]
 
 [params]
 

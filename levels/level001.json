@@ -1,108 +1,98 @@
 {
-    "level_id":  1,
-    "name":  "The First Clue",
-    "description":  "Learn to swipe, match, and gather evidence for Ethan\u0027s rescue.",
-    "difficulty":  "TUTORIAL",
-    "board":  {
-                  "rows":  8,
-                  "columns":  8,
-                  "tile_size":  68,
-                  "spawn_points":  [
-
-                                   ],
-                  "blocked_cells":  [
-
-                                    ],
-                  "locked_cells":  [
-
-                                   ]
-              },
-    "moves":  {
-                  "total":  30
-              },
-    "objectives":  [
-                       {
-                           "type":  "COLLECT_ITEMS",
-                           "target":  "KEY",
-                           "amount":  7
-                       }
-                   ],
-    "tile_pool":  {
-                      "tiles":  [
-                                    "key",
-                                    "phone",
-                                    "fingerprint",
-                                    "recorder",
-                                    "clock"
-                                ],
-                      "weights":  [
-                                      20,
-                                      20,
-                                      20,
-                                      20,
-                                      20
-                                  ]
-                  },
-    "powerups":  {
-                     "enabled":  false,
-                     "available":  [
-
-                                   ]
-                 },
-    "obstacles":  {
-                      "items":  [
-
-                                ]
-                  },
-    "rewards":  {
-                    "coins":  10,
-                    "stars":  3,
-                    "first_try_bonus":  0,
-                    "perfect_bonus":  0,
-                    "powerups":  [
-
-                                 ]
-                },
-    "tutorial":  {
-                     "enabled":  true,
-                     "steps":  [
-                                   {
-                                       "message":  "Amara found a key by the fence. Drag one glowing key onto the other (or tap both). Match three keys in a line to clear them and add to the goal.",
-                                       "highlight":  [
-
-                                                     ]
-                                   }
-                               ]
-                 },
-    "story":  {
-                  "before_level":  "chapter01",
-                  "after_level":  "",
-                  "first_clear":  "",
-                  "return_to_map":  false
-              },
-    "audio":  {
-                  "music":  "",
-                  "victory":  "",
-                  "game_over":  ""
-              },
-    "background":  {
-                       "image":  "res://assets/sprites/backgrounds/grass_board_background.jpeg",
-                       "parallax":  false
-                   },
-    "settings":  {
-                     "time_limit":  0,
-                     "allow_shuffle":  true,
-                     "allow_boosters":  false
-                 },
-    "metadata":  {
-                     "version":  1,
-                     "author":  "Save The Baby",
-                     "notes":  "First tutorial level in Chapter 1. Teaches swipe-to-swap and evidence collection.",
-                     "chapter_id":  1,
-                     "chapter_title":  "Amara\u0027s Home",
-                     "chapter_start_level":  1,
-                     "chapter_end_level":  8,
-                     "map_background":  "garden_map_tile_cutout.png",
-                     "map_landmark":  "tree_bush_topdown_cutout.png"
-                 }
+    "level_id": 1,
+    "name": "The First Clue",
+    "description": "Learn to swipe, match, and gather evidence for Ethan's rescue.",
+    "difficulty": "EXTREMELY_EASY",
+    "board": {
+        "rows": 8,
+        "columns": 8,
+        "tile_size": 68,
+        "spawn_points": [],
+        "blocked_cells": [],
+        "locked_cells": []
+    },
+    "moves": {
+        "total": 30
+    },
+    "objectives": [
+        {
+            "type": "COLLECT_ITEMS",
+            "target": "KEY",
+            "amount": 7
+        }
+    ],
+    "tile_pool": {
+        "tiles": [
+            "key",
+            "phone",
+            "fingerprint",
+            "recorder",
+            "clock"
+        ],
+        "weights": [
+            36,
+            16,
+            16,
+            16,
+            16
+        ]
+    },
+    "powerups": {
+        "enabled": false,
+        "available": []
+    },
+    "obstacles": {
+        "items": []
+    },
+    "rewards": {
+        "coins": 10,
+        "stars": 3,
+        "first_try_bonus": 0,
+        "perfect_bonus": 0,
+        "powerups": []
+    },
+    "tutorial": {
+        "enabled": true,
+        "steps": [
+            {
+                "message": "Amara found a key by the fence. Drag one glowing key onto the other (or tap both). Match three keys in a line to clear them and add to the goal.",
+                "highlight": []
+            }
+        ]
+    },
+    "story": {
+        "before_level": "chapter01",
+        "after_level": "",
+        "first_clear": "",
+        "return_to_map": false
+    },
+    "audio": {
+        "music": "",
+        "victory": "",
+        "game_over": ""
+    },
+    "background": {
+        "image": "res://assets/sprites/backgrounds/grass_board_background.jpeg",
+        "parallax": false
+    },
+    "settings": {
+        "time_limit": 0,
+        "allow_shuffle": true,
+        "allow_boosters": false
+    },
+    "metadata": {
+        "version": 1,
+        "author": "Save The Baby",
+        "notes": "First tutorial level in Chapter 1. Teaches swipe-to-swap and evidence collection.",
+        "chapter_id": 1,
+        "chapter_title": "Amara's Home",
+        "chapter_start_level": 1,
+        "chapter_end_level": 8,
+        "map_background": "garden_map_tile_cutout.png",
+        "map_landmark": "tree_bush_topdown_cutout.png",
+        "map_props": [
+            "bush_topdown_variant_cutout.png",
+            "wooden_fence_cutout.png"
+        ]
+    }
 }

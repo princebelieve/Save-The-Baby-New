@@ -23,8 +23,8 @@ var _economy_manager
 # INITIALIZATION
 # =========================================================
 
-func initialize() -> void:
-	_economy_manager = get_parent().get_node_or_null("EconomyManager")
+func initialize(economy_manager = null) -> void:
+	_economy_manager = economy_manager
 
 
 # =========================================================
@@ -90,8 +90,8 @@ func grant_lives(amount) -> void:
 	if _economy_manager == null:
 		return
 
-	if _economy_manager.has_method("add_lives"):
-		_economy_manager.add_lives(amount)
+	if _economy_manager.has_method("add_life"):
+		_economy_manager.add_life(amount)
 
 
 func grant_booster(type, amount) -> void:

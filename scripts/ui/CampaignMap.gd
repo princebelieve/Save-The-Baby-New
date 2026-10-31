@@ -52,6 +52,7 @@ func _group_levels_into_chapters() -> void:
 				"last": int(metadata.get("chapter_end_level", level.get("level_id", 1))),
 				"background": str(metadata.get("map_background", "river_map_section_cutout.png")),
 				"landmark": str(metadata.get("map_landmark", "wooden_bridge_cutout.png")),
+				"props": metadata.get("map_props", []),
 				"levels": []
 			}
 		var chapter: Dictionary = groups[chapter_id]
@@ -176,6 +177,21 @@ func _build_chapter_art(map: Control, index: int, chapter: Dictionary, levels: A
 	landmark.size = Vector2(130, 120)
 	landmark.modulate = Color(1, 1, 1, 0.96)
 	map.add_child(landmark)
+	var prop_set: Array = chapter.get("props", [])
+	var prop_size := _map_width * 0.15
+	for prop_index in prop_set.size():
+		var prop := TextureRect.new()
+		prop.name = "ChapterProp%d" % prop_index
+		prop.texture = ResourceManager.load_texture(PROP_DIR + str(prop_set[prop_index]))
+		prop.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		prop.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		var prop_x := 8.0 if prop_index == 0 else _map_width - prop_size - 8.0
+		var prop_y := top + 170.0 if prop_index == 0 else top + _chapter_height - 205.0
+		prop.position = Vector2(prop_x, prop_y)
+		prop.size = Vector2(prop_size, prop_size * 0.82)
+		prop.modulate = Color(0.9, 0.95, 0.83, 0.94)
+		prop.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		map.add_child(prop)
 	var sign := TextureRect.new()
 	sign.texture = ResourceManager.load_texture(SIGNPOST_PATH)
 	sign.expand_mode = TextureRect.EXPAND_IGNORE_SIZE

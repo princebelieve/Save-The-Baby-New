@@ -54,6 +54,26 @@ func calculate_bonus_rewards(result) -> Array:
 	return calculate_reward_set("bonus", rewards)
 
 
+func calculate_special_move_rewards(kind: String, created_count: int) -> Array:
+	var definition := _reward_table.get_special_move_config()
+	var rewards: Array[Dictionary] = []
+	var coin_amount := maxi(0, int(definition.get("coins_per_creation", 0)))
+	if coin_amount > 0:
+		rewards.append({"type": Constants.RewardType.COINS, "amount": coin_amount})
+	var milestone := maxi(0, int(definition.get("booster_every", 0)))
+	if milestone > 0 and created_count > 0 and created_count % milestone == 0:
+		rewards.append({
+			"type": Constants.RewardType.BOOSTER,
+			"booster": kind,
+			"amount": maxi(1, int(definition.get("milestone_booster_amount", 1)))
+		})
+	return calculate_reward_set("special_move", rewards)
+
+
+func get_special_move_milestone() -> int:
+	return maxi(0, int(_reward_table.get_special_move_config().get("booster_every", 0)))
+
+
 # =========================================================
 # STORY
 # =========================================================

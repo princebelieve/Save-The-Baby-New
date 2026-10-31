@@ -11,7 +11,15 @@ var _preview
 var _queue
 var _distributor
 
-func initialize() -> void:
+
+func _ready() -> void:
+	var economy_manager = get_parent().get_node_or_null("EconomyManager") if get_parent() != null else null
+	initialize(economy_manager)
+
+
+func initialize(economy_manager = null) -> void:
+	if _calculator != null:
+		return
 	_calculator = RewardCalculator.new()
 	_calculator.initialize()
 
@@ -22,7 +30,7 @@ func initialize() -> void:
 	_queue.initialize()
 
 	_distributor = RewardDistributor.new()
-	_distributor.initialize()
+	_distributor.initialize(economy_manager)
 
 	_pending_rewards = _queue
 
@@ -51,6 +59,19 @@ func grant_rewards(reward_data) -> void:
 	_distributor.grant_rewards(reward_data)
 
 	emit_signal("reward_granted", reward_data)
+
+
+func grant_special_move(kind: String, created_count: int) -> Array:
+	var rewards: Array = _calculator.calculate_special_move_rewards(kind, created_count)
+	if rewards.is_empty():
+		return rewards
+	_distributor.grant_rewards(rewards)
+	emit_signal("reward_granted", rewards)
+	return rewards
+
+
+func get_special_move_milestone() -> int:
+	return _calculator.get_special_move_milestone()
 
 
 func grant_daily_reward():

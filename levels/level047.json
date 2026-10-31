@@ -1,128 +1,122 @@
 {
-    "story":  {
-                  "return_to_map":  true,
-                  "after_level":  "",
-                  "before_level":  "",
-                  "first_clear":  ""
-              },
-    "metadata":  {
-                     "chapter_end_level":  50,
-                     "map_landmark":  "wooden_bridge_cutout.png",
-                     "version":  1,
-                     "notes":  "Chapter 6: Victor\u0027s Factory. Tutorial progression follows the campaign-map route.",
-                     "author":  "Save The Baby",
-                     "chapter_title":  "Victor\u0027s Factory",
-                     "map_background":  "factory_map_section_cutout.png",
-                     "chapter_start_level":  41,
-                     "chapter_id":  6
-                 },
-    "board":  {
-                  "columns":  8,
-                  "spawn_points":  [
-
-                                   ],
-                  "tile_size":  64,
-                  "locked_cells":  [
-
-                                   ],
-                  "blocked_cells":  [
-
-                                    ],
-                  "rows":  8
-              },
-    "powerups":  {
-                     "available":  [
-                                       "ROCKET",
-                                       "BOMB",
-                                       "THUNDER"
-                                   ],
-                     "enabled":  true
-                 },
-    "tile_pool":  {
-                      "weights":  [
-                                      20,
-                                      20,
-                                      20,
-                                      20,
-                                      20
-                                  ],
-                      "tiles":  [
-                                    "key",
-                                    "phone",
-                                    "fingerprint",
-                                    "recorder",
-                                    "clock"
-                                ]
-                  },
-    "difficulty":  "MEDIUM",
-    "objectives":  [
-                       {
-                           "amount":  10,
-                           "target":  "PHONE",
-                           "type":  "COLLECT_ITEMS"
-                       }
-                   ],
-    "audio":  {
-                  "music":  "",
-                  "victory":  "",
-                  "game_over":  ""
-              },
-    "level_id":  47,
-    "settings":  {
-                     "allow_shuffle":  true,
-                     "allow_boosters":  true,
-                     "time_limit":  0
-                 },
-    "description":  "Follow David\u0027s trail through Victor\u0027s Factory and gather the evidence that can lead to Ethan.",
-    "tutorial":  {
-                     "steps":  [
-                                   {
-                                       "message":  "Thunder booster unlocked. Tap thunder, then a piece to clear every matching symbol.",
-                                       "highlight":  [
-
-                                                     ],
-                                       "booster":  "thunder"
-                                   }
-                               ],
-                     "enabled":  true
-                 },
-    "obstacles":  {
-                      "items":  [
-                                    {
-                                        "y":  3,
-                                        "health":  1,
-                                        "type":  "bomb",
-                                        "x":  2
-                                    },
-                                    {
-                                        "y":  1,
-                                        "health":  1,
-                                        "type":  "bomb",
-                                        "x":  2
-                                    },
-                                    {
-                                        "y":  1,
-                                        "health":  1,
-                                        "type":  "bomb",
-                                        "x":  5
-                                    }
-                                ]
-                  },
-    "background":  {
-                       "parallax":  false,
-                       "image":  "res://assets/sprites/backgrounds/dirt_board_background.jpeg"
-                   },
-    "moves":  {
-                  "total":  19
-              },
-    "rewards":  {
-                    "powerups":  [
-
-                                 ],
-                    "perfect_bonus":  20,
-                    "coins":  55,
-                    "stars":  3,
-                    "first_try_bonus":  10
-                },
-    "name":  "Ethan\u0027s Drawing"
+    "story": {
+        "return_to_map": true,
+        "after_level": "",
+        "before_level": "",
+        "first_clear": ""
+    },
+    "metadata": {
+        "chapter_end_level": 50,
+        "map_landmark": "wooden_bridge_cutout.png",
+        "version": 1,
+        "notes": "Chapter 6: Victor's Factory. Tutorial progression follows the campaign-map route.",
+        "author": "Save The Baby",
+        "chapter_title": "Victor's Factory",
+        "map_background": "factory_map_section_cutout.png",
+        "chapter_start_level": 41,
+        "chapter_id": 6,
+        "map_props": [
+            "police_car_topdown_cutout.png",
+            "wooden_bridge_cutout.png"
+        ]
+    },
+    "board": {
+        "columns": 8,
+        "spawn_points": [],
+        "tile_size": 64,
+        "locked_cells": [],
+        "blocked_cells": [],
+        "rows": 8
+    },
+    "powerups": {
+        "enabled": true,
+        "available": [
+            "ROCKET",
+            "BOMB",
+            "THUNDER"
+        ]
+    },
+    "tile_pool": {
+        "weights": [
+            16,
+            20,
+            16,
+            16,
+            16
+        ],
+        "tiles": [
+            "key",
+            "phone",
+            "fingerprint",
+            "recorder",
+            "clock"
+        ]
+    },
+    "difficulty": "MEDIUM",
+    "objectives": [
+        {
+            "amount": 10,
+            "target": "PHONE",
+            "type": "COLLECT_ITEMS"
+        }
+    ],
+    "audio": {
+        "music": "",
+        "victory": "",
+        "game_over": ""
+    },
+    "level_id": 47,
+    "settings": {
+        "allow_shuffle": true,
+        "allow_boosters": true,
+        "time_limit": 0
+    },
+    "description": "Follow David's trail through Victor's Factory and gather the evidence that can lead to Ethan.",
+    "tutorial": {
+        "steps": [
+            {
+                "message": "Thunder booster unlocked. Tap thunder, then a piece to clear every matching symbol.",
+                "highlight": [],
+                "booster": "thunder"
+            }
+        ],
+        "enabled": true
+    },
+    "obstacles": {
+        "items": [
+            {
+                "y": 3,
+                "health": 1,
+                "type": "bomb",
+                "x": 2
+            },
+            {
+                "y": 1,
+                "health": 1,
+                "type": "bomb",
+                "x": 2
+            },
+            {
+                "y": 1,
+                "health": 1,
+                "type": "bomb",
+                "x": 5
+            }
+        ]
+    },
+    "background": {
+        "parallax": false,
+        "image": "res://assets/sprites/backgrounds/dirt_board_background.jpeg"
+    },
+    "moves": {
+        "total": 20
+    },
+    "rewards": {
+        "powerups": [],
+        "perfect_bonus": 20,
+        "coins": 55,
+        "stars": 3,
+        "first_try_bonus": 10
+    },
+    "name": "Ethan's Drawing"
 }

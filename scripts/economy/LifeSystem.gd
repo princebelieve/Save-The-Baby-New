@@ -23,6 +23,7 @@ class_name LifeSystem
 # =========================================================
 
 var _current_lives: int = 0
+var _maximum_lives: int = 5
 var _last_regeneration_time: int = 0
 
 var _unlimited_timer: int = 0  # unix timestamp end time
@@ -34,6 +35,8 @@ var _unlimited_timer: int = 0  # unix timestamp end time
 
 func initialize() -> void:
 	reset()
+	var game_config: Dictionary = ConfigLoader.load_config(Constants.ConfigPaths.GAME)
+	_maximum_lives = maxi(1, int(game_config.get("max_lives", 5)))
 
 
 func reset() -> void:
@@ -49,7 +52,7 @@ func reset() -> void:
 func add_life(amount: int) -> void:
 	if amount <= 0:
 		return
-	_current_lives += amount
+	_current_lives = mini(_maximum_lives, _current_lives + amount)
 
 
 func lose_life(amount: int) -> void:
@@ -60,7 +63,7 @@ func lose_life(amount: int) -> void:
 
 
 func set_lives(amount: int) -> void:
-	_current_lives = max(0, amount)
+	_current_lives = clampi(amount, 0, _maximum_lives)
 
 
 func get_lives() -> int:
@@ -69,7 +72,7 @@ func get_lives() -> int:
 
 func restore_full_lives() -> void:
 	# No cap defined here (cap belongs to Economy config / manager layer)
-	_current_lives = 0
+	_current_lives = _maximum_lives
 
 
 func has_lives() -> bool:
@@ -77,8 +80,7 @@ func has_lives() -> bool:
 
 
 func is_full() -> bool:
-	# Since max lives is not defined here, treat as "non-zero baseline full"
-	return false
+	return _current_lives >= _maximum_lives
 
 
 # =========================================================
@@ -120,33 +122,27 @@ func update() -> void:
 
 
 func restore_regenerated_lives() -> void:
-	# NOTE:
-	# Exact regeneration rules (max lives, interval)
-	# belong in EconomyManager or config system.
-	#
-	# This system only tracks timing.
-
 	var now := TimeHelper.current_unix_time()
 
 	if _last_regeneration_time == 0:
 		_last_regeneration_time = now
 		return
 
-	# Placeholder-safe rule:
-	# assume 1 life per 300 seconds baseline (config-driven later)
-	var interval := 300
+	var game_config: Dictionary = ConfigLoader.load_config(Constants.ConfigPaths.GAME)
+	var interval := maxi(60, int(game_config.get("life_regeneration_seconds", 1800)))
 
 	var elapsed := now - _last_regeneration_time
 
 	if elapsed >= interval:
 		var gained := elapsed / interval
-		_current_lives += gained
+		_current_lives = mini(_maximum_lives, _current_lives + gained)
 		_last_regeneration_time += gained * interval
 
 
 func seconds_until_next_life() -> int:
 	var now := TimeHelper.current_unix_time()
-	var interval := 300
+	var game_config: Dictionary = ConfigLoader.load_config(Constants.ConfigPaths.GAME)
+	var interval := maxi(60, int(game_config.get("life_regeneration_seconds", 1800)))
 
 	var next_time := _last_regeneration_time + interval
 

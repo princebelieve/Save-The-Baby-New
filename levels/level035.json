@@ -1,119 +1,115 @@
 {
-    "story":  {
-                  "return_to_map":  true,
-                  "after_level":  "",
-                  "before_level":  "",
-                  "first_clear":  ""
-              },
-    "metadata":  {
-                     "chapter_end_level":  40,
-                     "map_landmark":  "bush_topdown_variant_cutout.png",
-                     "version":  1,
-                     "notes":  "Chapter 5: Forest Path. Tutorial progression follows the campaign-map route.",
-                     "author":  "Save The Baby",
-                     "chapter_title":  "Forest Path",
-                     "map_background":  "river_waterfall_map_tile_cutout.png",
-                     "chapter_start_level":  31,
-                     "chapter_id":  5
-                 },
-    "board":  {
-                  "columns":  8,
-                  "spawn_points":  [
-
-                                   ],
-                  "tile_size":  64,
-                  "locked_cells":  [
-
-                                   ],
-                  "blocked_cells":  [
-
-                                    ],
-                  "rows":  8
-              },
-    "powerups":  {
-                     "available":  [
-
-                                   ],
-                     "enabled":  false
-                 },
-    "tile_pool":  {
-                      "weights":  [
-                                      20,
-                                      20,
-                                      20,
-                                      20,
-                                      20
-                                  ],
-                      "tiles":  [
-                                    "key",
-                                    "phone",
-                                    "fingerprint",
-                                    "recorder",
-                                    "clock"
-                                ]
-                  },
-    "difficulty":  "TUTORIAL",
-    "objectives":  [
-                       {
-                           "amount":  9,
-                           "target":  "CLOCK",
-                           "type":  "COLLECT_ITEMS"
-                       }
-                   ],
-    "audio":  {
-                  "music":  "",
-                  "victory":  "",
-                  "game_over":  ""
-              },
-    "level_id":  35,
-    "settings":  {
-                     "allow_shuffle":  true,
-                     "allow_boosters":  false,
-                     "time_limit":  0
-                 },
-    "description":  "Follow David\u0027s trail through Forest Path and gather the evidence that can lead to Ethan.",
-    "tutorial":  {
-                     "steps":  [
-                                   {
-                                       "message":  "Swipe the glowing pair to match beside the highlighted obstacle. Matches next to it damage it; other moves are locked.",
-                                       "highlight":  [
-
-                                                     ]
-                                   }
-                               ],
-                     "enabled":  false
-                 },
-    "obstacles":  {
-                      "items":  [
-                                    {
-                                        "y":  5,
-                                        "health":  1,
-                                        "type":  "electric_trap",
-                                        "x":  2
-                                    },
-                                    {
-                                        "y":  3,
-                                        "health":  1,
-                                        "type":  "electric_trap",
-                                        "x":  2
-                                    }
-                                ]
-                  },
-    "background":  {
-                       "parallax":  false,
-                       "image":  "res://assets/sprites/backgrounds/dirt_board_background.jpeg"
-                   },
-    "moves":  {
-                  "total":  22
-              },
-    "rewards":  {
-                    "powerups":  [
-
-                                 ],
-                    "perfect_bonus":  20,
-                    "coins":  45,
-                    "stars":  3,
-                    "first_try_bonus":  10
-                },
-    "name":  "The Waterfall Path"
+    "story": {
+        "return_to_map": true,
+        "after_level": "",
+        "before_level": "",
+        "first_clear": ""
+    },
+    "metadata": {
+        "chapter_end_level": 40,
+        "map_landmark": "bush_topdown_variant_cutout.png",
+        "version": 1,
+        "notes": "Chapter 5: Forest Path. Tutorial progression follows the campaign-map route.",
+        "author": "Save The Baby",
+        "chapter_title": "Forest Path",
+        "map_background": "river_waterfall_map_tile_cutout.png",
+        "chapter_start_level": 31,
+        "chapter_id": 5,
+        "map_props": [
+            "bush_topdown_variant_cutout.png",
+            "tree_bush_topdown_cutout.png"
+        ]
+    },
+    "board": {
+        "columns": 8,
+        "spawn_points": [],
+        "tile_size": 64,
+        "locked_cells": [],
+        "blocked_cells": [],
+        "rows": 8
+    },
+    "powerups": {
+        "enabled": true,
+        "available": [
+            "ROCKET",
+            "BOMB",
+            "THUNDER"
+        ]
+    },
+    "tile_pool": {
+        "weights": [
+            16,
+            16,
+            16,
+            16,
+            20
+        ],
+        "tiles": [
+            "key",
+            "phone",
+            "fingerprint",
+            "recorder",
+            "clock"
+        ]
+    },
+    "difficulty": "MEDIUM",
+    "objectives": [
+        {
+            "amount": 9,
+            "target": "CLOCK",
+            "type": "COLLECT_ITEMS"
+        }
+    ],
+    "audio": {
+        "music": "",
+        "victory": "",
+        "game_over": ""
+    },
+    "level_id": 35,
+    "settings": {
+        "allow_shuffle": true,
+        "allow_boosters": true,
+        "time_limit": 0
+    },
+    "description": "Follow David's trail through Forest Path and gather the evidence that can lead to Ethan.",
+    "tutorial": {
+        "steps": [
+            {
+                "message": "Swipe the glowing pair to match beside the highlighted obstacle. Matches next to it damage it; other moves are locked.",
+                "highlight": []
+            }
+        ],
+        "enabled": false
+    },
+    "obstacles": {
+        "items": [
+            {
+                "y": 5,
+                "health": 1,
+                "type": "electric_trap",
+                "x": 2
+            },
+            {
+                "y": 3,
+                "health": 1,
+                "type": "electric_trap",
+                "x": 2
+            }
+        ]
+    },
+    "background": {
+        "parallax": false,
+        "image": "res://assets/sprites/backgrounds/dirt_board_background.jpeg"
+    },
+    "moves": {
+        "total": 21
+    },
+    "rewards": {
+        "powerups": [],
+        "perfect_bonus": 20,
+        "coins": 45,
+        "stars": 3,
+        "first_try_bonus": 10
+    },
+    "name": "The Waterfall Path"
 }

@@ -7,6 +7,8 @@ signal match_collected(tile_types: Array)
 signal turn_resolved
 signal booster_used(kind: String)
 signal obstacles_cleared(amount: int)
+signal obstacle_damaged(cell: Vector2i, remaining_health: int, destroyed: bool)
+signal tiles_matched_with_cells(tile_types: Array, cells: Array)
 signal special_created(kind: String)
 signal special_activated(kind: String)
 
@@ -58,7 +60,7 @@ func initialize(level_data: Dictionary) -> bool:
 	var columns := maxi(get_width(), 1)
 	# Keep the playable grid prominent on modern portrait screens while honoring
 	# larger per-level tile sizes.
-	_tile_size = maxi(configured_tile_size, int(floor(viewport_width() * 0.80 / columns)))
+	_tile_size = maxi(configured_tile_size, int(floor(viewport_width() * 0.92 / columns)))
 	for position in _grid:
 		var tile: Tile = _grid[position]
 		_attach_tile(tile, position)
@@ -308,10 +310,13 @@ func _cell_center(grid_position: Vector2i) -> Vector2:
 
 func notify_match_tiles(tiles: Array) -> void:
 	var tile_types: Array = []
+	var cells: Array = []
 	for tile in tiles:
 		if tile != null:
 			tile_types.append(tile.get_tile_type())
+			cells.append(tile.get_grid_position())
 	match_collected.emit(tile_types)
+	tiles_matched_with_cells.emit(tile_types, cells)
 	SignalBus.matches_found.emit(tiles)
 	_damage_nearby_obstacles(tiles)
 
@@ -563,11 +568,13 @@ func _damage_nearby_obstacles(tiles: Array) -> void:
 			_obstacles.erase(cell)
 			continue
 		obstacle.damage(1)
+		var destroyed := obstacle.is_destroyed()
+		obstacle_damaged.emit(cell, obstacle.get_obstacle_state().get_health(), destroyed)
 		var shake := create_tween()
 		shake.tween_property(obstacle, "rotation", 0.08, 0.05)
 		shake.tween_property(obstacle, "rotation", -0.08, 0.05)
 		shake.tween_property(obstacle, "rotation", 0.0, 0.05)
-		if obstacle.is_destroyed():
+		if destroyed:
 			_obstacles.erase(cell)
 			cleared += 1
 			var destroy := create_tween()
@@ -605,6 +612,11 @@ func use_booster_at(kind: String, position: Vector2i) -> bool:
 			var target_type: int = target.get_tile_type()
 			for tile in _grid.values():
 				if tile.get_tile_type() == target_type: targets.append(tile)
+		"ethan":
+			for y in range(maxi(0, position.y - 2), mini(get_height(), position.y + 3)):
+				for x in range(maxi(0, position.x - 2), mini(get_width(), position.x + 3)):
+					var rescue_tile: Tile = get_tile(Vector2i(x, y))
+					if rescue_tile != null: targets.append(rescue_tile)
 		_:
 			return false
 	if targets.is_empty():

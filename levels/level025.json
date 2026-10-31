@@ -1,119 +1,114 @@
 {
-    "story":  {
-                  "return_to_map":  true,
-                  "after_level":  "",
-                  "before_level":  "",
-                  "first_clear":  ""
-              },
-    "metadata":  {
-                     "chapter_end_level":  30,
-                     "map_landmark":  "police_car_topdown_cutout.png",
-                     "version":  1,
-                     "notes":  "Chapter 4: Police Station. Tutorial progression follows the campaign-map route.",
-                     "author":  "Save The Baby",
-                     "chapter_title":  "Police Station",
-                     "map_background":  "riverbank_map_section_cutout.png",
-                     "chapter_start_level":  23,
-                     "chapter_id":  4
-                 },
-    "board":  {
-                  "columns":  8,
-                  "spawn_points":  [
-
-                                   ],
-                  "tile_size":  64,
-                  "locked_cells":  [
-
-                                   ],
-                  "blocked_cells":  [
-
-                                    ],
-                  "rows":  8
-              },
-    "powerups":  {
-                     "available":  [
-
-                                   ],
-                     "enabled":  false
-                 },
-    "tile_pool":  {
-                      "weights":  [
-                                      20,
-                                      20,
-                                      20,
-                                      20,
-                                      20
-                                  ],
-                      "tiles":  [
-                                    "key",
-                                    "phone",
-                                    "fingerprint",
-                                    "recorder",
-                                    "clock"
-                                ]
-                  },
-    "difficulty":  "TUTORIAL",
-    "objectives":  [
-                       {
-                           "amount":  8,
-                           "target":  "RECORDER",
-                           "type":  "COLLECT_ITEMS"
-                       }
-                   ],
-    "audio":  {
-                  "music":  "",
-                  "victory":  "",
-                  "game_over":  ""
-              },
-    "level_id":  25,
-    "settings":  {
-                     "allow_shuffle":  true,
-                     "allow_boosters":  false,
-                     "time_limit":  0
-                 },
-    "description":  "Follow David\u0027s trail through Police Station and gather the evidence that can lead to Ethan.",
-    "tutorial":  {
-                     "steps":  [
-                                   {
-                                       "message":  "Swipe the glowing pair to match beside the highlighted obstacle. Matches next to it damage it; other moves are locked.",
-                                       "highlight":  [
-
-                                                     ]
-                                   }
-                               ],
-                     "enabled":  false
-                 },
-    "obstacles":  {
-                      "items":  [
-                                    {
-                                        "y":  1,
-                                        "health":  2,
-                                        "type":  "lock",
-                                        "x":  2
-                                    },
-                                    {
-                                        "y":  1,
-                                        "health":  2,
-                                        "type":  "lock",
-                                        "x":  5
-                                    }
-                                ]
-                  },
-    "background":  {
-                       "parallax":  false,
-                       "image":  "res://assets/sprites/backgrounds/grass_board_background.jpeg"
-                   },
-    "moves":  {
-                  "total":  25
-              },
-    "rewards":  {
-                    "powerups":  [
-
-                                 ],
-                    "perfect_bonus":  20,
-                    "coins":  35,
-                    "stars":  3,
-                    "first_try_bonus":  10
-                },
-    "name":  "The Evidence Room"
+    "story": {
+        "return_to_map": true,
+        "after_level": "",
+        "before_level": "",
+        "first_clear": ""
+    },
+    "metadata": {
+        "chapter_end_level": 30,
+        "map_landmark": "police_car_topdown_cutout.png",
+        "version": 1,
+        "notes": "Chapter 4: Police Station. Tutorial progression follows the campaign-map route.",
+        "author": "Save The Baby",
+        "chapter_title": "Police Station",
+        "map_background": "riverbank_map_section_cutout.png",
+        "chapter_start_level": 23,
+        "chapter_id": 4,
+        "map_props": [
+            "police_car_topdown_cutout.png",
+            "wooden_fence_cutout.png"
+        ]
+    },
+    "board": {
+        "columns": 8,
+        "spawn_points": [],
+        "tile_size": 64,
+        "locked_cells": [],
+        "blocked_cells": [],
+        "rows": 8
+    },
+    "powerups": {
+        "enabled": true,
+        "available": [
+            "ROCKET",
+            "BOMB"
+        ]
+    },
+    "tile_pool": {
+        "weights": [
+            16,
+            16,
+            16,
+            20,
+            16
+        ],
+        "tiles": [
+            "key",
+            "phone",
+            "fingerprint",
+            "recorder",
+            "clock"
+        ]
+    },
+    "difficulty": "MEDIUM",
+    "objectives": [
+        {
+            "amount": 8,
+            "target": "RECORDER",
+            "type": "COLLECT_ITEMS"
+        }
+    ],
+    "audio": {
+        "music": "",
+        "victory": "",
+        "game_over": ""
+    },
+    "level_id": 25,
+    "settings": {
+        "allow_shuffle": true,
+        "allow_boosters": true,
+        "time_limit": 0
+    },
+    "description": "Follow David's trail through Police Station and gather the evidence that can lead to Ethan.",
+    "tutorial": {
+        "steps": [
+            {
+                "message": "Swipe the glowing pair to match beside the highlighted obstacle. Matches next to it damage it; other moves are locked.",
+                "highlight": []
+            }
+        ],
+        "enabled": false
+    },
+    "obstacles": {
+        "items": [
+            {
+                "y": 1,
+                "health": 2,
+                "type": "lock",
+                "x": 2
+            },
+            {
+                "y": 1,
+                "health": 2,
+                "type": "lock",
+                "x": 5
+            }
+        ]
+    },
+    "background": {
+        "parallax": false,
+        "image": "res://assets/sprites/backgrounds/grass_board_background.jpeg"
+    },
+    "moves": {
+        "total": 24
+    },
+    "rewards": {
+        "powerups": [],
+        "perfect_bonus": 20,
+        "coins": 35,
+        "stars": 3,
+        "first_try_bonus": 10
+    },
+    "name": "The Evidence Room"
 }

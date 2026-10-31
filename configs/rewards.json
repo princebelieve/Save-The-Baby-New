@@ -1,0 +1,554 @@
+{
+  "levels": {
+    "1": [
+      {
+        "type": 0,
+        "amount": 10
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "2": [
+      {
+        "type": 0,
+        "amount": 10
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "3": [
+      {
+        "type": 0,
+        "amount": 10
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "4": [
+      {
+        "type": 0,
+        "amount": 15
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "5": [
+      {
+        "type": 0,
+        "amount": 15
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "6": [
+      {
+        "type": 0,
+        "amount": 15
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "7": [
+      {
+        "type": 0,
+        "amount": 15
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "8": [
+      {
+        "type": 0,
+        "amount": 15
+      },
+      {
+        "type": 1,
+        "amount": 3
+      },
+      {
+        "type": 3,
+        "booster": "bomb",
+        "amount": 1
+      }
+    ],
+    "9": [
+      {
+        "type": 0,
+        "amount": 20
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "10": [
+      {
+        "type": 0,
+        "amount": 20
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "11": [
+      {
+        "type": 0,
+        "amount": 20
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "12": [
+      {
+        "type": 0,
+        "amount": 20
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "13": [
+      {
+        "type": 0,
+        "amount": 20
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "14": [
+      {
+        "type": 0,
+        "amount": 25
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "15": [
+      {
+        "type": 0,
+        "amount": 25
+      },
+      {
+        "type": 1,
+        "amount": 3
+      },
+      {
+        "type": 3,
+        "booster": "rocket",
+        "amount": 1
+      }
+    ],
+    "16": [
+      {
+        "type": 0,
+        "amount": 25
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "17": [
+      {
+        "type": 0,
+        "amount": 25
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "18": [
+      {
+        "type": 0,
+        "amount": 25
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "19": [
+      {
+        "type": 0,
+        "amount": 30
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "20": [
+      {
+        "type": 0,
+        "amount": 30
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "21": [
+      {
+        "type": 0,
+        "amount": 30
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "22": [
+      {
+        "type": 0,
+        "amount": 30
+      },
+      {
+        "type": 1,
+        "amount": 3
+      },
+      {
+        "type": 3,
+        "booster": "thunder",
+        "amount": 1
+      }
+    ],
+    "23": [
+      {
+        "type": 0,
+        "amount": 30
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "24": [
+      {
+        "type": 0,
+        "amount": 35
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "25": [
+      {
+        "type": 0,
+        "amount": 35
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "26": [
+      {
+        "type": 0,
+        "amount": 35
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "27": [
+      {
+        "type": 0,
+        "amount": 35
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "28": [
+      {
+        "type": 0,
+        "amount": 35
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "29": [
+      {
+        "type": 0,
+        "amount": 40
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "30": [
+      {
+        "type": 0,
+        "amount": 40
+      },
+      {
+        "type": 1,
+        "amount": 3
+      },
+      {
+        "type": 3,
+        "booster": "bomb",
+        "amount": 1
+      }
+    ],
+    "31": [
+      {
+        "type": 0,
+        "amount": 40
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "32": [
+      {
+        "type": 0,
+        "amount": 40
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "33": [
+      {
+        "type": 0,
+        "amount": 40
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "34": [
+      {
+        "type": 0,
+        "amount": 45
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "35": [
+      {
+        "type": 0,
+        "amount": 45
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "36": [
+      {
+        "type": 0,
+        "amount": 45
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "37": [
+      {
+        "type": 0,
+        "amount": 45
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "38": [
+      {
+        "type": 0,
+        "amount": 45
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "39": [
+      {
+        "type": 0,
+        "amount": 50
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "40": [
+      {
+        "type": 0,
+        "amount": 50
+      },
+      {
+        "type": 1,
+        "amount": 3
+      },
+      {
+        "type": 3,
+        "booster": "rocket",
+        "amount": 1
+      }
+    ],
+    "41": [
+      {
+        "type": 0,
+        "amount": 50
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "42": [
+      {
+        "type": 0,
+        "amount": 50
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "43": [
+      {
+        "type": 0,
+        "amount": 50
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "44": [
+      {
+        "type": 0,
+        "amount": 55
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "45": [
+      {
+        "type": 0,
+        "amount": 55
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "46": [
+      {
+        "type": 0,
+        "amount": 55
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "47": [
+      {
+        "type": 0,
+        "amount": 55
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "48": [
+      {
+        "type": 0,
+        "amount": 55
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "49": [
+      {
+        "type": 0,
+        "amount": 60
+      },
+      {
+        "type": 1,
+        "amount": 3
+      }
+    ],
+    "50": [
+      {
+        "type": 0,
+        "amount": 60
+      },
+      {
+        "type": 1,
+        "amount": 3
+      },
+      {
+        "type": 3,
+        "booster": "thunder",
+        "amount": 1
+      }
+    ]
+  },
+  "story": {
+    "chapter_complete": [
+      {
+        "type": 0,
+        "amount": 100
+      },
+      {
+        "type": 1,
+        "amount": 5
+      }
+    ]
+  },
+  "bonus": [],
+  "daily": [],
+  "chests": {},
+  "special_move": {
+    "coins_per_creation": 3,
+    "booster_every": 3,
+    "milestone_booster_amount": 1
+  }
+}

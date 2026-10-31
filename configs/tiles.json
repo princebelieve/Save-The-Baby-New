@@ -69,6 +69,48 @@
       "spawnable": true,
       "hidden": false,
       "special": false
+    },
+    {
+      "id": "ethan",
+      "enum": 15,
+      "name": "Ethan",
+      "texture": "res://assets/sprites/characters/ethan_portrait_cutout.png",
+      "icon": "res://assets/sprites/characters/ethan_portrait_cutout.png",
+      "animation_set": "default",
+      "score": 100,
+      "spawn_weight": 3,
+      "matchable": true,
+      "spawnable": true,
+      "hidden": false,
+      "special": true
+    },
+    {
+      "id": "detective",
+      "enum": 16,
+      "name": "Detective",
+      "texture": "res://assets/sprites/characters/detective_portrait_cutout.png",
+      "icon": "res://assets/sprites/characters/detective_portrait_cutout.png",
+      "animation_set": "default",
+      "score": 100,
+      "spawn_weight": 2,
+      "matchable": true,
+      "spawnable": true,
+      "hidden": false,
+      "special": true
+    },
+    {
+      "id": "victor",
+      "enum": 17,
+      "name": "Victor",
+      "texture": "res://assets/sprites/characters/victor_portrait_badge_cutout.png",
+      "icon": "res://assets/sprites/characters/victor_portrait_badge_cutout.png",
+      "animation_set": "default",
+      "score": 100,
+      "spawn_weight": 2,
+      "matchable": true,
+      "spawnable": true,
+      "hidden": false,
+      "special": true
     }
   ]
 }

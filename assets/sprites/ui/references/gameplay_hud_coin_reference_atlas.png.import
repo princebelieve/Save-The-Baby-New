@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cok1re7jhj4nm"
-path="res://.godot/imported/life_panel.png-87078762202074eb604bccfd1fcc496a.ctex"
+uid="uid://nsamgugp37hs"
+path="res://.godot/imported/gameplay_hud_coin_reference_atlas.png-4b9c7a5c6d71cfdc874b0c6a61d6e6eb.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/ui/panels/life_panel.png"
-dest_files=["res://.godot/imported/life_panel.png-87078762202074eb604bccfd1fcc496a.ctex"]
+source_file="res://assets/sprites/ui/references/gameplay_hud_coin_reference_atlas.png"
+dest_files=["res://.godot/imported/gameplay_hud_coin_reference_atlas.png-4b9c7a5c6d71cfdc874b0c6a61d6e6eb.ctex"]
 
 [params]
 

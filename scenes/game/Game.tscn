@@ -6,6 +6,8 @@
 [ext_resource type="Script" path="res://scripts/game/Game.gd" id="4_gameplay"]
 [ext_resource type="Script" path="res://scripts/managers/StoryManager.gd" id="5_story"]
 [ext_resource type="Script" path="res://scripts/managers/AudioManager.gd" id="6_audio"]
+[ext_resource type="Script" path="res://scripts/managers/EconomyManager.gd" id="7_economy"]
+[ext_resource type="Script" path="res://scripts/managers/RewardManager.gd" id="8_reward"]
 
 [node name="Game" type="Node2D"]
 script = ExtResource("4_gameplay")
@@ -53,3 +55,9 @@ script = ExtResource("5_story")
 
 [node name="AudioManager" type="Node" parent="Managers"]
 script = ExtResource("6_audio")
+
+[node name="EconomyManager" type="Node" parent="Managers"]
+script = ExtResource("7_economy")
+
+[node name="RewardManager" type="Node" parent="Managers"]
+script = ExtResource("8_reward")

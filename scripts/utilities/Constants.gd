@@ -157,7 +157,10 @@ enum TileType {
 	PLIER,
 	ROCKET,
 	THUNDER,
-	BOMB_POWER
+	BOMB_POWER,
+	ETHAN,
+	DETECTIVE,
+	VICTOR
 }
 
 enum PowerupType {
