@@ -40,6 +40,8 @@ var _reward_label: Label
 var _lives_label: Label
 var _level_reward_label: Label
 var _star_reward_label: Label
+var _objective_target_icon: TextureRect
+var _objective_target_name: Label
 var _hint_label: Label
 var _pause_button: TextureButton
 var _case_file_button: TextureButton
@@ -296,7 +298,7 @@ func _build_gameplay_hud() -> void:
 	hud.layer = 2
 	hud.visible = true
 	var header := Control.new()
-	var hud_scale := clampf(get_viewport_rect().size.x / 486.0, 0.72, 1.0)
+	var hud_scale := clampf(get_viewport_rect().size.x / 720.0, 0.52, 1.0)
 	header.name = "MissionHeader"
 	header.anchor_left = 0.0
 	header.anchor_right = 1.0
@@ -313,7 +315,7 @@ func _build_gameplay_hud() -> void:
 	status_row.anchor_top = 0.145
 	status_row.anchor_bottom = 0.205
 	status_row.alignment = BoxContainer.ALIGNMENT_CENTER
-	status_row.add_theme_constant_override("separation", 4)
+	status_row.add_theme_constant_override("separation", roundi(4 * hud_scale))
 	var status_backing := Panel.new()
 	status_backing.name = "StatusRowBacking"
 	status_backing.anchor_left = 0.025
@@ -331,16 +333,17 @@ func _build_gameplay_hud() -> void:
 	hud.add_child(status_backing)
 	hud.move_child(status_backing, header.get_index() + 1)
 	hud.add_child(status_row)
-	_star_reward_label = _make_compact_hud_panel(status_row, "StarReward", "☆☆☆", Vector2(96, 48) * hud_scale, roundi(17 * hud_scale), Color("#f4ce49"))
-	_level_reward_label = _make_compact_hud_panel(status_row, "LevelReward", "+0", Vector2(92, 48) * hud_scale, roundi(16 * hud_scale), Color("#e9bd55"))
-	_reward_label = _make_compact_hud_panel(status_row, "CoinCounter", "100", Vector2(100, 48) * hud_scale, roundi(18 * hud_scale), Color("#e9bd55"))
-	_lives_label = _make_compact_hud_panel(status_row, "LifeHearts", "", Vector2(86, 48) * hud_scale, roundi(17 * hud_scale), Color("#f06c9b"))
+	_build_objective_target_badge(status_row, hud_scale)
+	_lives_label = _make_compact_hud_panel(status_row, "LifeHearts", "0/5", Vector2(150, 54) * hud_scale, roundi(21 * hud_scale), Color("#f06c9b"))
+	_reward_label = _make_compact_hud_panel(status_row, "CoinCounter", "0", Vector2(154, 54) * hud_scale, roundi(21 * hud_scale), Color("#e9bd55"))
+	_star_reward_label = _make_compact_hud_panel(status_row, "StarReward", "☆☆☆", Vector2(70, 54) * hud_scale, roundi(17 * hud_scale), Color("#f4ce49"))
+	_level_reward_label = _make_compact_hud_panel(status_row, "LevelReward", "+0", Vector2(64, 54) * hud_scale, roundi(17 * hud_scale), Color("#e9bd55"))
 	_lives_label.add_theme_color_override("font_color", Color("#71304c"))
 	_pause_button = TextureButton.new()
 	_pause_button.name = "SettingsButton"
 	_pause_button.ignore_texture_size = true
 	_pause_button.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
-	_pause_button.custom_minimum_size = Vector2(52, 52) * hud_scale
+	_pause_button.custom_minimum_size = Vector2(46, 54) * hud_scale
 	var pause_icon := _load_hud_asset("res://assets/sprites/ui/hud/pause_button.png")
 	_pause_button.texture_normal = pause_icon
 	_pause_button.texture_hover = pause_icon
@@ -355,7 +358,7 @@ func _build_gameplay_hud() -> void:
 	_case_file_button.name = "CaseFileButton"
 	_case_file_button.ignore_texture_size = true
 	_case_file_button.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
-	_case_file_button.custom_minimum_size = Vector2(104, 54) * hud_scale
+	_case_file_button.custom_minimum_size = Vector2(88, 54) * hud_scale
 	_case_file_button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	var case_file_icon := _load_hud_asset("res://assets/casefile_hud.png")
 	var case_file_art := AtlasTexture.new()
@@ -444,6 +447,38 @@ func _build_dynamic_objective_hud(parent: Control) -> void:
 	values.add_child(_blocker_label)
 
 
+func _build_objective_target_badge(parent: Control, hud_scale: float) -> void:
+	var badge := PanelContainer.new()
+	badge.name = "ObjectiveTargetBadge"
+	badge.custom_minimum_size = Vector2(66, 64) * hud_scale
+	badge.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	badge.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.025, 0.08, 0.105, 0.92)
+	style.border_color = Color("#e3c275")
+	style.set_border_width_all(1)
+	style.set_corner_radius_all(10)
+	style.set_content_margin_all(2)
+	badge.add_theme_stylebox_override("panel", style)
+	parent.add_child(badge)
+	var contents := VBoxContainer.new()
+	contents.alignment = BoxContainer.ALIGNMENT_CENTER
+	contents.add_theme_constant_override("separation", 0)
+	badge.add_child(contents)
+	_objective_target_icon = TextureRect.new()
+	_objective_target_icon.name = "ObjectiveTargetIcon"
+	_objective_target_icon.custom_minimum_size = Vector2(38, 38) * hud_scale
+	_objective_target_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_objective_target_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_objective_target_icon.texture = ResourceManager.load_texture(_objective_icon_path(_objective_target))
+	_objective_target_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	contents.add_child(_objective_target_icon)
+	_objective_target_name = _make_label(_objective_hud_title(), maxi(10, roundi(12 * hud_scale)))
+	_objective_target_name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_objective_target_name.add_theme_color_override("font_color", Color("#fff3d5"))
+	contents.add_child(_objective_target_name)
+
+
 func _make_compact_hud_panel(parent: Control, panel_name: String, text: String, minimum_size: Vector2, font_size: int, accent: Color) -> Label:
 	var uses_generated_art := panel_name in ["MovesCounter", "CoinCounter", "LifeHearts", "StarReward", "LevelReward"]
 	var panel: Control = Control.new() if uses_generated_art else PanelContainer.new()
@@ -459,17 +494,17 @@ func _make_compact_hud_panel(parent: Control, panel_name: String, text: String, 
 		var art_path := "res://assets/moves_template.png"
 		match panel_name:
 			"CoinCounter":
-				art_path = "res://assets/coins_template.png"
+				art_path = "res://assets/sprites/ui/hud/coin_counter.png"
 			"LifeHearts":
-				art_path = "res://assets/lives_template.png"
+				art_path = "res://assets/sprites/ui/hud/lives_counter.png"
 			"StarReward":
 				art_path = "res://assets/moves_template.png"
 			"LevelReward":
 				art_path = "res://assets/dollar_sack.png"
 		panel_art.texture = _get_cropped_hud_art(panel_name, art_path)
-		if panel_name == "CoinCounter" or panel_name == "LevelReward":
+		if panel_name in ["CoinCounter", "LifeHearts", "LevelReward"]:
 			panel_art.anchor_left = 0.0
-			panel_art.anchor_right = 0.48
+			panel_art.anchor_right = 1.0
 			panel_art.anchor_top = 0.05
 			panel_art.anchor_bottom = 0.95
 		else:
@@ -495,9 +530,9 @@ func _make_compact_hud_panel(parent: Control, panel_name: String, text: String, 
 	label.name = "Value"
 	label.text = text
 	if uses_generated_art:
-		label.anchor_left = 0.48 if panel_name in ["MovesCounter", "CoinCounter", "LevelReward"] else 0.12
+		label.anchor_left = 0.58 if panel_name in ["CoinCounter", "LifeHearts"] else (0.48 if panel_name in ["MovesCounter", "LevelReward"] else 0.12)
 		label.anchor_right = 0.94
-		label.anchor_top = 0.32 if panel_name in ["StarReward", "LevelReward"] else (0.43 if panel_name == "MovesCounter" else 0.24)
+		label.anchor_top = 0.24 if panel_name in ["CoinCounter", "LifeHearts"] else (0.32 if panel_name in ["StarReward", "LevelReward"] else (0.43 if panel_name == "MovesCounter" else 0.24))
 		label.anchor_bottom = 0.80 if panel_name in ["MovesCounter", "StarReward", "LevelReward"] else 0.76
 	else:
 		label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -529,9 +564,9 @@ func _get_cropped_hud_art(panel_name: String, path: String) -> Texture2D:
 	var source := _load_hud_asset(path)
 	if source == null:
 		return null
+	if path.begins_with("res://assets/sprites/ui/hud/"):
+		return source
 	var regions := {
-		"CoinCounter": Rect2(245, 390, 2240, 510),
-		"LifeHearts": Rect2(260, 470, 1400, 400),
 		"StarReward": Rect2(250, 345, 1420, 570),
 		"MovesCounter": Rect2(120, 210, 1680, 760)
 	}
@@ -1629,6 +1664,10 @@ func _begin_level(_route_id: String) -> void:
 	var obstacle_items: Array = level_data.get("obstacles", {}).get("items", [])
 	_objective_target = str(objective.get("target", "KEY")).to_upper()
 	_objective_type = str(objective.get("type", "COLLECT_ITEMS")).to_upper()
+	if _objective_target_icon != null:
+		_objective_target_icon.texture = ResourceManager.load_texture(_objective_icon_path(_objective_target))
+	if _objective_target_name != null:
+		_objective_target_name.text = _objective_hud_title()
 	_obstacles_goal = obstacle_items.size() if _objective_type != "DESTROY_OBSTACLES" else 0
 	_obstacles_cleared = 0
 	_update_objective_hud()
@@ -1769,7 +1808,9 @@ func _set_displayed_coin_count(value: int) -> void:
 
 func _on_lives_changed(lives: int) -> void:
 	if _lives_label != null:
-		_lives_label.text = str(clampi(lives, 0, 5))
+		var game_config: Dictionary = ConfigLoader.load_config(Constants.ConfigPaths.GAME)
+		var maximum_lives := int(game_config.get("max_lives", 5))
+		_lives_label.text = "%d/%d" % [lives, maximum_lives]
 	_campaign_progress.set_value("campaign", "lives", lives)
 	_persist_campaign_progress()
 
