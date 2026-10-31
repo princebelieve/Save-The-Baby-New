@@ -42,6 +42,8 @@ var _level_reward_label: Label
 var _star_reward_label: Label
 var _objective_target_icon: TextureRect
 var _objective_target_name: Label
+var _level_number_label: Label
+var _objective_description_label: Label
 var _hint_label: Label
 var _pause_button: TextureButton
 var _case_file_button: TextureButton
@@ -320,7 +322,7 @@ func _build_gameplay_hud() -> void:
 	status_backing.name = "StatusRowBacking"
 	status_backing.anchor_left = 0.025
 	status_backing.anchor_right = 0.975
-	status_backing.anchor_top = 0.142
+	status_backing.anchor_top = 0.107
 	status_backing.anchor_bottom = 0.216
 	var backing_style := StyleBoxFlat.new()
 	backing_style.bg_color = Color(0.025, 0.08, 0.105, 0.82)
@@ -332,13 +334,13 @@ func _build_gameplay_hud() -> void:
 	status_backing.add_theme_stylebox_override("panel", backing_style)
 	hud.add_child(status_backing)
 	hud.move_child(status_backing, header.get_index() + 1)
+	_build_level_objective_row(hud, hud_scale)
 	hud.add_child(status_row)
 	_build_objective_target_badge(status_row, hud_scale)
 	_lives_label = _make_compact_hud_panel(status_row, "LifeHearts", "0/5", Vector2(150, 54) * hud_scale, roundi(21 * hud_scale), Color("#f06c9b"))
 	_reward_label = _make_compact_hud_panel(status_row, "CoinCounter", "0", Vector2(154, 54) * hud_scale, roundi(21 * hud_scale), Color("#e9bd55"))
 	_star_reward_label = _make_compact_hud_panel(status_row, "StarReward", "☆☆☆", Vector2(70, 54) * hud_scale, roundi(17 * hud_scale), Color("#f4ce49"))
 	_level_reward_label = _make_compact_hud_panel(status_row, "LevelReward", "+0", Vector2(64, 54) * hud_scale, roundi(17 * hud_scale), Color("#e9bd55"))
-	_lives_label.add_theme_color_override("font_color", Color("#71304c"))
 	_pause_button = TextureButton.new()
 	_pause_button.name = "SettingsButton"
 	_pause_button.ignore_texture_size = true
@@ -479,6 +481,57 @@ func _build_objective_target_badge(parent: Control, hud_scale: float) -> void:
 	contents.add_child(_objective_target_name)
 
 
+func _build_level_objective_row(parent: CanvasLayer, hud_scale: float) -> void:
+	var row := HBoxContainer.new()
+	row.name = "LevelObjectiveRow"
+	row.anchor_left = 0.055
+	row.anchor_right = 0.945
+	row.anchor_top = 0.108
+	row.anchor_bottom = 0.145
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", roundi(8 * hud_scale))
+	parent.add_child(row)
+	var level_chip := Control.new()
+	level_chip.name = "LevelNumber"
+	level_chip.custom_minimum_size = Vector2(150, 38) * hud_scale
+	level_chip.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	level_chip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	level_chip.clip_contents = true
+	var level_art := TextureRect.new()
+	level_art.name = "LevelArtwork"
+	var level_source := _load_hud_asset("res://assets/level_no.png")
+	if level_source != null:
+		var level_crop := AtlasTexture.new()
+		level_crop.atlas = level_source
+		level_crop.region = Rect2(200, 480, 1510, 400)
+		level_art.texture = level_crop
+	level_art.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	level_art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	level_art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	level_art.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_apply_hud_chroma_key(level_art)
+	level_chip.add_child(level_art)
+	_level_number_label = _make_label("01", roundi(20 * hud_scale))
+	_level_number_label.anchor_left = 0.65
+	_level_number_label.anchor_right = 0.94
+	_level_number_label.anchor_top = 0.18
+	_level_number_label.anchor_bottom = 0.82
+	_level_number_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_level_number_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_level_number_label.add_theme_color_override("font_color", Color("#172b49"))
+	level_chip.add_child(_level_number_label)
+	row.add_child(level_chip)
+	_objective_description_label = _make_label("COLLECT THE CLUES", roundi(19 * hud_scale))
+	_objective_description_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_objective_description_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	_objective_description_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_objective_description_label.add_theme_color_override("font_color", Color("#fff5dc"))
+	_objective_description_label.add_theme_color_override("font_shadow_color", Color("#14202c"))
+	_objective_description_label.add_theme_constant_override("shadow_offset_x", 1)
+	_objective_description_label.add_theme_constant_override("shadow_offset_y", 2)
+	row.add_child(_objective_description_label)
+
+
 func _make_compact_hud_panel(parent: Control, panel_name: String, text: String, minimum_size: Vector2, font_size: int, accent: Color) -> Label:
 	var uses_generated_art := panel_name in ["MovesCounter", "CoinCounter", "LifeHearts", "StarReward", "LevelReward"]
 	var panel: Control = Control.new() if uses_generated_art else PanelContainer.new()
@@ -545,7 +598,12 @@ func _make_compact_hud_panel(parent: Control, panel_name: String, text: String, 
 	label.add_theme_constant_override("shadow_offset_x", 1)
 	label.add_theme_constant_override("shadow_offset_y", 2)
 	if uses_generated_art:
-		label.add_theme_color_override("font_color", Color("#71304c") if panel_name == "LifeHearts" else Color("#60401c"))
+		if panel_name in ["LifeHearts", "CoinCounter"]:
+			label.add_theme_color_override("font_color", Color("#102640"))
+			label.add_theme_color_override("font_outline_color", Color("#fff8df"))
+			label.add_theme_constant_override("outline_size", 1)
+		else:
+			label.add_theme_color_override("font_color", Color("#60401c"))
 		label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0))
 	content.add_child(label)
 	if panel_name == "CoinCounter":
@@ -1609,6 +1667,37 @@ func _format_objective(objective: Dictionary) -> String:
 	return "Collect %d %s" % [amount, target]
 
 
+func _format_hud_objective_summary(level_data: Dictionary) -> String:
+	var summaries: Array[String] = []
+	var objectives = level_data.get("objectives", [])
+	if typeof(objectives) == TYPE_ARRAY:
+		for objective_value in objectives:
+			if typeof(objective_value) != TYPE_DICTIONARY:
+				continue
+			var objective: Dictionary = objective_value
+			var amount := int(objective.get("amount", 1))
+			if str(objective.get("type", "")).to_upper() == "DESTROY_OBSTACLES":
+				summaries.append("CLEAR %d OBSTACLES" % amount)
+			else:
+				var target := str(objective.get("target", "CLUES")).replace("_", " ").to_upper()
+				var plural := target + "S"
+				if target == "KEY":
+					plural = "KEYS"
+				elif target == "PHONE":
+					plural = "PHONES"
+				summaries.append("COLLECT %d %s" % [amount, plural])
+	if _obstacles_goal > 0 and _objective_type != "DESTROY_OBSTACLES":
+		summaries.append("CLEAR %d BLOCKERS" % _obstacles_goal)
+	if summaries.is_empty():
+		return str(level_data.get("description", "COMPLETE THE INVESTIGATION")).to_upper()
+	var summary := ""
+	for entry in summaries:
+		if not summary.is_empty():
+			summary += "  |  "
+		summary += entry
+	return "OBJECTIVE: " + summary
+
+
 func _objective_icon_path(target: String) -> String:
 	var icons := {
 		"KEY": "key_objective_icon.jpeg",
@@ -1670,6 +1759,10 @@ func _begin_level(_route_id: String) -> void:
 		_objective_target_name.text = _objective_hud_title()
 	_obstacles_goal = obstacle_items.size() if _objective_type != "DESTROY_OBSTACLES" else 0
 	_obstacles_cleared = 0
+	if _level_number_label != null:
+		_level_number_label.text = "%02d" % _current_level_id
+	if _objective_description_label != null:
+		_objective_description_label.text = _format_hud_objective_summary(level_data)
 	_update_objective_hud()
 	_reward_label.text = str(_economy_manager.get_coins() if _economy_manager != null else int(_campaign_progress.get_value("campaign", "coins", 0)))
 	for kind in ["rocket", "bomb", "thunder"]:
