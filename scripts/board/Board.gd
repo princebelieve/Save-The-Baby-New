@@ -54,7 +54,11 @@ func initialize(level_data: Dictionary) -> bool:
 
 	_grid = generated
 	var board_data: Dictionary = _level_data.get("board", {})
-	_tile_size = int(board_data.get("tile_size", 64))
+	var configured_tile_size := int(board_data.get("tile_size", 64))
+	var columns := maxi(get_width(), 1)
+	# Keep the playable grid prominent on modern portrait screens while honoring
+	# larger per-level tile sizes.
+	_tile_size = maxi(configured_tile_size, int(floor(viewport_width() * 0.80 / columns)))
 	for position in _grid:
 		var tile: Tile = _grid[position]
 		_attach_tile(tile, position)
@@ -69,7 +73,32 @@ func initialize(level_data: Dictionary) -> bool:
 		maxf(120.0, (viewport_size.y - get_height() * _tile_size) * 0.45)
 	)
 	moves_changed.emit(_remaining_moves)
+	queue_redraw()
 	return true
+
+
+func viewport_width() -> float:
+	return get_viewport_rect().size.x
+
+
+func _draw() -> void:
+	if _grid.is_empty() or _tile_size <= 0:
+		return
+	var board_size := Vector2(get_width() * _tile_size, get_height() * _tile_size)
+	var frame := StyleBoxFlat.new()
+	frame.bg_color = Color("#10283a")
+	frame.border_color = Color("#d6b66e")
+	frame.set_border_width_all(4)
+	frame.set_corner_radius_all(16)
+	frame.set_content_margin_all(10)
+	draw_style_box(frame, Rect2(Vector2(-10, -10), board_size + Vector2(20, 20)))
+	for y in get_height():
+		for x in get_width():
+			var inset := 2.0
+			var cell := Rect2(Vector2(x * _tile_size + inset, y * _tile_size + inset), Vector2(_tile_size - inset * 2.0, _tile_size - inset * 2.0))
+			var fill := Color("#18354b") if (x + y) % 2 == 0 else Color("#1c3b50")
+			draw_rect(cell, fill, true)
+			draw_rect(cell, Color(0.55, 0.75, 0.82, 0.16), false, 1.0)
 
 
 func reset() -> void:

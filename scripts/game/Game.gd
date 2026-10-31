@@ -1476,7 +1476,7 @@ func _on_tiles_matched(tile_types: Array) -> void:
 	if _objective_type == "COLLECT_ITEMS":
 		_objective_label.text = "%s\n%d / %d" % [_objective_target.replace("_", " ") + "S", _evidence_count, _evidence_goal]
 	if _evidence_count >= _evidence_goal and _objective_type == "COLLECT_ITEMS":
-		_hint_label.text = "CLUE SECURED | The evidence points toward Victor's route."
+		_hint_label.text = "GOAL REACHED | Wrapping up the investigation..."
 		_play_objective_complete_sound()
 	elif not _tutorial_active:
 		_hint_label.text = "CLUES | %d of %d %s collected" % [_evidence_count, _evidence_goal, _objective_target.replace("_", " ").to_lower()]
@@ -1768,7 +1768,7 @@ func _on_obstacles_cleared(amount: int) -> void:
 	_evidence_count = mini(_evidence_goal, _evidence_count + amount)
 	_objective_label.text = "OBSTACLES\n%d / %d" % [_evidence_count, _evidence_goal]
 	if _evidence_count >= _evidence_goal:
-		_hint_label.text = "OBJECTIVE COMPLETE | The route is clear."
+		_hint_label.text = "GOAL REACHED | Wrapping up the investigation..."
 		_play_objective_complete_sound()
 
 
@@ -1828,13 +1828,18 @@ func _show_level_result(won: bool) -> void:
 	content.alignment = BoxContainer.ALIGNMENT_CENTER
 	content.add_theme_constant_override("separation", 18)
 	card.add_child(content)
-	var heading := _make_label("CLUE SECURED!" if won else "THE TRAIL WENT COLD", 32)
+	var heading := _make_label("MISSION COMPLETED!" if won else "THE TRAIL WENT COLD", 32)
 	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	content.add_child(heading)
 	var result_manager := get_node_or_null("Managers/LevelManager")
 	var result_data: Dictionary = result_manager.get_level_data() if result_manager != null else {}
+	if won and _is_story_final_level(result_data):
+		var story_complete := _make_label("STORY OBJECTIVE COMPLETE!", 22)
+		story_complete.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		story_complete.add_theme_color_override("font_color", Color("#ffe279"))
+		content.add_child(story_complete)
 	var reward_info: Dictionary = result_data.get("rewards", {})
-	var detail_text := "Case %03d is unlocked. +%d coins and %d stars saved." % [mini(_highest_unlocked_level, _current_level_id + 1), int(reward_info.get("coins", 0)), maxi(1, int(reward_info.get("stars", 3)))] if won else "The remaining moves ran out. No case was unlocked. Try the investigation again."
+	var detail_text := ("Story objective achieved. Case %03d is unlocked. +%d coins and %d stars saved." if _is_story_final_level(result_data) else "Case %03d is unlocked. +%d coins and %d stars saved.") % [mini(_highest_unlocked_level, _current_level_id + 1), int(reward_info.get("coins", 0)), maxi(1, int(reward_info.get("stars", 3)))] if won else "The remaining moves ran out. No case was unlocked. Try the investigation again."
 	var detail := _make_label(detail_text, 19)
 	detail.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	detail.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -1858,6 +1863,11 @@ func _show_level_result(won: bool) -> void:
 		SignalBus.play_sfx.emit("level_victory")
 	else:
 		SignalBus.play_sfx.emit("level_failure")
+
+
+func _is_story_final_level(level_data: Dictionary) -> bool:
+	var metadata: Dictionary = level_data.get("metadata", {})
+	return int(metadata.get("chapter_end_level", 0)) == int(level_data.get("level_id", -1))
 
 
 func _dismiss_level_result() -> void:
