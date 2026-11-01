@@ -9,7 +9,7 @@
         "chapter_end_level": 15,
         "map_landmark": "wooden_bridge_cutout.png",
         "version": 1,
-        "notes": "Chapter 2: Village Road. Tutorial progression follows the campaign-map route.",
+        "notes": "Academy progression: teach before availability, then practice and mastery.",
         "author": "Save The Baby",
         "chapter_title": "Village Road",
         "map_background": "level_map_landscape_cutout.png",
@@ -18,7 +18,8 @@
         "map_props": [
             "police_car_topdown_cutout.png",
             "bush_topdown_variant_cutout.png"
-        ]
+        ],
+        "balance_version": 2
     },
     "board": {
         "columns": 8,
@@ -31,37 +32,33 @@
     "powerups": {
         "enabled": true,
         "available": [
-            "ROCKET"
+            "ROCKET",
+            "BOMB",
+            "THUNDER"
         ]
     },
     "tile_pool": {
-        "weights": [
-            22,
-            12,
-            22,
-            22,
-            22,
-            3,
-            2,
-            2
-        ],
         "tiles": [
             "key",
             "phone",
             "fingerprint",
             "recorder",
-            "clock",
-            "ethan",
-            "detective",
-            "victor"
+            "clock"
+        ],
+        "weights": [
+            20,
+            20,
+            20,
+            20,
+            20
         ]
     },
-    "difficulty": "EXTREMELY_HARD",
+    "difficulty": "STANDARD",
     "objectives": [
         {
-            "amount": 12,
-            "target": "PHONE",
-            "type": "COLLECT_ITEMS"
+            "type": "COLLECT_ITEMS",
+            "target": "RECORDER",
+            "amount": 32
         }
     ],
     "audio": {
@@ -73,43 +70,37 @@
     "settings": {
         "allow_shuffle": true,
         "allow_boosters": true,
-        "time_limit": 0
+        "time_limit": 0,
+        "available_boosters": [
+            "rocket",
+            "bomb",
+            "thunder"
+        ]
     },
     "description": "Follow David's trail through Village Road and gather the evidence that can lead to Ethan.",
     "tutorial": {
-        "steps": [
-            {
-                "message": "Swipe the glowing pair to match beside the highlighted obstacle. Matches next to it damage it; other moves are locked.",
-                "highlight": []
-            }
-        ],
-        "enabled": false
+        "enabled": false,
+        "steps": []
     },
     "obstacles": {
         "items": [
             {
+                "x": 6,
                 "y": 3,
-                "health": 1,
-                "type": "tape",
-                "x": 2
+                "type": "lock",
+                "health": 1
             },
             {
-                "y": 1,
-                "health": 1,
-                "type": "tape",
-                "x": 2
+                "x": 2,
+                "y": 2,
+                "type": "chain",
+                "health": 2
             },
             {
-                "y": 1,
-                "health": 1,
-                "type": "tape",
-                "x": 5
-            },
-            {
+                "x": 5,
                 "y": 5,
-                "health": 1,
-                "type": "tape",
-                "x": 5
+                "type": "lock",
+                "health": 1
             }
         ]
     },
@@ -118,7 +109,7 @@
         "image": "res://assets/sprites/backgrounds/grass_board_background.jpeg"
     },
     "moves": {
-        "total": 18
+        "total": 25
     },
     "rewards": {
         "powerups": [],

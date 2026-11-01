@@ -1,7 +1,7 @@
 {
   "music": {
     "suspense_opening": {
-      "path": "res://assets/audio/music/night_search.wav",
+      "path": "res://assets/audio/music/suspense_opening.ogg",
       "loop": true
     }
   },

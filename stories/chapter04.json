@@ -1,47 +1,87 @@
 {
-    "story_id":  "chapter04",
-    "title":  "The Police Station",
-    "background_music":  "suspense_opening",
-    "default_background":  "res://assets/sprites/backgrounds/riverside_landscape.jpeg",
-    "portrait":  "res://assets/sprites/characters/detective_portrait_cutout.png",
-    "characters":  [
-                       "david",
-                       "amara",
-                       "ethan",
-                       "victor"
-                   ],
-    "scenes":  [
-                   {
-                       "scene_id":  "chapter_04_intro",
-                       "choices":  [
-
-                                   ],
-                       "dialogues":  [
-                                         {
-                                             "speaker":  "Detective Morris",
-                                             "portrait":  "res://assets/sprites/characters/detective_portrait_cutout.png",
-                                             "text":  "The number plate was stolen, but the station camera caught the van heading north. We have a direction, not a location.",
-                                             "animation":  "fade"
-                                         },
-                                         {
-                                             "speaker":  "David",
-                                             "portrait":  "res://assets/sprites/characters/david_portrait_v2.png",
-                                             "text":  "Victor expected the police to arrive. He left the camera running so we would see the road he wanted us to take.",
-                                             "animation":  "fade"
-                                         },
-                                         {
-                                             "speaker":  "Detective Morris",
-                                             "portrait":  "res://assets/sprites/characters/detective_portrait_cutout.png",
-                                             "text":  "The second camera shows the van turning toward the forest. I am sending the image now. Move carefully.",
-                                             "animation":  "fade"
-                                         }
-                                     ]
-                   }
-               ],
-    "metadata":  {
-                     "version":  1,
-                     "chapter":  4,
-                     "campaign_levels":  "023-030",
-                     "tutorial_chapter":  true
-                 }
+    "story_id": "chapter04",
+    "title": "The Police Station",
+    "background_music": "suspense_opening",
+    "default_background": "res://assets/sprites/backgrounds/riverside_landscape.jpeg",
+    "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
+    "characters": [
+        "david",
+        "amara",
+        "ethan",
+        "victor"
+    ],
+    "scenes": [
+        {
+            "scene_id": "chapter_04_intro",
+            "choices": [
+                {
+                    "id": "police",
+                    "label": "Coordinate a quiet search",
+                    "impact": "Morris organizes a discreet search beyond the station. Morris can watch for danger, but he needs you to share each clue before he can act.",
+                    "response": "Morris organizes a discreet search beyond the station. Ethan must come home alive."
+                },
+                {
+                    "id": "signal",
+                    "label": "Follow the newest phone ping",
+                    "impact": "Amara finds a moving signal near the forest path. Amara stays involved, but the signal could be a decoy. David will still need physical evidence.",
+                    "response": "Amara finds a moving signal near the forest path. Ethan must come home alive."
+                },
+                {
+                    "id": "alone",
+                    "label": "Visit the witness myself",
+                    "impact": "A witness tells David which forest trail Victor used. You can investigate quietly, but no one will be close enough to help immediately if Victor is waiting.",
+                    "response": "A witness tells David which forest trail Victor used. Ethan must come home alive."
+                }
+            ],
+            "dialogues": [
+                {
+                    "speaker": "Detective Morris",
+                    "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
+                    "text": "The number plate was stolen, but the station camera caught the van heading north. We have a direction, not a location.",
+                    "animation": "fade"
+                },
+                {
+                    "speaker": "David",
+                    "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+                    "text": "Victor expected the police to arrive. He left the camera running so we would see the road he wanted us to take.",
+                    "animation": "fade"
+                },
+                {
+                    "speaker": "Detective Morris",
+                    "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
+                    "text": "The second camera shows the van turning toward the forest. I am sending the image now. Move carefully.",
+                    "animation": "fade"
+                }
+            ],
+            "route_dialogues": {
+                "police": [
+                    {
+                        "speaker": "David",
+                        "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+                        "text": "Morris compares the witness statement with a patrol report. Both place the van near the forest road."
+                    }
+                ],
+                "signal": [
+                    {
+                        "speaker": "David",
+                        "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+                        "text": "Amara identifies a second device moving beyond the station. Someone is carrying it toward the forest."
+                    }
+                ],
+                "alone": [
+                    {
+                        "speaker": "David",
+                        "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+                        "text": "The witness trusts me with a detail left out of the report: Victor changed vehicles beside the forest road."
+                    }
+                ]
+            }
+        }
+    ],
+    "metadata": {
+        "version": 1,
+        "chapter": 4,
+        "campaign_levels": "023-030",
+        "tutorial_chapter": true
+    }
 }

@@ -141,7 +141,7 @@ func _check_dead_board() -> void:
 	check(board.is_stable() and shuffler.needs_shuffle(board), "The dead-board fixture must have no matches or legal moves")
 	shuffler.shuffle(board)
 	check(board.is_stable() and not shuffler.needs_shuffle(board), "Shuffling must restore a stable playable board")
-	check(board.get_all_tiles().size() == 64 and board.get_remaining_moves() == 30, "Shuffle must preserve a full board and not spend moves")
+	check(board.get_all_tiles().size() == 64 and board.get_remaining_moves() == int(data["moves"]["total"]), "Shuffle must preserve a full board and not spend moves")
 	var identities := {}
 	for tile in board.get_all_tiles():
 		identities[tile.get_instance_id()] = true
@@ -257,7 +257,7 @@ func _check_special_combinations() -> void:
 			await get_tree().process_frame
 		check(not board.is_locked(), "Special combination must finish")
 		check(turns[0] == 1, "Special combination must emit exactly one completed turn")
-		check(board.get_remaining_moves() == 29, "Combination must spend one move")
+		check(board.get_remaining_moves() == int(data["moves"]["total"]) - 1, "Combination must spend one move")
 		check(board.is_stable(), "Combination must leave a stable board")
 		if combination == ["bomb", "bomb"]:
 			check(not clears.is_empty() and clears[0].size() == 25, "Two bombs must clear a 5 by 5 area")

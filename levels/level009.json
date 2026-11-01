@@ -9,7 +9,7 @@
         "chapter_end_level": 15,
         "map_landmark": "wooden_bridge_cutout.png",
         "version": 1,
-        "notes": "Chapter 2: Village Road. Tutorial progression follows the campaign-map route.",
+        "notes": "Academy progression: teach before availability, then practice and mastery.",
         "author": "Save The Baby",
         "chapter_title": "Village Road",
         "map_background": "level_map_landscape_cutout.png",
@@ -18,7 +18,8 @@
         "map_props": [
             "police_car_topdown_cutout.png",
             "bush_topdown_variant_cutout.png"
-        ]
+        ],
+        "balance_version": 2
     },
     "board": {
         "columns": 8,
@@ -31,31 +32,33 @@
     "powerups": {
         "enabled": true,
         "available": [
-            "ROCKET"
+            "ROCKET",
+            "BOMB",
+            "THUNDER"
         ]
     },
     "tile_pool": {
-        "weights": [
-            16,
-            36,
-            16,
-            16,
-            16
-        ],
         "tiles": [
             "key",
             "phone",
             "fingerprint",
             "recorder",
             "clock"
+        ],
+        "weights": [
+            20,
+            20,
+            20,
+            20,
+            20
         ]
     },
-    "difficulty": "EXTREMELY_EASY",
+    "difficulty": "INTRODUCTION",
     "objectives": [
         {
-            "amount": 7,
+            "type": "COLLECT_ITEMS",
             "target": "PHONE",
-            "type": "COLLECT_ITEMS"
+            "amount": 24
         }
     ],
     "audio": {
@@ -67,26 +70,30 @@
     "settings": {
         "allow_shuffle": true,
         "allow_boosters": true,
-        "time_limit": 0
+        "time_limit": 0,
+        "available_boosters": [
+            "rocket",
+            "bomb",
+            "thunder"
+        ]
     },
     "description": "Follow David's trail through Village Road and gather the evidence that can lead to Ethan.",
     "tutorial": {
+        "enabled": true,
         "steps": [
             {
-                "message": "David: Tape blocks the footprints. Match the glowing pair beside it to damage a layer and reopen the trail.",
                 "mechanic": "damage_obstacle",
-                "highlight": []
+                "message": "Make the glowing match beside the blocker. Watch its remaining health."
             }
-        ],
-        "enabled": true
+        ]
     },
     "obstacles": {
         "items": [
             {
-                "y": 3,
-                "health": 1,
-                "type": "tape",
-                "x": 2
+                "x": 5,
+                "y": 5,
+                "type": "chain",
+                "health": 2
             }
         ]
     },
@@ -95,7 +102,7 @@
         "image": "res://assets/sprites/backgrounds/grass_board_background.jpeg"
     },
     "moves": {
-        "total": 29
+        "total": 26
     },
     "rewards": {
         "powerups": [],

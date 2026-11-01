@@ -44,3 +44,30 @@ Actual rendered title, campaign, gameplay, and pause screens were inspected. The
 - Obstacle-specific behavior, including configured countdown threats and key-only locks, still needs implementation/content review; the current starter obstacles predominantly take adjacent-match damage.
 - Final art consistency, accessibility/localization coverage, store listing/support/privacy materials, and release signing/device distribution need review before publishing.
 - Ads and online services remain staged roadmap features, not implemented production services.
+
+
+## Academy revision ? November 2, 2026
+
+Reauthored the validation pack with balanced evidence spawn weights, larger collection goals, staged booster visibility, and increasing blocker count/durability. New mechanics are explained before interaction, with guided targeting at levels 4/6/8 and blocker practice at 9/12/16/20. Level 41 now applies established skills. `configs/academy.json` contains the curriculum; no ending was added at level 50.
+
+Tutorial banners paginate short readable copy with Next/Continue and X. Skipping clears input restrictions and waits for an in-flight move to settle. Presented lessons, practice notes and map instructions are saved in Amara's case file. Individual case cards open illustrated paged popups with corner navigation and a close button. Interrupted and completed lessons have separate saved state.
+
+Every chapter offers three new choices. Consequence previews support Back and confirmation; choices persist individually and select distinct narrative branches in later chapters. Route decisions do not change puzzle content or move budgets.
+
+Rendered pointer-input walkthroughs passed the curriculum, card details, all three booster exercises, and all six chapter decisions at normal and short portrait sizes. The release regression suite passed after updating move-budget fixtures. `tests/academy_content_checks.py` enforces teaching order as content grows. A deterministic 21-run diagnostic found no first-turn wins; later cases still defeated a simple goal-first bot in several samples. Human difficulty testing remains required. Audio source files were preserved byte-for-byte.
+
+
+## Illustrated popups and returning-player tutorial fix
+
+Tutorials, case-file details and choice confirmations now share an illustrated mint-and-gold popup card with David, contextual art, short copy, previous/next corner controls and a top-right X. Action instructions use a smaller card positioned clear of their target. Existing artwork is reused; no audio changes were made.
+
+Fixed a returning-player path at level 8: a completed practice flag could skip the practice while leaving the academy card visible. Final acknowledgement now hides its card before advancing state, and a skipped/completed practice explicitly clears the overlay. The rendered walkthrough covers both fresh practice and the existing-completion save path, previous-page navigation, closing details and confirming choices. A layout assertion prevents the large popup's text width from leaking into compact action cards.
+
+
+## Scope correction: gameplay guidance and discovered-skill journal
+
+The illustrated popup is now a separate `IllustratedPopup` class used for case-file details and story choices. `TutorialOverlay` restores the compact guided speech bubble, spotlight and gesture, with complete action instructions. Both retain the final-Continue dismissal fix.
+
+`CaseJournal` records explicitly mapped facts when their tutorial page is presented or the player performs the corresponding skill. Stable skill/fact IDs prevent duplicate cards and repeated paraphrases. Titles and illustrations are assigned in content rather than inferred by scanning unrelated text. The case file no longer shows seeded evidence references, full unseen lessons, raw practice logs or generic factory recaps. Old save fields are retained but those placeholder sections are not rendered. Actual confirmed story decisions remain separate.
+
+Regression coverage checks unread/skip behavior, repeated rules, journal persistence, card-label/art identity, interactive booster lessons, the returning-player level 8 path and all six story confirmations at normal and short sizes.

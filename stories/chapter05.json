@@ -1,47 +1,87 @@
 {
-    "story_id":  "chapter05",
-    "title":  "The Forest Path",
-    "background_music":  "suspense_opening",
-    "default_background":  "res://assets/sprites/backgrounds/river_waterfall_map_tile.jpeg",
-    "portrait":  "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-    "characters":  [
-                       "david",
-                       "amara",
-                       "ethan",
-                       "victor"
-                   ],
-    "scenes":  [
-                   {
-                       "scene_id":  "chapter_05_intro",
-                       "choices":  [
-
-                                   ],
-                       "dialogues":  [
-                                         {
-                                             "speaker":  "Amara",
-                                             "portrait":  "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-                                             "text":  "There is a small shoe print in the mud. Ethan wore those shoes when I last saw him.",
-                                             "animation":  "fade"
-                                         },
-                                         {
-                                             "speaker":  "David",
-                                             "portrait":  "res://assets/sprites/characters/david_portrait_v2.png",
-                                             "text":  "He was here. Victor is trying to hide the path, but he cannot erase every sign that Ethan passed through.",
-                                             "animation":  "fade"
-                                         },
-                                         {
-                                             "speaker":  "Victor",
-                                             "portrait":  "res://assets/sprites/characters/victor_portrait_v2.png",
-                                             "text":  "You are closer than I expected, David. Keep following the trail. It only gets harder from here.",
-                                             "animation":  "fade"
-                                         }
-                                     ]
-                   }
-               ],
-    "metadata":  {
-                     "version":  1,
-                     "chapter":  5,
-                     "campaign_levels":  "031-040",
-                     "tutorial_chapter":  true
-                 }
+    "story_id": "chapter05",
+    "title": "The Forest Path",
+    "background_music": "suspense_opening",
+    "default_background": "res://assets/sprites/backgrounds/river_waterfall_map_tile.jpeg",
+    "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+    "characters": [
+        "david",
+        "amara",
+        "ethan",
+        "victor"
+    ],
+    "scenes": [
+        {
+            "scene_id": "chapter_05_intro",
+            "choices": [
+                {
+                    "id": "police",
+                    "label": "Ask Morris to watch the exits",
+                    "impact": "Morris positions lookouts while David enters the forest. Morris can watch for danger, but he needs you to share each clue before he can act.",
+                    "response": "Morris positions lookouts while David enters the forest. Ethan must come home alive."
+                },
+                {
+                    "id": "signal",
+                    "label": "Ask Amara to follow the transmitter",
+                    "impact": "Amara guides David toward an old factory road. Amara stays involved, but the signal could be a decoy. David will still need physical evidence.",
+                    "response": "Amara guides David toward an old factory road. Ethan must come home alive."
+                },
+                {
+                    "id": "alone",
+                    "label": "Track Victor through the forest",
+                    "impact": "David spots a delivery marker leading to the factory. You can investigate quietly, but no one will be close enough to help immediately if Victor is waiting.",
+                    "response": "David spots a delivery marker leading to the factory. Ethan must come home alive."
+                }
+            ],
+            "dialogues": [
+                {
+                    "speaker": "Amara",
+                    "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+                    "text": "There is a small shoe print in the mud. Ethan wore those shoes when I last saw him.",
+                    "animation": "fade"
+                },
+                {
+                    "speaker": "David",
+                    "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+                    "text": "He was here. Victor is trying to hide the path, but he cannot erase every sign that Ethan passed through.",
+                    "animation": "fade"
+                },
+                {
+                    "speaker": "Victor",
+                    "portrait": "res://assets/sprites/characters/victor_portrait_v2.png",
+                    "text": "You are closer than I expected, David. Keep following the trail. It only gets harder from here.",
+                    "animation": "fade"
+                }
+            ],
+            "route_dialogues": {
+                "police": [
+                    {
+                        "speaker": "David",
+                        "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+                        "text": "Morris finds tire marks at the north exit. His lookout will watch it while I follow the delivery trail."
+                    }
+                ],
+                "signal": [
+                    {
+                        "speaker": "David",
+                        "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+                        "text": "Amara separates the decoy phone from the moving transmitter. Its last ping came from the factory road."
+                    }
+                ],
+                "alone": [
+                    {
+                        "speaker": "David",
+                        "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+                        "text": "I spot a factory delivery marker under the mud. Victor has used this trail before."
+                    }
+                ]
+            }
+        }
+    ],
+    "metadata": {
+        "version": 1,
+        "chapter": 5,
+        "campaign_levels": "031-040",
+        "tutorial_chapter": true
+    }
 }

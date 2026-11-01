@@ -16,6 +16,7 @@ signal story_finished(id)
 var _current_story: Dictionary = {}
 var _current_scene: int = -1
 var _current_dialogue: int = -1
+var _approach := "alone"
 
 var _dialogue_player: DialoguePlayer
 var _choice_manager: ChoiceManager
@@ -52,6 +53,13 @@ func load_story(id: String) -> bool:
 		return false
 
 	_current_story = data
+	# A chapter remembers the latest decision, then offers a fresh one.
+	for scene in _current_story.get("scenes", []):
+		var branches: Dictionary = scene.get("route_dialogues", {})
+		if branches.has(_approach):
+			var branch: Array = branches[_approach].duplicate(true)
+			branch.append_array(scene.get("dialogues", []))
+			scene["dialogues"] = branch
 	_current_scene = -1
 	_current_dialogue = -1
 
@@ -70,6 +78,10 @@ func start_story(id: String) -> void:
 	SignalBus.story_started.emit(id)
 
 	goto_scene(0)
+
+
+func set_approach(approach: String) -> void:
+	_approach = approach
 
 
 func end_story() -> void:

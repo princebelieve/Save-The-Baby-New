@@ -1,47 +1,87 @@
 {
-    "story_id":  "chapter03",
-    "title":  "The Technician’s Office",
-    "background_music":  "suspense_opening",
-    "default_background":  "res://assets/sprites/backgrounds/factory_map_section.jpeg",
-    "portrait":  "res://assets/sprites/characters/detective_portrait_cutout.png",
-    "characters":  [
-                       "david",
-                       "amara",
-                       "ethan",
-                       "victor"
-                   ],
-    "scenes":  [
-                   {
-                       "scene_id":  "chapter_03_intro",
-                       "choices":  [
-
-                                   ],
-                       "dialogues":  [
-                                         {
-                                             "speaker":  "Detective Morris",
-                                             "portrait":  "res://assets/sprites/characters/detective_portrait_cutout.png",
-                                             "text":  "The workshop owner found a receiver hidden under his bench. Its last signal came from an industrial property outside town.",
-                                             "animation":  "fade"
-                                         },
-                                         {
-                                             "speaker":  "David",
-                                             "portrait":  "res://assets/sprites/characters/david_portrait_v2.png",
-                                             "text":  "Victor used the workshop to hide his trail. That receiver is still warm.",
-                                             "animation":  "fade"
-                                         },
-                                         {
-                                             "speaker":  "Amara",
-                                             "portrait":  "res://assets/sprites/characters/amara_police_portrait_cutout.png",
-                                             "text":  "Then Ethan may be close. David, listen: someone just tried to call from the receiver.",
-                                             "animation":  "fade"
-                                         }
-                                     ]
-                   }
-               ],
-    "metadata":  {
-                     "version":  1,
-                     "chapter":  3,
-                     "campaign_levels":  "016-022",
-                     "tutorial_chapter":  true
-                 }
+    "story_id": "chapter03",
+    "title": "The Technician\u00e2\u20ac\u2122s Office",
+    "background_music": "suspense_opening",
+    "default_background": "res://assets/sprites/backgrounds/factory_map_section.jpeg",
+    "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
+    "characters": [
+        "david",
+        "amara",
+        "ethan",
+        "victor"
+    ],
+    "scenes": [
+        {
+            "scene_id": "chapter_03_intro",
+            "choices": [
+                {
+                    "id": "police",
+                    "label": "Share the recording with Morris",
+                    "impact": "Morris identifies a voice in the recording. Morris can watch for danger, but he needs you to share each clue before he can act.",
+                    "response": "Morris identifies a voice in the recording. Ethan must come home alive."
+                },
+                {
+                    "id": "signal",
+                    "label": "Let Amara decode the message",
+                    "impact": "Amara identifies a factory extension in the recording. Amara stays involved, but the signal could be a decoy. David will still need physical evidence.",
+                    "response": "Amara identifies a factory extension in the recording. Ethan must come home alive."
+                },
+                {
+                    "id": "alone",
+                    "label": "Question the technician myself",
+                    "impact": "David earns the technician's trust and learns about a service entrance. You can investigate quietly, but no one will be close enough to help immediately if Victor is waiting.",
+                    "response": "David earns the technician's trust and learns about a service entrance. Ethan must come home alive."
+                }
+            ],
+            "dialogues": [
+                {
+                    "speaker": "Detective Morris",
+                    "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
+                    "text": "The workshop owner found a receiver hidden under his bench. Its last signal came from an industrial property outside town.",
+                    "animation": "fade"
+                },
+                {
+                    "speaker": "David",
+                    "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+                    "text": "Victor used the workshop to hide his trail. That receiver is still warm.",
+                    "animation": "fade"
+                },
+                {
+                    "speaker": "Amara",
+                    "portrait": "res://assets/sprites/characters/amara_police_portrait_cutout.png",
+                    "text": "Then Ethan may be close. David, listen: someone just tried to call from the receiver.",
+                    "animation": "fade"
+                }
+            ],
+            "route_dialogues": {
+                "police": [
+                    {
+                        "speaker": "David",
+                        "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+                        "text": "Morris recognizes the recorded voice as a former factory guard. He sends us to the technician who repaired its radio."
+                    }
+                ],
+                "signal": [
+                    {
+                        "speaker": "David",
+                        "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+                        "text": "Amara decodes a factory extension in the message. The technician can tell us where it connects."
+                    }
+                ],
+                "alone": [
+                    {
+                        "speaker": "David",
+                        "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+                        "text": "The technician agrees to speak to me privately. Victor asked him to repair a service-door radio."
+                    }
+                ]
+            }
+        }
+    ],
+    "metadata": {
+        "version": 1,
+        "chapter": 3,
+        "campaign_levels": "016-022",
+        "tutorial_chapter": true
+    }
 }

@@ -2,6 +2,8 @@ extends Control
 class_name TutorialOverlay
 
 signal acknowledged
+signal skipped
+signal page_presented(index: int, message: String)
 
 const SHADE := Color(0.015, 0.025, 0.06, 0.78)
 
@@ -17,6 +19,14 @@ var _gesture_outline: Line2D
 var _gesture_tween: Tween
 var _acknowledge_button: Button
 var _body_scroll: ScrollContainer
+var _skip_button: Button
+var _previous_button: Button
+var _pages: Array[String] = []
+var _page := 0
+var _needs_ack := false
+var _source_indices: Array[int] = []
+var _source_texts: Array[String] = []
+var _last_chunks: Array[bool] = []
 
 
 func _ready() -> void:
@@ -37,7 +47,28 @@ func show_tip(message: String, target_rect: Rect2, speaker_name: String = "DAVID
 	_spotlight = target_rect
 	for shade in _shade_panels:
 		shade.color = Color(SHADE.r, SHADE.g, SHADE.b, 0.12 if keep_board_bright else SHADE.a)
-	_body_label.text = " ".join(message.strip_edges().split("\n", false))
+	_pages.clear()
+	_source_indices.clear()
+	_source_texts.clear()
+	_last_chunks.clear()
+	var width := minf(570.0, get_viewport_rect().size.x - 36.0)
+	var text_width := maxf(120.0, width - 68.0 - (104.0 if not portrait_path.is_empty() else 0.0))
+	var font := _body_label.get_theme_font("font")
+	var paragraphs := message.split("\n", false)
+	for source_index in paragraphs.size():
+		var paragraph := paragraphs[source_index].strip_edges()
+		var chunk := ""
+		for word in paragraph.split(" ", false):
+			var candidate := chunk + (" " if not chunk.is_empty() else "") + word
+			if not chunk.is_empty() and font.get_multiline_string_size(candidate, HORIZONTAL_ALIGNMENT_LEFT, text_width, 22).y > font.get_height(22) * 2.0 + 2.0:
+				_append_chunk(chunk, source_index, paragraph, false)
+				chunk = ""
+			chunk += (" " if not chunk.is_empty() else "") + word
+		if not chunk.is_empty(): _append_chunk(chunk, source_index, paragraph, true)
+	if _pages.is_empty(): _append_chunk(message, 0, message, true)
+	_page = 0
+	_needs_ack = needs_acknowledgement
+	_update_page()
 	_heading.text = speaker_name.to_upper()
 	_speaker_portrait.texture = ResourceManager.load_texture(portrait_path) if not portrait_path.is_empty() else null
 	if portrait_path.ends_with("david_portrait_v2.png") and _speaker_portrait.texture != null:
@@ -47,13 +78,13 @@ func show_tip(message: String, target_rect: Rect2, speaker_name: String = "DAVID
 		face.region = Rect2(source.get_size() * Vector2(0.15, 0), source.get_size() * Vector2(0.72, 0.58))
 		_speaker_portrait.texture = face
 	_speaker_portrait.visible = _speaker_portrait.texture != null
-	_acknowledge_button.visible = needs_acknowledgement
-	_acknowledge_button.text = "CONTINUE"
+
 	_gesture_hand.visible = show_gesture
 	_gesture_outline.visible = show_gesture
 	show()
 	_layout_tip()
 	_animate_gesture_hand(keep_board_bright)
+	_emit_page_presented()
 	_bubble.scale = Vector2(0.94, 0.94)
 	_bubble.modulate.a = 0.0
 	var tween := create_tween().set_parallel(true)
@@ -154,8 +185,28 @@ func _build_bubble() -> void:
 	var ack_hover := ack_style.duplicate() as StyleBoxFlat
 	ack_hover.bg_color = Color("#347e94")
 	_acknowledge_button.add_theme_stylebox_override("hover", ack_hover)
-	_acknowledge_button.pressed.connect(acknowledged.emit)
-	bubble_content.add_child(_acknowledge_button)
+	_acknowledge_button.pressed.connect(_next_page)
+	var footer := HBoxContainer.new()
+	footer.add_theme_constant_override("separation", 12)
+	bubble_content.add_child(footer)
+	_previous_button = Button.new()
+	_previous_button.text = "BACK"
+	_previous_button.custom_minimum_size = Vector2(92, 58)
+	_previous_button.add_theme_font_size_override("font_size", 20)
+	_previous_button.pressed.connect(_previous_page)
+	footer.add_child(_previous_button)
+	var spacer := Control.new()
+	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	footer.add_child(spacer)
+	footer.add_child(_acknowledge_button)
+	_skip_button = Button.new()
+	_skip_button.text = "X"
+	_skip_button.custom_minimum_size = Vector2(44, 44)
+	_skip_button.tooltip_text = "Skip coaching"
+	_skip_button.pressed.connect(func():
+		hide_tip()
+		skipped.emit())
+	_bubble.add_child(_skip_button)
 	_pointer = Polygon2D.new()
 	_pointer.color = Color("#fff3cf")
 	add_child(_pointer)
@@ -186,8 +237,8 @@ func _layout_tip() -> void:
 	_body_scroll.custom_minimum_size = Vector2(0, visible_body_height)
 	var row_height := maxf(visible_body_height + 40.0, 112.0 if _speaker_portrait.visible else 0.0)
 	var bubble_height := row_height + action_height + 28.0
+	_bubble.custom_minimum_size = Vector2(bubble_width, bubble_height)
 	_bubble.size = Vector2(bubble_width, bubble_height)
-	_bubble.custom_minimum_size = _bubble.size
 	var bubble_x := clampf(hole.get_center().x - bubble_width * 0.5, 18.0, viewport.x - bubble_width - 18.0)
 	var bubble_y := hole.position.y - bubble_height - 28.0
 	var pointer_points := PackedVector2Array([Vector2(0, 0), Vector2(28, 0), Vector2(14, 18)])
@@ -199,6 +250,48 @@ func _layout_tip() -> void:
 		_pointer.position = Vector2(clampf(hole.get_center().x - 14.0, 20.0, viewport.x - 48.0), bubble_y + bubble_height - 2.0)
 	_pointer.polygon = pointer_points
 	_bubble.position = Vector2(bubble_x, bubble_y)
+	_skip_button.position = Vector2(bubble_width - 50, 6)
+
+
+func _update_page() -> void:
+	_body_label.text = _pages[_page]
+	_body_scroll.scroll_vertical = 0
+	_acknowledge_button.visible = _page < _pages.size() - 1 or _needs_ack
+	_acknowledge_button.text = "NEXT" if _page < _pages.size() - 1 else "CONTINUE"
+	_previous_button.visible = _page > 0
+
+
+func _next_page() -> void:
+	if _page < _pages.size() - 1:
+		_page += 1
+		_update_page()
+		_layout_tip()
+		_emit_page_presented()
+	else:
+		hide_tip()
+		acknowledged.emit()
+
+
+func _previous_page() -> void:
+	if _page > 0:
+		_page -= 1
+		_update_page()
+		_layout_tip()
+		_emit_page_presented()
+
+
+func _append_chunk(copy: String, source_index: int, source_text: String, last: bool) -> void:
+	_pages.append(copy)
+	_source_indices.append(source_index)
+	_source_texts.append(source_text)
+	_last_chunks.append(last)
+
+
+func _emit_page_presented() -> void:
+	# Archive a rule after its complete instruction has been presented. Screen
+	# pagination must not shift its authored skill ID or truncate the journal.
+	if _last_chunks[_page]:
+		page_presented.emit(_source_indices[_page], _source_texts[_page])
 
 
 func _set_panel(panel: ColorRect, panel_position: Vector2, panel_size: Vector2) -> void:

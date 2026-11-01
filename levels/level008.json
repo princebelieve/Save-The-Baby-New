@@ -9,7 +9,7 @@
         "chapter_end_level": 8,
         "map_landmark": "tree_bush_topdown_cutout.png",
         "version": 1,
-        "notes": "Chapter 1: Amara's Home. Tutorial progression follows the campaign-map route.",
+        "notes": "Academy progression: teach before availability, then practice and mastery.",
         "author": "Save The Baby",
         "chapter_title": "Amara's Home",
         "map_background": "garden_map_tile_cutout.png",
@@ -18,7 +18,8 @@
         "map_props": [
             "bush_topdown_variant_cutout.png",
             "wooden_fence_cutout.png"
-        ]
+        ],
+        "balance_version": 2
     },
     "board": {
         "columns": 8,
@@ -31,37 +32,33 @@
     "powerups": {
         "enabled": true,
         "available": [
-            "ROCKET"
+            "ROCKET",
+            "BOMB",
+            "THUNDER"
         ]
     },
     "tile_pool": {
-        "weights": [
-            12,
-            22,
-            22,
-            22,
-            22,
-            3,
-            2,
-            2
-        ],
         "tiles": [
             "key",
             "phone",
             "fingerprint",
             "recorder",
-            "clock",
-            "ethan",
-            "detective",
-            "victor"
+            "clock"
+        ],
+        "weights": [
+            20,
+            20,
+            20,
+            20,
+            20
         ]
     },
-    "difficulty": "EXTREMELY_HARD",
+    "difficulty": "INTRODUCTION",
     "objectives": [
         {
-            "amount": 12,
-            "target": "KEY",
-            "type": "COLLECT_ITEMS"
+            "type": "COLLECT_ITEMS",
+            "target": "PHONE",
+            "amount": 20
         }
     ],
     "audio": {
@@ -73,18 +70,22 @@
     "settings": {
         "allow_shuffle": true,
         "allow_boosters": true,
-        "time_limit": 0
+        "time_limit": 0,
+        "available_boosters": [
+            "rocket",
+            "bomb",
+            "thunder"
+        ]
     },
     "description": "Follow David's trail through Amara's Home and gather the evidence that can lead to Ethan.",
     "tutorial": {
+        "enabled": true,
         "steps": [
             {
-                "mechanic": "character_tiles",
-                "message": "Match 3 of the same portrait. Each Ethan or Detective tile gives 1 rescue assist; each Victor tile gives 10 coins. The Ethan booster in the tray spends 1 assist to clear a chosen 5x5 area.",
-                "highlight": []
+                "booster": "thunder",
+                "message": "Choose the goal symbol when you can. Random clearing wastes its reach."
             }
-        ],
-        "enabled": true
+        ]
     },
     "obstacles": {
         "items": []
@@ -94,7 +95,7 @@
         "image": "res://assets/sprites/backgrounds/grass_board_background.jpeg"
     },
     "moves": {
-        "total": 18
+        "total": 26
     },
     "rewards": {
         "powerups": [],

@@ -9,7 +9,7 @@
         "chapter_end_level": 40,
         "map_landmark": "bush_topdown_variant_cutout.png",
         "version": 1,
-        "notes": "Chapter 5: Forest Path. Tutorial progression follows the campaign-map route.",
+        "notes": "Academy progression: teach before availability, then practice and mastery.",
         "author": "Save The Baby",
         "chapter_title": "Forest Path",
         "map_background": "river_waterfall_map_tile_cutout.png",
@@ -18,7 +18,8 @@
         "map_props": [
             "bush_topdown_variant_cutout.png",
             "tree_bush_topdown_cutout.png"
-        ]
+        ],
+        "balance_version": 2
     },
     "board": {
         "columns": 8,
@@ -37,27 +38,33 @@
         ]
     },
     "tile_pool": {
-        "weights": [
-            16,
-            16,
-            16,
-            16,
-            20
-        ],
         "tiles": [
             "key",
             "phone",
             "fingerprint",
             "recorder",
-            "clock"
+            "clock",
+            "ethan",
+            "detective",
+            "victor"
+        ],
+        "weights": [
+            18,
+            18,
+            18,
+            18,
+            18,
+            4,
+            4,
+            2
         ]
     },
-    "difficulty": "MEDIUM",
+    "difficulty": "INTRODUCTION",
     "objectives": [
         {
-            "amount": 8,
+            "type": "COLLECT_ITEMS",
             "target": "CLOCK",
-            "type": "COLLECT_ITEMS"
+            "amount": 26
         }
     ],
     "audio": {
@@ -69,25 +76,56 @@
     "settings": {
         "allow_shuffle": true,
         "allow_boosters": true,
-        "time_limit": 0
+        "time_limit": 0,
+        "available_boosters": [
+            "rocket",
+            "bomb",
+            "thunder",
+            "ethan"
+        ]
     },
     "description": "Follow David's trail through Forest Path and gather the evidence that can lead to Ethan.",
     "tutorial": {
-        "steps": [
-            {
-                "message": "Swipe the glowing pair to match beside the highlighted obstacle. Matches next to it damage it; other moves are locked.",
-                "highlight": []
-            }
-        ],
-        "enabled": false
+        "enabled": false,
+        "steps": []
     },
     "obstacles": {
         "items": [
             {
-                "y": 1,
-                "health": 1,
+                "x": 5,
+                "y": 5,
+                "type": "lock",
+                "health": 2
+            },
+            {
+                "x": 2,
+                "y": 5,
+                "type": "bomb",
+                "health": 2
+            },
+            {
+                "x": 5,
+                "y": 2,
                 "type": "electric_trap",
-                "x": 2
+                "health": 2
+            },
+            {
+                "x": 3,
+                "y": 3,
+                "type": "chain",
+                "health": 2
+            },
+            {
+                "x": 4,
+                "y": 4,
+                "type": "lock",
+                "health": 2
+            },
+            {
+                "x": 1,
+                "y": 4,
+                "type": "bomb",
+                "health": 2
             }
         ]
     },
@@ -96,7 +134,7 @@
         "image": "res://assets/sprites/backgrounds/dirt_board_background.jpeg"
     },
     "moves": {
-        "total": 22
+        "total": 26
     },
     "rewards": {
         "powerups": [],

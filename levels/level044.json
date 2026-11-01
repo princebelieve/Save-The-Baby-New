@@ -9,7 +9,7 @@
         "chapter_end_level": 50,
         "map_landmark": "wooden_bridge_cutout.png",
         "version": 1,
-        "notes": "Chapter 6: Victor's Factory. Tutorial progression follows the campaign-map route.",
+        "notes": "Academy progression: teach before availability, then practice and mastery.",
         "author": "Save The Baby",
         "chapter_title": "Victor's Factory",
         "map_background": "factory_map_section_cutout.png",
@@ -18,7 +18,8 @@
         "map_props": [
             "police_car_topdown_cutout.png",
             "wooden_bridge_cutout.png"
-        ]
+        ],
+        "balance_version": 2
     },
     "board": {
         "columns": 8,
@@ -37,27 +38,33 @@
         ]
     },
     "tile_pool": {
-        "weights": [
-            16,
-            16,
-            16,
-            20,
-            16
-        ],
         "tiles": [
             "key",
             "phone",
             "fingerprint",
             "recorder",
-            "clock"
+            "clock",
+            "ethan",
+            "detective",
+            "victor"
+        ],
+        "weights": [
+            18,
+            18,
+            18,
+            18,
+            18,
+            4,
+            4,
+            2
         ]
     },
-    "difficulty": "MEDIUM",
+    "difficulty": "HARD",
     "objectives": [
         {
-            "amount": 8,
+            "type": "COLLECT_ITEMS",
             "target": "RECORDER",
-            "type": "COLLECT_ITEMS"
+            "amount": 32
         }
     ],
     "audio": {
@@ -69,32 +76,62 @@
     "settings": {
         "allow_shuffle": true,
         "allow_boosters": true,
-        "time_limit": 0
+        "time_limit": 0,
+        "available_boosters": [
+            "rocket",
+            "bomb",
+            "thunder",
+            "ethan"
+        ]
     },
     "description": "Follow David's trail through Victor's Factory and gather the evidence that can lead to Ethan.",
     "tutorial": {
-        "steps": [
-            {
-                "message": "Bomb booster unlocked. Tap the glowing bomb, then the marked piece to clear its surrounding area.",
-                "highlight": [],
-                "booster": "bomb"
-            }
-        ],
-        "enabled": true
+        "enabled": false,
+        "steps": []
     },
     "obstacles": {
         "items": [
             {
+                "x": 3,
                 "y": 3,
-                "health": 1,
-                "type": "bomb",
-                "x": 5
+                "type": "chain",
+                "health": 2
             },
             {
-                "y": 3,
-                "health": 1,
+                "x": 4,
+                "y": 4,
+                "type": "lock",
+                "health": 2
+            },
+            {
+                "x": 1,
+                "y": 4,
                 "type": "bomb",
-                "x": 2
+                "health": 2
+            },
+            {
+                "x": 6,
+                "y": 3,
+                "type": "electric_trap",
+                "health": 2
+            },
+            {
+                "x": 2,
+                "y": 2,
+                "type": "chain",
+                "health": 2
+            },
+            {
+                "x": 5,
+                "y": 5,
+                "type": "lock",
+                "health": 2
+            },
+            {
+                "x": 2,
+                "y": 5,
+                "type": "bomb",
+                "health": 2
             }
         ]
     },
@@ -103,7 +140,7 @@
         "image": "res://assets/sprites/backgrounds/dirt_board_background.jpeg"
     },
     "moves": {
-        "total": 20
+        "total": 24
     },
     "rewards": {
         "powerups": [],

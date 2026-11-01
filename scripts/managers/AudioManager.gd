@@ -102,9 +102,6 @@ func play_music(track) -> void:
 	var entry = music_entries.get(str(track), {}) if typeof(music_entries) == TYPE_DICTIONARY else {}
 	if stream is AudioStreamOggVorbis and typeof(entry) == TYPE_DICTIONARY:
 		stream.loop = bool(entry.get("loop", false))
-	if stream is AudioStreamWAV and typeof(entry) == TYPE_DICTIONARY:
-		stream.loop_mode = AudioStreamWAV.LOOP_FORWARD if bool(entry.get("loop", false)) else AudioStreamWAV.LOOP_DISABLED
-		stream.loop_end = int(stream.get_length() * stream.mix_rate)
 	_music_player.stream = stream
 	_current_music_track = str(track)
 	_music_player.play()

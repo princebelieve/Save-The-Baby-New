@@ -526,6 +526,7 @@ func _clear_tutorial_highlights() -> void:
 func set_booster_mode(kind: String) -> void:
 	if _locked:
 		return
+	cancel_pointer_gesture()
 	_booster_mode = kind
 	if not kind.is_empty():
 		SignalBus.play_sfx.emit("booster_select")
@@ -533,6 +534,7 @@ func set_booster_mode(kind: String) -> void:
 
 func cancel_booster_mode() -> void:
 	_booster_mode = ""
+	_required_booster_target = Vector2i(-1, -1)
 
 
 func _load_obstacles() -> void:
@@ -894,6 +896,8 @@ func _begin_pointer_gesture(screen_position: Vector2) -> void:
 	_press_screen_position = screen_position
 	if _drag_start == null:
 		return
+	if not _booster_mode.is_empty():
+		return
 	if _tap_selection != null and _tap_selection != _drag_start:
 		var first_position := _tap_selection.get_grid_position()
 		var second_position := _drag_start.get_grid_position()
@@ -946,15 +950,19 @@ func _finish_swipe(target: Tile, drag_delta: Vector2) -> void:
 func _finish_pointer_gesture(screen_position: Vector2) -> void:
 	var release_tile := _tile_at_screen_position(screen_position)
 	if not _booster_mode.is_empty():
+		# Releasing the HUD button that selected the booster is not a board target.
+		# Keep targeting active until a gesture actually starts and ends on the grid.
+		if _drag_start == null or release_tile == null:
+			_drag_start = null
+			_tap_selection = null
+			return
 		var selected_kind := _booster_mode
 		if release_tile != null and _required_booster_target != Vector2i(-1, -1) and release_tile.get_grid_position() != _required_booster_target:
 			move_rejected.emit()
 			_drag_start = null
 			_tap_selection = null
 			return
-		_booster_mode = ""
-		if release_tile != null:
-			use_booster_at(selected_kind, release_tile.get_grid_position())
+		use_booster_at(selected_kind, release_tile.get_grid_position())
 		_drag_start = null
 		_tap_selection = null
 		return

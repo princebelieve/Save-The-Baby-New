@@ -26,7 +26,7 @@ Level goals can include collecting evidence and mission items, clearing obstacle
 
 ### Opening campaign (Version 1.0)
 
-Version 1.0 targets 50 carefully authored levels as the opening campaign pack, with the rescue story reaching Victorâ€™s factory and a boss-style confrontation at level 050. The map presents six locations: Amaraâ€™s Home (001â€“008), Village Road (009â€“015), Technicianâ€™s Office (016â€“022), Police Station (023â€“030), Forest Path (031â€“040), and Victorâ€™s Factory (041â€“050). Use a small number of guided tutorials at the moment each mechanic appears, then give players regular practice levels; a chapter is not itself a tutorial. Introduce boosters after Chapter 5 and unlock them in stages. Fifty is a launch milestone, not a maximum level count; future chapters and level packs continue the quest.
+Version 1.0 targets 50 carefully authored levels as the opening campaign pack, with the rescue story reaching Victorâ€™s factory and a boss-style confrontation at level 050. The map presents six locations: Amaraâ€™s Home (001â€“008), Village Road (009â€“015), Technicianâ€™s Office (016â€“022), Police Station (023â€“030), Forest Path (031â€“040), and Victorâ€™s Factory (041â€“050). Use a small number of guided tutorials at the moment each mechanic appears, then give players regular practice levels; a chapter is not itself a tutorial. Teach rockets at level 4, bombs at level 6, and thunder at level 8 before their first use. Fifty is a launch milestone, not a maximum level count; future chapters and level packs continue the quest.
 
 The three opening approaches establish distinct story presentation and can change selected scenes, dialogue, evidence framing, and level dressing. The first release should keep the playable campaign achievable by sharing the central progression and introducing controlled variations, rather than multiplying the initial content workload into three complete 50-level tracks.
 
@@ -52,7 +52,7 @@ The intended match patterns include straight matches, L/T shapes, and square mat
 
 - Four in a line creates a Rocket that clears a row or column.
 - Five in a line creates a Thunder piece that clears a selected piece type (or follows the configured targeting rule).
-- A square match creates a Bomb that clears nearby cells.
+- Intersecting T/L matches create a Bomb that clears a 3 by 3 area.
 - Special-piece combinations have their own effects, feedback, and animations. Planned combinations include Rocket+Rocket, Rocket+Bomb, Bomb+Bomb, Bomb+Thunder, and Thunder+Thunder.
 
 The exact balance, targeting, and compatibility rules are authored and tuned through configuration. Effects must resolve safely when multiple specials trigger together.
@@ -157,3 +157,27 @@ Audio currently uses the supplied music and UI/match sound effects, plus generat
 Version 1.0 is the first complete public game: approximately 50 opening levels, the first campaign pack in a continuing rescue quest, core puzzle systems, progression/rewards, local save, polished UI/audio/animation, and Android/Windows release readiness. Ads and online/live services remain planned product capabilities and enter production in their staged roadmap phases; their exact inclusion and service scope for the first store release are release decisions made after implementation and platform review.
 
 After Version 1.0, continue the campaign and service features as ongoing updates. The game has no hardcoded final level count. The architecture should make continued growth practical while allowing each release to have a clear, achievable content scope.
+
+
+## Academy progression and story decisions (implemented November 2, 2026)
+
+The player represents David, Amara's lover and guide in the search for baby Ethan. Victor has taken Ethan; bringing him home alive drives the continuing story. The first 50 levels remain a validation pack, never a campaign ending.
+
+The opening must look approachable but reward deliberate decisions. Every mission requires evidence collection within a move budget; from level 9 onward it also requires every placed blocker to be cleared. Evidence spawn weights no longer favor the target. Teaching missions offer room to practice; later missions increase evidence amounts, blocker count and durability while tightening the move budget. These values need human playtesting as well as automated checks.
+
+David teaches new mechanics before the player can use them. The content lives in `configs/academy.json` and the level files. The sequence is: matching and goals (1), rocket and tray targeting (4), bomb and early combinations (6), thunder and thunder combinations (8), chains (9), locks (12), devices (16), electric traps (20), character rewards and rescue assists (24), combination practice (28), planning ahead (33), and factory mastery (41). Locked boosters are hidden. Later chapters reuse established skills instead of teaching familiar tools for the first time.
+
+Tutorials use animated banners, short readable pages, Next/Continue and a visible X. Guided actions follow the explanation. Skipping clears every input restriction. Presented lessons are saved in Amara's case file as individual clickable cards with readable detail pages; completed and merely presented lessons are tracked separately so an interrupted lesson can return. Evidence references and saved story decisions have their own cards.
+
+Every chapter offers all three approaches anew. A compact choice button opens a consequence page; Back preserves all alternatives, and confirmation records the decision. The latest approach selects distinct opening dialogue in the next chapter. Decisions alter David's support and investigation scenes, while puzzle objectives, tile pools and move budgets remain independent of route. All choices keep Ethan's safe return as the goal. Existing progress, currency and audio behavior are preserved.
+
+Verification artifacts: `tests/academy_playthrough.tscn` exercises actual pointer input through lessons, skipping, case cards, booster targeting and all six chapter decisions. `tests/academy_balance.tscn` samples goal-seeking play without tray boosters; this diagnostic is not a substitute for human difficulty testing.
+
+
+### Gameplay guidance, case files and choice cards
+
+Gameplay tutorials use a compact David speech bubble, a highlighted target and animated gesture. Keep text to two readable lines per page, with Next/Continue and a top X, next to the actual board or HUD target. Longer instructions continue across pages without losing their content or their journal association. Illustrated modal cards belong to case-file details and story choices; they must not replace interactive guidance.
+
+Amara's case file is a persistent journal of instructions actually presented and skills actually performed. Each authored lesson page identifies its skill, stable fact ID, exact title and illustration. Only the visible page is recorded. Skipping cannot unlock unread pages; revisiting a rule cannot duplicate it. Performing a swap, creating or firing a special, using a booster, matching a character, or damaging a blocker also records the corresponding skill. Repeated lessons add knowledge to the existing skill card instead of creating another copy.
+
+The case file does not prefill evidence descriptions, future lessons, whole unseen lectures or raw walkthrough logs. Older placeholder sections are excluded. Story decisions remain a separate section containing actual confirmed choices. Each card opens only its own recorded facts, with its explicitly assigned art, Previous/Next controls and X. Keep the level 8 returning-player Continue fix.

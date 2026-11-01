@@ -9,7 +9,7 @@
         "chapter_end_level": 22,
         "map_landmark": "wooden_fence_cutout.png",
         "version": 1,
-        "notes": "Chapter 3: Technician's Office. Tutorial progression follows the campaign-map route.",
+        "notes": "Academy progression: teach before availability, then practice and mastery.",
         "author": "Save The Baby",
         "chapter_title": "Technician's Office",
         "map_background": "river_map_section_cutout.png",
@@ -18,7 +18,8 @@
         "map_props": [
             "tree_bush_topdown_cutout.png",
             "wooden_bridge_cutout.png"
-        ]
+        ],
+        "balance_version": 2
     },
     "board": {
         "columns": 8,
@@ -32,31 +33,32 @@
         "enabled": true,
         "available": [
             "ROCKET",
-            "BOMB"
+            "BOMB",
+            "THUNDER"
         ]
     },
     "tile_pool": {
-        "weights": [
-            16,
-            16,
-            36,
-            16,
-            16
-        ],
         "tiles": [
             "key",
             "phone",
             "fingerprint",
             "recorder",
             "clock"
+        ],
+        "weights": [
+            20,
+            20,
+            20,
+            20,
+            20
         ]
     },
-    "difficulty": "EXTREMELY_EASY",
+    "difficulty": "INTRODUCTION",
     "objectives": [
         {
-            "amount": 7,
-            "target": "FINGERPRINT",
-            "type": "COLLECT_ITEMS"
+            "type": "COLLECT_ITEMS",
+            "target": "CLOCK",
+            "amount": 22
         }
     ],
     "audio": {
@@ -68,26 +70,30 @@
     "settings": {
         "allow_shuffle": true,
         "allow_boosters": true,
-        "time_limit": 0
+        "time_limit": 0,
+        "available_boosters": [
+            "rocket",
+            "bomb",
+            "thunder"
+        ]
     },
     "description": "Follow David's trail through Technician's Office and gather the evidence that can lead to Ethan.",
     "tutorial": {
+        "enabled": true,
         "steps": [
             {
-                "message": "David: Match the glowing four-piece line to create a rocket. Swap the rocket with a neighbor to fire its row and column.",
-                "mechanic": "create_rocket",
-                "highlight": []
+                "mechanic": "damage_obstacle",
+                "message": "Make the glowing match beside the blocker. Watch its remaining health."
             }
-        ],
-        "enabled": true
+        ]
     },
     "obstacles": {
         "items": [
             {
-                "y": 3,
-                "health": 2,
-                "type": "chain",
-                "x": 2
+                "x": 2,
+                "y": 2,
+                "type": "bomb",
+                "health": 1
             }
         ]
     },
@@ -96,7 +102,7 @@
         "image": "res://assets/sprites/backgrounds/dirt_board_background.jpeg"
     },
     "moves": {
-        "total": 28
+        "total": 26
     },
     "rewards": {
         "powerups": [],

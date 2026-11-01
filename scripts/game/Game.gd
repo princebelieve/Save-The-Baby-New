@@ -68,7 +68,11 @@ var _displayed_coins := 0
 var _coin_count_tween: Tween
 var _selected_booster := ""
 var _booster_confirm: ConfirmationDialog
+var _academy_pending_level: Dictionary = {}
+var _academy_lesson_id := ""
+var _detail_layer: CanvasLayer
 var _tutorial_active := false
+var _tutorial_skip_pending := false
 var _tutorial_action := ""
 var _tutorial_mechanic := ""
 var _tutorial_pause_open := false
@@ -995,50 +999,26 @@ func _show_case_file() -> void:
 	intro_copy.alignment = BoxContainer.ALIGNMENT_CENTER
 	intro_copy.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	intro.add_child(intro_copy)
-	var title := _make_label("AMARA'S EVIDENCE BOARD", 24)
+	var title := _make_label("AMARA'S CASE FILE", 24)
 	intro_copy.add_child(title)
-	var explanation := _make_label("Any three matching pieces clear. Only the evidence type shown in the goal card advances this case.", 17)
+	var explanation := _make_label("Your discovered skills and decisions. Open a card to review exactly what you learned.", 17)
 	explanation.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	intro_copy.add_child(explanation)
-	var entries: Array[Dictionary] = [
-		{"name": "KEY", "icon": "key_objective_icon.jpeg", "meaning": "A lock or gate Victor opened. Match keys when the case goal asks for them."},
-		{"name": "PHONE", "icon": "phone_evidence_icon.svg", "meaning": "A call or location trace that can point toward Victor."},
-		{"name": "FINGERPRINT", "icon": "fingerprint_evidence_icon.jpeg", "meaning": "A trace that can connect an object to the person who handled it."},
-		{"name": "RECORDER", "icon": "recorder_evidence_icon.jpeg", "meaning": "A recording that may reveal a voice or a hidden clue."},
-		{"name": "CLOCK", "icon": "timer_objective_icon.jpeg", "meaning": "A timestamp that helps the team reconstruct when the trail moved."},
-		{"name": "CHARACTER TILES", "icon_path": "res://assets/sprites/characters/ethan_portrait_cutout.png", "meaning": "Match 3 of the same portrait. Each Ethan or Detective tile gives 1 rescue assist; each Victor tile gives 10 coins. The Ethan booster in the tray spends 1 assist to clear a chosen 5x5 area."}
-	]
-	for entry in entries:
-		var row := PanelContainer.new()
-		row.custom_minimum_size.y = 92 if entry["name"] == "CHARACTER TILES" else 76
-		var row_style := StyleBoxFlat.new()
-		row_style.bg_color = Color("#193a56")
-		row_style.border_color = Color("#52708a")
-		row_style.set_border_width_all(1)
-		row_style.set_corner_radius_all(14)
-		row_style.set_content_margin_all(8)
-		row.add_theme_stylebox_override("panel", row_style)
-		content.add_child(row)
-		var row_content := HBoxContainer.new()
-		row_content.add_theme_constant_override("separation", 14)
-		row.add_child(row_content)
-		var icon := TextureRect.new()
-		icon.custom_minimum_size = Vector2(58, 58)
-		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		icon.texture = ResourceManager.load_texture(str(entry.get("icon_path", "res://assets/sprites/tiles/" + str(entry.get("icon", "")))))
-		row_content.add_child(icon)
-		var copy := VBoxContainer.new()
-		copy.alignment = BoxContainer.ALIGNMENT_CENTER
-		copy.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		copy.add_theme_constant_override("separation", 1)
-		row_content.add_child(copy)
-		var tile_name := _make_label(str(entry["name"]), 16)
-		tile_name.add_theme_color_override("font_color", Color("#f2ce7c"))
-		copy.add_child(tile_name)
-		var meaning := _make_label(str(entry["meaning"]), 14 if entry["name"] == "CHARACTER TILES" else 15)
-		meaning.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		copy.add_child(meaning)
+	var discovered := CaseJournal.entries(_campaign_progress)
+	if discovered.is_empty():
+		var empty := _make_label("David's instructions will appear here as you uncover them. Read a lesson or practise a new skill to add it to this file.", 23)
+		empty.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		content.add_child(empty)
+	else:
+		content.add_child(_make_label("SKILLS YOU HAVE UNCOVERED", 23))
+		for entry in discovered:
+			var pages: Array = entry["facts"].values()
+			_add_case_card(content, str(entry["title"]), "Discovered in level %d" % int(entry["level"]), "\n".join(pages), str(entry["illustration"]))
+	var decisions: Dictionary = _campaign_progress.get_value("story_choices", "history", {})
+	if not decisions.is_empty(): content.add_child(_make_label("YOUR STORY DECISIONS", 23))
+	for story_id in decisions:
+		var decision: Dictionary = decisions[story_id]
+		_add_case_card(content, str(decision.get("label", "Decision")), "Story decision | " + str(story_id), str(decision.get("response", "")), "res://assets/sprites/props/evidence_briefcase.jpeg")
 	var close := _make_story_action_button("BACK TO SEARCH", 240)
 	close.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	close.pressed.connect(_close_case_file)
@@ -1183,19 +1163,6 @@ func _show_audio_settings(parent_layer: Node) -> void:
 		enabled.text = "Enabled" if enabled.button_pressed else "Disabled"
 		enabled.toggled.connect(_set_audio_enabled.bind(bus_kind, enabled))
 		settings.add_child(enabled)
-	var preview := _make_menu_button("PREVIEW MUSIC")
-	preview.name = "PreviewMusic"
-	preview.custom_minimum_size = Vector2(260, 62)
-	preview.pressed.connect(func():
-		audio_manager.set_music_enabled(true)
-		if audio_manager.get_music_volume() <= 0.01:
-			audio_manager.set_music_volume(0.65)
-		audio_manager.play_music("suspense_opening")
-		audio_manager.resume_music()
-		var toggle := settings.get_node_or_null("MusicEnabled") as CheckButton
-		if toggle != null: toggle.set_pressed_no_signal(true)
-	)
-	settings.add_child(preview)
 	popup.add_child(settings)
 	if _tutorial_active and _tutorial_action == "settings":
 		popup.confirmed.connect(_on_tutorial_settings_confirmed, CONNECT_ONE_SHOT)
@@ -1440,6 +1407,7 @@ func _on_dialogue_started(_dialogue_id: Variant) -> void:
 		SignalBus.play_sfx.emit(story_sound)
 	_speaker_label.text = str(line.get("speaker", ""))
 	_dialogue_label.text = str(line.get("text", ""))
+
 	var portrait_path := str(line.get("portrait", ""))
 	if portrait_path.is_empty():
 		var portraits := {
@@ -1486,7 +1454,7 @@ func _play_dialogue_typing_ticks() -> void:
 func _present_route_choices(choices: Array) -> void:
 	if not _choice_box.get_children().is_empty():
 		return
-	_speaker_label.text = "CHOOSE DAVID'S FIRST MOVE"
+	_speaker_label.text = "CHOOSE DAVID'S NEXT MOVE"
 	_dialogue_label.text = "Each choice sets the team's approach. See the immediate consequence before you decide."
 	_dialogue_label.custom_minimum_size.y = 58
 	_dialogue_label.visible_characters = -1
@@ -1500,8 +1468,8 @@ func _present_route_choices(choices: Array) -> void:
 	_story_previous_button.hide()
 	for choice in choices:
 		var button := Button.new()
-		button.text = "%s\n%s" % [str(choice.get("label", "Choose")).to_upper(), str(choice.get("impact", choice.get("response", "Begin the search.")))]
-		button.custom_minimum_size = Vector2(0, 108)
+		button.text = str(choice.get("label", "Choose")).to_upper()
+		button.custom_minimum_size = Vector2(0, 72)
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
@@ -1522,7 +1490,7 @@ func _present_route_choices(choices: Array) -> void:
 		var choice_hover := choice_style.duplicate() as StyleBoxFlat
 		choice_hover.bg_color = Color("#2d628e")
 		button.add_theme_stylebox_override("hover", choice_hover)
-		button.pressed.connect(_select_route.bind(choice))
+		button.pressed.connect(_preview_story_choice.bind(choice))
 		button.pressed.connect(_play_ui_confirm)
 		button.mouse_entered.connect(_animate_choice_button.bind(button, 1.04))
 		button.mouse_exited.connect(_animate_choice_button.bind(button, 1.0))
@@ -1564,14 +1532,26 @@ func _on_route_selected(choice: Dictionary) -> void:
 		_story_portrait.texture = ResourceManager.load_portrait("res://assets/sprites/characters/david_portrait_v2.png")
 	_speaker_label.text = str(choice.get("label", ""))
 	_dialogue_label.text = str(choice.get("response", "The search begins."))
-	_story_continue_button.text = "CAMPAIGN MAP"
-	_story_continue_button.show()
-	_story_continue_button.pressed.disconnect(_advance_story)
-	_chosen_route_label = str(choice.get("label", "Begin the search"))
+	_dialogue_label.visible_characters = -1
+	_is_dialogue_typing = false
+	var story_id := str(_story_manager.get_story_data().get("story_id", "opening_story"))
+	var history: Dictionary = _campaign_progress.get_value("story_choices", "history", {})
+	history[story_id] = choice.duplicate(true)
+	_campaign_progress.set_value("story_choices", "history", history)
+	_chosen_route_label = str(choice.get("label", "Continue the search"))
+	_current_route_id = route_id
 	_campaign_progress.set_value("campaign", "route", route_id)
 	_campaign_progress.set_value("campaign", "route_label", _chosen_route_label)
 	_persist_campaign_progress()
-	_story_continue_button.pressed.connect(_show_campaign_map.bind(route_id), CONNECT_ONE_SHOT)
+	_story_continue_button.show()
+	if _story_continue_button.pressed.is_connected(_advance_story):
+		_story_continue_button.pressed.disconnect(_advance_story)
+	_story_continue_button.text = "CONTINUE"
+	if _pending_level_id > 0:
+		_pending_route_id = route_id
+		_story_continue_button.pressed.connect(_story_manager.goto_next_scene, CONNECT_ONE_SHOT)
+	else:
+		_story_continue_button.pressed.connect(_show_campaign_map.bind(route_id), CONNECT_ONE_SHOT)
 	set_meta("chosen_route", route_id)
 
 
@@ -1672,6 +1652,8 @@ func _on_campaign_level_selected(level_id: int, route_id: String) -> void:
 
 
 func _start_campaign_story(story_id: String) -> void:
+	if _story_manager != null:
+		_story_manager.set_approach(_current_route_id)
 	if _story_manager == null or not _story_manager.load_story(story_id):
 		DebugLogger.error("Game: Campaign story could not be loaded -> %s" % story_id)
 		_pending_level_id = 0
@@ -1985,91 +1967,12 @@ func _begin_level(_route_id: String) -> void:
 		var entry: Dictionary = _booster_buttons[kind]
 		(entry["count"] as Label).text = str(int(_booster_inventory[kind]))
 		(entry["button"] as BaseButton).disabled = false
-	var tutorial: Dictionary = level_data.get("tutorial", {})
-	var raw_steps: Variant = tutorial.get("steps", [])
-	var tutorial_steps: Array = raw_steps if raw_steps is Array else []
-	if bool(tutorial.get("enabled", false)) and not tutorial_steps.is_empty() and not bool(_campaign_progress.get_value("tutorials", str(_current_level_id), false)):
-		_tutorial_active = true
-		_tutorial_mechanic = str(tutorial_steps[0].get("mechanic", ""))
-		_tutorial_pause_open = false
-		_tutorial_booster_kind = str(tutorial_steps[0].get("booster", "")).to_lower()
-		if _tutorial_mechanic == "character_tiles":
-			_tutorial_action = "explain_character_tiles"
-			if _board != null:
-				_board.lock()
-			_hint_label.text = "NEW MATCH PIECES | CHARACTER REWARDS"
-			_refresh_tutorial_controls()
-			_show_tutorial_tip(
-				str(tutorial_steps[0].get("message", "Match character portraits for their rewards.")),
-				_button_screen_rect(_booster_buttons["ethan"]["button"]),
-				"DAVID",
-				"",
-				true
-			)
-		elif not _tutorial_booster_kind.is_empty():
-			_tutorial_action = "booster_select"
-			_board.lock()
-			_hint_label.text = "BOOSTER TRAINING | " + _tutorial_booster_kind.to_upper()
-			_refresh_tutorial_controls()
-			_show_tutorial_tip(
-				_hint_label.text,
-				_button_screen_rect(_booster_buttons[_tutorial_booster_kind]["button"]),
-				"DAVID",
-				"res://assets/sprites/characters/david_portrait_v2.png"
-			)
-		else:
-			_tutorial_action = "guided_swap"
-			var guided_swap: Array[Vector2i] = []
-			var guided_move_hits_obstacle := false
-			var tutorial_mechanic_unavailable := false
-			if _board != null:
-				if _tutorial_mechanic == "create_rocket":
-					var objective_type := int(Constants.TileType.get(_objective_target, -1))
-					guided_swap = _board.find_valid_swap_for_type(objective_type, 4)
-					if guided_swap.is_empty():
-						guided_swap = _board.find_valid_swap_for_type(-1, 4)
-				elif _current_level_id == 1 and _objective_type == "COLLECT_ITEMS":
-					guided_swap = _board.find_valid_swap_for_type(int(Constants.TileType.get(_objective_target, -1)))
-				if guided_swap.is_empty() and not obstacle_items.is_empty() and _tutorial_mechanic == "damage_obstacle":
-					guided_swap = _board.find_valid_swap_near_obstacle()
-					guided_move_hits_obstacle = not guided_swap.is_empty()
-				if _tutorial_mechanic == "damage_obstacle" and not guided_move_hits_obstacle:
-					_tutorial_mechanic = ""
-					tutorial_mechanic_unavailable = true
-				if guided_swap.is_empty():
-					guided_swap = _board.find_valid_swap()
-					if _tutorial_mechanic == "create_rocket":
-						_tutorial_mechanic = ""
-						tutorial_mechanic_unavailable = true
-			if _board != null:
-				_board.set_required_swap(guided_swap)
-			var base_message := str(tutorial_steps[0].get("message", "Swap the highlighted neighboring pieces to make a match."))
-			if tutorial_mechanic_unavailable:
-				if _current_level_id == 16:
-					base_message = "This board has no safe four-piece setup yet. Make the glowing match; we will show you a rocket when one appears."
-				else:
-					base_message = "No safe match beside the obstacle is available yet. Follow the glow; nearby matches are what damage it."
-			if _tutorial_mechanic == "damage_obstacle" and not guided_move_hits_obstacle:
-				base_message = "Swipe the highlighted neighboring tiles to make a match."
-			_hint_label.text = "DAVID'S FIELD COACHING | FOLLOW THE GLOW"
-			if guided_swap.size() == 2:
-				var first_rect := _board.get_cell_screen_rect(guided_swap[0])
-				var second_rect := _board.get_cell_screen_rect(guided_swap[1])
-				_show_tutorial_tip(base_message, first_rect.merge(second_rect), "DAVID", "res://assets/sprites/characters/david_portrait_v2.png")
-	else:
-		_tutorial_active = false
-		_tutorial_action = ""
-		var mission_hint := "MATCH %s | COLLECT %d CLUES IN %d MOVES" % [
-			_objective_target.replace("_", " "), _evidence_goal, int(level_data.get("moves", {}).get("total", 0))
-		]
-		if _obstacles_goal > 0:
-			mission_hint += " | CLEAR %d BLOCKERS" % _obstacles_goal
-		_hint_label.text = mission_hint
+	_start_academy_lesson(level_data)
 	_refresh_tutorial_controls()
 	if level_manager != null:
 		level_manager.start_level()
 	if _board != null:
-		if not (_tutorial_active and ["booster_select", "explain_character_tiles"].has(_tutorial_action)):
+		if not (_tutorial_active and ["academy_lesson", "explain_booster", "booster_select", "explain_character_tiles"].has(_tutorial_action)):
 			_board.unlock()
 	var active_hud := get_node_or_null("HUD") as CanvasLayer
 	if active_hud != null:
@@ -2296,6 +2199,12 @@ func _on_tiles_matched(tile_types: Array) -> void:
 	var ethan_matches := int(character_rewards["ethan"])
 	var detective_matches := int(character_rewards["detective"])
 	var victor_matches := int(character_rewards["victor"])
+	if ethan_matches + detective_matches + victor_matches > 0:
+		_discover_journal_fact("characters", 0)
+	if ethan_matches + detective_matches > 0:
+		_discover_journal_fact("characters", 1)
+	if victor_matches > 0:
+		_discover_journal_fact("characters", 2)
 	if ethan_matches > 0:
 		reward_notices.append("ETHAN +%d RESCUE ASSIST%s" % [ethan_matches, "" if ethan_matches == 1 else "S"])
 	if detective_matches > 0:
@@ -2376,6 +2285,7 @@ func _show_match_feedback(caption: String, sound_id: String, shake_board: bool) 
 
 
 func _on_special_created(kind: String) -> void:
+	_discover_journal_fact(kind, 0)
 	SignalBus.play_sfx.emit("special_created")
 	_special_moves_created += 1
 	var rewards: Array = []
@@ -2413,11 +2323,18 @@ func _on_special_created(kind: String) -> void:
 
 
 func _on_special_activated(kind: String) -> void:
+	_discover_journal_fact(kind, 1)
 	if _board != null:
 		_board.play_celebration_shake(1.5 if kind == "thunder" else 0.8)
 
 
 func _on_board_turn_resolved() -> void:
+	_discover_journal_fact("first_moves", 1)
+	_discover_journal_fact("first_moves", 2)
+	if _tutorial_skip_pending:
+		_tutorial_skip_pending = false
+		_finish_tutorial()
+		return
 	_match_streak = 0
 	if _result_layer != null:
 		return
@@ -2526,17 +2443,17 @@ func _on_tutorial_acknowledged() -> void:
 		return
 	if not _tutorial_active:
 		return
-	if _tutorial_action == "explain_goal":
-		_tutorial_action = "pause"
-		if _board != null:
-			_board.lock()
-		_refresh_tutorial_controls()
-		_show_tutorial_tip(
-			"Tap the gear to adjust music and sound effects separately. You can change them again whenever you need.",
-		_button_screen_rect(_pause_button),
-			"DAVID",
-			"res://assets/sprites/characters/david_portrait_v2.png"
-		)
+	if _tutorial_action == "academy_lesson":
+		_complete_academy_lesson()
+		var pending := _academy_pending_level
+		_academy_pending_level = {}
+		_start_practice_tutorial(pending)
+		if not _tutorial_active:
+			_board.unlock()
+	elif _tutorial_action == "explain_booster":
+		_show_tutorial_booster_selection()
+	elif _tutorial_action == "explain_goal":
+		_finish_tutorial()
 	elif _tutorial_action == "explain_obstacle":
 		_finish_tutorial()
 	elif _tutorial_action == "explain_special_created":
@@ -2547,7 +2464,22 @@ func _on_tutorial_acknowledged() -> void:
 		_finish_tutorial()
 
 
+func _show_tutorial_booster_selection() -> void:
+	if _economy_manager != null and _economy_manager.get_booster_count(_tutorial_booster_kind) <= 0:
+		_economy_manager.add_booster(_tutorial_booster_kind, 1)
+	_tutorial_action = "booster_select"
+	_board.lock()
+	_refresh_tutorial_controls()
+	_show_tutorial_tip(
+		"Tap the glowing %s booster below. Then choose the marked piece on the board." % _tutorial_booster_kind,
+		_button_screen_rect(_booster_buttons[_tutorial_booster_kind]["button"]),
+		"DAVID",
+		"res://assets/sprites/characters/david_portrait_v2.png"
+	)
+
+
 func _finish_tutorial() -> void:
+	_tutorial_skip_pending = false
 	if _tutorial_active and _current_level_id > 0:
 		_campaign_progress.set_value("tutorials", str(_current_level_id), true)
 		_persist_campaign_progress()
@@ -2563,7 +2495,9 @@ func _finish_tutorial() -> void:
 	_refresh_tutorial_controls()
 	if _board != null:
 		_board.clear_required_swap()
+		_board.cancel_booster_mode()
 		_board.unlock()
+	_selected_booster = ""
 	call_deferred("_evaluate_level_end")
 
 
@@ -2577,7 +2511,11 @@ func _refresh_tutorial_controls() -> void:
 		var button := entry["button"] as BaseButton
 		button.visible = true
 		var tutorial_allows: bool = not _tutorial_active or (_tutorial_action == "booster_select" and kind == _tutorial_booster_kind)
-		button.disabled = not tutorial_allows
+		var level_manager := get_node_or_null("Managers/LevelManager")
+		var data: Dictionary = level_manager.get_level_data() if level_manager != null else {}
+		var unlocked: bool = data.get("settings", {}).get("available_boosters", []).has(kind)
+		button.get_parent().visible = unlocked
+		button.disabled = not tutorial_allows or not unlocked
 
 
 func _on_booster_pressed(kind: String) -> void:
@@ -2598,8 +2536,8 @@ func _on_booster_pressed(kind: String) -> void:
 		_tutorial_action = "booster_target"
 		_tutorial_target_cell = Vector2i(_board.get_width() / 2, _board.get_height() / 2)
 		_board.set_required_booster_target(_tutorial_target_cell)
-		_board.set_booster_mode(kind)
 		_board.unlock()
+		_board.set_booster_mode(kind)
 		var target_rect := _board.get_cell_screen_rect(_tutorial_target_cell)
 		var message := "Tap the glowing piece to use %s. This clears nearby evidence." % kind.capitalize()
 		_hint_label.text = "BOOSTER TRAINING | TARGET THE GLOWING PIECE"
@@ -2665,6 +2603,7 @@ func _cancel_booster_targeting() -> void:
 
 
 func _on_booster_used(kind: String) -> void:
+	_discover_journal_fact("characters" if kind == "ethan" else kind, 3 if kind == "ethan" else 2)
 	_selected_booster = ""
 	_hint_label.text = "%s USED" % kind.to_upper()
 	_booster_inventory[kind] = maxi(0, int(_booster_inventory.get(kind, 0)) - 1)
@@ -2694,10 +2633,12 @@ func _show_tutorial_tip(message: String, target_rect: Rect2, speaker: String = "
 		add_child(layer)
 		_tutorial_overlay = TutorialOverlay.new()
 		_tutorial_overlay.acknowledged.connect(_on_tutorial_acknowledged)
+		_tutorial_overlay.skipped.connect(_skip_tutorial)
+		_tutorial_overlay.page_presented.connect(_on_tutorial_page_presented)
 		layer.add_child(_tutorial_overlay)
 	var board_action := ["guided_swap", "activate_special", "booster_target"].has(_tutorial_action)
-	var tap_action := board_action or ["campaign_map_intro", "settings", "pause", "field_guide"].has(_tutorial_action)
-	_tutorial_overlay.show_tip(message, target_rect, speaker, portrait_path, needs_acknowledgement, board_action, tap_action)
+	var tap_action := board_action or ["campaign_map_intro", "settings", "pause", "field_guide", "booster_select"].has(_tutorial_action)
+	_tutorial_overlay.show_tip(message, target_rect, speaker, portrait_path if not portrait_path.is_empty() else "res://assets/sprites/characters/david_portrait_v2.png", needs_acknowledgement, board_action, tap_action)
 
 
 func _button_screen_rect(button: Control) -> Rect2:
@@ -2718,6 +2659,11 @@ func _on_obstacles_cleared(amount: int) -> void:
 func _on_obstacle_damaged(cell: Vector2i, remaining_health: int, destroyed: bool) -> void:
 	if _board == null:
 		return
+	var obstacle: Obstacle = _board._obstacles.get(cell)
+	if is_instance_valid(obstacle):
+		var kinds := {Constants.ObstacleType.CHAIN: ["chain", 1], Constants.ObstacleType.LOCK: ["lock", 0], Constants.ObstacleType.BOMB: ["hazard", 1], Constants.ObstacleType.ELECTRIC_TRAP: ["electric", 1]}
+		var source: Array = kinds.get(obstacle.get_obstacle_type(), [])
+		if not source.is_empty(): _discover_journal_fact(str(source[0]), int(source[1]))
 	var rect := _board.get_cell_screen_rect(cell)
 	var hud := get_node_or_null("HUD") as CanvasLayer
 	if hud == null or rect.size == Vector2.ZERO:
@@ -3036,3 +2982,204 @@ func _record_level_completion() -> bool:
 		_campaign_progress.set_value("campaign", "total_stars", int(_campaign_progress.get_value("campaign", "total_stars", 0)) + stars_earned)
 	_persist_campaign_progress()
 	return old_stars == 0
+
+
+func _academy_lessons() -> Array:
+	var data: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://configs/academy.json"))
+	return data.get("lessons", []) if data is Dictionary else []
+
+
+func _start_academy_lesson(level_data: Dictionary) -> void:
+	_academy_pending_level = {}
+	_academy_lesson_id = ""
+	for lesson in _academy_lessons():
+		if int(lesson["level"]) != _current_level_id:
+			continue
+		if bool(_campaign_progress.get_value("academy_completed", str(lesson["id"]), false)):
+			break
+		# Archive on first presentation, including when an experienced player skips.
+		_campaign_progress.set_value("academy", str(lesson["id"]), true)
+		_persist_campaign_progress()
+		_academy_pending_level = level_data
+		_academy_lesson_id = str(lesson["id"])
+		_tutorial_active = true
+		_tutorial_action = "academy_lesson"
+		_board.lock()
+		_show_tutorial_tip("\n".join(lesson["pages"]), _objective_label.get_global_rect(), "DAVID", "res://assets/sprites/characters/david_portrait_v2.png", true)
+		return
+	_start_practice_tutorial(level_data)
+
+
+func _skip_tutorial() -> void:
+	if _tutorial_action == "campaign_map_intro":
+		_on_tutorial_acknowledged()
+		return
+	_complete_academy_lesson()
+	_academy_pending_level = {}
+	if _board != null and _board.is_locked() and ["guided_swap", "activate_special", "booster_resolving"].has(_tutorial_action):
+		_tutorial_skip_pending = true
+		_tutorial_overlay.hide_tip()
+		return
+	_finish_tutorial()
+
+
+func _complete_academy_lesson() -> void:
+	if not _academy_lesson_id.is_empty():
+		_campaign_progress.set_value("academy_completed", _academy_lesson_id, true)
+		_persist_campaign_progress()
+	_academy_lesson_id = ""
+
+
+func _add_case_card(parent: VBoxContainer, title: String, subtitle: String, detail: String, illustration: String = "") -> void:
+	var button := _make_story_action_button(title, 0)
+	button.custom_minimum_size.y = 76
+	button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	button.tooltip_text = subtitle
+	button.pressed.connect(_show_detail.bind(title, detail, Callable(), "", illustration))
+	parent.add_child(button)
+
+
+func _preview_story_choice(choice: Dictionary) -> void:
+	_show_detail("Are you sure?", "%s?\n\n%s" % [str(choice.get("label", "Choose this approach")), str(choice.get("impact", ""))], _select_route.bind(choice), "CHOOSE THIS APPROACH")
+
+
+func _show_detail(title: String, body: String, confirm: Callable = Callable(), confirm_text: String = "", illustration: String = "") -> void:
+	if is_instance_valid(_detail_layer):
+		return
+	_detail_layer = CanvasLayer.new()
+	_detail_layer.name = "CaseDetail"
+	_detail_layer.layer = 35
+	add_child(_detail_layer)
+	var card := IllustratedPopup.new()
+	card.name = "IllustratedDetailCard"
+	_detail_layer.add_child(card)
+	card.set_card_context(title, illustration, "CONFIRM" if confirm.is_valid() else "BACK")
+	card.skipped.connect(_close_detail)
+	card.acknowledged.connect(func():
+		_close_detail()
+		if confirm.is_valid(): confirm.call())
+	card.show_tip(body, Rect2(), "DAVID", "res://assets/sprites/characters/david_portrait_v2.png", true)
+
+
+func _close_detail() -> void:
+	if is_instance_valid(_detail_layer):
+		_detail_layer.queue_free()
+	_detail_layer = null
+
+
+func _start_practice_tutorial(level_data: Dictionary) -> void:
+	var obstacle_items: Array = level_data.get("obstacles", {}).get("items", [])
+	var tutorial: Dictionary = level_data.get("tutorial", {})
+	var raw_steps: Variant = tutorial.get("steps", [])
+	var tutorial_steps: Array = raw_steps if raw_steps is Array else []
+	if bool(tutorial.get("enabled", false)) and not tutorial_steps.is_empty() and not bool(_campaign_progress.get_value("tutorials", str(_current_level_id), false)):
+		_tutorial_active = true
+		_tutorial_mechanic = str(tutorial_steps[0].get("mechanic", ""))
+		_tutorial_pause_open = false
+		_tutorial_booster_kind = str(tutorial_steps[0].get("booster", "")).to_lower()
+		if _tutorial_mechanic == "character_tiles":
+			_tutorial_action = "explain_character_tiles"
+			if _board != null:
+				_board.lock()
+			_hint_label.text = "NEW MATCH PIECES | CHARACTER REWARDS"
+			_refresh_tutorial_controls()
+			_show_tutorial_tip(
+				str(tutorial_steps[0].get("message", "Match character portraits for their rewards.")),
+				_button_screen_rect(_booster_buttons["ethan"]["button"]),
+				"DAVID",
+				"",
+				true
+			)
+		elif not _tutorial_booster_kind.is_empty():
+			_tutorial_action = "explain_booster"
+			_board.lock()
+			_hint_label.text = "BOOSTER TRAINING | " + _tutorial_booster_kind.to_upper()
+			_refresh_tutorial_controls()
+			_show_tutorial_tip(
+				str(tutorial_steps[0].get("message", "Learn to use your new booster.")) + " A practice booster is provided if your supply is empty. Tap Continue to try it.",
+				_objective_label.get_global_rect(),
+				"DAVID",
+				"res://assets/sprites/characters/david_portrait_v2.png",
+				true
+			)
+		else:
+			_tutorial_action = "guided_swap"
+			var guided_swap: Array[Vector2i] = []
+			var guided_move_hits_obstacle := false
+			var tutorial_mechanic_unavailable := false
+			if _board != null:
+				if _tutorial_mechanic == "create_rocket":
+					var objective_type := int(Constants.TileType.get(_objective_target, -1))
+					guided_swap = _board.find_valid_swap_for_type(objective_type, 4)
+					if guided_swap.is_empty():
+						guided_swap = _board.find_valid_swap_for_type(-1, 4)
+				elif _current_level_id == 1 and _objective_type == "COLLECT_ITEMS":
+					guided_swap = _board.find_valid_swap_for_type(int(Constants.TileType.get(_objective_target, -1)))
+				if guided_swap.is_empty() and not obstacle_items.is_empty() and _tutorial_mechanic == "damage_obstacle":
+					guided_swap = _board.find_valid_swap_near_obstacle()
+					guided_move_hits_obstacle = not guided_swap.is_empty()
+				if _tutorial_mechanic == "damage_obstacle" and not guided_move_hits_obstacle:
+					_tutorial_mechanic = ""
+					tutorial_mechanic_unavailable = true
+				if guided_swap.is_empty():
+					guided_swap = _board.find_valid_swap()
+					if _tutorial_mechanic == "create_rocket":
+						_tutorial_mechanic = ""
+						tutorial_mechanic_unavailable = true
+			if _board != null:
+				_board.set_required_swap(guided_swap)
+			var base_message := str(tutorial_steps[0].get("message", "Swap the highlighted neighboring pieces to make a match."))
+			if tutorial_mechanic_unavailable:
+				if _current_level_id == 16:
+					base_message = "This board has no safe four-piece setup yet. Make the glowing match; we will show you a rocket when one appears."
+				else:
+					base_message = "No safe match beside the obstacle is available yet. Follow the glow; nearby matches are what damage it."
+			if _tutorial_mechanic == "damage_obstacle" and not guided_move_hits_obstacle:
+				base_message = "Swipe the highlighted neighboring tiles to make a match."
+			_hint_label.text = "DAVID'S FIELD COACHING | FOLLOW THE GLOW"
+			if guided_swap.size() == 2:
+				var first_rect := _board.get_cell_screen_rect(guided_swap[0])
+				var second_rect := _board.get_cell_screen_rect(guided_swap[1])
+				_show_tutorial_tip(base_message, first_rect.merge(second_rect), "DAVID", "res://assets/sprites/characters/david_portrait_v2.png")
+	else:
+		_tutorial_active = false
+		_tutorial_action = ""
+		if _tutorial_overlay != null: _tutorial_overlay.hide_tip()
+		var mission_hint := "MATCH %s | COLLECT %d CLUES IN %d MOVES" % [
+			_objective_target.replace("_", " "), _evidence_goal, int(level_data.get("moves", {}).get("total", 0))
+		]
+		if _obstacles_goal > 0:
+			mission_hint += " | CLEAR %d BLOCKERS" % _obstacles_goal
+		_hint_label.text = mission_hint
+	_refresh_tutorial_controls()
+	if not _tutorial_active or _tutorial_action == "guided_swap":
+		_board.unlock()
+
+
+
+
+func _on_tutorial_page_presented(index: int, message: String) -> void:
+	if _tutorial_action == "academy_lesson":
+		for lesson in _academy_lessons():
+			if str(lesson["id"]) != _academy_lesson_id: continue
+			var journal_pages: Array = lesson.get("journal_pages", [])
+			if index >= journal_pages.size(): return
+			var fact: Dictionary = journal_pages[index]
+			if not fact.is_empty() and CaseJournal.discover(_campaign_progress, str(fact["id"]), str(fact["title"]), str(fact["fact"]), message, str(fact["illustration"]), _current_level_id):
+				_persist_campaign_progress()
+			return
+	elif _tutorial_action == "campaign_map_intro":
+		if CaseJournal.discover(_campaign_progress, "map", "Using the campaign map", "navigation", message, "res://assets/sprites/props/evidence_briefcase.jpeg", _current_level_id):
+			_persist_campaign_progress()
+
+
+func _discover_journal_fact(lesson_id: String, page: int) -> void:
+	for lesson in _academy_lessons():
+		if str(lesson["id"]) != lesson_id: continue
+		var sources: Array = lesson.get("journal_pages", [])
+		if page >= sources.size(): return
+		var fact: Dictionary = sources[page]
+		if fact.is_empty(): return
+		if CaseJournal.discover(_campaign_progress, str(fact["id"]), str(fact["title"]), str(fact["fact"]), str(lesson["pages"][page]), str(fact["illustration"]), _current_level_id):
+			_persist_campaign_progress()
+		return
