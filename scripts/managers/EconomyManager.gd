@@ -45,6 +45,8 @@ func initialize() -> void:
 	_validator.initialize()
 	_shop = Shop.new()
 	_shop.initialize()
+	for system in [_coins, _stars, _lives, _boosters, _ethan, _validator, _shop]:
+		add_child(system)
 
 
 # ---------------- COINS ----------------
@@ -110,6 +112,19 @@ func update_life_timer() -> void:
 	_lives.update()
 	if _lives.get_lives() != previous_lives:
 		emit_signal("lives_changed", _lives.get_lives())
+
+
+func restore_life_clock(timestamp: int) -> void:
+	_lives.restore_regeneration_time(timestamp)
+	update_life_timer()
+
+
+func get_life_clock() -> int:
+	return _lives.get_regeneration_time()
+
+
+func seconds_until_next_life() -> int:
+	return 0 if _lives.is_full() else _lives.seconds_until_next_life()
 
 
 # ---------------- BOOSTERS ----------------

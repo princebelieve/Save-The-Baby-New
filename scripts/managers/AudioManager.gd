@@ -38,6 +38,10 @@ var _sfx_enabled := true
 
 var _muted: bool = false
 var _initialized: bool = false
+var _preferences_timer: Timer
+var _preferences_dirty := false
+var _current_music_track := ""
+var _application_suspended := false
 
 
 #===============================================================================
@@ -53,13 +57,23 @@ func initialize() ->void:
 		return
 
 	_initialized = true
+	_preferences_timer = Timer.new()
+	_preferences_timer.one_shot = true
+	_preferences_timer.wait_time = 0.25
+	_preferences_timer.process_mode = Node.PROCESS_MODE_ALWAYS
+	_preferences_timer.timeout.connect(_flush_preferences)
+	add_child(_preferences_timer)
 
 	_music_player = AudioStreamPlayer.new()
+	_music_player.process_mode = Node.PROCESS_MODE_ALWAYS
 	add_child(_music_player)
 
 	_music_player.finished.connect(_on_music_finished)
 
 	_load_audio_configuration()
+	_load_preferences()
+	_ensure_audio_bus(_music_bus_name)
+	_ensure_audio_bus(_sfx_bus_name)
 	_music_player.bus = _music_bus_name
 	_apply_bus_volumes()
 
@@ -72,6 +86,8 @@ func initialize() ->void:
 
 func play_music(track) -> void:
 	if track == null:
+		return
+	if _current_music_track == str(track) and _music_player.playing:
 		return
 
 	var resolved_track := _resolve_audio_id("music", track)
@@ -86,9 +102,13 @@ func play_music(track) -> void:
 	var entry = music_entries.get(str(track), {}) if typeof(music_entries) == TYPE_DICTIONARY else {}
 	if stream is AudioStreamOggVorbis and typeof(entry) == TYPE_DICTIONARY:
 		stream.loop = bool(entry.get("loop", false))
+	if stream is AudioStreamWAV and typeof(entry) == TYPE_DICTIONARY:
+		stream.loop_mode = AudioStreamWAV.LOOP_FORWARD if bool(entry.get("loop", false)) else AudioStreamWAV.LOOP_DISABLED
+		stream.loop_end = int(stream.get_length() * stream.mix_rate)
 	_music_player.stream = stream
+	_current_music_track = str(track)
 	_music_player.play()
-	_music_player.stream_paused = _muted or not _music_enabled
+	_music_player.stream_paused = _application_suspended or _muted or not _music_enabled
 
 	emit_signal("music_changed", track)
 
@@ -98,6 +118,7 @@ func play_music(track) -> void:
 
 func stop_music() -> void:
 	_music_player.stop()
+	_current_music_track = ""
 
 
 func pause_music() -> void:
@@ -106,8 +127,10 @@ func pause_music() -> void:
 
 
 func resume_music() -> void:
-	if _music_player != null and _music_player.playing:
-		_music_player.stream_paused = _muted or not _music_enabled
+	if _music_player != null and _music_player.stream != null:
+		_music_player.stream_paused = _application_suspended or _muted or not _music_enabled
+		if not _current_music_track.is_empty() and not _music_player.playing:
+			_music_player.play()
 
 
 func play_sfx(sound) -> void:
@@ -153,16 +176,19 @@ func stop_sfx(sound) -> void:
 func set_master_volume(value) -> void:
 	_master_volume = clampf(value, 0.0, 1.0)
 	_apply_bus_volumes()
+	_save_preferences()
 
 
 func set_music_volume(value) -> void:
 	_music_volume = clampf(value, 0.0, 1.0)
 	_apply_bus_volumes()
+	_save_preferences()
 
 
 func set_sfx_volume(value) -> void:
 	_sfx_volume = clampf(value, 0.0, 1.0)
 	_apply_bus_volumes()
+	_save_preferences()
 
 
 func set_music_enabled(enabled: bool) -> void:
@@ -170,6 +196,7 @@ func set_music_enabled(enabled: bool) -> void:
 	if _music_player != null and _music_player.playing:
 		_music_player.stream_paused = _muted or not _music_enabled
 	_apply_bus_volumes()
+	_save_preferences()
 
 
 func is_music_enabled() -> bool:
@@ -181,6 +208,7 @@ func set_sfx_enabled(enabled: bool) -> void:
 	if not _sfx_enabled:
 		_stop_all_sfx()
 	_apply_bus_volumes()
+	_save_preferences()
 
 
 func is_sfx_enabled() -> bool:
@@ -213,6 +241,64 @@ func unmute() -> void:
 #===============================================================================
 # Internal Helpers
 #===============================================================================
+
+func _ensure_audio_bus(bus_name: String) -> void:
+	if AudioServer.get_bus_index(bus_name) >= 0:
+		return
+	AudioServer.add_bus()
+	var index := AudioServer.bus_count - 1
+	AudioServer.set_bus_name(index, bus_name)
+	AudioServer.set_bus_send(index, "Master")
+
+
+func _load_preferences() -> void:
+	var preferences := ConfigFile.new()
+	if CampaignProgressStore.read(preferences, "user://audio_preferences.cfg") != OK:
+		return
+	_master_volume = clampf(float(preferences.get_value("audio", "master", _master_volume)), 0.0, 1.0)
+	_music_volume = clampf(float(preferences.get_value("audio", "music", _music_volume)), 0.0, 1.0)
+	_sfx_volume = clampf(float(preferences.get_value("audio", "sfx", _sfx_volume)), 0.0, 1.0)
+	_music_enabled = bool(preferences.get_value("audio", "music_enabled", true))
+	_sfx_enabled = bool(preferences.get_value("audio", "sfx_enabled", true))
+
+
+func _save_preferences() -> void:
+	_preferences_dirty = true
+	if _preferences_timer != null and _preferences_timer.is_inside_tree():
+		_preferences_timer.start()
+	else:
+		_flush_preferences()
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_APPLICATION_PAUSED:
+		_flush_preferences()
+		_application_suspended = true
+		if _music_player != null: _music_player.stream_paused = true
+	elif what == NOTIFICATION_APPLICATION_RESUMED:
+		_application_suspended = false
+		resume_music()
+
+
+func _exit_tree() -> void:
+	_flush_preferences()
+
+
+func _flush_preferences() -> void:
+	if not _preferences_dirty:
+		return
+	var preferences := ConfigFile.new()
+	preferences.set_value("audio", "master", _master_volume)
+	preferences.set_value("audio", "music", _music_volume)
+	preferences.set_value("audio", "sfx", _sfx_volume)
+	preferences.set_value("audio", "music_enabled", _music_enabled)
+	preferences.set_value("audio", "sfx_enabled", _sfx_enabled)
+	var error := CampaignProgressStore.write(preferences, "user://audio_preferences.cfg")
+	if error != OK:
+		push_warning("Could not save audio preferences: %s" % error_string(error))
+	else:
+		_preferences_dirty = false
+
 
 func _load_audio_configuration() -> void:
 	if ConfigLoader == null:

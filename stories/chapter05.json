@@ -25,13 +25,13 @@
                                          },
                                          {
                                              "speaker":  "David",
-                                             "portrait":  "res://assets/sprites/characters/david_portrait_cutout.png",
+                                             "portrait":  "res://assets/sprites/characters/david_portrait_v2.png",
                                              "text":  "He was here. Victor is trying to hide the path, but he cannot erase every sign that Ethan passed through.",
                                              "animation":  "fade"
                                          },
                                          {
                                              "speaker":  "Victor",
-                                             "portrait":  "res://assets/sprites/characters/victor_portrait_dark_cutout.png",
+                                             "portrait":  "res://assets/sprites/characters/victor_portrait_v2.png",
                                              "text":  "You are closer than I expected, David. Keep following the trail. It only gets harder from here.",
                                              "animation":  "fade"
                                          }

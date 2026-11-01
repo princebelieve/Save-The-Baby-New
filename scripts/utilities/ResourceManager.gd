@@ -109,6 +109,27 @@ func load_texture(path: String) -> Texture2D:
 	return null
 
 
+func load_portrait(path: String) -> Texture2D:
+	var key := "portrait::" + path
+	if _resource_cache.has(key):
+		return _resource_cache[key] as Texture2D
+	var texture := load_texture(path)
+	if texture == null:
+		return null
+	var pixels := texture.get_image()
+	if pixels == null:
+		return texture
+	if pixels.is_compressed(): pixels.decompress()
+	var used := pixels.get_used_rect()
+	if used.size.x <= 0 or used.size.y <= 0:
+		return texture
+	var portrait := AtlasTexture.new()
+	portrait.atlas = texture
+	portrait.region = Rect2(used)
+	_resource_cache[key] = portrait
+	return portrait
+
+
 func load_audio(path: String) -> AudioStream:
 	var res = get_resource(path)
 

@@ -16,7 +16,7 @@
                                          {
                                              "speaker":  "Late that night",
                                              "text":  "Rain rattled the windows. David was sorting drawings made by his young son, Ethan, when Amara called. Ethan\u0027s mother was whispering.",
-                                             "portrait":  "res://assets/sprites/characters/david_portrait_cutout.png"
+                                             "portrait":  "res://assets/sprites/characters/david_portrait_v2.png"
                                          },
                                          {
                                              "speaker":  "Amara",
@@ -26,7 +26,7 @@
                                          {
                                              "speaker":  "Victor",
                                              "sfx":  "door_close",
-                                             "portrait":  "res://assets/sprites/characters/victor_portrait_dark_cutout.png",
+                                             "portrait":  "res://assets/sprites/characters/victor_portrait_v2.png",
                                              "text":  "A video flickers on David\u0027s phone. Victor looks into the camera: \u0027You have until dawn. Follow the trail I left, and come alone—or Ethan disappears for good.\u0027 The screen goes black."
                                          }
                                      ],

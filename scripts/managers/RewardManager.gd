@@ -31,6 +31,8 @@ func initialize(economy_manager = null) -> void:
 
 	_distributor = RewardDistributor.new()
 	_distributor.initialize(economy_manager)
+	for system in [_calculator, _preview, _queue, _distributor]:
+		add_child(system)
 
 	_pending_rewards = _queue
 

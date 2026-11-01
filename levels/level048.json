@@ -73,7 +73,7 @@
     },
     "description": "Follow David's trail through Victor's Factory and gather the evidence that can lead to Ethan.",
     "tutorial": {
-        "steps": {},
+        "steps": [],
         "enabled": false
     },
     "obstacles": {

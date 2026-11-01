@@ -25,7 +25,7 @@
                                          },
                                          {
                                              "speaker":  "David",
-                                             "portrait":  "res://assets/sprites/characters/david_portrait_cutout.png",
+                                             "portrait":  "res://assets/sprites/characters/david_portrait_v2.png",
                                              "text":  "Then the gate is our first clue. We will search every footprint until we know which way he took Ethan.",
                                              "animation":  "fade"
                                          },

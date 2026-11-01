@@ -25,7 +25,7 @@
                                          },
                                          {
                                              "speaker":  "David",
-                                             "portrait":  "res://assets/sprites/characters/david_portrait_cutout.png",
+                                             "portrait":  "res://assets/sprites/characters/david_portrait_v2.png",
                                              "text":  "Victor used the workshop to hide his trail. That receiver is still warm.",
                                              "animation":  "fade"
                                          },

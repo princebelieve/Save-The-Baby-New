@@ -16,6 +16,7 @@ var _gesture_hand: Polygon2D
 var _gesture_outline: Line2D
 var _gesture_tween: Tween
 var _acknowledge_button: Button
+var _body_scroll: ScrollContainer
 
 
 func _ready() -> void:
@@ -39,6 +40,12 @@ func show_tip(message: String, target_rect: Rect2, speaker_name: String = "DAVID
 	_body_label.text = " ".join(message.strip_edges().split("\n", false))
 	_heading.text = speaker_name.to_upper()
 	_speaker_portrait.texture = ResourceManager.load_texture(portrait_path) if not portrait_path.is_empty() else null
+	if portrait_path.ends_with("david_portrait_v2.png") and _speaker_portrait.texture != null:
+		var source := _speaker_portrait.texture
+		var face := AtlasTexture.new()
+		face.atlas = source
+		face.region = Rect2(source.get_size() * Vector2(0.15, 0), source.get_size() * Vector2(0.72, 0.58))
+		_speaker_portrait.texture = face
 	_speaker_portrait.visible = _speaker_portrait.texture != null
 	_acknowledge_button.visible = needs_acknowledgement
 	_acknowledge_button.text = "CONTINUE"
@@ -71,7 +78,7 @@ func _build_bubble() -> void:
 	_bubble = Panel.new()
 	_bubble.name = "TutorialSpeechBubble"
 	_bubble.mouse_filter = Control.MOUSE_FILTER_STOP
-	_bubble.clip_contents = true
+	_bubble.clip_contents = false
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color("#fff3cf")
 	style.border_color = Color("#dc8735")
@@ -99,7 +106,7 @@ func _build_bubble() -> void:
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	bubble_content.add_child(row)
 	_speaker_portrait = TextureRect.new()
-	_speaker_portrait.custom_minimum_size = Vector2(64, 64)
+	_speaker_portrait.custom_minimum_size = Vector2(92, 112)
 	_speaker_portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_speaker_portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	_speaker_portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -112,7 +119,7 @@ func _build_bubble() -> void:
 	row.add_child(content)
 	_heading = Label.new()
 	_heading.text = "DAVID"
-	_heading.add_theme_font_size_override("font_size", 16)
+	_heading.add_theme_font_size_override("font_size", 19)
 	_heading.add_theme_color_override("font_color", Color("#995221"))
 	_heading.add_theme_color_override("font_outline_color", Color("#fffaf0"))
 	_heading.add_theme_constant_override("outline_size", 2)
@@ -120,18 +127,23 @@ func _build_bubble() -> void:
 	content.add_child(_heading)
 	_body_label = Label.new()
 	_body_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_body_label.add_theme_font_size_override("font_size", 19)
+	_body_label.add_theme_font_size_override("font_size", 22)
+	_body_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_body_label.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	_body_label.add_theme_color_override("font_color", Color("#26364d"))
 	_body_label.add_theme_color_override("font_outline_color", Color("#fffaf0"))
 	_body_label.add_theme_constant_override("outline_size", 1)
 	_body_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	content.add_child(_body_label)
+	_body_scroll = ScrollContainer.new()
+	_body_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_body_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	content.add_child(_body_scroll)
+	_body_scroll.add_child(_body_label)
 	_acknowledge_button = Button.new()
 	_acknowledge_button.text = "CONTINUE"
-	_acknowledge_button.custom_minimum_size = Vector2(138, 44)
+	_acknowledge_button.custom_minimum_size = Vector2(178, 58)
 	_acknowledge_button.size_flags_horizontal = Control.SIZE_SHRINK_END
-	_acknowledge_button.add_theme_font_size_override("font_size", 17)
+	_acknowledge_button.add_theme_font_size_override("font_size", 22)
 	_acknowledge_button.add_theme_color_override("font_color", Color("#fff8e9"))
 	var ack_style := StyleBoxFlat.new()
 	ack_style.bg_color = Color("#245a70")
@@ -163,8 +175,17 @@ func _layout_tip() -> void:
 	_set_panel(_shade_panels[2], Vector2(hole.end.x, hole.position.y), Vector2(viewport.x - hole.end.x, hole.size.y))
 	_set_panel(_shade_panels[3], Vector2(0, hole.end.y), Vector2(viewport.x, viewport.y - hole.end.y))
 
-	var bubble_width := minf(440.0, viewport.x - 36.0)
-	var bubble_height := minf(236.0 if _acknowledge_button.visible else 194.0, viewport.y * (0.28 if _acknowledge_button.visible else 0.20))
+	var bubble_width := minf(570.0, viewport.x - 36.0)
+	var portrait_width := 104.0 if _speaker_portrait.visible else 0.0
+	var body_width := maxf(120.0, bubble_width - 68.0 - portrait_width)
+	var font := _body_label.get_theme_font("font")
+	var body_height := ceilf(font.get_multiline_string_size(_body_label.text, HORIZONTAL_ALIGNMENT_LEFT, body_width, 22).y) + 24.0
+	var action_height := 64.0 if _acknowledge_button.visible else 0.0
+	var visible_body_height := minf(body_height, viewport.y * 0.55 - 80.0 - action_height)
+	_body_label.custom_minimum_size = Vector2(0, body_height)
+	_body_scroll.custom_minimum_size = Vector2(0, visible_body_height)
+	var row_height := maxf(visible_body_height + 40.0, 112.0 if _speaker_portrait.visible else 0.0)
+	var bubble_height := row_height + action_height + 28.0
 	_bubble.size = Vector2(bubble_width, bubble_height)
 	_bubble.custom_minimum_size = _bubble.size
 	var bubble_x := clampf(hole.get_center().x - bubble_width * 0.5, 18.0, viewport.x - bubble_width - 18.0)

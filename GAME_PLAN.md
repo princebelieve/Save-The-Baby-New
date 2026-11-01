@@ -32,6 +32,8 @@ The three opening approaches establish distinct story presentation and can chang
 
 ### Continuing campaign
 
+The initial 50 levels are a development and validation pack, never a hardcoded campaign or story ending. Clearing the latest available level returns to the campaign map with a continuation message. New level files extend the same progression, and completed progress remains valid as the campaign grows.
+
 The long-term game is an ongoing quest. New chapters can add locations, characters, villains, mechanics, obstacles, objectives, level collections, and story decisions. Level identifiers and save data must support growth beyond 50 without renumbering or overwriting existing progress. Chapter and level content belongs in data/resources, not level-specific engine code.
 
 Post-launch content is planned to include additional chapters and level packs, more villains and environments, seasonal events, daily challenges, new obstacles and powerups, localization, and other progression features. Content cadence and exact quantities are production decisions; the architecture must not impose a fixed campaign ceiling.
@@ -71,7 +73,7 @@ Ads are a planned part of the product, including rewarded ads and, if the final 
 
 ## 6. Story and choices
 
-The first story arc begins with Victor kidnapping Ethan and Amara asking David for help. David chooses to call the police, trace Victorâ€™s signal, or go alone. Each approach receives suitable scenes and dialogue and can affect presentation or selected mission framing. The story proceeds through investigation, leads to Victorâ€™s factory, and culminates in a confrontation and rescue. Story scenes recur at campaign milestones, rather than interrupting every few levels without regard to pacing.
+The first story arc begins with Victor kidnapping Ethan and Amara asking David for help. David chooses to call the police, trace Victorâ€™s signal, or go alone. Each approach receives suitable scenes and dialogue and can affect presentation or selected mission framing. The story proceeds through investigation, leads to Victorâ€™s factory, and continues through confrontations and rescue-related milestones as further chapters are authored. Level 050 is not a story ending. Story scenes recur at campaign milestones, rather than interrupting every few levels without regard to pacing.
 
 Dialogue, portraits, backgrounds, choices, conditions, sound, and transitions should be content-driven. Choice state must be saved and available to story conditions. Branches may diverge and reconverge; the system must support either without hardcoding a single three-track structure. Later chapters can build on prior decisions and introduce new branches.
 
@@ -124,7 +126,7 @@ The opening campaign includes a playable starter set: rocket, bomb, and thunder 
 
 ### F. Story and campaign progression
 
-Implement story content loading, dialogue, choices, branch conditions, scene transitions, chapter/map progression, and persistent choice state. Build the first campaign through the factory rescue and boss-style encounter.
+Implement story content loading, dialogue, choices, branch conditions, scene transitions, chapter/map progression, and persistent choice state. Build the initial campaign pack through the factory investigation and a boss-style encounter, with the larger rescue quest continuing beyond this pack.
 
 ### G. Product UI, economy, and local save
 
@@ -132,7 +134,7 @@ Deliver boot/menu/map/gameplay/pause/victory/failure/reward/settings/shop screen
 
 ### H. Content and polish
 
-Author and balance the opening 50 levels across all six campaign locations. Chapters 1â€“5 teach the core and newly introduced mechanics through tutorial levels and practice; Chapter 6 brings those mechanics together for the factory confrontation and rescue. Complete tutorials, audio, effects, animation, localization-ready text handling, performance, crash/regression, and device-size work. Expand art/audio coverage as defined by the asset backlog.
+Author and balance the opening 50 levels across all six campaign locations. Chapters 1â€“5 teach the core and newly introduced mechanics through tutorial levels and practice; Chapter 6 brings those mechanics together for a factory confrontation that leaves room for the continuing quest. Complete tutorials, audio, effects, animation, localization-ready text handling, performance, crash/regression, and device-size work. Expand art/audio coverage as defined by the asset backlog.
 
 ### I. Monetization and online services
 
@@ -152,6 +154,6 @@ Audio currently uses the supplied music and UI/match sound effects, plus generat
 
 ## 12. Version boundaries
 
-Version 1.0 is the first complete public game: approximately 50 opening levels, the first rescue chapter, core puzzle systems, progression/rewards, local save, polished UI/audio/animation, and Android/Windows release readiness. Ads and online/live services remain planned product capabilities and enter production in their staged roadmap phases; their exact inclusion and service scope for the first store release are release decisions made after implementation and platform review.
+Version 1.0 is the first complete public game: approximately 50 opening levels, the first campaign pack in a continuing rescue quest, core puzzle systems, progression/rewards, local save, polished UI/audio/animation, and Android/Windows release readiness. Ads and online/live services remain planned product capabilities and enter production in their staged roadmap phases; their exact inclusion and service scope for the first store release are release decisions made after implementation and platform review.
 
 After Version 1.0, continue the campaign and service features as ongoing updates. The game has no hardcoded final level count. The architecture should make continued growth practical while allowing each release to have a clear, achievable content scope.

@@ -58,7 +58,8 @@ func add_life(amount: int) -> void:
 func lose_life(amount: int) -> void:
 	if amount <= 0:
 		return
-
+	if is_full():
+		_last_regeneration_time = TimeHelper.current_unix_time()
 	_current_lives = max(0, _current_lives - amount)
 
 
@@ -123,6 +124,11 @@ func update() -> void:
 
 func restore_regenerated_lives() -> void:
 	var now := TimeHelper.current_unix_time()
+	if is_full():
+		_last_regeneration_time = now
+		return
+	# A changed device clock must not postpone regeneration indefinitely.
+	_last_regeneration_time = mini(_last_regeneration_time, now)
 
 	if _last_regeneration_time == 0:
 		_last_regeneration_time = now
@@ -137,6 +143,14 @@ func restore_regenerated_lives() -> void:
 		var gained := elapsed / interval
 		_current_lives = mini(_maximum_lives, _current_lives + gained)
 		_last_regeneration_time += gained * interval
+
+
+func restore_regeneration_time(timestamp: int) -> void:
+	_last_regeneration_time = clampi(timestamp, 1, TimeHelper.current_unix_time())
+
+
+func get_regeneration_time() -> int:
+	return _last_regeneration_time
 
 
 func seconds_until_next_life() -> int:

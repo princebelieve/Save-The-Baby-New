@@ -19,6 +19,7 @@ var _tile_size: int = 64
 var _drag_start: Tile
 var _tap_selection: Tile
 var _press_screen_position: Vector2 = Vector2.ZERO
+var _active_touch_index := -1
 var _remaining_moves: int = 0
 var _required_swap: Array[Vector2i] = []
 var _required_booster_target := Vector2i(-1, -1)
@@ -58,9 +59,13 @@ func initialize(level_data: Dictionary) -> bool:
 	var board_data: Dictionary = _level_data.get("board", {})
 	var configured_tile_size := int(board_data.get("tile_size", 64))
 	var columns := maxi(get_width(), 1)
-	# Keep the playable grid prominent on modern portrait screens while honoring
-	# larger per-level tile sizes.
-	_tile_size = maxi(configured_tile_size, int(floor(viewport_width() * 0.92 / columns)))
+	var viewport_size := get_viewport_rect().size
+	var board_top := viewport_size.y * 0.205 + 16.0
+	var board_bottom := viewport_size.y * 0.80 - 20.0
+	var horizontal_limit := int(floor(viewport_size.x * 0.92 / columns))
+	var vertical_limit := int(floor((board_bottom - board_top) / maxi(get_height(), 1)))
+	# Respect the HUD and booster tray on short phones as well as tall screens.
+	_tile_size = maxi(24, mini(maxi(configured_tile_size, horizontal_limit), mini(horizontal_limit, vertical_limit)))
 	for position in _grid:
 		var tile: Tile = _grid[position]
 		_attach_tile(tile, position)
@@ -69,10 +74,9 @@ func initialize(level_data: Dictionary) -> bool:
 		spawn_tween.tween_property(tile, "scale", Vector2.ONE, 0.22).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	_load_obstacles()
 
-	var viewport_size := get_viewport_rect().size
 	position = Vector2(
 		(viewport_size.x - get_width() * _tile_size) * 0.5,
-		maxf(120.0, (viewport_size.y - get_height() * _tile_size) * 0.45)
+		board_top + (board_bottom - board_top - get_height() * _tile_size) * 0.5
 	)
 	moves_changed.emit(_remaining_moves)
 	queue_redraw()
@@ -251,6 +255,9 @@ func swap_tiles(position_a: Vector2i, position_b: Vector2i) -> bool:
 	var tile_b: Tile = get_tile(position_b)
 	if tile_a == null or tile_b == null:
 		return false
+	if not _move_validator.is_adjacent(tile_a, tile_b):
+		move_rejected.emit()
+		return false
 	if not _required_swap.is_empty() and not _is_required_swap(position_a, position_b):
 		move_rejected.emit()
 		return false
@@ -282,7 +289,8 @@ func _animate_swap_then_resolve(tile_a: Tile, tile_b: Tile, special_tile: Tile =
 	SignalBus.moves_changed.emit(_remaining_moves)
 	SignalBus.move_used.emit(_remaining_moves)
 	if special_tile != null:
-		await _resolve_special_powerup(special_tile)
+		var partner := tile_b if special_tile == tile_a else tile_a
+		await _resolve_special_powerup(special_tile, partner)
 	else:
 		await _cascade_processor.process_animated(self)
 	_locked = false
@@ -629,31 +637,75 @@ func use_booster_at(kind: String, position: Vector2i) -> bool:
 	return true
 
 
-func _resolve_special_powerup(powerup_tile: Tile) -> void:
+func _resolve_special_powerup(powerup_tile: Tile, partner: Tile) -> void:
 	var kind := str(powerup_tile.get_meta("powerup_kind", "rocket"))
 	special_activated.emit(kind)
-	var target_type := int(powerup_tile.get_tile_type())
-	var targets: Array = []
-	if kind == "thunder":
-		for tile in _grid.values():
-			if tile.get_tile_type() == target_type: targets.append(tile)
-	elif kind == "bomb":
-		var position := powerup_tile.get_grid_position()
-		for y in range(maxi(0, position.y - 1), mini(get_height(), position.y + 2)):
-			for x in range(maxi(0, position.x - 1), mini(get_width(), position.x + 2)):
-				var tile: Tile = get_tile(Vector2i(x, y))
-				if tile != null: targets.append(tile)
-	else:
-		var position := powerup_tile.get_grid_position()
-		for x in range(get_width()):
-			var row_tile: Tile = get_tile(Vector2i(x, position.y))
-			if row_tile != null: targets.append(row_tile)
-		for y in range(get_height()):
-			var column_tile: Tile = get_tile(Vector2i(position.x, y))
-			if column_tile != null and not targets.has(column_tile): targets.append(column_tile)
+	var target_type := int(partner.get_tile_type())
+	var origin := powerup_tile.get_grid_position()
+	var targets := _special_targets(kind, origin, target_type)
+	if partner.has_powerup():
+		var other_kind := str(partner.get_meta("powerup_kind", "rocket"))
+		special_activated.emit(other_kind)
+		if kind == "thunder" and other_kind == "thunder":
+			targets = get_all_tiles()
+		elif kind == "thunder" or other_kind == "thunder":
+			var blast_kind := other_kind if kind == "thunder" else kind
+			var color_type := int(partner.get_tile_type()) if kind == "thunder" else int(powerup_tile.get_tile_type())
+			targets = []
+			for tile in get_all_tiles():
+				if int(tile.get_tile_type()) == color_type:
+					targets.append_array(_special_targets(blast_kind, tile.get_grid_position(), color_type))
+		elif kind == "bomb" and other_kind == "bomb":
+			targets = _special_targets("large_bomb", origin, target_type)
+		elif kind == "bomb" or other_kind == "bomb":
+			targets = _special_targets("wide_rocket", origin, target_type)
+		else:
+			targets.append_array(_special_targets(other_kind, partner.get_grid_position(), target_type))
+		partner.clear_powerup()
+		partner.remove_meta("powerup_kind")
+	targets.append(powerup_tile)
+	targets.append(partner)
 	powerup_tile.clear_powerup()
 	powerup_tile.remove_meta("powerup_kind")
-	_resolve_external_clear(targets, kind)
+	await _resolve_external_clear(targets, kind, false)
+
+
+func _special_targets(kind: String, origin: Vector2i, target_type: int) -> Array:
+	var targets: Array = []
+	for tile in get_all_tiles():
+		var cell: Vector2i = tile.get_grid_position()
+		var delta := cell - origin
+		var hit := false
+		match kind:
+			"thunder": hit = int(tile.get_tile_type()) == target_type
+			"bomb": hit = absi(delta.x) <= 1 and absi(delta.y) <= 1
+			"large_bomb": hit = absi(delta.x) <= 2 and absi(delta.y) <= 2
+			"wide_rocket": hit = absi(delta.x) <= 1 or absi(delta.y) <= 1
+			_: hit = delta.x == 0 or delta.y == 0
+		if hit:
+			targets.append(tile)
+	return targets
+
+
+func expand_special_targets(tiles: Array, excluded: Tile = null) -> Array:
+	var expanded: Array = []
+	for tile in tiles:
+		if is_instance_valid(tile) and not expanded.has(tile):
+			expanded.append(tile)
+	var index := 0
+	while index < expanded.size():
+		var tile: Tile = expanded[index]
+		index += 1
+		if tile == excluded or not tile.has_powerup():
+			continue
+		var kind := str(tile.get_meta("powerup_kind", "rocket"))
+		tile.clear_powerup()
+		tile.remove_meta("powerup_kind")
+		special_activated.emit(kind)
+		for target in _special_targets(kind, tile.get_grid_position(), int(tile.get_tile_type())):
+			if not expanded.has(target):
+				expanded.append(target)
+	return expanded
 
 
 func play_celebration_shake(intensity: float = 1.0) -> void:
@@ -666,13 +718,12 @@ func play_celebration_shake(intensity: float = 1.0) -> void:
 	shake.tween_property(self, "position", origin, 0.07).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
 
 
-func _resolve_external_clear(tiles: Array, effect: String) -> void:
-	var unique_tiles: Array = []
-	for tile in tiles:
-		if is_instance_valid(tile) and not unique_tiles.has(tile): unique_tiles.append(tile)
+func _resolve_external_clear(tiles: Array, effect: String, finish_turn: bool = true) -> void:
+	var unique_tiles := expand_special_targets(tiles)
 	if unique_tiles.is_empty():
-		_locked = false
-		turn_resolved.emit()
+		if finish_turn:
+			_locked = false
+			turn_resolved.emit()
 		return
 	if effect == "thunder":
 		SignalBus.play_sfx.emit("thunder_crack")
@@ -691,8 +742,11 @@ func _resolve_external_clear(tiles: Array, effect: String) -> void:
 	await animate_falling_tiles(movements)
 	_refill_system.refill(self)
 	await _cascade_processor.process_animated(self)
-	_locked = false
-	turn_resolved.emit()
+	if finish_turn:
+		if _board_shuffler != null and _board_shuffler.needs_shuffle(self):
+			_board_shuffler.shuffle(self)
+		_locked = false
+		turn_resolved.emit()
 
 
 func animate_match_tiles(tiles: Array) -> void:
@@ -718,6 +772,20 @@ func animate_falling_tiles(movements: Array) -> void:
 
 func get_all_tiles() -> Array:
 	return _grid.values()
+
+
+func repair_dead_board() -> bool:
+	var replacement := _board_generator.generate(_level_data)
+	if replacement.is_empty():
+		return false
+	cancel_pointer_gesture()
+	for tile in _grid.values():
+		if is_instance_valid(tile):
+			tile.queue_free()
+	_grid = replacement
+	for cell in _grid:
+		_attach_tile(_grid[cell], cell)
+	return true
 
 
 func get_row(index: int) -> Array:
@@ -788,18 +856,37 @@ func _attach_tile(tile: Tile, grid_position: Vector2i) -> void:
 
 
 func _input(event: InputEvent) -> void:
+	if event is InputEventScreenTouch:
+		if event.pressed:
+			if _locked or _active_touch_index != -1:
+				return
+			_active_touch_index = event.index
+			_begin_pointer_gesture(event.position)
+		elif event.index == _active_touch_index:
+			_active_touch_index = -1
+			if event.canceled:
+				cancel_pointer_gesture()
+			elif not _locked:
+				_finish_pointer_gesture(event.position)
+		return
 	if _locked:
 		return
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		# Touch already owns its gesture; synthesized mouse events must not replay it.
+		if event.device == InputEvent.DEVICE_ID_EMULATION or _active_touch_index != -1:
+			return
 		if event.pressed:
 			_begin_pointer_gesture(event.position)
 		else:
 			_finish_pointer_gesture(event.position)
-	elif event is InputEventScreenTouch:
-		if event.pressed:
-			_begin_pointer_gesture(event.position)
-		else:
-			_finish_pointer_gesture(event.position)
+
+
+func cancel_pointer_gesture() -> void:
+	_active_touch_index = -1
+	_drag_start = null
+	if is_instance_valid(_tap_selection):
+		_tap_selection.reset_tile_modulate()
+	_tap_selection = null
 
 
 func _begin_pointer_gesture(screen_position: Vector2) -> void:

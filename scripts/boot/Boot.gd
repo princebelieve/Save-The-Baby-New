@@ -95,6 +95,7 @@ func create_game_scene() -> void:
 		return
 
 	get_tree().root.add_child(_game_scene)
+	get_tree().current_scene = _game_scene
 
 
 func finish_boot() -> void:

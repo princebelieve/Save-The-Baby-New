@@ -11,6 +11,10 @@ extends Node
 var _cache: Dictionary = {}
 var _file_helper: FileHelper = FileHelper.new()
 
+
+func _init() -> void:
+	add_child(_file_helper)
+
 # =========================================================
 # INITIALIZATION
 # =========================================================

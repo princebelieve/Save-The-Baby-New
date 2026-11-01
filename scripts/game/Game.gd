@@ -1,7 +1,7 @@
 extends Node2D
 class_name Game
 
-const DISPLAY_FONT: FontFile = preload("res://assets/fonts/CrimsonPro-Variable.ttf")
+const DISPLAY_FONT: FontFile = preload("res://assets/fonts/Baloo2-Variable.ttf")
 
 const OPENING_STORY_PATH := "res://stories/opening_story.json"
 const CAMPAIGN_PROGRESS_PATH := "user://campaign_progress.cfg"
@@ -21,6 +21,7 @@ var _story_skip_button: Button
 var _story_previous_button: Button
 var _launch_layer: CanvasLayer
 var _story_portrait: TextureRect
+var _story_dialogue_panel: PanelContainer
 var _pause_layer: CanvasLayer
 var _briefing_layer: CanvasLayer
 var _campaign_layer: CanvasLayer
@@ -31,6 +32,7 @@ var _pending_story_id := ""
 var _chosen_route_label: String = "Go after Victor alone"
 var _dialogue_tween: Tween
 var _is_dialogue_typing: bool = false
+var _last_typing_tick_character: int = 0
 var _choice_box: VBoxContainer
 var _moves_label: Label
 var _objective_label: Label
@@ -43,7 +45,7 @@ var _level_number_label: Label
 var _objective_description_label: Label
 var _hint_label: Label
 var _pause_button: TextureButton
-var _case_file_button: TextureButton
+var _case_file_button: BaseButton
 var _case_file_layer: CanvasLayer
 var _case_file_was_board_locked := false
 var _booster_dock: PanelContainer
@@ -80,6 +82,21 @@ var _match_streak := 0
 var _special_moves_created := 0
 var _objective_complete_sound_played := false
 var _story_objective_sound_pending := false
+var _restore_tutorial_after_pause := false
+
+
+func _notification(what: int) -> void:
+	if not is_node_ready():
+		return
+	if what == NOTIFICATION_APPLICATION_PAUSED:
+		_persist_campaign_progress()
+		if _board != null and _launch_layer == null and _story_layer == null and _campaign_layer == null and _result_layer == null:
+			_show_pause_menu(true)
+	elif what == NOTIFICATION_WM_GO_BACK_REQUEST:
+		if _pause_layer != null:
+			_close_pause_menu()
+		elif _board != null and _launch_layer == null and _story_layer == null and _campaign_layer == null and _result_layer == null:
+			_show_pause_menu(true)
 
 
 func _ready() -> void:
@@ -92,6 +109,7 @@ func _ready() -> void:
 		_economy_manager.set_coins(int(_campaign_progress.get_value("campaign", "coins", int(game_config.get("starting_coins", 0)))))
 		var initial_lives := int(_campaign_progress.get_value("campaign", "lives", int(game_config.get("max_lives", 5))))
 		_economy_manager.set_lives(initial_lives)
+		_economy_manager.restore_life_clock(int(_campaign_progress.get_value("campaign", "life_regeneration_time", TimeHelper.current_unix_time())))
 		var economy_config: Dictionary = ConfigLoader.load_config(Constants.ConfigPaths.ECONOMY)
 		var saved_boosters: Dictionary = _campaign_progress.get_value("campaign", "boosters", {})
 		var starting_boosters: Dictionary = economy_config.get("starting_boosters", {})
@@ -133,6 +151,7 @@ func _load_game_art() -> void:
 	art.texture = _load_full_bleed_background("res://assets/sprites/backgrounds/riverside_landscape.jpeg")
 	art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	_apply_opening_background_blur(art)
 	background.add_child(art)
 	var tint := ColorRect.new()
 	tint.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -157,6 +176,30 @@ func _load_full_bleed_background(path: String) -> Texture2D:
 	return cropped
 
 
+func _apply_opening_background_blur(target: TextureRect) -> void:
+	var shader := Shader.new()
+	shader.code = """
+shader_type canvas_item;
+void fragment() {
+	vec2 px = vec2(0.055);
+	vec4 color = textureLod(TEXTURE, UV, 6.5) * 0.28;
+	color += textureLod(TEXTURE, clamp(UV + vec2(px.x, 0.0), vec2(0.0), vec2(1.0)), 6.5) * 0.12;
+	color += textureLod(TEXTURE, clamp(UV - vec2(px.x, 0.0), vec2(0.0), vec2(1.0)), 6.5) * 0.12;
+	color += textureLod(TEXTURE, clamp(UV + vec2(0.0, px.y), vec2(0.0), vec2(1.0)), 6.5) * 0.12;
+	color += textureLod(TEXTURE, clamp(UV - vec2(0.0, px.y), vec2(0.0), vec2(1.0)), 6.5) * 0.12;
+	color += textureLod(TEXTURE, clamp(UV + px, vec2(0.0), vec2(1.0)), 6.5) * 0.06;
+	color += textureLod(TEXTURE, clamp(UV - px, vec2(0.0), vec2(1.0)), 6.5) * 0.06;
+	color += textureLod(TEXTURE, clamp(UV + vec2(px.x, -px.y), vec2(0.0), vec2(1.0)), 6.5) * 0.06;
+	color += textureLod(TEXTURE, clamp(UV + vec2(-px.x, px.y), vec2(0.0), vec2(1.0)), 6.5) * 0.06;
+	COLOR = vec4(color.rgb, 1.0);
+}
+"""
+	var material := ShaderMaterial.new()
+	material.shader = shader
+	target.material = material
+	target.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+
+
 func _show_loading_screen() -> void:
 	var layer := CanvasLayer.new()
 	layer.name = "LoadingScreen"
@@ -167,6 +210,7 @@ func _show_loading_screen() -> void:
 	background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	background.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_apply_opening_background_blur(background)
 	layer.add_child(background)
 	var wash := ColorRect.new()
 	wash.color = Color(0.015, 0.055, 0.075, 0.56)
@@ -181,7 +225,7 @@ func _show_loading_screen() -> void:
 	wash.add_child(stack)
 	var logo := TextureRect.new()
 	logo.texture = ResourceManager.load_texture("res://assets/sprites/ui/game_logo_cutout.png")
-	logo.custom_minimum_size = Vector2(220, 220)
+	logo.custom_minimum_size = Vector2(280, 280)
 	logo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	logo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	logo.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
@@ -204,6 +248,7 @@ func _show_loading_screen() -> void:
 
 
 func _show_launch_screen() -> void:
+	SignalBus.play_music.emit("suspense_opening")
 	_launch_layer = CanvasLayer.new()
 	_launch_layer.name = "LaunchScreen"
 	_launch_layer.layer = 10
@@ -213,9 +258,10 @@ func _show_launch_screen() -> void:
 	background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	background.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_apply_opening_background_blur(background)
 	_launch_layer.add_child(background)
 	var veil := ColorRect.new()
-	veil.color = Color(0.008, 0.025, 0.055, 0.48)
+	veil.color = Color(0.008, 0.025, 0.055, 0.58)
 	veil.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_launch_layer.add_child(veil)
 	var content := Control.new()
@@ -223,18 +269,18 @@ func _show_launch_screen() -> void:
 	veil.add_child(content)
 	var viewport_size := get_viewport_rect().size
 	var logo := TextureRect.new()
-	logo.position = Vector2(viewport_size.x * 0.20, viewport_size.y * 0.055)
-	logo.size = Vector2(viewport_size.x * 0.60, viewport_size.y * 0.25)
+	logo.position = Vector2(viewport_size.x * 0.14, viewport_size.y * 0.035)
+	logo.size = Vector2(viewport_size.x * 0.72, viewport_size.y * 0.28)
 	logo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	logo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	logo.texture = ResourceManager.load_texture("res://assets/sprites/ui/game_logo_cutout.png")
 	content.add_child(logo)
 	var family := TextureRect.new()
-	family.position = Vector2(viewport_size.x * 0.18, viewport_size.y * 0.32)
-	family.size = Vector2(viewport_size.x * 0.64, viewport_size.y * 0.30)
+	family.position = Vector2(viewport_size.x * 0.13, viewport_size.y * 0.33)
+	family.size = Vector2(viewport_size.x * 0.74, viewport_size.y * 0.33)
 	family.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	family.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	family.texture = ResourceManager.load_texture("res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png")
+	family.texture = ResourceManager.load_portrait("res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png")
 	content.add_child(family)
 	var quest_title := _make_label("THE QUEST FOR ETHAN", 21)
 	quest_title.position = Vector2(viewport_size.x * 0.08, viewport_size.y * 0.68)
@@ -252,7 +298,7 @@ func _show_launch_screen() -> void:
 	start.size = Vector2(minf(300.0, viewport_size.x * 0.66), 92)
 	start.pressed.connect(_start_opening_story)
 	content.add_child(start)
-	var settings_size := Vector2(minf(116.0, viewport_size.x * 0.30), 40.0)
+	var settings_size := Vector2(minf(154.0, viewport_size.x * 0.30), 64.0)
 	var settings_button := _make_texture_button("settings", settings_size)
 	settings_button.position = Vector2(viewport_size.x - settings_size.x - 18.0, 18.0)
 	settings_button.size = settings_size
@@ -282,6 +328,12 @@ func _show_title_settings() -> void:
 func _start_opening_story() -> void:
 	if _launch_layer != null:
 		_launch_layer.queue_free()
+		_launch_layer = null
+	var saved_route := str(_campaign_progress.get_value("campaign", "route", ""))
+	if saved_route in ["alone", "police", "signal"]:
+		_chosen_route_label = str(_campaign_progress.get_value("campaign", "route_label", _chosen_route_label))
+		_show_campaign_map(saved_route)
+		return
 	_show_story_overlay()
 	if _story_manager != null:
 		SignalBus.play_sfx.emit("case_open")
@@ -434,7 +486,9 @@ func _build_level_objective_row(parent: CanvasLayer) -> void:
 	objective_copy.add_theme_constant_override("separation", 0)
 	row.add_child(objective_copy)
 	_objective_description_label = _make_label("COLLECT THE CLUES", roundi(26 * hud_scale))
-	_objective_description_label.clip_text = true
+	_objective_description_label.clip_text = false
+	_objective_description_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_objective_description_label.custom_minimum_size.y = 34
 	_objective_description_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	_objective_description_label.add_theme_color_override("font_color", Color("#fff5dc"))
 	objective_copy.add_child(_objective_description_label)
@@ -442,18 +496,9 @@ func _build_level_objective_row(parent: CanvasLayer) -> void:
 	_objective_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	_objective_label.add_theme_color_override("font_color", Color("#f4ce49"))
 	objective_copy.add_child(_objective_label)
-	var case_art := _load_hud_asset("res://assets/sprites/ui/hud/casefile_button_serif.png")
-	var case_crop := AtlasTexture.new()
-	case_crop.atlas = case_art
-	case_crop.region = Rect2(405, 475, 1110, 350)
-	_case_file_button = TextureButton.new()
+	_case_file_button = _make_story_action_button("CASE FILE", 142)
 	_case_file_button.name = "CaseFileButton"
-	_case_file_button.ignore_texture_size = true
-	_case_file_button.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
-	_case_file_button.custom_minimum_size = Vector2(116, 70) * hud_scale
-	_case_file_button.texture_normal = case_crop
-	_case_file_button.texture_hover = case_crop
-	_case_file_button.texture_pressed = case_crop
+	_case_file_button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_case_file_button.tooltip_text = "OPEN CASE FILE"
 	_case_file_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	_case_file_button.pressed.connect(_show_case_file)
@@ -739,7 +784,7 @@ func _build_booster_dock(parent: CanvasLayer) -> void:
 		button.name = "%sPowerup" % kind.capitalize()
 		button.ignore_texture_size = true
 		button.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
-		button.custom_minimum_size = Vector2(78, 70)
+		button.custom_minimum_size = Vector2(96, 88)
 		button.texture_normal = ResourceManager.load_texture(icon_paths[kind])
 		button.texture_hover = button.texture_normal
 		button.texture_pressed = button.texture_normal
@@ -748,7 +793,7 @@ func _build_booster_dock(parent: CanvasLayer) -> void:
 		var name_label := _make_label(kind.to_upper(), 14)
 		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		wrapper.add_child(name_label)
-		var count_label := _make_label("0", 22)
+		var count_label := _make_label("0", 26)
 		count_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		wrapper.add_child(count_label)
 		_booster_buttons[kind] = {"button": button, "count": count_label}
@@ -768,20 +813,23 @@ func _make_texture_button(name: String, button_size: Vector2, folder: String = "
 	return button
 
 
-func _show_pause_menu() -> void:
+func _show_pause_menu(force_pause: bool = false) -> void:
 	if _pause_layer != null:
 		return
-	if _tutorial_active and _tutorial_action != "pause":
+	if not force_pause and _tutorial_active and _tutorial_action != "pause":
 		return
-	if _tutorial_active:
+	_restore_tutorial_after_pause = force_pause and _tutorial_overlay != null and _tutorial_overlay.visible
+	if _restore_tutorial_after_pause:
+		_tutorial_overlay.hide()
+	if _board != null:
+		_board.cancel_pointer_gesture()
+	if _tutorial_active and not force_pause:
 		_tutorial_pause_open = true
 		_tutorial_action = "pause_open"
 		if _tutorial_overlay != null:
 			_tutorial_overlay.hide_tip()
 	get_tree().paused = true
 	var audio_manager := get_node_or_null("Managers/AudioManager")
-	if audio_manager != null:
-		audio_manager.pause_music()
 	_pause_layer = CanvasLayer.new()
 	_pause_layer.name = "PauseMenuLayer"
 	_pause_layer.layer = 12
@@ -866,6 +914,9 @@ func _play_ui_confirm() -> void:
 
 func _close_pause_menu() -> void:
 	get_tree().paused = false
+	if _restore_tutorial_after_pause and _tutorial_overlay != null:
+		_tutorial_overlay.show()
+	_restore_tutorial_after_pause = false
 	var audio_manager := get_node_or_null("Managers/AudioManager")
 	if audio_manager != null:
 		audio_manager.resume_music()
@@ -882,7 +933,7 @@ func _close_pause_menu() -> void:
 			"Amara's case file explains each piece of evidence. Open it before you continue the search.",
 			_button_screen_rect(_case_file_button),
 			"DAVID",
-			"res://assets/sprites/characters/david_portrait_cutout.png"
+			"res://assets/sprites/characters/david_portrait_v2.png"
 		)
 
 
@@ -909,7 +960,7 @@ func _show_case_file() -> void:
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	veil.add_child(center)
 	var card := PanelContainer.new()
-	card.custom_minimum_size = Vector2(minf(650.0, get_viewport_rect().size.x * 0.92), minf(820.0, get_viewport_rect().size.y * 0.88))
+	card.custom_minimum_size = Vector2(minf(650.0, get_viewport_rect().size.x * 0.92), minf(1000.0, get_viewport_rect().size.y * 0.88))
 	var card_style := StyleBoxFlat.new()
 	card_style.bg_color = Color("#10263d")
 	card_style.border_color = Color("#e2bf72")
@@ -920,17 +971,25 @@ func _show_case_file() -> void:
 	card_style.shadow_size = 16
 	card.add_theme_stylebox_override("panel", card_style)
 	center.add_child(card)
+	var layout := VBoxContainer.new()
+	layout.add_theme_constant_override("separation", 16)
+	card.add_child(layout)
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	layout.add_child(scroll)
 	var content := VBoxContainer.new()
+	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	content.add_theme_constant_override("separation", 10)
-	card.add_child(content)
+	scroll.add_child(content)
 	var intro := HBoxContainer.new()
 	intro.add_theme_constant_override("separation", 18)
 	content.add_child(intro)
 	var amara := TextureRect.new()
-	amara.custom_minimum_size = Vector2(94, 108)
+	amara.custom_minimum_size = Vector2(128, 144)
 	amara.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	amara.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	amara.texture = ResourceManager.load_texture("res://assets/sprites/characters/amara_police_portrait_cutout.png")
+	amara.texture = ResourceManager.load_portrait("res://assets/sprites/characters/amara_police_portrait_cutout.png")
 	intro.add_child(amara)
 	var intro_copy := VBoxContainer.new()
 	intro_copy.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -983,7 +1042,7 @@ func _show_case_file() -> void:
 	var close := _make_story_action_button("BACK TO SEARCH", 240)
 	close.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	close.pressed.connect(_close_case_file)
-	content.add_child(close)
+	layout.add_child(close)
 	card.modulate.a = 0.0
 	var entrance := create_tween()
 	entrance.tween_property(card, "modulate:a", 1.0, 0.2)
@@ -1022,38 +1081,127 @@ func _show_gameplay_audio_settings() -> void:
 	_show_audio_settings(get_node_or_null("HUD"))
 
 
+func _prepare_dialog(dialog: AcceptDialog) -> void:
+	dialog.dialog_autowrap = true
+	dialog.borderless = true
+	dialog.transparent_bg = true
+	dialog.add_theme_constant_override("buttons_min_width", 174)
+	dialog.add_theme_constant_override("buttons_min_height", 62)
+	dialog.add_theme_constant_override("buttons_separation", 18)
+	dialog.about_to_popup.connect(func():
+		if not dialog.has_meta("custom_heading"):
+			dialog.dialog_text = dialog.title.to_upper() + ("\n\n" + dialog.dialog_text if not dialog.dialog_text.is_empty() else "")
+	, CONNECT_ONE_SHOT)
+	dialog.add_theme_font_override("title_font", DISPLAY_FONT)
+	dialog.add_theme_font_size_override("title_font_size", 24)
+	dialog.add_theme_constant_override("title_height", 48)
+	dialog.add_theme_color_override("title_color", Color("#f2ce7c"))
+	var border := StyleBoxFlat.new()
+	border.bg_color = Color("#10263d")
+	border.border_color = Color("#e3c275")
+	border.set_border_width_all(2)
+	border.set_corner_radius_all(18)
+	border.content_margin_top = 48
+	border.content_margin_left = 12
+	border.content_margin_right = 12
+	border.content_margin_bottom = 12
+	dialog.add_theme_stylebox_override("embedded_border", border)
+	var panel := StyleBoxFlat.new()
+	panel.bg_color = Color("#10263d")
+	panel.border_color = Color("#e3c275")
+	panel.set_border_width_all(2)
+	panel.set_corner_radius_all(20)
+	panel.set_content_margin_all(24)
+	dialog.add_theme_stylebox_override("panel", panel)
+	var label := dialog.get_label()
+	label.add_theme_font_override("font", DISPLAY_FONT)
+	label.add_theme_font_size_override("font_size", 24)
+	label.add_theme_color_override("font_color", Color("#fff3d5"))
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var buttons: Array[Button] = [dialog.get_ok_button()]
+	if dialog is ConfirmationDialog:
+		buttons.append(dialog.get_cancel_button())
+	for button in buttons:
+		button.custom_minimum_size = Vector2(174, 62)
+		button.add_theme_font_size_override("font_size", 22)
+		button.add_theme_font_override("font", DISPLAY_FONT)
+		button.add_theme_color_override("font_color", Color("#fff3d5"))
+		var style := StyleBoxFlat.new()
+		style.bg_color = Color("#245a70")
+		style.border_color = Color("#e3c275")
+		style.set_border_width_all(2)
+		style.set_corner_radius_all(14)
+		style.set_content_margin_all(12)
+		button.add_theme_stylebox_override("normal", style)
+		var hover := style.duplicate() as StyleBoxFlat
+		hover.bg_color = Color("#347e94")
+		button.add_theme_stylebox_override("hover", hover)
+		button.add_theme_stylebox_override("pressed", hover)
+
+
 func _show_audio_settings(parent_layer: Node) -> void:
 	var audio_manager := get_node_or_null("Managers/AudioManager")
 	if audio_manager == null or parent_layer == null:
 		return
 	var popup := AcceptDialog.new()
+	popup.name = "AudioSettings"
+	popup.set_meta("custom_heading", true)
 	popup.title = "AUDIO SETTINGS"
+	popup.ok_button_text = "DONE"
+	_prepare_dialog(popup)
+	popup.get_label().hide()
 	popup.process_mode = Node.PROCESS_MODE_ALWAYS
 	parent_layer.add_child(popup)
 	if _tutorial_active and _tutorial_action == "settings" and _tutorial_overlay != null:
 		_tutorial_overlay.hide_tip()
 	var settings := VBoxContainer.new()
-	settings.custom_minimum_size = Vector2(minf(420.0, get_viewport_rect().size.x * 0.78), 190)
+	settings.custom_minimum_size = Vector2(minf(480.0, get_viewport_rect().size.x * 0.78), 340)
+	settings.add_theme_constant_override("separation", 12)
+	var heading := _make_label("AUDIO SETTINGS", 28)
+	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	heading.add_theme_color_override("font_color", Color("#f2ce7c"))
+	settings.add_child(heading)
 	for bus_kind in ["music", "sfx"]:
 		var volume_label := Label.new()
+		volume_label.add_theme_font_size_override("font_size", 23)
 		volume_label.text = "Background music" if bus_kind == "music" else "Sound effects"
 		settings.add_child(volume_label)
 		var volume := HSlider.new()
+		volume.name = "MusicVolume" if bus_kind == "music" else "EffectsVolume"
 		volume.min_value = 0.0
 		volume.max_value = 1.0
 		volume.step = 0.01
+		volume.custom_minimum_size.y = 48
 		volume.value = audio_manager.get_music_volume() if bus_kind == "music" else audio_manager.get_sfx_volume()
 		volume.value_changed.connect(_set_audio_volume.bind(bus_kind))
 		settings.add_child(volume)
 		var enabled := CheckButton.new()
+		enabled.add_theme_font_size_override("font_size", 23)
+		enabled.name = "MusicEnabled" if bus_kind == "music" else "EffectsEnabled"
+		enabled.custom_minimum_size.y = 52
 		enabled.button_pressed = audio_manager.is_music_enabled() if bus_kind == "music" else audio_manager.is_sfx_enabled()
 		enabled.text = "Enabled" if enabled.button_pressed else "Disabled"
 		enabled.toggled.connect(_set_audio_enabled.bind(bus_kind, enabled))
 		settings.add_child(enabled)
+	var preview := _make_menu_button("PREVIEW MUSIC")
+	preview.name = "PreviewMusic"
+	preview.custom_minimum_size = Vector2(260, 62)
+	preview.pressed.connect(func():
+		audio_manager.set_music_enabled(true)
+		if audio_manager.get_music_volume() <= 0.01:
+			audio_manager.set_music_volume(0.65)
+		audio_manager.play_music("suspense_opening")
+		audio_manager.resume_music()
+		var toggle := settings.get_node_or_null("MusicEnabled") as CheckButton
+		if toggle != null: toggle.set_pressed_no_signal(true)
+	)
+	settings.add_child(preview)
 	popup.add_child(settings)
 	if _tutorial_active and _tutorial_action == "settings":
 		popup.confirmed.connect(_on_tutorial_settings_confirmed, CONNECT_ONE_SHOT)
-	popup.popup_centered()
+	popup.confirmed.connect(popup.queue_free, CONNECT_ONE_SHOT)
+	popup.canceled.connect(popup.queue_free, CONNECT_ONE_SHOT)
+	popup.popup_centered_clamped(Vector2i(mini(580, int(get_viewport_rect().size.x * 0.9)), 520))
 
 
 func _on_tutorial_settings_confirmed() -> void:
@@ -1065,7 +1213,7 @@ func _on_tutorial_settings_confirmed() -> void:
 		"Music and sound effects each have separate controls. The gear also opens the pause menu so you can resume or leave the investigation.",
 		_button_screen_rect(_pause_button),
 		"DAVID",
-		"res://assets/sprites/characters/david_portrait_cutout.png"
+		"res://assets/sprites/characters/david_portrait_v2.png"
 	)
 
 
@@ -1075,10 +1223,8 @@ func _set_audio_volume(value: float, kind: String) -> void:
 		return
 	if kind == "music":
 		audio_manager.set_music_volume(value)
-		audio_manager.set_music_enabled(value > 0.0)
 	else:
 		audio_manager.set_sfx_volume(value)
-		audio_manager.set_sfx_enabled(value > 0.0)
 
 
 func _set_audio_enabled(enabled: bool, kind: String, indicator: CheckButton) -> void:
@@ -1100,6 +1246,7 @@ func _return_to_title() -> void:
 
 
 func _make_label(value: String, font_size: int) -> Label:
+	font_size = maxi(20, font_size)
 	var label := Label.new()
 	label.text = value
 	label.add_theme_color_override("font_color", Color("#fff3d5"))
@@ -1143,9 +1290,10 @@ func _show_story_overlay() -> void:
 	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	background.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	_apply_opening_background_blur(background)
 	var veil := ColorRect.new()
 	veil.name = "StoryVeil"
-	veil.color = Color(0.008, 0.02, 0.045, 0.54)
+	veil.color = Color(0.008, 0.02, 0.045, 0.66)
 	veil.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_story_layer.add_child(veil)
 	var title := _make_label(str(_story.get("title", "The Night Ethan Vanished")), 24)
@@ -1157,19 +1305,20 @@ func _show_story_overlay() -> void:
 	title.z_index = 2
 	veil.add_child(title)
 	_story_portrait = TextureRect.new()
-	_story_portrait.position = Vector2(viewport_size.x * 0.17, viewport_size.y * 0.075)
-	_story_portrait.size = Vector2(viewport_size.x * 0.66, viewport_size.y * 0.47)
+	_story_portrait.position = Vector2(viewport_size.x * 0.10, viewport_size.y * 0.09)
+	_story_portrait.size = Vector2(viewport_size.x * 0.80, viewport_size.y * 0.43)
 	_story_portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_story_portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	_story_portrait.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	_story_portrait.z_index = 1
-	_story_portrait.texture = ResourceManager.load_texture(str(_story.get("portrait", "")))
+	_story_portrait.texture = ResourceManager.load_portrait(str(_story.get("portrait", "")))
 	veil.add_child(_story_portrait)
 	var dialogue_panel := PanelContainer.new()
+	_story_dialogue_panel = dialogue_panel
 	dialogue_panel.name = "StoryDialoguePanel"
 	dialogue_panel.anchor_left = 0.045
 	dialogue_panel.anchor_right = 0.955
-	dialogue_panel.anchor_top = 0.565
+	dialogue_panel.anchor_top = 0.54
 	dialogue_panel.anchor_bottom = 0.97
 	dialogue_panel.offset_top = 58.0
 	dialogue_panel.offset_bottom = 58.0
@@ -1183,14 +1332,22 @@ func _show_story_overlay() -> void:
 	panel_style.shadow_size = 14
 	dialogue_panel.add_theme_stylebox_override("panel", panel_style)
 	veil.add_child(dialogue_panel)
+	var layout := VBoxContainer.new()
+	layout.add_theme_constant_override("separation", 14)
+	dialogue_panel.add_child(layout)
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	layout.add_child(scroll)
 	var content := VBoxContainer.new()
+	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	content.add_theme_constant_override("separation", 8)
-	dialogue_panel.add_child(content)
+	scroll.add_child(content)
 	_speaker_label = _make_label("", 23)
 	_speaker_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	_speaker_label.add_theme_color_override("font_color", Color("#f2ce7c"))
 	content.add_child(_speaker_label)
-	_dialogue_label = _make_label("", 23)
+	_dialogue_label = _make_label("", 25)
 	_dialogue_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_dialogue_label.custom_minimum_size = Vector2(0, 112)
 	_dialogue_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -1205,7 +1362,7 @@ func _show_story_overlay() -> void:
 	var story_actions := HBoxContainer.new()
 	story_actions.alignment = BoxContainer.ALIGNMENT_CENTER
 	story_actions.add_theme_constant_override("separation", 10)
-	content.add_child(story_actions)
+	layout.add_child(story_actions)
 	_story_previous_button = _make_story_action_button("BACK", 112)
 	_story_previous_button.pressed.connect(_previous_story_dialogue)
 	_story_previous_button.hide()
@@ -1228,8 +1385,8 @@ func _show_story_overlay() -> void:
 func _make_story_action_button(caption: String, width: float) -> Button:
 	var button := Button.new()
 	button.text = caption
-	button.custom_minimum_size = Vector2(width, 54)
-	button.add_theme_font_size_override("font_size", 18)
+	button.custom_minimum_size = Vector2(width, 64)
+	button.add_theme_font_size_override("font_size", 21)
 	button.add_theme_font_override("font", DISPLAY_FONT)
 	button.add_theme_color_override("font_color", Color("#fff5db"))
 	var normal := StyleBoxFlat.new()
@@ -1287,15 +1444,15 @@ func _on_dialogue_started(_dialogue_id: Variant) -> void:
 	if portrait_path.is_empty():
 		var portraits := {
 			"Amara": "amara_and_ethan_portrait_cutout.png",
-			"David": "david_portrait_cutout.png",
+			"David": "david_portrait_v2.png",
 			"Ethan": "ethan_portrait_cutout.png",
-			"Victor": "victor_portrait_dark_cutout.png",
+			"Victor": "victor_portrait_v2.png",
 			"Detective Morris": "detective_portrait_cutout.png",
-			"Unknown number": "victor_portrait_dark_cutout.png"
+			"Unknown number": "victor_portrait_v2.png"
 		}
 		portrait_path = "res://assets/sprites/characters/" + str(portraits.get(str(line.get("speaker", "")), "amara_and_ethan_portrait_cutout.png"))
 	if not portrait_path.is_empty():
-		_story_portrait.texture = ResourceManager.load_texture(portrait_path)
+		_story_portrait.texture = ResourceManager.load_portrait(portrait_path)
 	_dialogue_label.visible_characters = 0
 	_is_dialogue_typing = true
 	_story_continue_button.disabled = false
@@ -1305,12 +1462,25 @@ func _on_dialogue_started(_dialogue_id: Variant) -> void:
 	_dialogue_tween = create_tween()
 	_dialogue_tween.tween_property(_dialogue_label, "visible_characters", _dialogue_label.text.length(), maxf(0.65, _dialogue_label.text.length() * 0.028))
 	_dialogue_tween.finished.connect(_finish_dialogue_typing)
+	_last_typing_tick_character = 0
+	_play_dialogue_typing_ticks()
 	_story_previous_button.visible = int(_dialogue_id) > 0
 	_story_portrait.modulate.a = 0.0
 	_story_portrait.scale = Vector2(0.94, 0.94)
 	var portrait_tween := create_tween().set_parallel(true)
 	portrait_tween.tween_property(_story_portrait, "modulate:a", 1.0, 0.3)
 	portrait_tween.tween_property(_story_portrait, "scale", Vector2.ONE, 0.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+
+func _play_dialogue_typing_ticks() -> void:
+	while _is_dialogue_typing and is_instance_valid(_dialogue_label):
+		await get_tree().create_timer(0.075).timeout
+		if not _is_dialogue_typing or not is_instance_valid(_dialogue_label):
+			return
+		var visible_count := _dialogue_label.visible_characters
+		if visible_count >= 0 and visible_count - _last_typing_tick_character >= 2:
+			_last_typing_tick_character = visible_count
+			SignalBus.play_sfx.emit("dialogue_type")
 
 
 func _present_route_choices(choices: Array) -> void:
@@ -1322,19 +1492,20 @@ func _present_route_choices(choices: Array) -> void:
 	_dialogue_label.visible_characters = -1
 	_is_dialogue_typing = false
 	_story_continue_button.hide()
-	_story_portrait.texture = ResourceManager.load_texture("res://assets/sprites/characters/david_portrait_cutout.png")
-	_story_portrait.position = Vector2(get_viewport_rect().size.x * 0.36, get_viewport_rect().size.y * 0.12)
-	_story_portrait.size = Vector2(get_viewport_rect().size.x * 0.28, get_viewport_rect().size.y * 0.36)
+	_story_dialogue_panel.anchor_top = 0.39
+	_story_portrait.texture = ResourceManager.load_portrait("res://assets/sprites/characters/david_portrait_v2.png")
+	_story_portrait.position = Vector2(get_viewport_rect().size.x * 0.17, get_viewport_rect().size.y * 0.075)
+	_story_portrait.size = Vector2(get_viewport_rect().size.x * 0.66, get_viewport_rect().size.y * 0.32)
 	_story_skip_button.hide()
 	_story_previous_button.hide()
 	for choice in choices:
 		var button := Button.new()
 		button.text = "%s\n%s" % [str(choice.get("label", "Choose")).to_upper(), str(choice.get("impact", choice.get("response", "Begin the search.")))]
-		button.custom_minimum_size = Vector2(0, 82)
+		button.custom_minimum_size = Vector2(0, 108)
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		button.add_theme_font_size_override("font_size", 16)
+		button.add_theme_font_size_override("font_size", 21)
 		button.add_theme_color_override("font_color", Color("#fff7e6"))
 		button.add_theme_color_override("font_hover_color", Color("#ffffff"))
 		button.add_theme_constant_override("h_separation", 12)
@@ -1370,10 +1541,13 @@ func _select_route(choice: Dictionary) -> void:
 
 
 func _skip_opening_story() -> void:
-	if _pending_level_id > 0:
+	if _pending_level_id != 0:
 		if _story_manager != null:
 			_story_manager.skip_story()
 		return
+	_campaign_progress.set_value("campaign", "route", "alone")
+	_campaign_progress.set_value("campaign", "route_label", _chosen_route_label)
+	_persist_campaign_progress()
 	_show_campaign_map("alone")
 
 
@@ -1383,22 +1557,30 @@ func _on_route_selected(choice: Dictionary) -> void:
 		button.queue_free()
 	var route_id := str(choice.get("id", "alone"))
 	if route_id == "police":
-		_story_portrait.texture = ResourceManager.load_texture("res://assets/sprites/characters/detective_portrait_cutout.png")
+		_story_portrait.texture = ResourceManager.load_portrait("res://assets/sprites/characters/detective_portrait_cutout.png")
 	elif route_id == "signal":
-		_story_portrait.texture = ResourceManager.load_texture("res://assets/sprites/characters/amara_police_portrait_cutout.png")
+		_story_portrait.texture = ResourceManager.load_portrait("res://assets/sprites/characters/amara_police_portrait_cutout.png")
 	else:
-		_story_portrait.texture = ResourceManager.load_texture("res://assets/sprites/characters/david_portrait_cutout.png")
+		_story_portrait.texture = ResourceManager.load_portrait("res://assets/sprites/characters/david_portrait_v2.png")
 	_speaker_label.text = str(choice.get("label", ""))
 	_dialogue_label.text = str(choice.get("response", "The search begins."))
 	_story_continue_button.text = "CAMPAIGN MAP"
 	_story_continue_button.show()
 	_story_continue_button.pressed.disconnect(_advance_story)
 	_chosen_route_label = str(choice.get("label", "Begin the search"))
+	_campaign_progress.set_value("campaign", "route", route_id)
+	_campaign_progress.set_value("campaign", "route_label", _chosen_route_label)
+	_persist_campaign_progress()
 	_story_continue_button.pressed.connect(_show_campaign_map.bind(route_id), CONNECT_ONE_SHOT)
 	set_meta("chosen_route", route_id)
 
 
 func _show_campaign_map(route_id: String) -> void:
+	_current_route_id = route_id
+	SignalBus.play_music.emit("suspense_opening")
+	_is_dialogue_typing = false
+	if _dialogue_tween != null and _dialogue_tween.is_running():
+		_dialogue_tween.kill()
 	if _story_layer != null and is_instance_valid(_story_layer):
 		_story_layer.queue_free()
 		_story_layer = null
@@ -1437,7 +1619,7 @@ func _show_campaign_map_coach() -> void:
 		"This is the campaign trail. Each marker opens an investigation; chapters show where the search moves next. Start with the glowing first case.",
 		target_rect,
 		"DAVID",
-		"res://assets/sprites/characters/david_portrait_cutout.png",
+		"res://assets/sprites/characters/david_portrait_v2.png",
 		true
 	)
 
@@ -1507,6 +1689,11 @@ func _start_campaign_story(story_id: String) -> void:
 
 
 func _on_story_finished(story_id: String) -> void:
+	if _pending_level_id == -1 and story_id == _pending_story_id:
+		_pending_level_id = 0
+		_pending_story_id = ""
+		_show_campaign_map(_current_route_id)
+		return
 	if _pending_level_id <= 0 or story_id != _pending_story_id:
 		return
 	var route_id := _pending_route_id
@@ -1542,7 +1729,7 @@ func _show_level_briefing(route_id: String) -> void:
 
 	var panel := PanelContainer.new()
 	panel.name = "MissionCard"
-	panel.custom_minimum_size = Vector2(minf(590.0, get_viewport_rect().size.x * 0.9), minf(790.0, get_viewport_rect().size.y * 0.88))
+	panel.custom_minimum_size = Vector2(minf(610.0, get_viewport_rect().size.x * 0.9), minf(940.0, get_viewport_rect().size.y * 0.9))
 	var panel_style := StyleBoxFlat.new()
 	panel_style.bg_color = Color("#102238")
 	panel_style.border_color = Color("#d0ac67")
@@ -1559,10 +1746,18 @@ func _show_level_briefing(route_id: String) -> void:
 	entrance.tween_property(panel, "modulate:a", 1.0, 0.28)
 	entrance.tween_property(panel, "scale", Vector2.ONE, 0.34).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
+	var layout := VBoxContainer.new()
+	layout.add_theme_constant_override("separation", 16)
+	panel.add_child(layout)
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	layout.add_child(scroll)
 	var content := VBoxContainer.new()
+	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	content.alignment = BoxContainer.ALIGNMENT_CENTER
-	content.add_theme_constant_override("separation", 16)
-	panel.add_child(content)
+	content.add_theme_constant_override("separation", 10)
+	scroll.add_child(content)
 	var level_id := int(level_data.get("level_id", 1))
 	var level_title := _make_label("INVESTIGATION %02d" % level_id, 18)
 	level_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -1572,23 +1767,23 @@ func _show_level_briefing(route_id: String) -> void:
 	content.add_child(title)
 
 	var portrait := TextureRect.new()
-	portrait.custom_minimum_size = Vector2(154, 154)
+	portrait.custom_minimum_size = Vector2(220, 210)
 	portrait.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	portrait.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+	portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	var portrait_paths := {
 		"police": "res://assets/sprites/characters/detective_portrait_cutout.png",
 		"signal": "res://assets/sprites/characters/amara_police_portrait_cutout.png",
-		"alone": "res://assets/sprites/characters/david_portrait_cutout.png"
+		"alone": "res://assets/sprites/characters/david_portrait_v2.png"
 	}
-	portrait.texture = ResourceManager.load_texture(str(portrait_paths.get(route_id, portrait_paths["alone"])))
+	portrait.texture = ResourceManager.load_portrait(str(portrait_paths.get(route_id, portrait_paths["alone"])))
 	content.add_child(portrait)
 	var route_label := _make_label("APPROACH | " + _chosen_route_label.to_upper(), 17)
 	route_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	content.add_child(route_label)
 	var description := _make_label(str(level_data.get("description", "")), 19)
 	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	description.custom_minimum_size.x = 480
+	description.custom_minimum_size.x = 0
 	description.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	content.add_child(description)
 	var route_briefings := {
@@ -1598,9 +1793,10 @@ func _show_level_briefing(route_id: String) -> void:
 	}
 	var route_detail := _make_label(str(route_briefings.get(route_id, route_briefings["alone"])), 17)
 	route_detail.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	route_detail.custom_minimum_size.x = 480
+	route_detail.custom_minimum_size.x = 0
 	route_detail.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	content.add_child(route_detail)
+	route_detail.hide()
 
 	var objective := _get_primary_objective(level_data)
 	var objective_panel := PanelContainer.new()
@@ -1643,7 +1839,7 @@ func _show_level_briefing(route_id: String) -> void:
 	play.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	play.pressed.connect(_play_ui_confirm)
 	play.pressed.connect(_begin_level.bind(route_id), CONNECT_ONE_SHOT)
-	content.add_child(play)
+	layout.add_child(play)
 
 
 func _get_primary_objective(level_data: Dictionary) -> Dictionary:
@@ -1746,6 +1942,11 @@ func _begin_level(_route_id: String) -> void:
 	var level_manager := get_node_or_null("Managers/LevelManager")
 	var level_data: Dictionary = level_manager.get_level_data() if level_manager != null else {}
 	_booster_dock.visible = true
+	var level_music := str(level_data.get("audio", {}).get("music", ""))
+	SignalBus.play_music.emit(level_music if not level_music.is_empty() else "suspense_opening")
+	var audio_manager := get_node_or_null("Managers/AudioManager")
+	if audio_manager != null:
+		audio_manager.resume_music()
 	_current_level_id = int(level_data.get("level_id", 1))
 	_current_route_id = _route_id
 	var objective := _get_primary_objective(level_data)
@@ -1782,11 +1983,12 @@ func _begin_level(_route_id: String) -> void:
 		_board.clear_required_swap()
 	for kind in _booster_buttons:
 		var entry: Dictionary = _booster_buttons[kind]
-		(entry["count"] as Label).text = "%s\n%d" % [kind.to_upper(), int(_booster_inventory[kind])]
+		(entry["count"] as Label).text = str(int(_booster_inventory[kind]))
 		(entry["button"] as BaseButton).disabled = false
 	var tutorial: Dictionary = level_data.get("tutorial", {})
-	var tutorial_steps: Array = tutorial.get("steps", [])
-	if bool(tutorial.get("enabled", false)) and not tutorial_steps.is_empty():
+	var raw_steps: Variant = tutorial.get("steps", [])
+	var tutorial_steps: Array = raw_steps if raw_steps is Array else []
+	if bool(tutorial.get("enabled", false)) and not tutorial_steps.is_empty() and not bool(_campaign_progress.get_value("tutorials", str(_current_level_id), false)):
 		_tutorial_active = true
 		_tutorial_mechanic = str(tutorial_steps[0].get("mechanic", ""))
 		_tutorial_pause_open = false
@@ -1813,7 +2015,7 @@ func _begin_level(_route_id: String) -> void:
 				_hint_label.text,
 				_button_screen_rect(_booster_buttons[_tutorial_booster_kind]["button"]),
 				"DAVID",
-				"res://assets/sprites/characters/david_portrait_cutout.png"
+				"res://assets/sprites/characters/david_portrait_v2.png"
 			)
 		else:
 			_tutorial_action = "guided_swap"
@@ -1853,7 +2055,7 @@ func _begin_level(_route_id: String) -> void:
 			if guided_swap.size() == 2:
 				var first_rect := _board.get_cell_screen_rect(guided_swap[0])
 				var second_rect := _board.get_cell_screen_rect(guided_swap[1])
-				_show_tutorial_tip(base_message, first_rect.merge(second_rect), "DAVID", "res://assets/sprites/characters/david_portrait_cutout.png")
+				_show_tutorial_tip(base_message, first_rect.merge(second_rect), "DAVID", "res://assets/sprites/characters/david_portrait_v2.png")
 	else:
 		_tutorial_active = false
 		_tutorial_action = ""
@@ -1973,6 +2175,7 @@ func _open_booster_shop(kind: String) -> void:
 	var cost := int(item.get("price", 0))
 	var dialog := ConfirmationDialog.new()
 	dialog.title = "FIELD SUPPLIES"
+	_prepare_dialog(dialog)
 	dialog.dialog_text = "Buy %s for %d Ethan Coins? You have %d." % [str(item.get("name", kind.capitalize())), cost, _economy_manager.get_coins()]
 	dialog.ok_button_text = "BUY"
 	var layer := CanvasLayer.new()
@@ -1998,10 +2201,11 @@ func _open_booster_shop(kind: String) -> void:
 			_save_inventory_progress()
 		else:
 			_show_shop_notice("You need %d Ethan Coins for this supply." % cost)
+		purchase.free()
 	)
 	dialog.confirmed.connect(layer.queue_free, CONNECT_ONE_SHOT)
 	dialog.canceled.connect(layer.queue_free, CONNECT_ONE_SHOT)
-	dialog.popup_centered()
+	dialog.popup_centered_clamped(Vector2i(mini(560, int(get_viewport_rect().size.x * 0.9)), 300))
 
 
 func _update_objective_hud() -> void:
@@ -2060,7 +2264,9 @@ func _animate_matched_tiles(tile_types: Array, cells: Array) -> void:
 func _persist_campaign_progress() -> void:
 	_campaign_progress.set_value("campaign", "highest_unlocked_level", _highest_unlocked_level)
 	_campaign_progress.set_value("campaign", "completed_levels", _completed_levels)
-	var error := _campaign_progress.save(CAMPAIGN_PROGRESS_PATH)
+	if _economy_manager != null:
+		_campaign_progress.set_value("campaign", "life_regeneration_time", _economy_manager.get_life_clock())
+	var error := CampaignProgressStore.write(_campaign_progress, CAMPAIGN_PROGRESS_PATH)
 	if error != OK:
 		push_error("Could not save campaign progress: %s" % error_string(error))
 
@@ -2247,7 +2453,7 @@ func _show_tutorial_goal_feedback() -> void:
 		message % [_moves_remaining, _evidence_count, _evidence_goal],
 		hud_target,
 		"DAVID",
-		"res://assets/sprites/characters/david_portrait_cutout.png",
+		"res://assets/sprites/characters/david_portrait_v2.png",
 		true
 	)
 	_refresh_tutorial_controls()
@@ -2269,7 +2475,7 @@ func _show_tutorial_obstacle_result() -> void:
 		var obstacle_name := str(obstacle.get("type", "obstacle")).replace("_", " ").to_upper()
 		message = "You hit the %s. Matches beside it remove one health layer; clear it completely to finish the BLOCKERS mission. Watch its health fly up after each hit." % obstacle_name
 	_tutorial_action = "explain_obstacle"
-	_show_tutorial_tip(message, target_rect, "DAVID", "res://assets/sprites/characters/david_portrait_cutout.png", true)
+	_show_tutorial_tip(message, target_rect, "DAVID", "res://assets/sprites/characters/david_portrait_v2.png", true)
 
 
 func _show_tutorial_special_created() -> void:
@@ -2291,14 +2497,14 @@ func _show_tutorial_special_created() -> void:
 	_board.set_required_swap([special_cell, neighbor])
 	_board.unlock()
 	var target_rect := _board.get_cell_screen_rect(special_cell).merge(_board.get_cell_screen_rect(neighbor))
-	_show_tutorial_tip("Four in a line made a rocket. Swap it with the glowing neighbor to fire its row and column. Special pieces activate through a swap.", target_rect, "DAVID", "res://assets/sprites/characters/david_portrait_cutout.png")
+	_show_tutorial_tip("Four in a line made a rocket. Swap it with the glowing neighbor to fire its row and column. Special pieces activate through a swap.", target_rect, "DAVID", "res://assets/sprites/characters/david_portrait_v2.png")
 
 
 func _show_tutorial_special_result() -> void:
 	_tutorial_action = "explain_special_result"
 	if _board != null:
 		_board.lock()
-	_show_tutorial_tip("The rocket cleared its row and column in one move. Creating special pieces also earns Ethan Coins; Amara sends a matching booster after the configured milestone. Use specials to clear a blocked path or reach mission evidence.", _objective_label.get_global_rect(), "DAVID", "res://assets/sprites/characters/david_portrait_cutout.png", true)
+	_show_tutorial_tip("The rocket cleared its row and column in one move. Creating special pieces also earns Ethan Coins; Amara sends a matching booster after the configured milestone. Use specials to clear a blocked path or reach mission evidence.", _objective_label.get_global_rect(), "DAVID", "res://assets/sprites/characters/david_portrait_v2.png", true)
 
 
 func _show_tutorial_booster_result() -> void:
@@ -2309,7 +2515,7 @@ func _show_tutorial_booster_result() -> void:
 	match _tutorial_booster_kind:
 		"bomb": consequence = "The bomb clears pieces around the target."
 		"thunder": consequence = "Thunder clears every piece of the chosen type."
-	_show_tutorial_tip("%s The booster count dropped by one; boosters are limited. Save the next one for a useful obstacle or hard-to-reach clue." % consequence, _objective_label.get_global_rect(), "DAVID", "res://assets/sprites/characters/david_portrait_cutout.png", true)
+	_show_tutorial_tip("%s The booster count dropped by one; boosters are limited. Save the next one for a useful obstacle or hard-to-reach clue." % consequence, _objective_label.get_global_rect(), "DAVID", "res://assets/sprites/characters/david_portrait_v2.png", true)
 
 
 func _on_tutorial_acknowledged() -> void:
@@ -2329,7 +2535,7 @@ func _on_tutorial_acknowledged() -> void:
 			"Tap the gear to adjust music and sound effects separately. You can change them again whenever you need.",
 		_button_screen_rect(_pause_button),
 			"DAVID",
-			"res://assets/sprites/characters/david_portrait_cutout.png"
+			"res://assets/sprites/characters/david_portrait_v2.png"
 		)
 	elif _tutorial_action == "explain_obstacle":
 		_finish_tutorial()
@@ -2342,6 +2548,9 @@ func _on_tutorial_acknowledged() -> void:
 
 
 func _finish_tutorial() -> void:
+	if _tutorial_active and _current_level_id > 0:
+		_campaign_progress.set_value("tutorials", str(_current_level_id), true)
+		_persist_campaign_progress()
 	_tutorial_active = false
 	_tutorial_action = ""
 	_tutorial_pause_open = false
@@ -2376,6 +2585,8 @@ func _on_booster_pressed(kind: String) -> void:
 		return
 	if _board == null:
 		return
+	if _booster_confirm != null or (_board.is_locked() and not _tutorial_active):
+		return
 	if int(_booster_inventory.get(kind, 0)) <= 0:
 		_open_booster_shop(kind)
 		return
@@ -2392,13 +2603,14 @@ func _on_booster_pressed(kind: String) -> void:
 		var target_rect := _board.get_cell_screen_rect(_tutorial_target_cell)
 		var message := "Tap the glowing piece to use %s. This clears nearby evidence." % kind.capitalize()
 		_hint_label.text = "BOOSTER TRAINING | TARGET THE GLOWING PIECE"
-		_show_tutorial_tip(message, target_rect, "DAVID", "res://assets/sprites/characters/david_portrait_cutout.png")
+		_show_tutorial_tip(message, target_rect, "DAVID", "res://assets/sprites/characters/david_portrait_v2.png")
 		_refresh_tutorial_controls()
 		return
 	_show_booster_confirmation(kind)
 
 
 func _show_booster_confirmation(kind: String) -> void:
+	_board.lock()
 	var descriptions := {
 		"rocket": "Choose a tile. Rocket clears its full row and column.",
 		"bomb": "Choose a tile. Bomb clears the tiles around it.",
@@ -2406,6 +2618,7 @@ func _show_booster_confirmation(kind: String) -> void:
 		"ethan": "Choose a tile. Ethan clears a 5 by 5 rescue area."
 	}
 	var dialog := ConfirmationDialog.new()
+	_prepare_dialog(dialog)
 	dialog.name = "BoosterUseConfirmation"
 	dialog.title = "%s | %d available" % [kind.capitalize(), int(_booster_inventory.get(kind, 0))]
 	dialog.dialog_text = "%s\n\nUse one now? After you choose Use, tap a tile on the board to set the target." % descriptions.get(kind, "Choose a board tile to use this booster.")
@@ -2425,7 +2638,7 @@ func _show_booster_confirmation(kind: String) -> void:
 	dialog.canceled.connect(dialog.queue_free)
 	add_child(dialog)
 	_booster_confirm = dialog
-	_booster_confirm.popup_centered(Vector2i(380, 230))
+	_booster_confirm.popup_centered_clamped(Vector2i(mini(560, int(get_viewport_rect().size.x * 0.9)), 340))
 
 
 func _confirm_booster_use(kind: String) -> void:
@@ -2439,12 +2652,14 @@ func _confirm_booster_use(kind: String) -> void:
 func _cancel_booster_dialog() -> void:
 	_booster_confirm = null
 	_selected_booster = ""
+	if _board != null:
+		_board.unlock()
 
 
 func _cancel_booster_targeting() -> void:
 	if _board != null:
 		_board.cancel_booster_mode()
-		_board.lock()
+		_board.unlock()
 	_selected_booster = ""
 	_hint_label.text = "BOOSTER CANCELLED | No item was used."
 
@@ -2630,6 +2845,13 @@ func _show_level_result(won: bool) -> void:
 		story_complete.add_theme_color_override("font_color", Color("#ffe279"))
 		content.add_child(story_complete)
 	var reward_info: Dictionary = result_data.get("rewards", {})
+	var has_next_level := JsonLoader.file_exists("res://levels/level%03d.json" % (_current_level_id + 1))
+	var has_after_story := not str(result_data.get("story", {}).get("after_level", "")).is_empty()
+	if won:
+		var stars := _make_label("★".repeat(clampi(int(reward_info.get("stars", 3)), 1, 3)), 48)
+		stars.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		stars.add_theme_color_override("font_color", Color("#ffe279"))
+		content.add_child(stars)
 	var detail_text: String
 	if not won:
 		detail_text = "The remaining moves ran out. You lost one life. Try again or visit the Life Shop."
@@ -2637,16 +2859,18 @@ func _show_level_result(won: bool) -> void:
 		detail_text = "Case %03d unlocked. +%d Ethan Coins and %d stars added." % [mini(_highest_unlocked_level, _current_level_id + 1), int(reward_info.get("coins", 0)), maxi(1, int(reward_info.get("stars", 3)))]
 	else:
 		detail_text = "Case %03d unlocked. First-clear rewards were already collected." % mini(_highest_unlocked_level, _current_level_id + 1)
+	if won and not has_next_level:
+		detail_text = "You cleared all currently available cases. David's search continues as new investigations are added. Replay a case on the map while the next chapter is prepared."
+		if first_clear:
+			detail_text += " +%d Ethan Coins and %d stars added." % [int(reward_info.get("coins", 0)), maxi(1, int(reward_info.get("stars", 3)))]
 	if won and _is_story_final_level(result_data):
 		detail_text = "Story objective achieved. " + detail_text
-		if first_clear:
-			detail_text += " A chapter booster was added to your field kit."
 	var detail := _make_label(detail_text, 19)
 	detail.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	detail.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	content.add_child(detail)
 	if won:
-		var next := _make_menu_button("NEXT LEVEL")
+		var next := _make_menu_button("CONTINUE STORY" if has_after_story else ("NEXT LEVEL" if has_next_level else "RETURN TO MAP"))
 		next.pressed.connect(_next_level_after_win)
 		content.add_child(next)
 	else:
@@ -2691,8 +2915,11 @@ func _show_life_shop() -> void:
 		_show_shop_notice("Your life meter is already full.")
 		return
 	var purchase_dialog := ConfirmationDialog.new()
+	_prepare_dialog(purchase_dialog)
 	purchase_dialog.title = "LIFE SHOP"
 	purchase_dialog.dialog_text = "Refill %d lives for %d Ethan Coins? You have %d." % [amount, price, _economy_manager.get_coins()]
+	var seconds := _economy_manager.seconds_until_next_life()
+	purchase_dialog.dialog_text += "\n\nA free life returns in %02d:%02d." % [seconds / 60, seconds % 60]
 	purchase_dialog.ok_button_text = "BUY LIVES"
 	var shop_layer := CanvasLayer.new()
 	shop_layer.layer = 24
@@ -2715,14 +2942,16 @@ func _show_life_shop() -> void:
 				_show_shop_notice("Lives restored. Choose a case from the campaign map.")
 		else:
 			_show_shop_notice("You need %d Ethan Coins for this refill." % price)
+		purchase.free()
 	)
 	purchase_dialog.confirmed.connect(shop_layer.queue_free, CONNECT_ONE_SHOT)
 	purchase_dialog.canceled.connect(shop_layer.queue_free, CONNECT_ONE_SHOT)
-	purchase_dialog.popup_centered()
+	purchase_dialog.popup_centered_clamped(Vector2i(mini(560, int(get_viewport_rect().size.x * 0.9)), 350))
 
 
 func _show_shop_notice(message: String) -> void:
 	var notice := AcceptDialog.new()
+	_prepare_dialog(notice)
 	notice.title = "ETHAN COINS"
 	notice.dialog_text = message
 	var notice_layer := CanvasLayer.new()
@@ -2732,7 +2961,7 @@ func _show_shop_notice(message: String) -> void:
 	notice_layer.add_child(notice)
 	notice.confirmed.connect(notice_layer.queue_free)
 	notice.canceled.connect(notice_layer.queue_free)
-	notice.popup_centered()
+	notice.popup_centered_clamped(Vector2i(mini(540, int(get_viewport_rect().size.x * 0.9)), 250))
 
 
 func _is_story_final_level(level_data: Dictionary) -> bool:
@@ -2747,10 +2976,18 @@ func _dismiss_level_result() -> void:
 
 
 func _next_level_after_win() -> void:
+	var level_manager := get_node_or_null("Managers/LevelManager")
+	var level_data: Dictionary = level_manager.get_level_data() if level_manager != null else {}
+	var after_story := str(level_data.get("story", {}).get("after_level", ""))
 	var next_id := _current_level_id + 1
 	var path := "res://levels/level%03d.json" % next_id
 	_dismiss_level_result()
 	get_tree().paused = false
+	if not after_story.is_empty():
+		_pending_level_id = -1
+		_pending_story_id = after_story
+		_start_campaign_story(after_story)
+		return
 	if JsonLoader.file_exists(path):
 		_on_campaign_level_selected(next_id, _current_route_id)
 	else:
@@ -2771,7 +3008,7 @@ func _return_to_campaign_map() -> void:
 
 
 func _load_campaign_progress() -> void:
-	var error := _campaign_progress.load(CAMPAIGN_PROGRESS_PATH)
+	var error := CampaignProgressStore.read(_campaign_progress, CAMPAIGN_PROGRESS_PATH)
 	if error != OK:
 		_highest_unlocked_level = 1
 		_completed_levels.clear()

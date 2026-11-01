@@ -24,9 +24,11 @@ var _validator: RewardValidator
 
 func initialize() -> void:
 	_reward_table = RewardTable.new()
+	add_child(_reward_table)
 	_reward_table.initialize()
 
 	_validator = RewardValidator.new()
+	add_child(_validator)
 	_validator.initialize()
 
 

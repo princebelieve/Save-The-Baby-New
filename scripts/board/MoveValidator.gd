@@ -40,7 +40,10 @@ func _simulate_swap(board, first_position: Vector2i, second_position: Vector2i) 
 	board.set_tile(first_position, second_tile)
 	board.set_tile(second_position, first_tile)
 	var match_finder: MatchFinder = board.get_match_finder()
-	var has_match: bool = match_finder != null and match_finder.has_matches(board)
+	var has_match := false
+	if match_finder != null:
+		# Only a match involving a swapped tile makes this move legal.
+		has_match = match_finder.find_match_from_tile(board, first_tile) != null or match_finder.find_match_from_tile(board, second_tile) != null
 	board.set_tile(first_position, first_tile)
 	board.set_tile(second_position, second_tile)
 	return has_match

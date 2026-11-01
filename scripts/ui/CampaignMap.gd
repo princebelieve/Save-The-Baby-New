@@ -125,7 +125,7 @@ func _build_map() -> void:
 	subtitle.position = Vector2(70, 54)
 	subtitle.size = Vector2(_map_width - 140, 36)
 	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	subtitle.add_theme_font_size_override("font_size", 16)
+	subtitle.add_theme_font_size_override("font_size", 20)
 	subtitle.add_theme_color_override("font_color", Color("#d6e8c8"))
 	header.add_child(subtitle)
 	var back := TextureButton.new()
@@ -140,14 +140,14 @@ func _build_map() -> void:
 	header.add_child(back)
 
 	var hint := Label.new()
-	hint.text = "Scroll the trail | Chapters and level markers follow the campaign plan"
+	hint.text = "Follow the trail to find Ethan"
 	hint.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
 	hint.offset_top = -45
 	hint.offset_left = 12
 	hint.offset_right = -12
 	hint.offset_bottom = -4
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	hint.add_theme_font_size_override("font_size", 14)
+	hint.add_theme_font_size_override("font_size", 20)
 	hint.add_theme_color_override("font_color", Color("#fff1ca"))
 	add_child(hint)
 
@@ -182,7 +182,7 @@ func _build_chapter_art(map: Control, index: int, chapter: Dictionary, levels: A
 	for prop_index in prop_set.size():
 		var prop := TextureRect.new()
 		prop.name = "ChapterProp%d" % prop_index
-		prop.texture = ResourceManager.load_texture(PROP_DIR + str(prop_set[prop_index]))
+		prop.texture = ResourceManager.load_texture(_asset_path(PROP_DIR, str(prop_set[prop_index])))
 		prop.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		prop.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		var prop_x := 8.0 if prop_index == 0 else _map_width - prop_size - 8.0
@@ -192,34 +192,41 @@ func _build_chapter_art(map: Control, index: int, chapter: Dictionary, levels: A
 		prop.modulate = Color(0.9, 0.95, 0.83, 0.94)
 		prop.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		map.add_child(prop)
-	var sign := TextureRect.new()
-	sign.texture = ResourceManager.load_texture(SIGNPOST_PATH)
-	sign.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	sign.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	sign.position = Vector2((_map_width - 220) * 0.5, top - 8)
-	sign.size = Vector2(220, 220)
+	var sign := Panel.new()
+	var sign_width := minf(_map_width * 0.76, 440)
+	sign.position = Vector2((_map_width - sign_width) * 0.5, top + 16)
+	sign.size = Vector2(sign_width, 116)
+	var sign_style := StyleBoxFlat.new()
+	sign_style.bg_color = Color("#143b36")
+	sign_style.border_color = Color("#e3c275")
+	sign_style.set_border_width_all(2)
+	sign_style.set_corner_radius_all(18)
+	sign_style.shadow_color = Color(0, 0, 0, 0.35)
+	sign_style.shadow_size = 6
+	sign.add_theme_stylebox_override("panel", sign_style)
+	sign.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	map.add_child(sign)
 	var sign_title := Label.new()
 	sign_title.text = "CHAPTER %d\n%s" % [int(chapter["id"]), chapter["title"]]
-	sign_title.position = Vector2((_map_width - 148) * 0.5, top + 21)
-	sign_title.size = Vector2(148, 40)
+	sign_title.position = Vector2((_map_width - sign_width) * 0.5 + 12, top + 24)
+	sign_title.size = Vector2(sign_width - 24, 72)
 	sign_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	sign_title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	sign_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	sign_title.add_theme_font_size_override("font_size", 13)
-	sign_title.add_theme_color_override("font_color", Color("#392619"))
-	sign_title.add_theme_color_override("font_shadow_color", Color(1, 0.88, 0.62, 0.7))
+	sign_title.add_theme_font_size_override("font_size", 21)
+	sign_title.add_theme_color_override("font_color", Color("#fff3d5"))
+	sign_title.add_theme_color_override("font_shadow_color", Color("#102238"))
 	sign_title.add_theme_constant_override("shadow_offset_x", 1)
 	sign_title.add_theme_constant_override("shadow_offset_y", 1)
 	map.add_child(sign_title)
 	var range_label := Label.new()
 	range_label.text = "LEVELS %02d-%02d" % [chapter["first"], chapter["last"]]
-	range_label.position = Vector2((_map_width - 148) * 0.5, top + 57)
-	range_label.size = Vector2(148, 18)
+	range_label.position = Vector2((_map_width - sign_width) * 0.5, top + 98)
+	range_label.size = Vector2(sign_width, 24)
 	range_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	range_label.add_theme_font_size_override("font_size", 11)
-	range_label.add_theme_color_override("font_color", Color("#392619"))
-	range_label.add_theme_color_override("font_shadow_color", Color(1, 0.88, 0.62, 0.7))
+	range_label.add_theme_font_size_override("font_size", 13)
+	range_label.add_theme_color_override("font_color", Color("#f2ce7c"))
+	range_label.add_theme_color_override("font_shadow_color", Color("#102238"))
 	range_label.add_theme_constant_override("shadow_offset_x", 1)
 	range_label.add_theme_constant_override("shadow_offset_y", 1)
 	map.add_child(range_label)
@@ -234,7 +241,7 @@ func _build_chapter_art(map: Control, index: int, chapter: Dictionary, levels: A
 
 
 func _asset_path(directory: String, file_name: String) -> String:
-	if file_name.get_base_dir() == ".":
+	if file_name.get_base_dir().is_empty() or file_name.get_base_dir() == ".":
 		return directory + file_name
 	if file_name.begins_with("res://"):
 		return file_name

@@ -23,6 +23,7 @@ var _reward_table: RewardTable
 
 func initialize() -> void:
 	_reward_table = RewardTable.new()
+	add_child(_reward_table)
 	_reward_table.initialize()
 
 
