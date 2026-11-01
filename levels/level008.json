@@ -79,11 +79,12 @@
     "tutorial": {
         "steps": [
             {
-                "message": "Swipe the glowing neighboring tiles to collect the mission clue. Other swaps are locked until this guided move resolves.",
+                "mechanic": "character_tiles",
+                "message": "Match 3 of the same portrait. Each Ethan or Detective tile gives 1 rescue assist; each Victor tile gives 10 coins. The Ethan booster in the tray spends 1 assist to clear a chosen 5x5 area.",
                 "highlight": []
             }
         ],
-        "enabled": false
+        "enabled": true
     },
     "obstacles": {
         "items": []

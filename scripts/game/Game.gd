@@ -1,7 +1,7 @@
 extends Node2D
 class_name Game
 
-const DISPLAY_FONT: FontFile = preload("res://assets/fonts/Baloo2-Variable.ttf")
+const DISPLAY_FONT: FontFile = preload("res://assets/fonts/CrimsonPro-Variable.ttf")
 
 const OPENING_STORY_PATH := "res://stories/opening_story.json"
 const CAMPAIGN_PROGRESS_PATH := "user://campaign_progress.cfg"
@@ -196,7 +196,7 @@ func _show_loading_screen() -> void:
 	progress.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	stack.add_child(progress)
 	var tween := create_tween()
-	tween.tween_property(progress, "value", 100.0, 0.8)
+	tween.tween_property(progress, "value", 100.0, 1.6)
 	tween.tween_callback(func():
 		layer.queue_free()
 		_show_launch_screen()
@@ -382,31 +382,43 @@ func _build_level_objective_row(parent: CanvasLayer) -> void:
 	panel.add_child(row)
 	var level_box := Control.new()
 	level_box.name = "LevelNumber"
-	level_box.custom_minimum_size = Vector2(140, 0) * hud_scale
-	level_box.clip_contents = true
+	level_box.custom_minimum_size = Vector2(102, 70) * hud_scale
 	row.add_child(level_box)
-	var level_source := _load_hud_asset("res://assets/level_no.png")
-	var level_crop := AtlasTexture.new()
-	level_crop.atlas = level_source
-	level_crop.region = Rect2(200, 480, 1510, 400)
-	var level_art := TextureRect.new()
-	level_art.name = "LevelArtwork"
-	level_art.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	level_art.texture = level_crop
-	level_art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	level_art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	level_art.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_apply_hud_chroma_key(level_art)
-	level_box.add_child(level_art)
-	_level_number_label = _make_label("001", roundi(24 * hud_scale))
-	_level_number_label.anchor_left = 0.66
-	_level_number_label.anchor_right = 0.94
-	_level_number_label.anchor_top = 0.18
-	_level_number_label.anchor_bottom = 0.82
+	var level_card := Panel.new()
+	level_card.name = "LevelCard"
+	level_card.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var level_card_style := StyleBoxFlat.new()
+	level_card_style.bg_color = Color("#17314a")
+	level_card_style.border_color = Color("#e9b956")
+	level_card_style.set_border_width_all(2)
+	level_card_style.set_corner_radius_all(13)
+	level_card_style.shadow_color = Color(0.01, 0.025, 0.04, 0.72)
+	level_card_style.shadow_size = 3
+	level_card_style.shadow_offset = Vector2(0, 2)
+	level_card_style.content_margin_left = 6
+	level_card_style.content_margin_right = 6
+	level_card_style.content_margin_top = 4
+	level_card_style.content_margin_bottom = 4
+	level_card.add_theme_stylebox_override("panel", level_card_style)
+	level_box.add_child(level_card)
+	var level_card_content := VBoxContainer.new()
+	level_card_content.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	level_card_content.add_theme_constant_override("separation", 0)
+	level_card_content.alignment = BoxContainer.ALIGNMENT_CENTER
+	level_card.add_child(level_card_content)
+	var level_caption := _make_label("LEVEL", roundi(16 * hud_scale))
+	level_caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	level_caption.add_theme_color_override("font_color", Color("#f0c66f"))
+	level_caption.add_theme_constant_override("outline_size", 1)
+	level_caption.add_theme_color_override("font_outline_color", Color("#10253b"))
+	level_card_content.add_child(level_caption)
+	_level_number_label = _make_label("001", roundi(38 * hud_scale))
 	_level_number_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_level_number_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_level_number_label.add_theme_color_override("font_color", Color("#172b49"))
-	level_box.add_child(_level_number_label)
+	_level_number_label.add_theme_color_override("font_color", Color("#fff2d1"))
+	_level_number_label.add_theme_color_override("font_outline_color", Color("#10253b"))
+	_level_number_label.add_theme_constant_override("outline_size", 1)
+	level_card_content.add_child(_level_number_label)
 	_objective_target_icon = TextureRect.new()
 	_objective_target_icon.name = "ObjectiveTargetIcon"
 	_objective_target_icon.custom_minimum_size = Vector2(58, 58) * hud_scale
@@ -430,7 +442,7 @@ func _build_level_objective_row(parent: CanvasLayer) -> void:
 	_objective_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	_objective_label.add_theme_color_override("font_color", Color("#f4ce49"))
 	objective_copy.add_child(_objective_label)
-	var case_art := _load_hud_asset("res://assets/casefile_hud.png")
+	var case_art := _load_hud_asset("res://assets/sprites/ui/hud/casefile_button_serif.png")
 	var case_crop := AtlasTexture.new()
 	case_crop.atlas = case_art
 	case_crop.region = Rect2(405, 475, 1110, 350)
@@ -517,12 +529,12 @@ func _make_compact_hud_panel(parent: Control, panel_name: String, text: String, 
 		panel.clip_contents = true
 		var panel_art := TextureRect.new()
 		panel_art.name = "PanelArt"
-		var art_path := "res://assets/sprites/ui/hud/moves_counter.png"
+		var art_path := "res://assets/sprites/ui/hud/moves_counter_serif.png"
 		match panel_name:
 			"CoinCounter":
-				art_path = "res://assets/sprites/ui/hud/coin_counter.png"
+				art_path = "res://assets/sprites/ui/hud/coin_counter_serif.png"
 			"LifeHearts":
-				art_path = "res://assets/sprites/ui/hud/lives_counter.png"
+				art_path = "res://assets/sprites/ui/hud/lives_counter_serif.png"
 		panel_art.texture = _get_cropped_hud_art(panel_name, art_path)
 		if panel_name in ["CoinCounter", "LifeHearts"]:
 			panel_art.anchor_left = 0.0
@@ -559,10 +571,11 @@ func _make_compact_hud_panel(parent: Control, panel_name: String, text: String, 
 				label.anchor_top = 0.28
 				label.anchor_bottom = 0.76
 			"MovesCounter":
-				label.anchor_left = 0.46
-				label.anchor_right = 0.96
-				label.anchor_top = 0.44
-				label.anchor_bottom = 0.89
+				# Center the live move value inside the white inset of moves_counter_serif.png.
+				label.anchor_left = 0.45
+				label.anchor_right = 0.99
+				label.anchor_top = 0.40
+				label.anchor_bottom = 0.75
 			_:
 				label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	else:
@@ -576,12 +589,17 @@ func _make_compact_hud_panel(parent: Control, panel_name: String, text: String, 
 	label.add_theme_constant_override("shadow_offset_x", 1)
 	label.add_theme_constant_override("shadow_offset_y", 2)
 	if uses_generated_art:
-		if panel_name in ["LifeHearts", "CoinCounter"]:
-			label.add_theme_color_override("font_color", Color("#102640"))
-			label.add_theme_color_override("font_outline_color", Color("#ffffff"))
-			label.add_theme_constant_override("outline_size", 2)
-		else:
-			label.add_theme_color_override("font_color", Color("#60401c"))
+		match panel_name:
+			"LifeHearts":
+				label.add_theme_color_override("font_color", Color("#ffffff"))
+				label.add_theme_color_override("font_outline_color", Color("#a51d4e"))
+				label.add_theme_constant_override("outline_size", 2)
+			"CoinCounter":
+				label.add_theme_color_override("font_color", Color("#ffffff"))
+				label.add_theme_color_override("font_outline_color", Color("#70420a"))
+				label.add_theme_constant_override("outline_size", 2)
+			_:
+				label.add_theme_color_override("font_color", Color("#60401c"))
 		label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0))
 	content.add_child(label)
 	if panel_name == "CoinCounter":
@@ -928,11 +946,12 @@ func _show_case_file() -> void:
 		{"name": "PHONE", "icon": "phone_evidence_icon.svg", "meaning": "A call or location trace that can point toward Victor."},
 		{"name": "FINGERPRINT", "icon": "fingerprint_evidence_icon.jpeg", "meaning": "A trace that can connect an object to the person who handled it."},
 		{"name": "RECORDER", "icon": "recorder_evidence_icon.jpeg", "meaning": "A recording that may reveal a voice or a hidden clue."},
-		{"name": "CLOCK", "icon": "timer_objective_icon.jpeg", "meaning": "A timestamp that helps the team reconstruct when the trail moved."}
+		{"name": "CLOCK", "icon": "timer_objective_icon.jpeg", "meaning": "A timestamp that helps the team reconstruct when the trail moved."},
+		{"name": "CHARACTER TILES", "icon_path": "res://assets/sprites/characters/ethan_portrait_cutout.png", "meaning": "Match 3 of the same portrait. Each Ethan or Detective tile gives 1 rescue assist; each Victor tile gives 10 coins. The Ethan booster in the tray spends 1 assist to clear a chosen 5x5 area."}
 	]
 	for entry in entries:
 		var row := PanelContainer.new()
-		row.custom_minimum_size.y = 76
+		row.custom_minimum_size.y = 92 if entry["name"] == "CHARACTER TILES" else 76
 		var row_style := StyleBoxFlat.new()
 		row_style.bg_color = Color("#193a56")
 		row_style.border_color = Color("#52708a")
@@ -948,7 +967,7 @@ func _show_case_file() -> void:
 		icon.custom_minimum_size = Vector2(58, 58)
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		icon.texture = ResourceManager.load_texture("res://assets/sprites/tiles/" + str(entry["icon"]))
+		icon.texture = ResourceManager.load_texture(str(entry.get("icon_path", "res://assets/sprites/tiles/" + str(entry.get("icon", "")))))
 		row_content.add_child(icon)
 		var copy := VBoxContainer.new()
 		copy.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -958,7 +977,7 @@ func _show_case_file() -> void:
 		var tile_name := _make_label(str(entry["name"]), 16)
 		tile_name.add_theme_color_override("font_color", Color("#f2ce7c"))
 		copy.add_child(tile_name)
-		var meaning := _make_label(str(entry["meaning"]), 15)
+		var meaning := _make_label(str(entry["meaning"]), 14 if entry["name"] == "CHARACTER TILES" else 15)
 		meaning.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		copy.add_child(meaning)
 	var close := _make_story_action_button("BACK TO SEARCH", 240)
@@ -1769,11 +1788,23 @@ func _begin_level(_route_id: String) -> void:
 	var tutorial_steps: Array = tutorial.get("steps", [])
 	if bool(tutorial.get("enabled", false)) and not tutorial_steps.is_empty():
 		_tutorial_active = true
-		_tutorial_action = "guided_swap"
 		_tutorial_mechanic = str(tutorial_steps[0].get("mechanic", ""))
 		_tutorial_pause_open = false
 		_tutorial_booster_kind = str(tutorial_steps[0].get("booster", "")).to_lower()
-		if not _tutorial_booster_kind.is_empty():
+		if _tutorial_mechanic == "character_tiles":
+			_tutorial_action = "explain_character_tiles"
+			if _board != null:
+				_board.lock()
+			_hint_label.text = "NEW MATCH PIECES | CHARACTER REWARDS"
+			_refresh_tutorial_controls()
+			_show_tutorial_tip(
+				str(tutorial_steps[0].get("message", "Match character portraits for their rewards.")),
+				_button_screen_rect(_booster_buttons["ethan"]["button"]),
+				"DAVID",
+				"",
+				true
+			)
+		elif not _tutorial_booster_kind.is_empty():
 			_tutorial_action = "booster_select"
 			_board.lock()
 			_hint_label.text = "BOOSTER TRAINING | " + _tutorial_booster_kind.to_upper()
@@ -1785,6 +1816,7 @@ func _begin_level(_route_id: String) -> void:
 				"res://assets/sprites/characters/david_portrait_cutout.png"
 			)
 		else:
+			_tutorial_action = "guided_swap"
 			var guided_swap: Array[Vector2i] = []
 			var guided_move_hits_obstacle := false
 			var tutorial_mechanic_unavailable := false
@@ -1835,7 +1867,7 @@ func _begin_level(_route_id: String) -> void:
 	if level_manager != null:
 		level_manager.start_level()
 	if _board != null:
-		if not (_tutorial_active and _tutorial_action == "booster_select"):
+		if not (_tutorial_active and ["booster_select", "explain_character_tiles"].has(_tutorial_action)):
 			_board.unlock()
 	var active_hud := get_node_or_null("HUD") as CanvasLayer
 	if active_hud != null:
@@ -2039,7 +2071,7 @@ func _on_tiles_matched(tile_types: Array) -> void:
 	var feedback_caption := ""
 	var feedback_sound := ""
 	var shake_board := false
-	var special_reward_text := ""
+	var character_rewards := {"ethan": 0, "detective": 0, "victor": 0}
 	var target_enum := int(Constants.TileType.get(_objective_target, -1))
 	for tile_type in tile_types:
 		if _objective_type == "COLLECT_ITEMS" and int(tile_type) == target_enum:
@@ -2047,15 +2079,24 @@ func _on_tiles_matched(tile_types: Array) -> void:
 			objective_match = true
 		if int(tile_type) == int(Constants.TileType.ETHAN) and _economy_manager != null:
 			_economy_manager.add_ethan(1)
-			special_reward_text = "ETHAN FOUND | +1 RESCUE ASSIST"
+			character_rewards["ethan"] = int(character_rewards["ethan"]) + 1
 		elif int(tile_type) == int(Constants.TileType.DETECTIVE) and _economy_manager != null:
 			_economy_manager.add_ethan(1)
-			special_reward_text = "DETECTIVE FOUND | +1 RESCUE ASSIST"
+			character_rewards["detective"] = int(character_rewards["detective"]) + 1
 		elif int(tile_type) == int(Constants.TileType.VICTOR) and _economy_manager != null:
 			_economy_manager.add_coins(10)
-			special_reward_text = "VICTOR CAUGHT | +10 ETHAN COINS"
-		if [int(Constants.TileType.ETHAN), int(Constants.TileType.DETECTIVE), int(Constants.TileType.VICTOR)].has(int(tile_type)):
-			objective_match = true
+			character_rewards["victor"] = int(character_rewards["victor"]) + 1
+	var reward_notices: Array[String] = []
+	var ethan_matches := int(character_rewards["ethan"])
+	var detective_matches := int(character_rewards["detective"])
+	var victor_matches := int(character_rewards["victor"])
+	if ethan_matches > 0:
+		reward_notices.append("ETHAN +%d RESCUE ASSIST%s" % [ethan_matches, "" if ethan_matches == 1 else "S"])
+	if detective_matches > 0:
+		reward_notices.append("DETECTIVE +%d RESCUE ASSIST%s" % [detective_matches, "" if detective_matches == 1 else "S"])
+	if victor_matches > 0:
+		reward_notices.append("VICTOR +%d ETHAN COINS" % (victor_matches * 10))
+	var special_reward_text := " | ".join(reward_notices)
 	SignalBus.play_sfx.emit("clue_collected" if objective_match else "tile_match")
 	if tile_types.size() >= 5 or _match_streak >= 4:
 		feedback_caption = "WONDERFUL!"
@@ -2294,6 +2335,8 @@ func _on_tutorial_acknowledged() -> void:
 		_finish_tutorial()
 	elif _tutorial_action == "explain_special_created":
 		_show_tutorial_special_created()
+	elif _tutorial_action == "explain_character_tiles":
+		_finish_tutorial()
 	elif _tutorial_action == "explain_special_result" or _tutorial_action == "explain_booster_result":
 		_finish_tutorial()
 
