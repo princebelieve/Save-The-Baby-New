@@ -8,6 +8,14 @@ The UI system is responsible only for presentation and user interaction. It neve
 
 Displays gameplay information while a level is running.
 
+The gameplay HUD is composed from readable, touch-sized objective, move, life,
+coin, level, and case-file components. A level may request an investigation,
+hazard, or rescue presentation profile through its optional `hud.profile`
+field. If omitted, levels with board obstacles use the hazard profile and
+unobstructed evidence levels use investigation. Hazard and rescue profiles give
+their relevant counter panels more space; palettes follow the mission type.
+Profiles preserve the live gameplay counters.
+
 Initialization
 initialize()
 Moves

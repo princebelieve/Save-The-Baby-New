@@ -38,10 +38,7 @@ var _objective_title_label: Label
 var _blocker_label: Label
 var _reward_label: Label
 var _lives_label: Label
-var _level_reward_label: Label
-var _star_reward_label: Label
 var _objective_target_icon: TextureRect
-var _objective_target_name: Label
 var _level_number_label: Label
 var _objective_description_label: Label
 var _hint_label: Label
@@ -56,6 +53,9 @@ var _evidence_count: int = 0
 var _evidence_goal: int = 10
 var _objective_target := "KEY"
 var _objective_type := "COLLECT_ITEMS"
+var _hud_profile := "investigation"
+var _status_panel: Panel
+var _mission_panel: Panel
 var _moves_remaining: int = 0
 var _current_level_id := 1
 var _current_route_id := "alone"
@@ -299,53 +299,33 @@ func _build_gameplay_hud() -> void:
 		add_child(hud)
 	hud.layer = 2
 	hud.visible = true
-	var header := Control.new()
-	var hud_scale := clampf(get_viewport_rect().size.x / 720.0, 0.52, 1.0)
-	header.name = "MissionHeader"
-	header.anchor_left = 0.0
-	header.anchor_right = 1.0
-	header.anchor_top = 0.0
-	# Objective artwork values are positioned against the full viewport, so this
-	# overlay must occupy the full screen rather than a short header strip.
-	header.anchor_bottom = 1.0
-	hud.add_child(header)
-	_build_dynamic_objective_hud(header)
+	var hud_scale := clampf(get_viewport_rect().size.x / 720.0, 0.72, 1.0)
+	_build_level_objective_row(hud)
 	var status_row := HBoxContainer.new()
 	status_row.name = "StatusRow"
-	status_row.anchor_left = 0.035
-	status_row.anchor_right = 0.965
-	status_row.anchor_top = 0.145
-	status_row.anchor_bottom = 0.205
+	status_row.anchor_left = 0.045
+	status_row.anchor_right = 0.955
+	status_row.anchor_top = 0.108
+	status_row.anchor_bottom = 0.187
 	status_row.alignment = BoxContainer.ALIGNMENT_CENTER
-	status_row.add_theme_constant_override("separation", roundi(4 * hud_scale))
-	var status_backing := Panel.new()
-	status_backing.name = "StatusRowBacking"
-	status_backing.anchor_left = 0.025
-	status_backing.anchor_right = 0.975
-	status_backing.anchor_top = 0.107
-	status_backing.anchor_bottom = 0.216
-	var backing_style := StyleBoxFlat.new()
-	backing_style.bg_color = Color(0.025, 0.08, 0.105, 0.82)
-	backing_style.border_color = Color("#d6b66e")
-	backing_style.set_border_width_all(2)
-	backing_style.set_corner_radius_all(18)
-	backing_style.content_margin_left = 8
-	backing_style.content_margin_right = 8
-	status_backing.add_theme_stylebox_override("panel", backing_style)
-	hud.add_child(status_backing)
-	hud.move_child(status_backing, header.get_index() + 1)
-	_build_level_objective_row(hud, hud_scale)
+	status_row.add_theme_constant_override("separation", roundi(10 * hud_scale))
+	_status_panel = Panel.new()
+	_status_panel.name = "StatusRowBacking"
+	_status_panel.anchor_left = 0.025
+	_status_panel.anchor_right = 0.975
+	_status_panel.anchor_top = 0.101
+	_status_panel.anchor_bottom = 0.194
+	_apply_hud_profile_style()
+	hud.add_child(_status_panel)
 	hud.add_child(status_row)
-	_build_objective_target_badge(status_row, hud_scale)
-	_lives_label = _make_compact_hud_panel(status_row, "LifeHearts", "0/5", Vector2(150, 54) * hud_scale, roundi(21 * hud_scale), Color("#f06c9b"))
-	_reward_label = _make_compact_hud_panel(status_row, "CoinCounter", "0", Vector2(154, 54) * hud_scale, roundi(21 * hud_scale), Color("#e9bd55"))
-	_star_reward_label = _make_compact_hud_panel(status_row, "StarReward", "☆☆☆", Vector2(70, 54) * hud_scale, roundi(17 * hud_scale), Color("#f4ce49"))
-	_level_reward_label = _make_compact_hud_panel(status_row, "LevelReward", "+0", Vector2(64, 54) * hud_scale, roundi(17 * hud_scale), Color("#e9bd55"))
+	_moves_label = _make_compact_hud_panel(status_row, "MovesCounter", "0", Vector2(124, 94) * hud_scale, roundi(31 * hud_scale), Color("#38c8e5"))
+	_lives_label = _make_compact_hud_panel(status_row, "LifeHearts", "0/5", Vector2(170, 72) * hud_scale, roundi(30 * hud_scale), Color("#f06c9b"))
+	_reward_label = _make_compact_hud_panel(status_row, "CoinCounter", "0", Vector2(188, 72) * hud_scale, roundi(29 * hud_scale), Color("#e9bd55"))
 	_pause_button = TextureButton.new()
 	_pause_button.name = "SettingsButton"
 	_pause_button.ignore_texture_size = true
 	_pause_button.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
-	_pause_button.custom_minimum_size = Vector2(46, 54) * hud_scale
+	_pause_button.custom_minimum_size = Vector2(64, 68) * hud_scale
 	var pause_icon := _load_hud_asset("res://assets/sprites/ui/hud/pause_button.png")
 	_pause_button.texture_normal = pause_icon
 	_pause_button.texture_hover = pause_icon
@@ -356,28 +336,11 @@ func _build_gameplay_hud() -> void:
 	_pause_button.pressed.connect(_play_ui_click)
 	_pause_button.pressed.connect(_show_pause_menu)
 	status_row.add_child(_pause_button)
-	_case_file_button = TextureButton.new()
-	_case_file_button.name = "CaseFileButton"
-	_case_file_button.ignore_texture_size = true
-	_case_file_button.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
-	_case_file_button.custom_minimum_size = Vector2(88, 54) * hud_scale
-	_case_file_button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	var case_file_icon := _load_hud_asset("res://assets/casefile_hud.png")
-	var case_file_art := AtlasTexture.new()
-	case_file_art.atlas = case_file_icon
-	case_file_art.region = Rect2(405, 475, 1110, 350)
-	_case_file_button.texture_normal = case_file_art
-	_case_file_button.texture_hover = case_file_art
-	_case_file_button.texture_pressed = case_file_art
-	_case_file_button.tooltip_text = "OPEN CASE FILE"
-	_case_file_button.pressed.connect(_show_case_file)
-	status_row.add_child(_case_file_button)
-
 	_hint_label = _make_label("INVESTIGATION 01 | THE FIRST CLUE", 22)
 	_hint_label.anchor_left = 0.08
 	_hint_label.anchor_right = 0.92
-	_hint_label.anchor_top = 0.205
-	_hint_label.anchor_bottom = 0.235
+	_hint_label.anchor_top = 0.192
+	_hint_label.anchor_bottom = 0.222
 	_hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_hint_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_hint_label.add_theme_color_override("font_color", Color("#fff3d5"))
@@ -394,142 +357,152 @@ func _build_gameplay_hud() -> void:
 	add_child(_story_layer)
 
 
-func _build_dynamic_objective_hud(parent: Control) -> void:
-	var art := TextureRect.new()
-	art.name = "DynamicObjectiveArtwork"
-	art.anchor_left = 0.025
-	art.anchor_right = 0.975
-	art.anchor_top = 0.0
-	art.anchor_bottom = 0.145
-	var objective_texture := _load_hud_asset("res://assets/objective_hud_dynamic.png")
-	var cropped_objective := AtlasTexture.new()
-	cropped_objective.atlas = objective_texture
-	# The supplied art has large magenta margins. Crop to the actual pill so it
-	# renders at HUD size rather than shrinking its visible contents.
-	cropped_objective.region = Rect2(205, 210, 2230, 310)
-	art.texture = cropped_objective
-	art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	art.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var chroma := Shader.new()
-	chroma.code = "shader_type canvas_item;\nuniform vec3 key_color = vec3(1.0, 0.0, 1.0);\nvoid fragment() { vec4 c = texture(TEXTURE, UV) * COLOR; if (distance(c.rgb, key_color) < 0.16) { discard; } COLOR = c; }"
-	var material := ShaderMaterial.new()
-	material.shader = chroma
-	art.material = material
-	parent.add_child(art)
-	var values := Control.new()
-	values.name = "ObjectiveValues"
-	values.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	values.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	parent.add_child(values)
-	var screen_scale := get_viewport_rect().size.x * 0.95 / 2230.0
-	_objective_label = _make_label("0", 17)
-	# The artwork's value windows sit below the heading, around source y=335.
-	# Keep the live values inside those cutouts instead of above the pill.
-	_objective_label.position = Vector2(1075, 335) * screen_scale
-	_objective_label.size = Vector2(300, 105) * screen_scale
-	_objective_label.add_theme_font_size_override("font_size", 20)
-	_objective_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_objective_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_objective_label.add_theme_color_override("font_color", Color("#123d9b"))
-	values.add_child(_objective_label)
-	_moves_label = _make_label("0", 17)
-	_moves_label.position = Vector2(1685, 335) * screen_scale
-	_moves_label.size = Vector2(245, 105) * screen_scale
-	_moves_label.add_theme_font_size_override("font_size", 20)
-	_moves_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_moves_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_moves_label.add_theme_color_override("font_color", Color("#123d9b"))
-	values.add_child(_moves_label)
-	_blocker_label = _make_label("", 12)
-	_blocker_label.position = Vector2(1050, 220) * screen_scale
-	_blocker_label.size = Vector2(650, 30) * screen_scale
-	_blocker_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_blocker_label.add_theme_color_override("font_color", Color("#123d9b"))
-	values.add_child(_blocker_label)
-
-
-func _build_objective_target_badge(parent: Control, hud_scale: float) -> void:
-	var badge := PanelContainer.new()
-	badge.name = "ObjectiveTargetBadge"
-	badge.custom_minimum_size = Vector2(66, 64) * hud_scale
-	badge.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	badge.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+func _build_level_objective_row(parent: CanvasLayer) -> void:
+	var hud_scale := clampf(get_viewport_rect().size.x / 720.0, 0.72, 1.0)
+	var panel := Panel.new()
+	panel.name = "MissionHeader"
+	panel.anchor_left = 0.025
+	panel.anchor_right = 0.975
+	panel.anchor_top = 0.014
+	panel.anchor_bottom = 0.099
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.025, 0.08, 0.105, 0.92)
-	style.border_color = Color("#e3c275")
-	style.set_border_width_all(1)
-	style.set_corner_radius_all(10)
-	style.set_content_margin_all(2)
-	badge.add_theme_stylebox_override("panel", style)
-	parent.add_child(badge)
-	var contents := VBoxContainer.new()
-	contents.alignment = BoxContainer.ALIGNMENT_CENTER
-	contents.add_theme_constant_override("separation", 0)
-	badge.add_child(contents)
-	_objective_target_icon = TextureRect.new()
-	_objective_target_icon.name = "ObjectiveTargetIcon"
-	_objective_target_icon.custom_minimum_size = Vector2(38, 38) * hud_scale
-	_objective_target_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	_objective_target_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	_objective_target_icon.texture = ResourceManager.load_texture(_objective_icon_path(_objective_target))
-	_objective_target_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	contents.add_child(_objective_target_icon)
-	_objective_target_name = _make_label(_objective_hud_title(), maxi(10, roundi(12 * hud_scale)))
-	_objective_target_name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_objective_target_name.add_theme_color_override("font_color", Color("#fff3d5"))
-	contents.add_child(_objective_target_name)
-
-
-func _build_level_objective_row(parent: CanvasLayer, hud_scale: float) -> void:
+	style.bg_color = Color(0.025, 0.08, 0.105, 0.94)
+	style.border_color = Color("#d6b66e")
+	style.set_border_width_all(2)
+	style.set_corner_radius_all(18)
+	style.content_margin_left = 10
+	style.content_margin_right = 10
+	panel.add_theme_stylebox_override("panel", style)
+	_mission_panel = panel
+	parent.add_child(panel)
 	var row := HBoxContainer.new()
 	row.name = "LevelObjectiveRow"
-	row.anchor_left = 0.055
-	row.anchor_right = 0.945
-	row.anchor_top = 0.108
-	row.anchor_bottom = 0.145
-	row.alignment = BoxContainer.ALIGNMENT_CENTER
-	row.add_theme_constant_override("separation", roundi(8 * hud_scale))
-	parent.add_child(row)
-	var level_chip := Control.new()
-	level_chip.name = "LevelNumber"
-	level_chip.custom_minimum_size = Vector2(150, 38) * hud_scale
-	level_chip.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	level_chip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	level_chip.clip_contents = true
+	row.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	row.add_theme_constant_override("separation", 10)
+	panel.add_child(row)
+	var level_box := Control.new()
+	level_box.name = "LevelNumber"
+	level_box.custom_minimum_size = Vector2(140, 0) * hud_scale
+	level_box.clip_contents = true
+	row.add_child(level_box)
+	var level_source := _load_hud_asset("res://assets/level_no.png")
+	var level_crop := AtlasTexture.new()
+	level_crop.atlas = level_source
+	level_crop.region = Rect2(200, 480, 1510, 400)
 	var level_art := TextureRect.new()
 	level_art.name = "LevelArtwork"
-	var level_source := _load_hud_asset("res://assets/level_no.png")
-	if level_source != null:
-		var level_crop := AtlasTexture.new()
-		level_crop.atlas = level_source
-		level_crop.region = Rect2(200, 480, 1510, 400)
-		level_art.texture = level_crop
 	level_art.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	level_art.texture = level_crop
 	level_art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	level_art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	level_art.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_apply_hud_chroma_key(level_art)
-	level_chip.add_child(level_art)
-	_level_number_label = _make_label("01", roundi(20 * hud_scale))
-	_level_number_label.anchor_left = 0.65
+	level_box.add_child(level_art)
+	_level_number_label = _make_label("001", roundi(24 * hud_scale))
+	_level_number_label.anchor_left = 0.66
 	_level_number_label.anchor_right = 0.94
 	_level_number_label.anchor_top = 0.18
 	_level_number_label.anchor_bottom = 0.82
 	_level_number_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_level_number_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_level_number_label.add_theme_color_override("font_color", Color("#172b49"))
-	level_chip.add_child(_level_number_label)
-	row.add_child(level_chip)
-	_objective_description_label = _make_label("COLLECT THE CLUES", roundi(19 * hud_scale))
-	_objective_description_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	level_box.add_child(_level_number_label)
+	_objective_target_icon = TextureRect.new()
+	_objective_target_icon.name = "ObjectiveTargetIcon"
+	_objective_target_icon.custom_minimum_size = Vector2(58, 58) * hud_scale
+	_objective_target_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_objective_target_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_objective_target_icon.texture = ResourceManager.load_texture(_objective_icon_path(_objective_target))
+	_objective_target_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_child(_objective_target_icon)
+	var objective_copy := VBoxContainer.new()
+	objective_copy.name = "ObjectiveCopy"
+	objective_copy.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	objective_copy.alignment = BoxContainer.ALIGNMENT_CENTER
+	objective_copy.add_theme_constant_override("separation", 0)
+	row.add_child(objective_copy)
+	_objective_description_label = _make_label("COLLECT THE CLUES", roundi(26 * hud_scale))
+	_objective_description_label.clip_text = true
 	_objective_description_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	_objective_description_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_objective_description_label.add_theme_color_override("font_color", Color("#fff5dc"))
-	_objective_description_label.add_theme_color_override("font_shadow_color", Color("#14202c"))
-	_objective_description_label.add_theme_constant_override("shadow_offset_x", 1)
-	_objective_description_label.add_theme_constant_override("shadow_offset_y", 2)
-	row.add_child(_objective_description_label)
+	objective_copy.add_child(_objective_description_label)
+	_objective_label = _make_label("0 / 0", roundi(29 * hud_scale))
+	_objective_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	_objective_label.add_theme_color_override("font_color", Color("#f4ce49"))
+	objective_copy.add_child(_objective_label)
+	var case_art := _load_hud_asset("res://assets/casefile_hud.png")
+	var case_crop := AtlasTexture.new()
+	case_crop.atlas = case_art
+	case_crop.region = Rect2(405, 475, 1110, 350)
+	_case_file_button = TextureButton.new()
+	_case_file_button.name = "CaseFileButton"
+	_case_file_button.ignore_texture_size = true
+	_case_file_button.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
+	_case_file_button.custom_minimum_size = Vector2(116, 70) * hud_scale
+	_case_file_button.texture_normal = case_crop
+	_case_file_button.texture_hover = case_crop
+	_case_file_button.texture_pressed = case_crop
+	_case_file_button.tooltip_text = "OPEN CASE FILE"
+	_case_file_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	_case_file_button.pressed.connect(_show_case_file)
+	row.add_child(_case_file_button)
+	_apply_hud_profile_style()
+
+
+func _resolve_hud_profile(level_data: Dictionary) -> String:
+	var hud_settings: Dictionary = level_data.get("hud", {})
+	var metadata: Dictionary = level_data.get("metadata", {})
+	var requested := str(hud_settings.get("profile", metadata.get("hud_profile", ""))).to_lower()
+	if requested in ["investigation", "hazard", "rescue"]:
+		return requested
+	var objectives: Array = level_data.get("objectives", [])
+	for objective_value in objectives:
+		if typeof(objective_value) != TYPE_DICTIONARY:
+			continue
+		var kind := str(objective_value.get("type", "")).to_upper()
+		if kind in ["DESTROY_OBSTACLES", "UNLOCK_DOORS", "DEFUSE_BOMBS", "CLEAR_ALL_JELLY"]:
+			return "hazard"
+		if kind in ["RESCUE_BABY", "SURVIVE"]:
+			return "rescue"
+	var obstacle_items: Array = level_data.get("obstacles", {}).get("items", [])
+	if not obstacle_items.is_empty():
+		return "hazard"
+	return "investigation"
+
+
+func _apply_hud_profile_style() -> void:
+	var palette := {
+		"investigation": [Color(0.025, 0.08, 0.105, 0.94), Color("#d6b66e")],
+		"hazard": [Color(0.12, 0.055, 0.035, 0.96), Color("#ff9b45")],
+		"rescue": [Color(0.11, 0.035, 0.065, 0.96), Color("#ff8eaa")],
+	}
+	var colors: Array = palette.get(_hud_profile, palette["investigation"])
+	for panel in [_mission_panel, _status_panel]:
+		if panel == null:
+			continue
+		var style := StyleBoxFlat.new()
+		style.bg_color = colors[0]
+		style.border_color = colors[1]
+		style.set_border_width_all(2)
+		style.set_corner_radius_all(18)
+		style.set_content_margin_all(8)
+		panel.add_theme_stylebox_override("panel", style)
+	_apply_hud_profile_layout()
+
+
+func _apply_hud_profile_layout() -> void:
+	if _moves_label == null or _lives_label == null or _reward_label == null:
+		return
+	var scale_factor := clampf(get_viewport_rect().size.x / 720.0, 0.72, 1.0)
+	var sizes := {
+		"investigation": [Vector2(124, 94), Vector2(170, 72), Vector2(188, 72)],
+		"hazard": [Vector2(144, 94), Vector2(160, 72), Vector2(170, 72)],
+		"rescue": [Vector2(116, 88), Vector2(188, 78), Vector2(164, 72)]
+	}
+	var profile_sizes: Array = sizes.get(_hud_profile, sizes["investigation"])
+	_moves_label.get_parent().get_parent().custom_minimum_size = profile_sizes[0] * scale_factor
+	_lives_label.get_parent().get_parent().custom_minimum_size = profile_sizes[1] * scale_factor
+	_reward_label.get_parent().get_parent().custom_minimum_size = profile_sizes[2] * scale_factor
 
 
 func _make_compact_hud_panel(parent: Control, panel_name: String, text: String, minimum_size: Vector2, font_size: int, accent: Color) -> Label:
@@ -544,22 +517,18 @@ func _make_compact_hud_panel(parent: Control, panel_name: String, text: String, 
 		panel.clip_contents = true
 		var panel_art := TextureRect.new()
 		panel_art.name = "PanelArt"
-		var art_path := "res://assets/moves_template.png"
+		var art_path := "res://assets/sprites/ui/hud/moves_counter.png"
 		match panel_name:
 			"CoinCounter":
 				art_path = "res://assets/sprites/ui/hud/coin_counter.png"
 			"LifeHearts":
 				art_path = "res://assets/sprites/ui/hud/lives_counter.png"
-			"StarReward":
-				art_path = "res://assets/moves_template.png"
-			"LevelReward":
-				art_path = "res://assets/dollar_sack.png"
 		panel_art.texture = _get_cropped_hud_art(panel_name, art_path)
-		if panel_name in ["CoinCounter", "LifeHearts", "LevelReward"]:
+		if panel_name in ["CoinCounter", "LifeHearts"]:
 			panel_art.anchor_left = 0.0
 			panel_art.anchor_right = 1.0
-			panel_art.anchor_top = 0.05
-			panel_art.anchor_bottom = 0.95
+			panel_art.anchor_top = 0.10
+			panel_art.anchor_bottom = 0.90
 		else:
 			panel_art.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		panel_art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -583,10 +552,19 @@ func _make_compact_hud_panel(parent: Control, panel_name: String, text: String, 
 	label.name = "Value"
 	label.text = text
 	if uses_generated_art:
-		label.anchor_left = 0.58 if panel_name in ["CoinCounter", "LifeHearts"] else (0.48 if panel_name in ["MovesCounter", "LevelReward"] else 0.12)
-		label.anchor_right = 0.94
-		label.anchor_top = 0.24 if panel_name in ["CoinCounter", "LifeHearts"] else (0.32 if panel_name in ["StarReward", "LevelReward"] else (0.43 if panel_name == "MovesCounter" else 0.24))
-		label.anchor_bottom = 0.80 if panel_name in ["MovesCounter", "StarReward", "LevelReward"] else 0.76
+		match panel_name:
+			"CoinCounter", "LifeHearts":
+				label.anchor_left = 0.58
+				label.anchor_right = 0.96
+				label.anchor_top = 0.28
+				label.anchor_bottom = 0.76
+			"MovesCounter":
+				label.anchor_left = 0.46
+				label.anchor_right = 0.96
+				label.anchor_top = 0.44
+				label.anchor_bottom = 0.89
+			_:
+				label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	else:
 		label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -600,8 +578,8 @@ func _make_compact_hud_panel(parent: Control, panel_name: String, text: String, 
 	if uses_generated_art:
 		if panel_name in ["LifeHearts", "CoinCounter"]:
 			label.add_theme_color_override("font_color", Color("#102640"))
-			label.add_theme_color_override("font_outline_color", Color("#fff8df"))
-			label.add_theme_constant_override("outline_size", 1)
+			label.add_theme_color_override("font_outline_color", Color("#ffffff"))
+			label.add_theme_constant_override("outline_size", 2)
 		else:
 			label.add_theme_color_override("font_color", Color("#60401c"))
 		label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0))
@@ -624,10 +602,7 @@ func _get_cropped_hud_art(panel_name: String, path: String) -> Texture2D:
 		return null
 	if path.begins_with("res://assets/sprites/ui/hud/"):
 		return source
-	var regions := {
-		"StarReward": Rect2(250, 345, 1420, 570),
-		"MovesCounter": Rect2(120, 210, 1680, 760)
-	}
+	var regions := {"StarReward": Rect2(250, 345, 1420, 570)}
 	if not regions.has(panel_name):
 		return source
 	var cropped := AtlasTexture.new()
@@ -645,7 +620,7 @@ func _apply_hud_chroma_key(target: TextureRect) -> void:
 
 
 func _build_moves_panel(parent: Control, ui_scale: float) -> Label:
-	return _make_compact_hud_panel(parent, "MovesCounter", "30", Vector2(112, 64) * ui_scale, roundi(24 * ui_scale), Color("#38c8e5"))
+	return _make_compact_hud_panel(parent, "MovesCounter", "30", Vector2(124, 94) * ui_scale, roundi(31 * ui_scale), Color("#38c8e5"))
 
 
 func _build_objective_panel(parent: Control, ui_scale: float) -> Label:
@@ -1676,18 +1651,33 @@ func _format_hud_objective_summary(level_data: Dictionary) -> String:
 				continue
 			var objective: Dictionary = objective_value
 			var amount := int(objective.get("amount", 1))
-			if str(objective.get("type", "")).to_upper() == "DESTROY_OBSTACLES":
-				summaries.append("CLEAR %d OBSTACLES" % amount)
-			else:
-				var target := str(objective.get("target", "CLUES")).replace("_", " ").to_upper()
-				var plural := target + "S"
-				if target == "KEY":
-					plural = "KEYS"
-				elif target == "PHONE":
-					plural = "PHONES"
-				summaries.append("COLLECT %d %s" % [amount, plural])
-	if _obstacles_goal > 0 and _objective_type != "DESTROY_OBSTACLES":
-		summaries.append("CLEAR %d BLOCKERS" % _obstacles_goal)
+			var target := str(objective.get("target", "CLUES")).replace("_", " ").to_upper()
+			match str(objective.get("type", "")).to_upper():
+				"DESTROY_OBSTACLES":
+					summaries.append("CLEAR %d %s" % [amount, target if not target.is_empty() else "OBSTACLES"])
+				"UNLOCK_DOORS":
+					summaries.append("OPEN %d DOORS" % amount)
+				"DEFUSE_BOMBS":
+					summaries.append("DEFUSE %d BOMBS" % amount)
+				"REACH_SCORE":
+					summaries.append("REACH %d POINTS" % amount)
+				"RESCUE_BABY":
+					summaries.append("RESCUE ETHAN")
+				"SURVIVE":
+					summaries.append("SURVIVE THE ATTACK")
+				"CLEAR_ALL_JELLY":
+					summaries.append("CLEAR ALL JELLY")
+				_:
+					var plural := target + "S"
+					if target == "KEY":
+						plural = "KEYS"
+					elif target == "PHONE":
+						plural = "PHONES"
+					elif target == "FINGERPRINT":
+						plural = "FINGERPRINTS"
+					elif target == "CLOCK":
+						plural = "TIMESTAMPS"
+					summaries.append("COLLECT %d %s" % [amount, plural])
 	if summaries.is_empty():
 		return str(level_data.get("description", "COMPLETE THE INVESTIGATION")).to_upper()
 	var summary := ""
@@ -1695,7 +1685,7 @@ func _format_hud_objective_summary(level_data: Dictionary) -> String:
 		if not summary.is_empty():
 			summary += "  |  "
 		summary += entry
-	return "OBJECTIVE: " + summary
+	return summary
 
 
 func _objective_icon_path(target: String) -> String:
@@ -1704,20 +1694,17 @@ func _objective_icon_path(target: String) -> String:
 		"PHONE": "phone_evidence_icon.svg",
 		"FINGERPRINT": "fingerprint_evidence_icon.jpeg",
 		"RECORDER": "recorder_evidence_icon.jpeg",
-		"CLOCK": "timer_objective_icon.jpeg"
+		"CLOCK": "timer_objective_icon.jpeg",
+		"CHAIN": "chain_obstacle_icon.jpeg",
+		"LOCK": "locked_padlock_obstacle_icon.jpeg",
+		"BOMB": "missile_obstacle_icon.jpeg",
+		"MISSILE": "missile_obstacle_icon.jpeg",
+		"ELECTRIC_TRAP": "electric_trap_obstacle_icon.jpeg"
 	}
-	var file_name := str(icons.get(target.to_upper(), "evidence_document_icon.jpeg"))
-	return "res://assets/sprites/tiles/" + file_name
-
-
-func _objective_hud_title() -> String:
-	match _objective_target:
-		"FINGERPRINT":
-			return "PRINT"
-		"RECORDER":
-			return "REC"
-		_:
-			return _objective_target.replace("_", " ")
+	var normalized := target.to_upper()
+	if ["CHAIN", "LOCK", "BOMB", "MISSILE", "ELECTRIC_TRAP"].has(normalized):
+		return "res://assets/sprites/obstacles/" + str(icons[normalized])
+	return "res://assets/sprites/tiles/" + str(icons.get(normalized, "evidence_document_icon.jpeg"))
 
 
 func _begin_level(_route_id: String) -> void:
@@ -1747,20 +1734,17 @@ func _begin_level(_route_id: String) -> void:
 	_objective_complete_sound_played = false
 	_story_objective_sound_pending = false
 	_evidence_goal = int(objective.get("amount", 10))
-	var level_rewards: Dictionary = level_data.get("rewards", {})
-	_star_reward_label.text = "★ %d" % int(level_rewards.get("stars", 3))
-	_level_reward_label.text = "+%d" % int(level_rewards.get("coins", 0))
 	var obstacle_items: Array = level_data.get("obstacles", {}).get("items", [])
 	_objective_target = str(objective.get("target", "KEY")).to_upper()
 	_objective_type = str(objective.get("type", "COLLECT_ITEMS")).to_upper()
+	_hud_profile = _resolve_hud_profile(level_data)
+	_apply_hud_profile_style()
 	if _objective_target_icon != null:
 		_objective_target_icon.texture = ResourceManager.load_texture(_objective_icon_path(_objective_target))
-	if _objective_target_name != null:
-		_objective_target_name.text = _objective_hud_title()
 	_obstacles_goal = obstacle_items.size() if _objective_type != "DESTROY_OBSTACLES" else 0
 	_obstacles_cleared = 0
 	if _level_number_label != null:
-		_level_number_label.text = "%02d" % _current_level_id
+		_level_number_label.text = "%03d" % _current_level_id
 	if _objective_description_label != null:
 		_objective_description_label.text = _format_hud_objective_summary(level_data)
 	_update_objective_hud()
@@ -1897,6 +1881,9 @@ func _set_displayed_coin_count(value: int) -> void:
 	_displayed_coins = value
 	if _reward_label != null:
 		_reward_label.text = str(value)
+		var base_size := roundi(29 * clampf(get_viewport_rect().size.x / 720.0, 0.72, 1.0))
+		var digit_count := str(value).length()
+		_reward_label.add_theme_font_size_override("font_size", maxi(roundi(20 * clampf(get_viewport_rect().size.x / 720.0, 0.72, 1.0)), base_size - maxi(0, digit_count - 4) * 4))
 
 
 func _on_lives_changed(lives: int) -> void:
@@ -1988,8 +1975,12 @@ func _open_booster_shop(kind: String) -> void:
 func _update_objective_hud() -> void:
 	if _objective_label == null:
 		return
-	_objective_label.text = "%d / %d" % [mini(_evidence_count, _evidence_goal), _evidence_goal]
-	_blocker_label.text = "BLOCKERS %d / %d" % [_obstacles_cleared, _obstacles_goal] if _obstacles_goal > 0 else ""
+	var progress_text := "%d / %d" % [mini(_evidence_count, _evidence_goal), _evidence_goal]
+	if _obstacles_goal > 0:
+		progress_text += "  •  %d / %d BLOCKERS" % [_obstacles_cleared, _obstacles_goal]
+	_objective_label.text = progress_text
+	if _blocker_label != null:
+		_blocker_label.text = ""
 
 
 func _mission_objectives_complete() -> bool:

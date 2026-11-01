@@ -92,6 +92,7 @@ The intended quality bar is a polished, releasable game with stable performance,
 - Keep systems modular, reusable, testable, and maintainable. Give each manager/component one clear responsibility.
 - Use the established project folders and contracts documented in the API maps. API maps and `scripts/animation/AnimationFolderResponsibity.md` remain the detailed subsystem references; this plan defines product direction and production order.
 - Prefer data/resources for levels, story, objectives, rewards, economy, tile/obstacle definitions, settings, and progression. Adding a level or ordinary content should not require a bespoke engine code path.
+- Keep the gameplay HUD responsive and objective-led. A level may override its HUD presentation profile in level data; otherwise the profile follows its objective type. HUD profiles only change presentation and never determine objective rules or progress.
 - Keep board resolution separate from story, save, economy, and presentation concerns. Systems communicate through their public APIs/signals.
 - Give persistent level and chapter identifiers stable, extensible formats. Migrations must protect player progress as saves evolve.
 - Keep a developer tool path for jumping to a level/story scene, inspecting board state, and granting test resources. Developer tools must not leak into release behavior unintentionally.

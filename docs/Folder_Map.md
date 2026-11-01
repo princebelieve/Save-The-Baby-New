@@ -115,6 +115,11 @@ coin.png
 
 star.png
 
+sprites/ui/references/
+
+Contains visual references for UI layout and component research. These images
+are not loaded by gameplay scenes.
+
 sprites/characters/
 
 Contains portraits.

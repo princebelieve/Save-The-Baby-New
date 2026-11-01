@@ -41,7 +41,10 @@ Every level uses the same schema.
     "audio": {},
     "background": {},
     "settings": {},
-    "metadata": {}
+    "metadata": {},
+    "hud": {
+        "profile": "hazard"
+    }
 }
 level_id
 
@@ -290,6 +293,22 @@ Internal information.
 The chapter fields group levels and identify the location art, landmark, and
 decorative props used by the live campaign map. Keep them consistent within
 each chapter range. Prop filenames resolve inside assets/sprites/props/.
+
+hud (optional)
+
+Selects the gameplay HUD presentation for a level. The HUD profile affects
+presentation only; objectives and their counters continue to come from the
+level's objective data.
+
+{
+    "profile": "investigation"
+}
+
+Supported profiles are `investigation`, `hazard`, and `rescue`. When omitted,
+the profile is inferred from the objective type; levels with board obstacles
+use `hazard`, while evidence collection without obstacles uses `investigation`.
+A level may set `hud.profile` to override the inferred choice.
+
 Campaign chapters and level progression
 
 The campaign-map art divides the opening 50 levels into six locations. Keep these
