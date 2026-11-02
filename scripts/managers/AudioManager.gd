@@ -42,6 +42,12 @@ var _preferences_timer: Timer
 var _preferences_dirty := false
 var _current_music_track := ""
 var _application_suspended := false
+var _voice_player: AudioStreamPlayer
+var _voice_current_id := ""
+var _pending_voice: Dictionary = {}
+var _voice_not_before := 0
+var _last_praise_tick := -10000
+var _last_sfx_tick: Dictionary = {}
 
 
 #===============================================================================
@@ -69,12 +75,16 @@ func initialize() ->void:
 	add_child(_music_player)
 
 	_music_player.finished.connect(_on_music_finished)
+	_voice_player = AudioStreamPlayer.new()
+	add_child(_voice_player)
+	_voice_player.finished.connect(func(): _voice_current_id = "")
 
 	_load_audio_configuration()
 	_load_preferences()
 	_ensure_audio_bus(_music_bus_name)
 	_ensure_audio_bus(_sfx_bus_name)
 	_music_player.bus = _music_bus_name
+	_voice_player.bus = _sfx_bus_name
 	_apply_bus_volumes()
 
 	_connect_signal_bus()
@@ -139,6 +149,28 @@ func play_sfx(sound) -> void:
 	if stream == null:
 		DebugLogger.warning("AudioManager: Unable to load sound: %s" % resolved_sound)
 		return
+	var id := str(sound)
+	var cues: Dictionary = _audio_config.get("voice_cues", {})
+	if cues.has(id):
+		_queue_voice(id, stream, cues[id])
+		return
+	var now := Time.get_ticks_msec()
+	var limits: Dictionary = _audio_config.get("sfx_limits", {}).get(id, {})
+	if now - int(_last_sfx_tick.get(id, -10000)) < int(limits.get("cooldown_ms", 45)):
+		return
+	var instances := 0
+	for active_id in _sfx_ids_by_player.values():
+		if str(active_id) == id: instances += 1
+	if instances >= int(limits.get("max_instances", 3)) or _sfx_players.size() >= 10:
+		return
+	_last_sfx_tick[id] = now
+	if _is_impact_id(id):
+		_voice_not_before = now + 180
+		# A new move takes precedence over optional praise. Never stack speech
+		# over a fresh explosion or resume a word halfway through.
+		if _voice_player.playing and _voice_priority(_voice_current_id) < 80:
+			_voice_player.stop()
+			_voice_current_id = ""
 	var player := AudioStreamPlayer.new()
 	player.bus = _sfx_bus_name
 	player.stream = stream
@@ -160,6 +192,10 @@ func play_sfx(sound) -> void:
 
 
 func stop_sfx(sound) -> void:
+	if str(_pending_voice.get("id", "")) == str(sound): _pending_voice.clear()
+	if _voice_current_id == str(sound):
+		_voice_player.stop()
+		_voice_current_id = ""
 	for player in _sfx_players.duplicate():
 		if _sfx_ids_by_player.get(player) != sound:
 			continue
@@ -367,6 +403,9 @@ func _apply_bus_volumes() -> void:
 
 
 func _stop_all_sfx() -> void:
+	_pending_voice.clear()
+	if _voice_player != null: _voice_player.stop()
+	_voice_current_id = ""
 	for player in _sfx_players.duplicate():
 		_sfx_players.erase(player)
 		_sfx_ids_by_player.erase(player)
@@ -375,6 +414,49 @@ func _stop_all_sfx() -> void:
 			player.queue_free()
 	_sfx_players.clear()
 	_sfx_ids_by_player.clear()
+
+
+func _is_impact_id(id: String) -> bool:
+	return id.begins_with("powerup_") or id in ["thunder_crack", "thunder_roll"]
+
+
+func _voice_priority(id: String) -> int:
+	return int(_audio_config.get("voice_cues", {}).get(id, {}).get("priority", 0))
+
+
+func _queue_voice(id: String, stream: AudioStream, cue: Dictionary) -> void:
+	var now := Time.get_ticks_msec()
+	var priority := int(cue.get("priority", 10))
+	if bool(cue.get("praise", false)) and now - _last_praise_tick < 4200: return
+	if _voice_player.playing:
+		if priority < 80: return
+		if priority <= _voice_priority(_voice_current_id): return
+		_voice_player.stop()
+		_voice_current_id = ""
+	if not _pending_voice.is_empty() and int(_pending_voice["priority"]) > priority: return
+	_pending_voice = {"id": id, "stream": stream, "priority": priority, "expires": now + 5000, "praise": bool(cue.get("praise", false))}
+	_voice_not_before = maxi(_voice_not_before, now + 220)
+
+
+func _process(_delta: float) -> void:
+	if _pending_voice.is_empty() or _muted or not _sfx_enabled or _application_suspended: return
+	var now := Time.get_ticks_msec()
+	if now > int(_pending_voice["expires"]):
+		_pending_voice.clear()
+		return
+	if _voice_player.playing or now < _voice_not_before: return
+	for player in _sfx_players:
+		if is_instance_valid(player) and player.playing and _is_impact_id(str(_sfx_ids_by_player.get(player, ""))):
+			_voice_not_before = now + 180
+			return
+	var cue := _pending_voice.duplicate()
+	_pending_voice.clear()
+	_voice_current_id = str(cue["id"])
+	_voice_player.stream = cue["stream"]
+	_voice_player.volume_db = -1.5 if int(cue["priority"]) >= 80 else 0.0
+	_voice_player.play()
+	if bool(cue["praise"]): _last_praise_tick = now
+	sound_played.emit(_voice_current_id)
 
 
 func _linear_to_db(value: float) -> float:

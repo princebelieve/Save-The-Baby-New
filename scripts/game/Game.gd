@@ -83,6 +83,10 @@ var _campaign_progress := ConfigFile.new()
 var _highest_unlocked_level := 1
 var _completed_levels: Dictionary = {}
 var _match_streak := 0
+var _gameplay_effects: GameplayEffects
+var _turn_praise_rank := 0
+var _turn_praise_sound := ""
+var _waiting_for_collection := false
 var _special_moves_created := 0
 var _objective_complete_sound_played := false
 var _story_objective_sound_pending := false
@@ -1556,6 +1560,10 @@ func _on_route_selected(choice: Dictionary) -> void:
 
 
 func _show_campaign_map(route_id: String) -> void:
+	_waiting_for_collection = false
+	_turn_praise_rank = 0
+	_turn_praise_sound = ""
+	if is_instance_valid(_gameplay_effects): _gameplay_effects.clear()
 	_current_route_id = route_id
 	SignalBus.play_music.emit("suspense_opening")
 	_is_dialogue_typing = false
@@ -1905,6 +1913,10 @@ func _objective_icon_path(target: String) -> String:
 
 
 func _begin_level(_route_id: String) -> void:
+	_waiting_for_collection = false
+	_turn_praise_rank = 0
+	_turn_praise_sound = ""
+	if is_instance_valid(_gameplay_effects): _gameplay_effects.clear()
 	SignalBus.play_sfx.emit("door_close")
 	var gameplay_hud := get_node_or_null("HUD") as CanvasLayer
 	if gameplay_hud != null:
@@ -1990,6 +2002,7 @@ func _on_board_created() -> void:
 	_board.turn_resolved.connect(_on_board_turn_resolved)
 	_board.special_created.connect(_on_special_created)
 	_board.special_activated.connect(_on_special_activated)
+	_board.powerup_blast.connect(_on_powerup_blast)
 	_board.booster_used.connect(_on_booster_used)
 	_board.obstacles_cleared.connect(_on_obstacles_cleared)
 	_board.obstacle_damaged.connect(_on_obstacle_damaged)
@@ -2126,42 +2139,46 @@ func _mission_objectives_complete() -> bool:
 	return _evidence_count >= _evidence_goal and _obstacles_cleared >= _obstacles_goal
 
 
+func _effects() -> GameplayEffects:
+	if not is_instance_valid(_gameplay_effects):
+		_gameplay_effects = GameplayEffects.new()
+		add_child(_gameplay_effects)
+		_gameplay_effects.collections_finished.connect(func():
+			if _waiting_for_collection: _evaluate_level_end())
+	return _gameplay_effects
+
+
 func _animate_matched_tiles(tile_types: Array, cells: Array) -> void:
 	var target_enum := int(Constants.TileType.get(_objective_target, -1))
-	for index in range(mini(tile_types.size(), cells.size())):
-		var tile_type := int(tile_types[index])
-		var character_types: Array = [int(Constants.TileType.ETHAN), int(Constants.TileType.DETECTIVE), int(Constants.TileType.VICTOR)]
-		if tile_type != target_enum and not character_types.has(tile_type):
-			continue
-		var cell: Vector2i = cells[index]
-		var source := _board.get_cell_screen_rect(cell)
-		var panel := _objective_label.get_parent() as Control
-		var target := panel.get_node_or_null("ObjectiveIcon") as Control
-		if [int(Constants.TileType.ETHAN), int(Constants.TileType.DETECTIVE)].has(tile_type) and _booster_buttons.has("ethan"):
-			target = _booster_buttons["ethan"]["button"] as Control
-		elif tile_type == int(Constants.TileType.VICTOR):
-			# Victor matches grant coins directly; don't fly an oversized coin graphic
-			# across the board. The counter updates independently via coins_changed.
-			continue
-		if target == null:
-			target = _objective_label
-		var token := TextureRect.new()
-		var icon_path := _objective_icon_path(_objective_target) if tile_type == target_enum else "res://assets/sprites/characters/ethan_portrait_cutout.png"
-		if tile_type == int(Constants.TileType.DETECTIVE):
-			icon_path = "res://assets/sprites/characters/detective_portrait_cutout.png"
-		elif tile_type == int(Constants.TileType.VICTOR):
-			icon_path = "res://assets/sprites/characters/victor_portrait_badge_cutout.png"
-		token.texture = ResourceManager.load_texture(icon_path)
-		token.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		token.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		token.size = Vector2(30, 30)
-		token.position = source.get_center() - token.size * 0.5
-		get_node("HUD").add_child(token)
-		var tween := create_tween().set_parallel(true)
-		tween.tween_property(token, "position", target.get_global_rect().get_center() - token.size * 0.5, 0.38).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
-		tween.tween_property(token, "scale", Vector2(0.55, 0.55), 0.38)
-		tween.tween_property(token, "modulate:a", 0.25, 0.38)
-		tween.finished.connect(token.queue_free)
+	var groups: Dictionary = {}
+	for index in range(mini(tile_types.size(),cells.size())):
+		var kind := int(tile_types[index])
+		if kind != target_enum and not [int(Constants.TileType.ETHAN),int(Constants.TileType.DETECTIVE),int(Constants.TileType.VICTOR)].has(kind): continue
+		if not groups.has(kind): groups[kind] = []
+		groups[kind].append(_board.get_cell_screen_rect(cells[index]).get_center())
+	for kind in groups:
+		var target: Control = _objective_target_icon if _objective_target_icon != null else _objective_label
+		var texture_path := _objective_icon_path(_objective_target)
+		var value := 1
+		if kind == int(Constants.TileType.VICTOR):
+			target = _reward_label
+			texture_path = "res://assets/sprites/ui/icons/coins_icon.png"
+			value = 10
+		elif kind in [int(Constants.TileType.ETHAN),int(Constants.TileType.DETECTIVE)]:
+			target = _booster_buttons["ethan"]["button"]
+			texture_path = "res://assets/sprites/characters/%s" % ("ethan_portrait_cutout.png" if kind == int(Constants.TileType.ETHAN) else "detective_portrait_cutout.png")
+		var origins: Array[Vector2] = []
+		for point in groups[kind]: origins.append(point)
+		_effects().collect(ResourceManager.load_texture(texture_path),origins,target,value)
+	if tile_types.size() >= 5 and not cells.is_empty():
+		_effects().burst(_board.get_cell_screen_rect(cells[cells.size()/2]).get_center(),75,Color("#ffe082"))
+
+
+func _on_powerup_blast(kind: String, cell: Vector2i) -> void:
+	var first := _board.get_cell_screen_rect(Vector2i.ZERO)
+	var last := _board.get_cell_screen_rect(Vector2i(_board.get_width()-1,_board.get_height()-1))
+	_effects().powerup("bomb" if kind == "ethan" else kind,_board.get_cell_screen_rect(cell).get_center(),first.merge(last))
+	_board.play_celebration_shake(1.6 if kind in ["bomb","thunder","ethan"] else 1.2)
 
 
 func _persist_campaign_progress() -> void:
@@ -2213,16 +2230,26 @@ func _on_tiles_matched(tile_types: Array) -> void:
 		reward_notices.append("VICTOR +%d ETHAN COINS" % (victor_matches * 10))
 	var special_reward_text := " | ".join(reward_notices)
 	SignalBus.play_sfx.emit("clue_collected" if objective_match else "tile_match")
-	if tile_types.size() >= 5 or _match_streak >= 4:
+	var rank := 0
+	if tile_types.size() >= 16 or _match_streak >= 4:
 		feedback_caption = "WONDERFUL!"
 		feedback_sound = "match_wonderful"
+		rank = 3
 		shake_board = true
-	elif tile_types.size() >= 4 or _match_streak >= 3:
-		feedback_caption = "GREAT!"
+	elif tile_types.size() >= 8 or _match_streak >= 3:
+		feedback_caption = "EXCELLENT!"
 		feedback_sound = "match_great"
-	elif _match_streak >= 2:
+		rank = 2
+		shake_board = true
+	elif tile_types.size() >= 4 or _match_streak >= 2:
 		feedback_caption = "NICE!"
 		feedback_sound = "match_nice"
+		rank = 1
+	if rank <= _turn_praise_rank:
+		feedback_caption = ""
+	else:
+		_turn_praise_rank = rank
+		_turn_praise_sound = feedback_sound
 	_evidence_count = mini(_evidence_count, _evidence_goal)
 	_update_objective_hud()
 	if _mission_objectives_complete():
@@ -2241,47 +2268,11 @@ func _on_move_rejected() -> void:
 	_hint_label.text = "NO MATCH | Swap neighboring pieces to make a set of 3."
 
 
-func _show_match_feedback(caption: String, sound_id: String, shake_board: bool) -> void:
-	SignalBus.play_sfx.emit(sound_id)
+func _show_match_feedback(caption: String, _sound_id: String, shake_board: bool) -> void:
 	_hint_label.text = caption
 	_hint_label.add_theme_color_override("font_color", Color("#ffe279"))
-	var feedback_layer := CanvasLayer.new()
-	feedback_layer.name = "MatchFeedback"
-	feedback_layer.layer = 3
-	add_child(feedback_layer)
-	var shout := Label.new()
-	shout.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	shout.position = Vector2(-250.0, -55.0)
-	shout.size = Vector2(500.0, 110.0)
-	shout.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	shout.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	shout.text = caption
-	shout.add_theme_font_override("font", DISPLAY_FONT)
-	shout.add_theme_font_size_override("font_size", 40)
-	shout.add_theme_color_override("font_color", Color("#ffe278"))
-	shout.add_theme_color_override("font_outline_color", Color("#39213f"))
-	shout.add_theme_constant_override("outline_size", 7)
-	shout.add_theme_color_override("font_shadow_color", Color(0.04, 0.04, 0.1, 0.85))
-	shout.add_theme_constant_override("shadow_offset_x", 4)
-	shout.add_theme_constant_override("shadow_offset_y", 6)
-	feedback_layer.add_child(shout)
-	shout.scale = Vector2(0.4, 0.4)
-	shout.modulate.a = 0.0
-	var pop := create_tween().set_parallel(true)
-	pop.tween_property(shout, "modulate:a", 1.0, 0.1)
-	pop.tween_property(shout, "scale", Vector2(1.12, 1.12), 0.26).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	pop.chain().tween_property(shout, "scale", Vector2.ONE, 0.1)
-	pop.finished.connect(
-		func():
-			if not is_instance_valid(feedback_layer):
-				return
-			var fade := create_tween()
-			fade.tween_interval(0.55)
-			fade.tween_property(shout, "modulate:a", 0.0, 0.2)
-			fade.tween_callback(feedback_layer.queue_free)
-	)
-	if shake_board and _board != null:
-		_board.play_celebration_shake(1.0)
+	_effects().praise(caption,DISPLAY_FONT)
+	if shake_board and _board != null: _board.play_celebration_shake(1.3)
 
 
 func _on_special_created(kind: String) -> void:
@@ -2329,6 +2320,10 @@ func _on_special_activated(kind: String) -> void:
 
 
 func _on_board_turn_resolved() -> void:
+	if not _turn_praise_sound.is_empty() and not _tutorial_active and not _mission_objectives_complete() and _moves_remaining > 0:
+		SignalBus.play_sfx.emit(_turn_praise_sound)
+	_turn_praise_rank = 0
+	_turn_praise_sound = ""
 	_discover_journal_fact("first_moves", 1)
 	_discover_journal_fact("first_moves", 2)
 	if _tutorial_skip_pending:
@@ -2669,53 +2664,24 @@ func _on_obstacle_damaged(cell: Vector2i, remaining_health: int, destroyed: bool
 	if hud == null or rect.size == Vector2.ZERO:
 		return
 	var center := rect.get_center()
-	var particles := CPUParticles2D.new()
-	particles.position = center
-	particles.amount = 18
-	particles.lifetime = 0.48
-	particles.one_shot = true
-	particles.explosiveness = 1.0
-	particles.emission_shape = CPUParticles2D.EMISSION_SHAPE_SPHERE
-	particles.emission_sphere_radius = 9.0
-	particles.direction = Vector2.UP
-	particles.spread = 180.0
-	particles.initial_velocity_min = 48.0
-	particles.initial_velocity_max = 120.0
-	particles.gravity = Vector2(0, 70)
-	particles.scale_amount_min = 2.5
-	particles.scale_amount_max = 5.0
-	particles.color = Color("#ffe279")
-	hud.add_child(particles)
-	particles.emitting = true
-	get_tree().create_timer(0.8).timeout.connect(func():
-		if is_instance_valid(particles):
-			particles.queue_free()
-	)
-	var burst := Label.new()
-	burst.text = "✦  ✦  ✦"
-	burst.position = center - Vector2(42, 16)
-	burst.size = Vector2(84, 32)
-	burst.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	burst.add_theme_font_size_override("font_size", 22)
-	burst.add_theme_color_override("font_color", Color("#ffe279"))
-	hud.add_child(burst)
-	var pop := create_tween().set_parallel(true)
-	pop.tween_property(burst, "position", burst.position - Vector2(0, 30), 0.42)
-	pop.tween_property(burst, "modulate:a", 0.0, 0.42)
-	pop.finished.connect(burst.queue_free)
+	var icon_path := ""
+	if is_instance_valid(obstacle):
+		var type_name := str(Constants.ObstacleType.keys()[int(obstacle.get_obstacle_type())])
+		icon_path = _objective_icon_path(type_name)
+	_effects().obstacle_debris(center,ResourceManager.load_texture(icon_path) if not icon_path.is_empty() else null,destroyed)
 	var health := Label.new()
 	health.text = "BROKEN!" if destroyed else "%d LEFT" % remaining_health
-	health.position = center - Vector2(48, 2)
-	health.size = Vector2(96, 28)
+	health.position = center - Vector2(75, 2)
+	health.size = Vector2(150, 44)
 	health.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	health.add_theme_font_size_override("font_size", 16)
+	health.add_theme_font_size_override("font_size", 26)
 	health.add_theme_color_override("font_color", Color("#fff2c7"))
 	health.add_theme_color_override("font_outline_color", Color("#182c43"))
 	health.add_theme_constant_override("outline_size", 3)
 	hud.add_child(health)
 	var fly := create_tween().set_parallel(true)
-	fly.tween_property(health, "position", health.position - Vector2(0, 38), 0.55)
-	fly.tween_property(health, "modulate:a", 0.0, 0.55)
+	fly.tween_property(health, "position", health.position - Vector2(0, 80), 0.70)
+	fly.tween_property(health, "modulate:a", 0.0, 0.70)
 	fly.finished.connect(health.queue_free)
 
 
@@ -2731,6 +2697,11 @@ func _play_objective_complete_sound() -> void:
 func _evaluate_level_end() -> void:
 	if _result_layer != null or _current_level_id <= 0:
 		return
+	if (_mission_objectives_complete() or _moves_remaining <= 0) and is_instance_valid(_gameplay_effects) and _gameplay_effects.pending_collections > 0:
+		_waiting_for_collection = true
+		_board.lock()
+		return
+	_waiting_for_collection = false
 	if _mission_objectives_complete():
 		var level_manager := get_node_or_null("Managers/LevelManager")
 		if level_manager != null:

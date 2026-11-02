@@ -11,6 +11,7 @@ signal obstacle_damaged(cell: Vector2i, remaining_health: int, destroyed: bool)
 signal tiles_matched_with_cells(tile_types: Array, cells: Array)
 signal special_created(kind: String)
 signal special_activated(kind: String)
+signal powerup_blast(kind: String, cell: Vector2i)
 
 var _grid: Dictionary = {}
 var _locked: bool = false
@@ -27,6 +28,8 @@ var _booster_mode := ""
 var _obstacles: Dictionary = {}
 var _obstacle_database: ObstacleDatabase
 var _obstacle_factory: ObstacleFactory
+var _shake_tween: Tween
+var _shake_origin := Vector2.ZERO
 
 var _tile_database: TileDatabase
 var _tile_factory: TileFactory
@@ -40,6 +43,7 @@ var _board_shuffler: BoardShuffler
 
 
 func initialize(level_data: Dictionary) -> bool:
+	if _shake_tween != null and _shake_tween.is_running(): _shake_tween.kill()
 	_level_data = level_data.duplicate(true)
 	_locked = false
 	_tap_selection = null
@@ -78,6 +82,7 @@ func initialize(level_data: Dictionary) -> bool:
 		(viewport_size.x - get_width() * _tile_size) * 0.5,
 		board_top + (board_bottom - board_top - get_height() * _tile_size) * 0.5
 	)
+	_shake_origin = position
 	moves_changed.emit(_remaining_moves)
 	queue_redraw()
 	return true
@@ -635,6 +640,7 @@ func use_booster_at(kind: String, position: Vector2i) -> bool:
 	_booster_mode = ""
 	_required_booster_target = Vector2i(-1, -1)
 	booster_used.emit(kind)
+	powerup_blast.emit(kind, position)
 	_resolve_external_clear(targets, kind)
 	return true
 
@@ -644,9 +650,11 @@ func _resolve_special_powerup(powerup_tile: Tile, partner: Tile) -> void:
 	special_activated.emit(kind)
 	var target_type := int(partner.get_tile_type())
 	var origin := powerup_tile.get_grid_position()
+	powerup_blast.emit(kind, origin)
 	var targets := _special_targets(kind, origin, target_type)
 	if partner.has_powerup():
 		var other_kind := str(partner.get_meta("powerup_kind", "rocket"))
+		powerup_blast.emit(other_kind, partner.get_grid_position())
 		special_activated.emit(other_kind)
 		if kind == "thunder" and other_kind == "thunder":
 			targets = get_all_tiles()
@@ -704,6 +712,7 @@ func expand_special_targets(tiles: Array, excluded: Tile = null) -> Array:
 		tile.clear_powerup()
 		tile.remove_meta("powerup_kind")
 		special_activated.emit(kind)
+		powerup_blast.emit(kind, tile.get_grid_position())
 		for target in _special_targets(kind, tile.get_grid_position(), int(tile.get_tile_type())):
 			if not expanded.has(target):
 				expanded.append(target)
@@ -711,13 +720,16 @@ func expand_special_targets(tiles: Array, excluded: Tile = null) -> Array:
 
 
 func play_celebration_shake(intensity: float = 1.0) -> void:
-	var origin := position
-	var strength := 7.0 * clampf(intensity, 0.5, 1.6)
-	var shake := create_tween()
-	shake.tween_property(self, "position", origin + Vector2(strength, 0.0), 0.045)
-	shake.tween_property(self, "position", origin + Vector2(-strength, strength * 0.28), 0.045)
-	shake.tween_property(self, "position", origin + Vector2(strength * 0.72, -strength * 0.28), 0.045)
-	shake.tween_property(self, "position", origin, 0.07).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
+	if _shake_tween != null and _shake_tween.is_running():
+		_shake_tween.kill()
+	else:
+		_shake_origin = position
+	position = _shake_origin
+	var strength := 15.0 * clampf(intensity, 0.5, 1.6)
+	_shake_tween = create_tween()
+	for delta in [Vector2(1,0.25),Vector2(-1,-0.35),Vector2(0.8,0.4),Vector2(-0.6,-0.25),Vector2(0.3,0.15)]:
+		_shake_tween.tween_property(self,"position",_shake_origin + delta * strength,0.045)
+	_shake_tween.tween_property(self,"position",_shake_origin,0.10).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 
 func _resolve_external_clear(tiles: Array, effect: String, finish_turn: bool = true) -> void:
@@ -752,11 +764,13 @@ func _resolve_external_clear(tiles: Array, effect: String, finish_turn: bool = t
 
 
 func animate_match_tiles(tiles: Array) -> void:
+	if tiles.is_empty(): return
 	var tween := create_tween().set_parallel(true)
 	for tile in tiles:
 		if is_instance_valid(tile):
-			tween.tween_property(tile, "scale", Vector2.ZERO, 0.14).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
-			tween.tween_property(tile, "modulate:a", 0.0, 0.14)
+			tween.tween_property(tile, "scale", Vector2(1.30,1.30),0.08).set_trans(Tween.TRANS_BACK)
+			tween.tween_property(tile, "scale", Vector2.ZERO, 0.14).set_delay(0.08).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
+			tween.tween_property(tile, "modulate:a", 0.0, 0.12).set_delay(0.10)
 	await tween.finished
 
 

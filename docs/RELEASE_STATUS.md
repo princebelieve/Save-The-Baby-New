@@ -71,3 +71,14 @@ The illustrated popup is now a separate `IllustratedPopup` class used for case-f
 `CaseJournal` records explicitly mapped facts when their tutorial page is presented or the player performs the corresponding skill. Stable skill/fact IDs prevent duplicate cards and repeated paraphrases. Titles and illustrations are assigned in content rather than inferred by scanning unrelated text. The case file no longer shows seeded evidence references, full unseen lessons, raw practice logs or generic factory recaps. Old save fields are retained but those placeholder sections are not rendered. Actual confirmed story decisions remain separate.
 
 Regression coverage checks unread/skip behavior, repeated rules, journal persistence, card-label/art identity, interactive booster lessons, the returning-player level 8 path and all six story confirmations at normal and short sizes.
+
+
+## Gameplay impact and praise mix
+
+Added a dedicated visual-effects layer for large opaque objective flights with curved trails, HUD arrival pulses and grouped gains, textured obstacle fragments, radial bursts and powerup beams. Fixed the objective flight destination to use the real HUD icon. Results wait for active collection flights and lock input during delivery. Overlapping shakes share a stable origin, preventing board drift. Visual effects cancel safely across level changes, and praise banners escalate without stacking.
+
+The supplied praise recordings used Opus-in-Ogg and were not valid Godot Vorbis imports. Derived compatible WAV files preserve the originals, trim silence, filter and level-match speech near -18 dB RMS, and soften peaks/fade edges. `tools/prepare_praise_audio.py` reproduces the edit using locally installed VLC and the Python standard library. Processing notes live beside the new clips.
+
+AudioManager adds a single SFX voice lane with highest-priority selection, impact/voice exclusion, a quiet gap, a 4.2-second praise cooldown, and mission priority. Repetitive collection/impact sounds have per-event limits. The existing music stream, defaults and preference behavior are preserved.
+
+`tests/gameplay_feedback_checks.tscn` exercises real booster clears, debris, large objective flights, drift-free shaking, cancellation mid-flight, result ordering, voice priority/cooldown, impact exclusion and SFX mute while preserving music. Rendered checks passed at normal and short portrait sizes, alongside the release regression suite. Test playback uses the Dummy audio driver; it verifies routing and timing rather than physical speaker balance.

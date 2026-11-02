@@ -181,3 +181,12 @@ Gameplay tutorials use a compact David speech bubble, a highlighted target and a
 Amara's case file is a persistent journal of instructions actually presented and skills actually performed. Each authored lesson page identifies its skill, stable fact ID, exact title and illustration. Only the visible page is recorded. Skipping cannot unlock unread pages; revisiting a rule cannot duplicate it. Performing a swap, creating or firing a special, using a booster, matching a character, or damaging a blocker also records the corresponding skill. Repeated lessons add knowledge to the existing skill card instead of creating another copy.
 
 The case file does not prefill evidence descriptions, future lessons, whole unseen lectures or raw walkthrough logs. Older placeholder sections are excluded. Story decisions remain a separate section containing actual confirmed choices. Each card opens only its own recorded facts, with its explicitly assigned art, Previous/Next controls and X. Keep the level 8 returning-player Continue fix.
+
+
+### Expressive gameplay feedback
+
+Objective pieces stay visible while following curved sparkling trails from the board into the actual objective icon, rescue-assist tray, or coin counter. Arrival pulses the destination and shows a grouped gain. Results wait for the final collection flight, with board input locked during that short delivery.
+
+Destroyed obstacles throw textured fragments, expanding rings and larger damage labels. Rockets sweep a bright cross; bombs produce radial bursts; thunder branches across the board. Powerful moves trigger a stronger board shake that always returns to its original position. Praise text escalates in place instead of stacking repeated banners.
+
+Nice, Excellent and Wonderful use compatible processed copies of the supplied recordings. Request only the strongest praise per turn, serialize voice playback, wait until impact effects finish, use a praise cooldown, and prioritize mission announcements. Preserve original recordings and the working music path. Effects must remain noninteractive, bounded and safely cancel when leaving or resetting a level.
