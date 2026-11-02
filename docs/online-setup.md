@@ -43,6 +43,8 @@ Reference: https://developers.google.com/android-publisher/getting_started
 
 ### 3. Play Console: products
 
+Before creating products, upload a release-signed build containing `com.android.vending.BILLING` to an internal testing release and let Play process it. If the One-time products page says to add BILLING permission, Play has not processed a billing-enabled build yet. Use the new release AAB, not an older bundle or the debug APK.
+
 For `com.savethebaby.game`, create and activate these consumable one-time products (not subscriptions):
 
 | Product ID | Coins credited | Suggested title |

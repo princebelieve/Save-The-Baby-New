@@ -1,0 +1,86 @@
+[
+  {
+    "file": "app-icon-512.png",
+    "width": 512,
+    "height": 512,
+    "bytes": 448262
+  },
+  {
+    "file": "feature-graphic-1024x500.png",
+    "width": 1024,
+    "height": 500,
+    "bytes": 1398234
+  },
+  {
+    "file": "phone/gameplay-level-08.png",
+    "width": 1080,
+    "height": 1920,
+    "bytes": 793982
+  },
+  {
+    "file": "phone/gameplay-level-16.png",
+    "width": 1080,
+    "height": 1920,
+    "bytes": 823013
+  },
+  {
+    "file": "phone/gameplay-level-31.png",
+    "width": 1080,
+    "height": 1920,
+    "bytes": 988299
+  },
+  {
+    "file": "phone/gameplay-level-48.png",
+    "width": 1080,
+    "height": 1920,
+    "bytes": 923898
+  },
+  {
+    "file": "tablet-10-inch/gameplay-level-08.png",
+    "width": 1440,
+    "height": 2560,
+    "bytes": 1189307
+  },
+  {
+    "file": "tablet-10-inch/gameplay-level-16.png",
+    "width": 1440,
+    "height": 2560,
+    "bytes": 1333089
+  },
+  {
+    "file": "tablet-10-inch/gameplay-level-31.png",
+    "width": 1440,
+    "height": 2560,
+    "bytes": 1490924
+  },
+  {
+    "file": "tablet-10-inch/gameplay-level-48.png",
+    "width": 1440,
+    "height": 2560,
+    "bytes": 1519375
+  },
+  {
+    "file": "tablet-7-inch/gameplay-level-08.png",
+    "width": 1080,
+    "height": 1920,
+    "bytes": 790202
+  },
+  {
+    "file": "tablet-7-inch/gameplay-level-16.png",
+    "width": 1080,
+    "height": 1920,
+    "bytes": 863339
+  },
+  {
+    "file": "tablet-7-inch/gameplay-level-31.png",
+    "width": 1080,
+    "height": 1920,
+    "bytes": 947867
+  },
+  {
+    "file": "tablet-7-inch/gameplay-level-48.png",
+    "width": 1080,
+    "height": 1920,
+    "bytes": 1014207
+  }
+]

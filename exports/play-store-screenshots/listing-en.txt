@@ -8,19 +8,22 @@ FULL DESCRIPTION
 Ethan has vanished, and David must follow the trail. Save The Baby is a single-player, story-driven match-3 adventure that brings puzzle challenges and an unfolding investigation together.
 
 MATCH PIECES AND GATHER CLUES
-Swap adjacent pieces, make matches, and work toward each level's objectives. Collect evidence, clear blockers, and plan your moves as new challenges appear.
+Swap adjacent pieces, make matches, and work toward each level's objectives. Collect evidence, clear blockers, and plan your moves carefully.
 
-FOLLOW THE STORY
-Join David in the search for Ethan. Make story choices, explore the campaign, and follow the investigation through its changing locations.
+FOLLOW THE SEARCH FOR ETHAN
+Join David and Amara as they follow the clues left by Victor. Make story choices and explore the campaign through changing locations, from the village to the forest and factory.
+
+EXPLORE 50 PUZZLE LEVELS
+Take on the opening campaign with different objectives, obstacles, and limited-move challenges. Choose useful matches and create special pieces to help clear the board.
 
 LEARN AND USE BOOSTERS
-Discover rockets, bombs, and thunder through guided lessons. Use your supplies to help with challenging boards and follow your discovered information in the case journal.
+Discover rockets, bombs, and thunder through guided lessons. Use your supplies to tackle challenging boards and review what you have learned in the case journal.
 
 KEEP YOUR PROGRESS
-Your campaign progress and preferences are saved locally on your device. Clearing app storage or uninstalling the game may erase that progress.
+Your campaign progress and preferences are saved on your device, so you can return to the search later.
 
 Developed by S. B. Ibhadode Technologies.
 Support: info@sbi.globalcreest.com
 
 VIDEO
-Leave the optional video field blank until you have an actual gameplay trailer on YouTube.
+Leave blank.

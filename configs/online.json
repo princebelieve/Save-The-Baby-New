@@ -1,4 +1,4 @@
 {
-  "api_base_url": "",
+  "api_base_url": "https://save-the-baby-new.onrender.com",
   "coin_products": {"coins_500": 500, "coins_1500": 1500, "coins_3500": 3500}
 }

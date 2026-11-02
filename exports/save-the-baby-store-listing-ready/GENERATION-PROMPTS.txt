@@ -1,0 +1,11 @@
+Tool: built-in image_gen.imagegen. Two image calls, opaque backgrounds.
+
+APP ICON
+Reference: assets/sprites/ui/android/app_icon_main_192.png
+Create the Google Play store app icon for Save The Baby, using the attached existing Android app icon as the exact character and composition reference. Preserve the mother holding baby, expressive worried but gentle faces, clothing and stylized polished cartoon game art; render clean high resolution edges. Square 1:1 image, full opaque deep teal background matching reference, no text, no border, no rounded outer corners, no badge, no extra characters or objects. Mother and baby centered and generously large with safe margin. Intended final delivery 512 by 512 PNG under 1 MB.
+
+FEATURE GRAPHIC
+References: assets/sprites/ui/game_logo_cutout.png; assets/sprites/ui/android/app_icon_main_192.png
+Create a Google Play feature graphic for the actual story driven match-3 game SAVE THE BABY. Wide landscape composition intended for final export at 1024 by 500 pixels, aspect ratio 2.048:1. Use first reference as precise title logo reference: preserve the exact words SAVE THE BABY and its gold SAVE, lilac THE, cyan BABY, purple and white outline and red heart details. Use second reference for the mother and baby character likeness, mother holding baby together. Place large legible complete title logo on the left half, mother holding baby on right half, unified beautiful deep teal softly lit nighttime garden setting, subdued gold accents, polished colorful cartoon game artwork consistent with references, appealing story mystery atmosphere, gentle expressions. Keep all faces and lettering comfortably inside the canvas with generous crop-safe margins. Only text is SAVE THE BABY. Do not add buttons, store badges, review scores, pricing, sale claims, device frames, screenshots, promotional ribbons, extra characters or invented gameplay. This is a promotional feature graphic, not a gameplay screenshot. Opaque image.
+
+Both outputs were resized deterministically with System.Drawing to meet the requested pixel dimensions.

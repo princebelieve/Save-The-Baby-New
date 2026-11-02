@@ -1,0 +1,15 @@
+SAVE THE BABY - GOOGLE PLAY MAIN STORE LISTING
+
+1. App name: Save The Baby
+2. Copy short/full descriptions from listing-en.txt.
+3. App icon: app-icon-512.png (512 x 512 PNG, under 1 MB).
+4. Feature graphic: feature-graphic-1024x500.png (1024 x 500 PNG, under 15 MB).
+5. Video: leave blank until an actual gameplay trailer is available.
+6. Phone screenshots: upload all four PNGs from phone/ in this order: 08, 16, 31, 48.
+7. 7-inch tablet screenshots: corresponding four PNGs from tablet-7-inch/.
+8. 10-inch tablet screenshots: corresponding four PNGs from tablet-10-inch/.
+9. Google Play Games on PC, Desktop, and Android XR: leave blank for this Android listing.
+
+Screenshots are original gameplay renders previously captured from the running Godot project with real level data. They are not AI-generated images. Tablet images are viewport profiles, not evidence of physical-device testing.
+
+The icon and feature graphic were created with the built-in imagegen tool using existing game artwork as reference, then resized to the exact store dimensions. They are promotional graphics, not gameplay screenshots. The original in-game and launcher assets were not replaced. See GENERATION-PROMPTS.txt for the prompt set.
