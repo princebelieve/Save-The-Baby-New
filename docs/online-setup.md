@@ -64,11 +64,7 @@ Atlas hosts the database. Render hosts the API. The game connects to Render; onl
 3. Open **Database Access / Database Users** (the location may appear under Security). Add a database user using password authentication. This is a database login, separate from your Atlas website login. Use a name such as `save_the_baby_api` and generate/store a strong password privately.
 4. Give that user the built-in **readWrite** role for database **`save_the_baby`**, rather than Atlas administrator access. The database does not have to contain collections yet.
 5. In the cluster's **Connect** dialog, select **Drivers**, then **Node.js**. Copy the `mongodb+srv://...` driver connection string. Replace its username/password placeholders with the database user's credentials. URL-encode reserved characters in credentials; generating a long password using letters/digits avoids URI punctuation mistakes.
-6. The result looks like this example (your hostname will differ):
-
-   `mongodb+srv://save_the_baby_api:YOUR_PASSWORD@savethebaby.ABCDE.mongodb.net/?retryWrites=true&w=majority`
-
-   Put the real value only in Render's `MONGODB_URI` environment variable. Set `MONGODB_DATABASE=save_the_baby` separately; the server explicitly selects that database.
+6. Use the actual driver connection string copied from Atlas. Put it only in Render's `MONGODB_URI` environment variable after filling in the database user's password. Set `MONGODB_DATABASE=save_the_baby` separately. Do not put real connection strings into documentation or Git.
 7. Open **Network Access / IP Access List** in Atlas. Once your Render web service exists, find **Connect ? Outbound** or the service's outbound-IP section in Render. Add all the listed outbound IP ranges to Atlas. This is permission for the API server to reach MongoDB, not permission for players' phones. Add your own public IP only if you will run the backend locally.
 8. Do not use `0.0.0.0/0` as the normal deployment configuration; it allows connections from all IP addresses. The Render outbound ranges are the intended allowlist.
 9. The backend creates its collections and indexes automatically when it connects and data is written. You do not need to create `users`, `sessions`, `flows`, `purchases`, `spends`, or `rates` manually, or import sample data.
@@ -99,7 +95,7 @@ Set these environment variables in the service's Environment page:
 | Variable | Value |
 | --- | --- |
 | `NODE_VERSION` | `22.19.0` |
-| `PUBLIC_BASE_URL` | The actual Render HTTPS URL, without a trailing slash |
+| `PUBLIC_BASE_URL` | Optional override; otherwise the backend uses Render's automatic `RENDER_EXTERNAL_URL` |
 | `MONGODB_URI` | Your private Atlas connection string |
 | `MONGODB_DATABASE` | `save_the_baby` |
 | `GOOGLE_CLIENT_ID` | The Web application OAuth client ID |
@@ -110,7 +106,7 @@ Render supplies `PORT`; do not hardcode a public port in the game. If your servi
 
 Once you have the actual hostname:
 
-1. Set `PUBLIC_BASE_URL` to that HTTPS URL.
+1. The backend automatically uses Render's HTTPS service URL. Set `PUBLIC_BASE_URL` only to override it, for example with a custom domain.
 2. Add `https://YOUR-SERVICE.onrender.com/auth/google/callback` as an authorized redirect URI in your Google Web OAuth client.
 3. Allow the service's outbound IP ranges in Atlas as described above.
 4. Save the environment changes and redeploy.

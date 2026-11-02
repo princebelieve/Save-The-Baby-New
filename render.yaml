@@ -10,8 +10,6 @@ services:
     envVars:
       - key: NODE_VERSION
         value: 22.19.0
-      - key: PUBLIC_BASE_URL
-        sync: false
       - key: MONGODB_URI
         sync: false
       - key: MONGODB_DATABASE

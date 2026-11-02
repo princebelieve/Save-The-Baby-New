@@ -10,3 +10,9 @@
 **/.env
 **/.env.*
 !**/.env.example
+
+# Private Google credential downloads must never be committed.
+**/client_secret*.json
+**/*service-account*.json
+**/*service_account*.json
+**/save-the-baby-513514-*.json
