@@ -35,6 +35,8 @@ ConfigLoader="*uid://cu8j86nxy8kq0"
 ResourceManager="*uid://dvkv8hfsbjwme"
 JsonLoader="*uid://bosxr5gwvr1tg"
 AdProvider="*res://scripts/ads/AdProvider.gd"
+CloudAccount="*res://scripts/online/CloudAccount.gd"
+CoinPurchases="*res://scripts/online/CoinPurchases.gd"
 
 [display]
 
@@ -48,7 +50,7 @@ window/handheld/orientation=1
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/admob/plugin.cfg")
+enabled=PackedStringArray("res://addons/admob/plugin.cfg", "res://addons/brand_launch/plugin.cfg", "res://addons/GodotGooglePlayBilling/plugin.cfg")
 
 [gui]
 
@@ -63,3 +65,4 @@ theme/custom="res://assets/themes/game_theme.tres"
 rendering_device/driver.windows="d3d12"
 renderer/rendering_method="mobile"
 textures/vram_compression/import_etc2_astc=true
+environment/defaults/default_clear_color=Color(0.96, 0.91, 0.78, 1)

@@ -14,11 +14,11 @@ S.B. Ibhadode Technologies grants you a personal, limited, non-exclusive, non-tr
 
 ## The Game and local progress
 
-The Game is a single-player match-3 adventure. It stores campaign progress, story choices, in-game balances, tutorial and case-journal progress, and audio preferences locally on your device. This release does not provide accounts, online play, cloud saves, or server-based progression. Clearing the Game’s storage or uninstalling it may erase that local data. The Game does not promise that progress can be restored after it is erased or a device is replaced.
+The Game is a single-player match-3 adventure. It stores campaign progress, story choices, in-game balances, tutorial and case-journal progress, and audio preferences locally on your device. When configured, optional Google sign-in provides cloud saves and a server-managed purchased coin balance. Guest play remains available. Cloud saving requires a connection; unsynced progress can be lost if local data is cleared. A conflict between devices must be resolved before newer progress can be uploaded. Clearing the Game’s storage or uninstalling it may erase that local data. The Game does not promise that progress can be restored after it is erased or a device is replaced.
 
 ## In-game coins, lives, and boosters
 
-The Game includes virtual coins, lives, and boosters used for gameplay. In this release, these items are earned or used within the Game; there are no real-money purchases or cash-out features. Virtual items have no cash value, cannot be redeemed for money or goods, and cannot be transferred or sold outside the Game. We may adjust virtual balances or game rules to keep the game functioning or balanced.
+The Game includes virtual coins, lives, and boosters used for gameplay. Items may be earned through gameplay. When enabled, coin packs can also be purchased through Google Play at the price shown in its checkout. Purchased coins are linked to the signed-in game account and can be used for field supplies while connected to the service. They are tracked separately from earned coins. Pending or unsuccessful payments do not grant coins. Refunds or reversed payments may remove corresponding credit; a negative balance prevents further paid-wallet spending until resolved. Google Play handles billing and applicable refund processes. There are no cash-out features. Virtual items have no cash value, cannot be redeemed for money or goods, and cannot be transferred or sold outside the Game. We may adjust virtual balances or game rules to keep the game functioning or balanced.
 
 ## Advertising and optional rewards
 

@@ -11,6 +11,8 @@ var _ad_attempt := 0
 var _ad_revived := false
 var _result_ad_shown := false
 
+var _account_panel: Node
+
 var _board_manager: Node
 var _economy_manager: EconomyManager
 var _reward_manager: RewardManager
@@ -158,6 +160,10 @@ func _ready() -> void:
 	_show_loading_screen()
 	if _board != null:
 		_board.lock()
+
+	_account_panel = preload("res://scripts/online/AccountPanel.gd").new()
+	add_child(_account_panel)
+	_account_panel.initialize(self)
 
 
 func _load_game_art() -> void:
@@ -323,6 +329,12 @@ func _show_launch_screen() -> void:
 	settings_button.size = settings_size
 	settings_button.pressed.connect(_show_title_settings)
 	content.add_child(settings_button)
+	var account_button := _make_menu_button("ACCOUNT & COINS")
+	account_button.position = Vector2(viewport_size.x * 0.22, viewport_size.y * 0.89)
+	account_button.size = Vector2(viewport_size.x * 0.56, 54)
+	account_button.add_theme_font_size_override("font_size",20)
+	account_button.pressed.connect(func(): _account_panel.show_account())
+	content.add_child(account_button)
 	family.modulate.a = 0.0
 	family.scale = Vector2(0.97, 0.97)
 	var entrance := create_tween().set_parallel(true)
@@ -1191,6 +1203,11 @@ func _show_audio_settings(parent_layer: Node) -> void:
 		legal_button.pressed.connect(_show_legal_document.bind(parent_layer, str(legal_page["title"]), str(legal_page["path"])))
 		legal_links.add_child(legal_button)
 	settings.add_child(legal_links)
+	var account_button := _make_menu_button("ACCOUNT & COINS")
+	account_button.disabled = _launch_layer == null and _campaign_layer == null
+	account_button.tooltip_text = "Available from the title screen or campaign map."
+	account_button.pressed.connect(func(): _account_panel.show_account())
+	settings.add_child(account_button)
 	var ad_provider := get_node_or_null("/root/AdProvider")
 	if ad_provider != null and ad_provider.privacy_options_required():
 		var ad_privacy := _make_menu_button("AD PRIVACY OPTIONS")
@@ -2280,6 +2297,8 @@ func _persist_campaign_progress() -> void:
 	var error := CampaignProgressStore.write(_campaign_progress, CAMPAIGN_PROGRESS_PATH)
 	if error != OK:
 		push_error("Could not save campaign progress: %s" % error_string(error))
+	elif is_instance_valid(_account_panel):
+		_account_panel.local_changed()
 
 
 func _on_tiles_matched(tile_types: Array) -> void:

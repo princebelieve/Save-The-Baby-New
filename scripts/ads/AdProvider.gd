@@ -35,7 +35,11 @@ func _ready() -> void:
 		return
 	if OS.get_name() != "Android" or not Engine.has_singleton("PoingGodotAdMob"):
 		return
-	call_deferred("_update_consent")
+	# Boot starts consent after the company splash is finished.
+
+func start_session() -> void:
+	if OS.get_name() == "Android" and Engine.has_singleton("PoingGodotAdMob") and not _initialized and not _initializing:
+		call_deferred("_update_consent")
 
 func _process(_delta: float) -> void:
 	if not _initialized or not _consent_ready or _showing:

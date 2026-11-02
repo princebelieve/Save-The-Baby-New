@@ -14,9 +14,10 @@ func initialize() -> void:
 
 	_is_initialized = true
 
+	_build_splash_screen()
+	await RenderingServer.frame_post_draw
 	initialize_utilities()
 	load_configuration()
-	_build_splash_screen()
 	await get_tree().create_timer(3.6).timeout
 	create_game_scene()
 	finish_boot()
@@ -64,7 +65,7 @@ func _build_splash_screen() -> void:
 	var logo_size := minf(viewport_size.x * 0.94, viewport_size.y * 0.78)
 	logo.size = Vector2.ONE * logo_size
 	logo.position = (viewport_size - logo.size) * 0.5
-	logo.texture = ResourceManager.load_texture("res://assets/sb_ibhadode_splash.png")
+	logo.texture = preload("res://assets/sb_ibhadode_splash.png")
 	logo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	logo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	logo.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -99,4 +100,9 @@ func create_game_scene() -> void:
 
 
 func finish_boot() -> void:
+	if _game_scene == null:
+		return
+	var ads := get_node_or_null("/root/AdProvider")
+	if ads != null:
+		ads.start_session()
 	queue_free()

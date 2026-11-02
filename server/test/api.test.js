@@ -1,0 +1,68 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {createApp} from '../src/app.js';
+import {hash,validateSave,verifyPurchase} from '../src/domain.js';
+import {MemoryDb} from '../test-support/memory.js';
+
+test('save validation rejects Mongo operators, prototype keys, large payloads and invalid numbers',()=>{
+ for(const save of [{campaign:{$set:1}},JSON.parse('{"campaign":{"__proto__":{}}}'),{campaign:{coins:Infinity}},{campaign:{x:'a'.repeat(100000)}}])assert.throws(()=>validateSave(save));
+ assert.deepEqual(validateSave({campaign:{coins:10,completed_levels:{'1':3}}}),{campaign:{coins:10,completed_levels:{'1':3}}});
+});
+test('purchase checks reject pending, canceled, cross-account and multi-quantity payments',()=>{
+ for(const payment of [{purchaseState:2},{purchaseState:1},{purchaseState:0,obfuscatedExternalAccountId:'other'},{purchaseState:0,obfuscatedExternalAccountId:'owner',quantity:2}])assert.throws(()=>verifyPurchase(payment,'owner'));
+ verifyPurchase({purchaseState:0,obfuscatedExternalAccountId:'owner'},'owner');
+});
+
+test('API login, save conflicts, payment replay, atomic spending and logout',async t=>{
+ const db=new MemoryDb();let verified=0,consumed=0;
+ const userId='player-a',token='x'.repeat(40);
+ await db.collection('users').insertOne({_id:userId,name:'Test',wallet:0,revision:0,save:null});
+ await db.collection('sessions').insertOne({_id:hash(token),userId,expires:new Date(Date.now()+60000)});
+ const play={async verify(_product,purchaseToken){verified++;return {purchaseState:purchaseToken.includes('pending')?2:0,obfuscatedExternalAccountId:hash(userId),consumptionState:0};},async consume(){consumed++;}};
+ const oauth={claims:{},generateAuthUrl({state}){return `https://accounts.google.com/?state=${state}`;},async getToken(code){return {tokens:{id_token:code}};},async verifyIdToken({idToken}){return {getPayload:()=>oauth.claims[idToken]};}};
+ const app=createApp({db,client:db,oauth,play,baseUrl:'http://localhost:3000',clientId:'client',commerceEnabled:true});
+ const server=app.listen(0,'127.0.0.1');await new Promise(resolve=>server.once('listening',resolve));
+ t.after(()=>new Promise(resolve=>server.close(resolve)));
+ const base=`http://127.0.0.1:${server.address().port}`;
+ async function request(path,method='GET',body,session=token){const response=await fetch(base+path,{method,headers:{'Content-Type':'application/json',...(session?{Authorization:`Bearer ${session}`}:{})},body:body?JSON.stringify(body):undefined});return {status:response.status,body:await response.json()};}
+ assert.equal((await request('/v1/me','GET',undefined,'')).status,401);
+ const save={campaign:{coins:100,lives:3,boosters:{rocket:1}}};
+ assert.equal((await request('/v1/save','PUT',{revision:0,save})).status,200);
+ assert.equal((await request('/v1/save','PUT',{revision:0,save})).status,409);
+ assert.equal((await request('/v1/purchases/google','POST',{productId:'coins_500',purchaseToken:'pending-token'})).status,409);
+ const payment={productId:'coins_500',purchaseToken:'valid-purchase-token'};
+ assert.equal((await request('/v1/purchases/google','POST',payment)).body.wallet,500);
+ assert.equal((await request('/v1/purchases/google','POST',payment)).body.wallet,500);
+ assert.equal((await request('/v1/me')).body.wallet,500);
+ assert.equal(verified,3);assert.equal(consumed,1);
+ const spend={kind:'rocket',revision:1,requestId:'abcdef1234567890'};
+ assert.equal((await request('/v1/wallet/spend','POST',spend)).body.wallet,465);
+ assert.equal((await request('/v1/wallet/spend','POST',spend)).body.wallet,465);
+ assert.equal((await request('/v1/me')).body.save.campaign.boosters.rocket,2);
+ const concurrent=await Promise.all([request('/v1/wallet/spend','POST',{kind:'bomb',revision:2,requestId:'bbbbbbbbbbbbbbbb'}),request('/v1/wallet/spend','POST',{kind:'bomb',revision:2,requestId:'cccccccccccccccc'})]);
+ assert.deepEqual(concurrent.map(x=>x.status).sort(),[200,409]);
+ assert.equal((await request('/v1/me')).body.wallet,415);
+ await db.collection('users').insertOne({_id:'player-b',name:'Other',wallet:0,revision:0,save:null});
+ await db.collection('sessions').insertOne({_id:hash('y'.repeat(40)),userId:'player-b',expires:new Date(Date.now()+60000)});
+ assert.equal((await request('/v1/purchases/google','POST',payment,'y'.repeat(40))).status,403);
+ const concurrentCredits=await Promise.all([request('/v1/purchases/google','POST',{productId:'coins_500',purchaseToken:'second-valid-purchase-token'}),request('/v1/purchases/google','POST',{productId:'coins_500',purchaseToken:'second-valid-purchase-token'})]);
+ assert.ok(concurrentCredits.every(response=>response.status===200));
+ assert.equal((await request('/v1/me')).body.wallet,915);
+ const verifier='z'.repeat(64);
+ const started=await request('/auth/start','POST',{challenge:hash(verifier)},'');assert.equal(started.status,200);
+ const flow=started.body.flow;
+ assert.equal((await request('/auth/poll','POST',{flow,verifier:'wrong'.repeat(10)},'')).status,400);
+ const browser=await fetch(base+`/auth/google/start?flow=${flow}`,{redirect:'manual'});assert.equal(browser.status,302);
+ const cookie=browser.headers.get('set-cookie').split(';')[0];
+ const stored=await db.collection('flows').findOne({_id:flow});
+ oauth.claims.code={sub:'google-user',email_verified:true,name:'Google Player',nonce:stored.nonce};
+ assert.equal((await fetch(base+`/auth/google/callback?state=${flow}&code=code`,{redirect:'manual'})).status,400);
+ assert.equal((await fetch(base+`/auth/google/callback?state=${flow}&code=code`,{headers:{Cookie:cookie}})).status,200);
+ const login=await request('/auth/poll','POST',{flow,verifier},'');assert.equal(login.status,200);assert.ok(login.body.token);
+ assert.equal((await request('/auth/poll','POST',{flow,verifier},'')).status,400);
+ assert.equal((await request('/v1/account','DELETE',{},login.body.token)).status,200);
+ assert.equal((await request('/v1/me','GET',undefined,login.body.token)).status,401);
+ assert.ok(await db.collection('purchases').findOne({_id:hash(payment.purchaseToken)}));
+ assert.equal((await request('/v1/logout','POST',{})).status,200);
+ assert.equal((await request('/v1/me')).status,401);
+});
