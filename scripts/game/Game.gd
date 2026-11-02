@@ -1139,7 +1139,7 @@ func _show_audio_settings(parent_layer: Node) -> void:
 	if _tutorial_active and _tutorial_action == "settings" and _tutorial_overlay != null:
 		_tutorial_overlay.hide_tip()
 	var settings := VBoxContainer.new()
-	settings.custom_minimum_size = Vector2(minf(480.0, get_viewport_rect().size.x * 0.78), 340)
+	settings.custom_minimum_size = Vector2(minf(480.0, get_viewport_rect().size.x * 0.78), 400)
 	settings.add_theme_constant_override("separation", 12)
 	var heading := _make_label("AUDIO SETTINGS", 28)
 	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -1167,12 +1167,73 @@ func _show_audio_settings(parent_layer: Node) -> void:
 		enabled.text = "Enabled" if enabled.button_pressed else "Disabled"
 		enabled.toggled.connect(_set_audio_enabled.bind(bus_kind, enabled))
 		settings.add_child(enabled)
+	var legal_links := HBoxContainer.new()
+	legal_links.add_theme_constant_override("separation", 10)
+	for legal_page in [
+		{"title": "PRIVACY POLICY", "path": "res://legal/privacy_policy.md"},
+		{"title": "TERMS AND CONDITIONS", "path": "res://legal/terms_and_conditions.md"}
+	]:
+		var legal_button := _make_menu_button(str(legal_page["title"]))
+		legal_button.custom_minimum_size = Vector2(0, 54)
+		legal_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		legal_button.add_theme_font_size_override("font_size", 15)
+		legal_button.pressed.connect(_show_legal_document.bind(parent_layer, str(legal_page["title"]), str(legal_page["path"])))
+		legal_links.add_child(legal_button)
+	settings.add_child(legal_links)
 	popup.add_child(settings)
 	if _tutorial_active and _tutorial_action == "settings":
 		popup.confirmed.connect(_on_tutorial_settings_confirmed, CONNECT_ONE_SHOT)
 	popup.confirmed.connect(popup.queue_free, CONNECT_ONE_SHOT)
 	popup.canceled.connect(popup.queue_free, CONNECT_ONE_SHOT)
 	popup.popup_centered_clamped(Vector2i(mini(580, int(get_viewport_rect().size.x * 0.9)), 520))
+
+
+func _show_legal_document(parent_layer: Node, title: String, path: String) -> void:
+	if parent_layer == null:
+		return
+	var markdown := FileAccess.get_file_as_string(path)
+	if markdown.is_empty():
+		DebugLogger.warning("Game: Could not load legal document -> " + path)
+		return
+	var viewport_size := get_viewport_rect().size
+	var popup := AcceptDialog.new()
+	popup.title = title
+	popup.ok_button_text = "CLOSE"
+	var online_url := "https://sbi.globalcreest.com/privacy-policy" if path.ends_with("privacy_policy.md") else "https://sbi.globalcreest.com/terms-and-conditions"
+	popup.add_button("OPEN WEB PAGE", true, "open_legal_page")
+	popup.custom_action.connect(func(action: String):
+		if action == "open_legal_page":
+			OS.shell_open(online_url)
+	)
+	popup.process_mode = Node.PROCESS_MODE_ALWAYS
+	_prepare_dialog(popup)
+	popup.get_label().hide()
+	var body := RichTextLabel.new()
+	body.bbcode_enabled = false
+	body.text = _legal_markdown_to_plain_text(markdown)
+	body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	body.scroll_active = true
+	body.custom_minimum_size = Vector2(minf(500.0, viewport_size.x * 0.78), minf(600.0, viewport_size.y * 0.66))
+	body.add_theme_color_override("default_color", Color("#fff3d5"))
+	body.add_theme_font_size_override("normal_font_size", 17)
+	popup.add_child(body)
+	parent_layer.add_child(popup)
+	popup.confirmed.connect(popup.queue_free, CONNECT_ONE_SHOT)
+	popup.canceled.connect(popup.queue_free, CONNECT_ONE_SHOT)
+	popup.popup_centered_clamped(Vector2i(mini(580, int(viewport_size.x * 0.9)), mini(760, int(viewport_size.y * 0.82))))
+
+
+func _legal_markdown_to_plain_text(markdown: String) -> String:
+	var lines := PackedStringArray()
+	for raw_line in markdown.split("\n"):
+		var line := str(raw_line).strip_edges()
+		while line.begins_with("#"):
+			line = line.substr(1).strip_edges()
+		if line.begins_with("- "):
+			line = "• " + line.substr(2)
+		line = line.replace("**", "")
+		lines.append(line)
+	return lines.join("\n")
 
 
 func _on_tutorial_settings_confirmed() -> void:
