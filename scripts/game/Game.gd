@@ -85,7 +85,6 @@ var _completed_levels: Dictionary = {}
 var _match_streak := 0
 var _gameplay_effects: GameplayEffects
 var _turn_praise_rank := 0
-var _turn_praise_sound := ""
 var _waiting_for_collection := false
 var _special_moves_created := 0
 var _objective_complete_sound_played := false
@@ -1199,7 +1198,7 @@ func _show_legal_document(parent_layer: Node, title: String, path: String) -> vo
 	var popup := AcceptDialog.new()
 	popup.title = title
 	popup.ok_button_text = "CLOSE"
-	var online_url := "https://sbi.globalcreest.com/privacy-policy" if path.ends_with("privacy_policy.md") else "https://sbi.globalcreest.com/terms-and-conditions"
+	var online_url := "https://sbi.globalcreest.com/save-the-baby/privacy-policy" if path.ends_with("privacy_policy.md") else "https://sbi.globalcreest.com/save-the-baby/terms-and-conditions"
 	popup.add_button("OPEN WEB PAGE", true, "open_legal_page")
 	popup.custom_action.connect(func(action: String):
 		if action == "open_legal_page":
@@ -1233,7 +1232,7 @@ func _legal_markdown_to_plain_text(markdown: String) -> String:
 			line = "• " + line.substr(2)
 		line = line.replace("**", "")
 		lines.append(line)
-	return lines.join("\n")
+	return "\n".join(lines)
 
 
 func _on_tutorial_settings_confirmed() -> void:
@@ -1623,7 +1622,6 @@ func _on_route_selected(choice: Dictionary) -> void:
 func _show_campaign_map(route_id: String) -> void:
 	_waiting_for_collection = false
 	_turn_praise_rank = 0
-	_turn_praise_sound = ""
 	if is_instance_valid(_gameplay_effects): _gameplay_effects.clear()
 	_current_route_id = route_id
 	SignalBus.play_music.emit("suspense_opening")
@@ -1976,7 +1974,6 @@ func _objective_icon_path(target: String) -> String:
 func _begin_level(_route_id: String) -> void:
 	_waiting_for_collection = false
 	_turn_praise_rank = 0
-	_turn_praise_sound = ""
 	if is_instance_valid(_gameplay_effects): _gameplay_effects.clear()
 	SignalBus.play_sfx.emit("door_close")
 	var gameplay_hud := get_node_or_null("HUD") as CanvasLayer
@@ -2230,7 +2227,7 @@ func _animate_matched_tiles(tile_types: Array, cells: Array) -> void:
 			texture_path = "res://assets/sprites/characters/%s" % ("ethan_portrait_cutout.png" if kind == int(Constants.TileType.ETHAN) else "detective_portrait_cutout.png")
 		var origins: Array[Vector2] = []
 		for point in groups[kind]: origins.append(point)
-		_effects().collect(ResourceManager.load_texture(texture_path),origins,target,value)
+		_effects().collect(ResourceManager.load_texture(texture_path),origins,target,value,"objective_collected" if kind == target_enum else "")
 	if tile_types.size() >= 5 and not cells.is_empty():
 		_effects().burst(_board.get_cell_screen_rect(cells[cells.size()/2]).get_center(),75,Color("#ffe082"))
 
@@ -2254,7 +2251,6 @@ func _persist_campaign_progress() -> void:
 
 func _on_tiles_matched(tile_types: Array) -> void:
 	_match_streak += 1
-	var objective_match := false
 	var feedback_caption := ""
 	var feedback_sound := ""
 	var shake_board := false
@@ -2263,7 +2259,6 @@ func _on_tiles_matched(tile_types: Array) -> void:
 	for tile_type in tile_types:
 		if _objective_type == "COLLECT_ITEMS" and int(tile_type) == target_enum:
 			_evidence_count += 1
-			objective_match = true
 		if int(tile_type) == int(Constants.TileType.ETHAN) and _economy_manager != null:
 			_economy_manager.add_ethan(1)
 			character_rewards["ethan"] = int(character_rewards["ethan"]) + 1
@@ -2290,19 +2285,19 @@ func _on_tiles_matched(tile_types: Array) -> void:
 	if victor_matches > 0:
 		reward_notices.append("VICTOR +%d ETHAN COINS" % (victor_matches * 10))
 	var special_reward_text := " | ".join(reward_notices)
-	SignalBus.play_sfx.emit("clue_collected" if objective_match else "tile_match")
+	SignalBus.play_sfx.emit("tile_match")
 	var rank := 0
-	if tile_types.size() >= 16 or _match_streak >= 4:
+	if tile_types.size() >= 12 or _match_streak >= 5:
 		feedback_caption = "WONDERFUL!"
 		feedback_sound = "match_wonderful"
 		rank = 3
 		shake_board = true
-	elif tile_types.size() >= 8 or _match_streak >= 3:
+	elif tile_types.size() >= 9 or _match_streak >= 4:
 		feedback_caption = "EXCELLENT!"
 		feedback_sound = "match_great"
 		rank = 2
 		shake_board = true
-	elif tile_types.size() >= 4 or _match_streak >= 2:
+	elif tile_types.size() >= 6 or _match_streak >= 3:
 		feedback_caption = "NICE!"
 		feedback_sound = "match_nice"
 		rank = 1
@@ -2310,7 +2305,6 @@ func _on_tiles_matched(tile_types: Array) -> void:
 		feedback_caption = ""
 	else:
 		_turn_praise_rank = rank
-		_turn_praise_sound = feedback_sound
 	_evidence_count = mini(_evidence_count, _evidence_goal)
 	_update_objective_hud()
 	if _mission_objectives_complete():
@@ -2329,7 +2323,8 @@ func _on_move_rejected() -> void:
 	_hint_label.text = "NO MATCH | Swap neighboring pieces to make a set of 3."
 
 
-func _show_match_feedback(caption: String, _sound_id: String, shake_board: bool) -> void:
+func _show_match_feedback(caption: String, sound_id: String, shake_board: bool) -> void:
+	if not sound_id.is_empty(): SignalBus.play_sfx.emit(sound_id)
 	_hint_label.text = caption
 	_hint_label.add_theme_color_override("font_color", Color("#ffe279"))
 	_effects().praise(caption,DISPLAY_FONT)
@@ -2381,10 +2376,7 @@ func _on_special_activated(kind: String) -> void:
 
 
 func _on_board_turn_resolved() -> void:
-	if not _turn_praise_sound.is_empty() and not _tutorial_active and not _mission_objectives_complete() and _moves_remaining > 0:
-		SignalBus.play_sfx.emit(_turn_praise_sound)
 	_turn_praise_rank = 0
-	_turn_praise_sound = ""
 	_discover_journal_fact("first_moves", 1)
 	_discover_journal_fact("first_moves", 2)
 	if _tutorial_skip_pending:
@@ -2715,6 +2707,9 @@ func _on_obstacles_cleared(amount: int) -> void:
 func _on_obstacle_damaged(cell: Vector2i, remaining_health: int, destroyed: bool) -> void:
 	if _board == null:
 		return
+	if destroyed:
+		SignalBus.play_sfx.emit("obstacle_destroyed")
+		_board.play_celebration_shake(1.4)
 	var obstacle: Obstacle = _board._obstacles.get(cell)
 	if is_instance_valid(obstacle):
 		var kinds := {Constants.ObstacleType.CHAIN: ["chain", 1], Constants.ObstacleType.LOCK: ["lock", 0], Constants.ObstacleType.BOMB: ["hazard", 1], Constants.ObstacleType.ELECTRIC_TRAP: ["electric", 1]}

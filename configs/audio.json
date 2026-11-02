@@ -14,9 +14,11 @@
     "invalid_move": "res://assets/audio/sfx/invalid_move.ogg",
     "booster_select": "res://assets/audio/sfx/ui_click.ogg",
     "powerup_activate": "res://assets/audio/sfx/ui_confirm.ogg",
-    "match_nice": "res://assets/audio/sfx/praise/nice.wav",
-    "match_great": "res://assets/audio/sfx/praise/excellent.wav",
-    "match_wonderful": "res://assets/audio/sfx/praise/wonderful.wav",
+    "match_nice": "res://assets/audio/sfx/tile_match.ogg",
+    "match_great": "res://assets/audio/sfx/ui_confirm.ogg",
+    "match_wonderful": "res://assets/audio/sfx/kenney/coins.ogg",
+    "objective_collected": "res://assets/audio/sfx/kenney/coins.ogg",
+    "obstacle_destroyed": "res://assets/audio/sfx/kenney/obstacle_break.ogg",
     "powerup_rocket": "res://assets/audio/sfx/ui_confirm.ogg",
     "powerup_bomb": "res://assets/audio/sfx/thunder_crack.wav",
     "powerup_thunder": "res://assets/audio/sfx/thunder_crack.wav",
@@ -46,18 +48,6 @@
       "priority": 10,
       "praise": false
     },
-    "match_nice": {
-      "priority": 20,
-      "praise": true
-    },
-    "match_great": {
-      "priority": 30,
-      "praise": true
-    },
-    "match_wonderful": {
-      "priority": 40,
-      "praise": true
-    },
     "objective_achieved": {
       "priority": 80,
       "praise": false
@@ -78,6 +68,14 @@
     },
     "clue_collected": {
       "cooldown_ms": 160,
+      "max_instances": 2
+    },
+    "objective_collected": {
+      "cooldown_ms": 180,
+      "max_instances": 1
+    },
+    "obstacle_destroyed": {
+      "cooldown_ms": 120,
       "max_instances": 2
     },
     "thunder_crack": {

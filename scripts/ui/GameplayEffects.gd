@@ -66,7 +66,7 @@ func clear() -> void:
 	_feedback = null
 
 
-func collect(texture: Texture2D, origins: Array[Vector2], target: Control, value_per_piece: int = 1) -> void:
+func collect(texture: Texture2D, origins: Array[Vector2], target: Control, value_per_piece: int = 1, arrival_sound: String = "") -> void:
 	if not is_instance_valid(target) or texture == null: return
 	var count := mini(origins.size(), maxi(0, 48 - pending_collections))
 	if count == 0: return
@@ -98,6 +98,7 @@ func collect(texture: Texture2D, origins: Array[Vector2], target: Control, value
 			group_left[0] -= 1
 			if group_left[0] == 0 and is_instance_valid(target):
 				gain(target.get_global_rect().get_center(), origins.size() * value_per_piece)
+				if not arrival_sound.is_empty(): SignalBus.play_sfx.emit(arrival_sound)
 		)
 		tween.tween_property(token,"scale",Vector2(0.3,0.3),0.08)
 		tween.tween_callback(func():
@@ -203,23 +204,27 @@ func praise(caption: String, font: Font) -> void:
 	_feedback = label
 	label.text = caption
 	label.z_index = 20
-	label.size = Vector2(620,110)
-	label.position = get_viewport().get_visible_rect().size * Vector2(0.5,0.40)-label.size*0.5
+	var viewport_size := get_viewport().get_visible_rect().size
+	label.size = Vector2(minf(620.0, viewport_size.x - 24.0),130)
+	label.position = viewport_size * Vector2(0.5,0.40)-label.size*0.5
 	label.pivot_offset = label.size*0.5
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	label.add_theme_font_override("font",font)
-	label.add_theme_font_size_override("font_size",62)
+	label.add_theme_font_size_override("font_size",mini(76, roundi(viewport_size.x * 0.15)))
 	label.add_theme_color_override("font_color",Color("#ffe674"))
 	label.add_theme_color_override("font_outline_color",Color("#562051"))
 	label.add_theme_constant_override("outline_size",10)
 	add_child(label)
-	label.scale = Vector2(0.3,0.3)
+	label.scale = Vector2(0.05,0.05)
 	var tween := _effect_tween().bind_node(label)
-	tween.tween_property(label,"scale",Vector2(1.17,1.17),0.18).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	tween.tween_property(label,"scale",Vector2.ONE,0.12)
-	tween.tween_interval(0.40)
-	tween.tween_property(label,"modulate:a",0.0,0.22)
+	tween.tween_property(label,"scale",Vector2(1.48,1.48),0.22).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
+	tween.tween_property(label,"rotation",-0.045,0.08).set_trans(Tween.TRANS_BACK)
+	tween.tween_property(label,"rotation",0.045,0.10).set_trans(Tween.TRANS_BACK)
+	tween.tween_property(label,"rotation",0.0,0.08)
+	tween.tween_property(label,"scale",Vector2.ONE,0.14).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
+	tween.tween_interval(0.72)
+	tween.tween_property(label,"modulate:a",0.0,0.28)
 	tween.tween_callback(label.queue_free)
 
 

@@ -1,0 +1,21 @@
+SAVE THE BABY - STORE SCREENSHOTS
+Captured 2 November 2026 directly from the running Godot project.
+
+Each folder contains four real gameplay renders: levels 8, 16, 31, and 48.
+phone: 1080 x 1920, portrait 9:16.
+tablet-7-inch: 1080 x 1920, portrait 9:16.
+tablet-10-inch: 1440 x 2560, portrait 9:16.
+desktop: 1080 x 1920, the game's portrait layout.
+
+Upload all four phone images to Phone screenshots.
+Upload the corresponding four tablet images to each tablet section you distribute to.
+Desktop images depict the Windows/Godot game. They are not proof of Google Play Games on PC support; only use them for a compatible desktop release.
+The current project has XR disabled and no XR-specific export. No XR images are supplied.
+No TV, Wear OS, or automotive export was found.
+
+These are rendered captures from the actual game scenes with real level data, UI, and assets, using a separate test-save profile. They were not AI generated, painted, cropped, or stretched from another screenshot. Device classes are resolution profiles, not claims of testing physical tablets or Android/PC emulators.
+Portrait scaling follows the project's 720 x 1280 canvas and keep-width stretch configuration. Desktop landscape currently overlaps controls, so the desktop set uses the intended portrait orientation.
+No production game scripts or player save data were changed for these captures.
+
+Google guidance:
+https://support.google.com/googleplay/android-developer/answer/9866151?hl=en

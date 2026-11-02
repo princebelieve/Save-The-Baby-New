@@ -73,9 +73,10 @@ func initialize(level_data: Dictionary) -> bool:
 	for position in _grid:
 		var tile: Tile = _grid[position]
 		_attach_tile(tile, position)
-		tile.scale = Vector2.ONE * 0.72
+		tile.scale = Vector2.ONE * 0.12
 		var spawn_tween := create_tween()
-		spawn_tween.tween_property(tile, "scale", Vector2.ONE, 0.22).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		spawn_tween.tween_property(tile, "scale", Vector2.ONE * 1.28, 0.24).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
+		spawn_tween.tween_property(tile, "scale", Vector2.ONE, 0.12).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
 	_load_obstacles()
 
 	position = Vector2(
@@ -725,11 +726,11 @@ func play_celebration_shake(intensity: float = 1.0) -> void:
 	else:
 		_shake_origin = position
 	position = _shake_origin
-	var strength := 15.0 * clampf(intensity, 0.5, 1.6)
+	var strength := 30.0 * clampf(intensity, 0.5, 2.0)
 	_shake_tween = create_tween()
-	for delta in [Vector2(1,0.25),Vector2(-1,-0.35),Vector2(0.8,0.4),Vector2(-0.6,-0.25),Vector2(0.3,0.15)]:
-		_shake_tween.tween_property(self,"position",_shake_origin + delta * strength,0.045)
-	_shake_tween.tween_property(self,"position",_shake_origin,0.10).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	for delta in [Vector2(1,0.35),Vector2(-1,-0.45),Vector2(0.8,0.55),Vector2(-0.75,-0.3),Vector2(0.5,0.4),Vector2(-0.35,-0.25),Vector2(0.2,0.15)]:
+		_shake_tween.tween_property(self,"position",_shake_origin + delta * strength,0.055)
+		_shake_tween.tween_property(self,"position",_shake_origin,0.075).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 
 func _resolve_external_clear(tiles: Array, effect: String, finish_turn: bool = true) -> void:
@@ -765,13 +766,20 @@ func _resolve_external_clear(tiles: Array, effect: String, finish_turn: bool = t
 
 func animate_match_tiles(tiles: Array) -> void:
 	if tiles.is_empty(): return
-	var tween := create_tween().set_parallel(true)
 	for tile in tiles:
 		if is_instance_valid(tile):
-			tween.tween_property(tile, "scale", Vector2(1.30,1.30),0.08).set_trans(Tween.TRANS_BACK)
-			tween.tween_property(tile, "scale", Vector2.ZERO, 0.14).set_delay(0.08).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
-			tween.tween_property(tile, "modulate:a", 0.0, 0.12).set_delay(0.10)
-	await tween.finished
+			var tween := create_tween().set_parallel(true)
+			tween.tween_property(tile, "scale", Vector2(1.58,1.58),0.13).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
+			tween.tween_property(tile, "rotation", 0.22 if randi() % 2 == 0 else -0.22,0.12).set_trans(Tween.TRANS_BACK)
+			tween.tween_property(tile, "modulate", Color(1.8,1.45,0.65,1.0),0.08)
+			tween.chain().tween_property(tile,"scale",Vector2(0.72,0.72),0.09).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN_OUT)
+			tween.set_parallel(true)
+			tween.tween_property(tile, "rotation", 0.0,0.10)
+			tween.tween_property(tile, "modulate:a", 0.0,0.10)
+			tween.chain().tween_property(tile, "scale", Vector2.ZERO, 0.13).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
+	var wait := create_tween()
+	wait.tween_interval(0.35)
+	await wait.finished
 
 
 func animate_falling_tiles(movements: Array) -> void:

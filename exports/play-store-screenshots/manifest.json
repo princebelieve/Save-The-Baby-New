@@ -1,0 +1,130 @@
+﻿[
+    {
+        "profile":  "desktop",
+        "file":  "gameplay-level-08.png",
+        "width":  1080,
+        "height":  1920,
+        "bytes":  820789,
+        "sha256":  "6890DCA8C2BB1E486ACE7B71C135C65E30E0D06F077187A85CCF22BAEE4A4EFE"
+    },
+    {
+        "profile":  "desktop",
+        "file":  "gameplay-level-16.png",
+        "width":  1080,
+        "height":  1920,
+        "bytes":  862810,
+        "sha256":  "DD50A8D960BD98C0245C665D5D1915E2E121F70D265AC411AB251738DCBABA79"
+    },
+    {
+        "profile":  "desktop",
+        "file":  "gameplay-level-31.png",
+        "width":  1080,
+        "height":  1920,
+        "bytes":  1020149,
+        "sha256":  "D06FC3B1CA4185967C7A3C77203224C5EB6207E459E4917563C0142327CF5461"
+    },
+    {
+        "profile":  "desktop",
+        "file":  "gameplay-level-48.png",
+        "width":  1080,
+        "height":  1920,
+        "bytes":  903808,
+        "sha256":  "4B1EB9634E6AF1FADC37228A15BCAD67DE423503016FDC45A9848E29A95B6FF6"
+    },
+    {
+        "profile":  "phone",
+        "file":  "gameplay-level-08.png",
+        "width":  1080,
+        "height":  1920,
+        "bytes":  793982,
+        "sha256":  "68A99B67F98BB9F1F461FD97C4C530E546CDF3B4A0EC93DE56701A0DA45A2FD5"
+    },
+    {
+        "profile":  "phone",
+        "file":  "gameplay-level-16.png",
+        "width":  1080,
+        "height":  1920,
+        "bytes":  823013,
+        "sha256":  "30B78A714CC6966FEE45DEDFB69B4B7CCA6FA92A540AACC4C9851D23C8461D15"
+    },
+    {
+        "profile":  "phone",
+        "file":  "gameplay-level-31.png",
+        "width":  1080,
+        "height":  1920,
+        "bytes":  988299,
+        "sha256":  "56E1935405AA8F3E44EDE766E88ABE19D20FC78D1C9B374C78B574664C04B01C"
+    },
+    {
+        "profile":  "phone",
+        "file":  "gameplay-level-48.png",
+        "width":  1080,
+        "height":  1920,
+        "bytes":  923898,
+        "sha256":  "0F8CC837F90611FC770C79629F2E3E95E420F7B2B5A7B1ED19F249E8B4DBC77E"
+    },
+    {
+        "profile":  "tablet-10-inch",
+        "file":  "gameplay-level-08.png",
+        "width":  1440,
+        "height":  2560,
+        "bytes":  1189307,
+        "sha256":  "D5EAFBE1839BB3DA9A9E489603ACEB8F5A9D66B367674F82A5839E50E65FD06B"
+    },
+    {
+        "profile":  "tablet-10-inch",
+        "file":  "gameplay-level-16.png",
+        "width":  1440,
+        "height":  2560,
+        "bytes":  1333089,
+        "sha256":  "B000C4814DAE21DCBAA46A5A562AAAC103B3B45C9B379BC76CFB95FD236AA813"
+    },
+    {
+        "profile":  "tablet-10-inch",
+        "file":  "gameplay-level-31.png",
+        "width":  1440,
+        "height":  2560,
+        "bytes":  1490924,
+        "sha256":  "281573487B67796C1498D95DCB97E3390A58E36E39871701EDBDBB88E4D1B13B"
+    },
+    {
+        "profile":  "tablet-10-inch",
+        "file":  "gameplay-level-48.png",
+        "width":  1440,
+        "height":  2560,
+        "bytes":  1519375,
+        "sha256":  "48BF8D2952B37000B0E3F20B941EAB756D633411A331796D3D94F835BB289961"
+    },
+    {
+        "profile":  "tablet-7-inch",
+        "file":  "gameplay-level-08.png",
+        "width":  1080,
+        "height":  1920,
+        "bytes":  790202,
+        "sha256":  "69F7A5337A0CA375394AFE2D8D5957A922F2E06D4808A4E153EDF63303456F2D"
+    },
+    {
+        "profile":  "tablet-7-inch",
+        "file":  "gameplay-level-16.png",
+        "width":  1080,
+        "height":  1920,
+        "bytes":  863339,
+        "sha256":  "97BD9E2827376B3FE84AB76A70DAF0D198487504EC12453D3FC70E19FAD6C185"
+    },
+    {
+        "profile":  "tablet-7-inch",
+        "file":  "gameplay-level-31.png",
+        "width":  1080,
+        "height":  1920,
+        "bytes":  947867,
+        "sha256":  "2A416AB185E605F579368FAD67B0C0FE51112ED1385E8A3C74EA6A7284267518"
+    },
+    {
+        "profile":  "tablet-7-inch",
+        "file":  "gameplay-level-48.png",
+        "width":  1080,
+        "height":  1920,
+        "bytes":  1014207,
+        "sha256":  "4FE3948C00781330EBA7A28AC22AE7D84EF74E13A8B16F389E1B625721BE7B83"
+    }
+]

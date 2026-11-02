@@ -7,3 +7,12 @@ License text: https://creativecommons.org/publicdomain/zero/1.0/
 Files included in this project are doorOpen_1.ogg, doorClose_1.ogg,
 bookOpen.ogg, bookClose.ogg, and handleCoins.ogg. They are renamed for
 clarity in this project. Attribution is not required under CC0.
+
+`obstacle_break.ogg` is Kenney's `impactMetal_heavy_000.ogg` from the Impact
+Sounds pack (https://kenney.nl/assets/impact-sounds), also CC0. The individual
+file was retrieved from a public mirror because the official download endpoint
+returned an HTML error page. SHA-256:
+e07045693e4a2b3d165c424e3dab4c781d9ff8880a386880ac89a51315d7f831
+
+The objective collection arrival uses the existing `handleCoins.ogg` clip
+(`coins.ogg`), a Kenney RPG Audio sound already included above.

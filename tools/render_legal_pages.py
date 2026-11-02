@@ -78,7 +78,7 @@ def render_body(markdown: str) -> tuple[str, str]:
     return title, "\n".join(blocks)
 
 
-def render_page(title: str, body: str) -> str:
+def render_page(title: str, body: str, canonical_url: str, page_label: str) -> str:
     return f'''<!doctype html>
 <html lang="en">
 <head>
@@ -86,6 +86,7 @@ def render_page(title: str, body: str) -> str:
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
   <title>{escape(title)} | Save The Baby</title>
+  <link rel="canonical" href="{escape(canonical_url, quote=True)}">
   <style>
     :root {{ color-scheme: light; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #183047; background: #f4f1e8; }}
     body {{ margin: 0; padding: 2rem 1rem; }}
@@ -95,14 +96,16 @@ def render_page(title: str, body: str) -> str:
     h2 {{ margin-top: 2rem; padding-bottom: .35rem; border-bottom: 1px solid #e7dfcf; font-size: 1.25rem; }}
     p, li {{ line-height: 1.7; }}
     a {{ color: #155b83; }}
+    .site-context {{ max-width: 52rem; margin: 0 auto 1rem; color: #596875; font-size: .9rem; }}
     footer {{ max-width: 52rem; margin: 1rem auto 0; color: #596875; font-size: .9rem; }}
   </style>
 </head>
 <body>
+  <p class="site-context"><a href="https://sbi.globalcreest.com/">S. B. Ibhadode Technologies</a> / <a href="https://sbi.globalcreest.com/save-the-baby">Save The Baby</a> / {escape(page_label)}</p>
   <main>
 {body}
   </main>
-  <footer>Save The Baby · S.B. Ibhadode Technologies · <a href="https://sbi.globalcreest.com">sbi.globalcreest.com</a> · <a href="mailto:info@sbi.globalcreest.com">info@sbi.globalcreest.com</a></footer>
+  <footer>Save The Baby legal information · Published by S. B. Ibhadode Technologies · <a href="https://sbi.globalcreest.com/save-the-baby">Save The Baby home</a> · <a href="https://sbi.globalcreest.com/">Company website</a> · <a href="mailto:info@sbi.globalcreest.com">info@sbi.globalcreest.com</a></footer>
 </body>
 </html>
 '''
@@ -111,13 +114,22 @@ def render_page(title: str, body: str) -> str:
 def main() -> None:
     OUTPUT.mkdir(parents=True, exist_ok=True)
     pages = {
-        "privacy_policy.md": "privacy-policy.html",
-        "terms_and_conditions.md": "terms-and-conditions.html",
+        "privacy_policy.md": (
+            "privacy-policy.html",
+            "https://sbi.globalcreest.com/save-the-baby/privacy-policy",
+            "Privacy Policy",
+        ),
+        "terms_and_conditions.md": (
+            "terms-and-conditions.html",
+            "https://sbi.globalcreest.com/save-the-baby/terms-and-conditions",
+            "Terms and Conditions",
+        ),
     }
-    for source_name, output_name in pages.items():
+    for source_name, (output_name, canonical_url, page_label) in pages.items():
         source = LEGAL_SOURCE / source_name
         title, body = render_body(source.read_text(encoding="utf-8"))
-        (OUTPUT / output_name).write_text(render_page(title, body), encoding="utf-8")
+        with (OUTPUT / output_name).open("w", encoding="utf-8", newline="\n") as page:
+            page.write(render_page(title, body, canonical_url, page_label))
 
 
 if __name__ == "__main__":
