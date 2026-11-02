@@ -8,7 +8,45 @@ export function createApp({db, client, oauth, play, baseUrl, clientId, commerceE
  app.use((req,_res,next)=>{req.body ??= {}; next();});
  app.use((req,res,next)=>{res.set({'Cache-Control':'no-store','Referrer-Policy':'no-referrer','X-Content-Type-Options':'nosniff','Content-Security-Policy':"default-src 'none'; frame-ancestors 'none'; form-action 'self'"}); next();});
  app.get('/health',(_req,res)=>res.json({ok:true}));
- app.get('/account-deletion',(_req,res)=>res.type('html').send('<!doctype html><title>Delete Save The Baby account</title><h1>Delete your Save The Baby account</h1><p>In the game, open Settings, Account &amp; Coins, then Delete Online Account. Confirm to delete your cloud save and purchased coin balance.</p><p>If you cannot access the game, email info@sbi.globalcreest.com with your Player ID and ask for account deletion. We may ask for proof of account ownership. Purchase accounting records required for fraud prevention and legal obligations may be retained; cloud progress and active sessions are deleted.</p>'));
+ app.get('/account-deletion',(_req,res)=>res.set('Content-Security-Policy',"default-src 'none'; style-src 'unsafe-inline'; frame-ancestors 'none'; form-action 'self'").type('html').send(`<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#132b35">
+  <title>Delete your Save The Baby account</title>
+  <style>
+    :root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; color: #183047; background: #f4f1e8; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; padding: 32px 18px; display: grid; place-items: center; background: radial-gradient(ellipse at top, #fffdf5 0%, #f4f1e8 72%); }
+    main { width: min(100%, 680px); padding: clamp(24px, 6vw, 48px); border: 1px solid #e6dfcd; border-radius: 24px; background: #fffefa; box-shadow: 0 20px 60px #18304718; }
+    .brand { margin: 0 0 18px; color: #9b5b26; font-size: .78rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+    h1 { margin: 0; color: #173b45; font-family: Georgia, serif; font-size: clamp(2rem, 6vw, 3rem); line-height: 1.08; }
+    .intro { margin: 16px 0 28px; color: #51636b; font-size: 1.08rem; line-height: 1.65; }
+    .steps { margin: 0 0 26px; padding: 22px 24px 22px 48px; border-radius: 16px; background: #f1f6f1; line-height: 1.8; }
+    .steps li + li { margin-top: 5px; }
+    .button { display: inline-flex; min-height: 52px; align-items: center; justify-content: center; padding: 12px 20px; border: 0; border-radius: 12px; background: #176b61; color: #fff; font-weight: 750; text-decoration: none; box-shadow: 0 5px 0 #0c4e48; }
+    .button:hover, .button:focus-visible { background: #10574f; outline: 3px solid #e1ac55; outline-offset: 3px; }
+    .note { margin: 28px 0 0; padding-top: 20px; border-top: 1px solid #e6dfcd; color: #5b6669; font-size: .94rem; line-height: 1.65; }
+    a:not(.button) { color: #135e68; }
+    @media (prefers-reduced-motion: no-preference) { .button { transition: background-color .15s ease, transform .15s ease; } .button:hover { transform: translateY(-1px); } }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="brand">S. B. Ibhadode Technologies</p>
+    <h1>Delete your Save The Baby account</h1>
+    <p class="intro">You can delete your online account and the cloud data connected to it from inside the game.</p>
+    <ol class="steps">
+      <li>Open Save The Baby and sign in to the account you want to delete.</li>
+      <li>From the title screen or campaign map, open <strong>Settings → Account &amp; Coins</strong>.</li>
+      <li>Choose <strong>Delete Online Account</strong> and confirm.</li>
+    </ol>
+    <a class="button" href="mailto:info@sbi.globalcreest.com?subject=Save%20The%20Baby%20account%20deletion&amp;body=Please%20delete%20my%20Save%20The%20Baby%20online%20account.%0A%0AMy%20Player%20ID%3A%20">Email support to request deletion</a>
+    <p class="note">If you cannot access the game, email <a href="mailto:info@sbi.globalcreest.com?subject=Save%20The%20Baby%20account%20deletion">info@sbi.globalcreest.com</a> with your Player ID and ask for account deletion. We may ask you to verify account ownership. Deletion removes your cloud progress, active sessions, profile and purchased coin balance. Purchase tokens and accounting records needed to prevent fraud or meet legal obligations may be retained.</p>
+  </main>
+</body>
+</html>`));
  app.use(async(req,_res,next)=>{
   const bucket=hash(`${req.ip}:${Math.floor(Date.now()/60000)}`);
   const rate=await db.collection('rates').findOneAndUpdate({_id:bucket},{$inc:{count:1},$setOnInsert:{expires:new Date(Date.now()+120000)}},{upsert:true,returnDocument:'after'});
