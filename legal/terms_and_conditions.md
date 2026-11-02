@@ -20,6 +20,10 @@ The Game is a single-player match-3 adventure. It stores campaign progress, stor
 
 The Game includes virtual coins, lives, and boosters used for gameplay. In this release, these items are earned or used within the Game; there are no real-money purchases or cash-out features. Virtual items have no cash value, cannot be redeemed for money or goods, and cannot be transferred or sold outside the Game. We may adjust virtual balances or game rules to keep the game functioning or balanced.
 
+## Advertising and optional rewards
+
+The Game may show advertisements at the end of a level and offer optional rewarded advertisements. The offer states the reward before you choose to watch. Rewards are granted when the advertising SDK confirms completion; closing an ad early or a failed ad does not grant a reward. Ads require a network connection and may be unavailable. No reward requires clicking an advertisement or buying an advertised product. Third-party advertisements and destinations are operated by their respective providers.
+
 ## Acceptable use
 
 Do not use the Game unlawfully, interfere with its normal operation, or attempt to bypass its technical protections. Do not copy, modify, distribute, or reverse engineer the Game except where applicable law permits or requires it. Do not use the Game in a way that infringes another person’s rights. These restrictions do not limit rights that cannot legally be restricted.

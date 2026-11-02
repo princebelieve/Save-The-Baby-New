@@ -998,3 +998,9 @@ func _finish_pointer_gesture(screen_position: Vector2) -> void:
 				direction = Vector2i.DOWN if delta.y > 0 else Vector2i.UP
 			release_tile = get_tile(_drag_start.get_grid_position() + direction)
 	_finish_swipe(release_tile, screen_position - _press_screen_position)
+
+
+func add_reward_moves(amount: int) -> void:
+	_remaining_moves += maxi(0, amount)
+	moves_changed.emit(_remaining_moves)
+	SignalBus.moves_changed.emit(_remaining_moves)

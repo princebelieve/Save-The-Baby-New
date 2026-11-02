@@ -8,6 +8,11 @@
 
 config_version=5
 
+[admob]
+
+general/android/app_id="ca-app-pub-7480928068306811~8170975262"
+general/ios/enabled=false
+
 [application]
 
 config/name="Save The Baby"
@@ -29,6 +34,7 @@ RandomGenerator="*uid://uxhwmradss1c"
 ConfigLoader="*uid://cu8j86nxy8kq0"
 ResourceManager="*uid://dvkv8hfsbjwme"
 JsonLoader="*uid://bosxr5gwvr1tg"
+AdProvider="*res://scripts/ads/AdProvider.gd"
 
 [display]
 
@@ -39,6 +45,10 @@ window/size/window_height_override=1067
 window/stretch/mode="canvas_items"
 window/stretch/aspect="keep_width"
 window/handheld/orientation=1
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/admob/plugin.cfg")
 
 [gui]
 

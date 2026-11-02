@@ -3,3 +3,5 @@
 /android/
 /build/
 /.test-data/
+
+/.tmp/

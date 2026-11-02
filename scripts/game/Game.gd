@@ -6,6 +6,11 @@ const DISPLAY_FONT: FontFile = preload("res://assets/fonts/Baloo2-Variable.ttf")
 const OPENING_STORY_PATH := "res://stories/opening_story.json"
 const CAMPAIGN_PROGRESS_PATH := "user://campaign_progress.cfg"
 
+var _ads: AdManager
+var _ad_attempt := 0
+var _ad_revived := false
+var _result_ad_shown := false
+
 var _board_manager: Node
 var _economy_manager: EconomyManager
 var _reward_manager: RewardManager
@@ -95,6 +100,8 @@ var _restore_tutorial_after_pause := false
 func _notification(what: int) -> void:
 	if not is_node_ready():
 		return
+	if _ads != null and _ads.busy:
+		return
 	if what == NOTIFICATION_APPLICATION_PAUSED:
 		_persist_campaign_progress()
 		if _board != null and _launch_layer == null and _story_layer == null and _campaign_layer == null and _result_layer == null:
@@ -107,6 +114,11 @@ func _notification(what: int) -> void:
 
 
 func _ready() -> void:
+	_ads = AdManager.new()
+	add_child(_ads)
+	var provider := get_node_or_null("/root/AdProvider")
+	if provider != null:
+		_ads.configure(provider)
 	_load_campaign_progress()
 	_special_moves_created = int(_campaign_progress.get_value("campaign", "special_moves_created", 0))
 	_economy_manager = get_node_or_null("Managers/EconomyManager") as EconomyManager
@@ -1179,6 +1191,11 @@ func _show_audio_settings(parent_layer: Node) -> void:
 		legal_button.pressed.connect(_show_legal_document.bind(parent_layer, str(legal_page["title"]), str(legal_page["path"])))
 		legal_links.add_child(legal_button)
 	settings.add_child(legal_links)
+	var ad_provider := get_node_or_null("/root/AdProvider")
+	if ad_provider != null and ad_provider.privacy_options_required():
+		var ad_privacy := _make_menu_button("AD PRIVACY OPTIONS")
+		ad_privacy.pressed.connect(ad_provider.show_privacy_options)
+		settings.add_child(ad_privacy)
 	popup.add_child(settings)
 	if _tutorial_active and _tutorial_action == "settings":
 		popup.confirmed.connect(_on_tutorial_settings_confirmed, CONNECT_ONE_SHOT)
@@ -2053,6 +2070,9 @@ func _on_board_created() -> void:
 	var created_board: Board = _board_manager.get_board()
 	if created_board == null or created_board == _board:
 		return
+	_ad_attempt += 1
+	_ad_revived = false
+	_result_ad_shown = false
 	_board = created_board
 	_board.moves_changed.connect(_on_moves_changed)
 	_board.match_collected.connect(_on_tiles_matched)
@@ -2176,6 +2196,19 @@ func _open_booster_shop(kind: String) -> void:
 		else:
 			_show_shop_notice("You need %d Ethan Coins for this supply." % cost)
 		purchase.free()
+	)
+	var supplies_ad := dialog.add_button("Watch ad: +1 %s" % kind.capitalize(), false, "reward")
+	_bind_ad_button(supplies_ad, "supply_" + kind)
+	dialog.custom_action.connect(func(action: String):
+		if action == "reward":
+			layer.queue_free()
+			_request_reward("supply_" + kind, func():
+				if kind == "ethan":
+					_economy_manager.add_ethan(1)
+				else:
+					_economy_manager.add_booster(kind, 1)
+				_save_inventory_progress()
+			)
 	)
 	dialog.confirmed.connect(layer.queue_free, CONNECT_ONE_SHOT)
 	dialog.canceled.connect(layer.queue_free, CONNECT_ONE_SHOT)
@@ -2854,6 +2887,13 @@ func _show_level_result(won: bool) -> void:
 		var life_shop := _make_menu_button("LIFE SHOP")
 		life_shop.pressed.connect(_show_life_shop)
 		content.add_child(life_shop)
+	if won and first_clear and int(reward_info.get("coins", 0)) > 0:
+		_add_reward_offer(content, "Watch an ad: +%d bonus coins" % int(reward_info.get("coins", 0)), "completion", func():
+			_economy_manager.add_coins(int(reward_info.get("coins", 0)))
+			_persist_campaign_progress()
+		)
+	elif not won and not _ad_revived:
+		_add_reward_offer(content, "Watch an ad: +5 moves and restore lost life", "continue", _reward_continue)
 	var map_button := _make_menu_button("CAMPAIGN MAP")
 	map_button.pressed.connect(_return_to_campaign_map)
 	content.add_child(map_button)
@@ -2917,6 +2957,18 @@ func _show_life_shop() -> void:
 			_show_shop_notice("You need %d Ethan Coins for this refill." % price)
 		purchase.free()
 	)
+	var life_ad := purchase_dialog.add_button("Watch ad: +1 life", false, "reward")
+	_bind_ad_button(life_ad, "life")
+	purchase_dialog.custom_action.connect(func(action: String):
+		if action == "reward":
+			shop_layer.queue_free()
+			_request_reward("life", func():
+				_economy_manager.add_life(1)
+				_persist_campaign_progress()
+				if _result_layer != null:
+					_return_to_campaign_map()
+			)
+	)
 	purchase_dialog.confirmed.connect(shop_layer.queue_free, CONNECT_ONE_SHOT)
 	purchase_dialog.canceled.connect(shop_layer.queue_free, CONNECT_ONE_SHOT)
 	purchase_dialog.popup_centered_clamped(Vector2i(mini(560, int(get_viewport_rect().size.x * 0.9)), 350))
@@ -2949,6 +3001,9 @@ func _dismiss_level_result() -> void:
 
 
 func _next_level_after_win() -> void:
+	if _ads.busy:
+		return
+	await _show_result_ad()
 	var level_manager := get_node_or_null("Managers/LevelManager")
 	var level_data: Dictionary = level_manager.get_level_data() if level_manager != null else {}
 	var after_story := str(level_data.get("story", {}).get("after_level", ""))
@@ -2968,6 +3023,9 @@ func _next_level_after_win() -> void:
 
 
 func _retry_current_level() -> void:
+	if _ads.busy:
+		return
+	await _show_result_ad()
 	var level_id := _current_level_id
 	_dismiss_level_result()
 	get_tree().paused = false
@@ -2975,6 +3033,9 @@ func _retry_current_level() -> void:
 
 
 func _return_to_campaign_map() -> void:
+	if _ads.busy:
+		return
+	await _show_result_ad()
 	_dismiss_level_result()
 	get_tree().paused = false
 	_show_campaign_map(_current_route_id)
@@ -3210,3 +3271,81 @@ func _discover_journal_fact(lesson_id: String, page: int) -> void:
 		if CaseJournal.discover(_campaign_progress, str(fact["id"]), str(fact["title"]), str(fact["fact"]), str(lesson["pages"][page]), str(fact["illustration"]), _current_level_id):
 			_persist_campaign_progress()
 		return
+
+
+func _ad_key(placement: String) -> String:
+	return "%d:%s" % [_ad_attempt, placement]
+
+
+func _add_reward_offer(parent: Control, label: String, placement: String, reward: Callable) -> void:
+	var button := _make_menu_button(label)
+	var refresh := func():
+		if is_instance_valid(button):
+			button.disabled = not _ads.available("rewarded") or _ads.claimed(_ad_key(placement))
+			button.tooltip_text = "Reward granted only after completing the ad." if not button.disabled else "No ad available right now."
+	_ads.availability_changed.connect(refresh)
+	button.tree_exiting.connect(func():
+		if _ads.availability_changed.is_connected(refresh):
+			_ads.availability_changed.disconnect(refresh)
+	)
+	button.pressed.connect(func(): _request_reward(placement, reward))
+	parent.add_child(button)
+	refresh.call()
+
+
+func _request_reward(placement: String, reward: Callable) -> void:
+	if _ads.busy:
+		return
+	var ad_board := _board
+	var was_locked := ad_board == null or ad_board.is_locked()
+	if ad_board != null:
+		ad_board.lock()
+	# Connect before show: a provider may report failure synchronously.
+	var receive := func(earned: bool):
+		if is_instance_valid(ad_board) and not was_locked:
+			ad_board.unlock()
+		if earned:
+			_result_ad_shown = true
+			reward.call()
+		else:
+			_show_shop_notice("Ad not completed. No reward was used. Please try again later.")
+	_ads.finished.connect(receive, CONNECT_ONE_SHOT)
+	if not _ads.show_ad("rewarded", _ad_key(placement)):
+		_ads.finished.disconnect(receive)
+		if is_instance_valid(ad_board) and not was_locked:
+			ad_board.unlock()
+		_show_shop_notice("No ad available right now. Please try again later.")
+
+
+func _show_result_ad() -> void:
+	if _result_layer == null or _result_ad_shown:
+		return
+	_result_ad_shown = true
+	if _ads.available("interstitial"):
+		_ads.show_ad("interstitial", "level_end")
+		if _ads.busy:
+			await _ads.finished
+
+
+func _reward_continue() -> void:
+	if _result_layer == null or _board == null or _ad_revived:
+		return
+	_ad_revived = true
+	_economy_manager.add_life(1)
+	_board.add_reward_moves(5)
+	_dismiss_level_result()
+	get_tree().paused = false
+	_board.unlock()
+	_persist_campaign_progress()
+
+
+func _bind_ad_button(button: Button, placement: String) -> void:
+	var refresh := func():
+		if is_instance_valid(button):
+			button.disabled = not _ads.available("rewarded") or _ads.claimed(_ad_key(placement))
+	_ads.availability_changed.connect(refresh)
+	button.tree_exiting.connect(func():
+		if _ads.availability_changed.is_connected(refresh):
+			_ads.availability_changed.disconnect(refresh)
+	)
+	refresh.call()
