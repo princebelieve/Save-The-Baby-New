@@ -4,8 +4,9 @@ import {hash,random,HttpError,requireThat,PACKS,SUPPLIES,validateSave,verifyPurc
 export function createApp({db, client, oauth, play, baseUrl, clientId, commerceEnabled=false}) {
  const app=express(); app.disable('x-powered-by'); app.set('trust proxy',1);
  app.use(express.json({limit:'100kb'}));
+ app.use(express.urlencoded({extended:false,limit:'8kb'}));
  app.use((req,_res,next)=>{req.body ??= {}; next();});
- app.use((req,res,next)=>{res.set({'Cache-Control':'no-store','Referrer-Policy':'no-referrer','X-Content-Type-Options':'nosniff','Content-Security-Policy':"default-src 'none'; frame-ancestors 'none'"}); next();});
+ app.use((req,res,next)=>{res.set({'Cache-Control':'no-store','Referrer-Policy':'no-referrer','X-Content-Type-Options':'nosniff','Content-Security-Policy':"default-src 'none'; frame-ancestors 'none'; form-action 'self'"}); next();});
  app.get('/health',(_req,res)=>res.json({ok:true}));
  app.get('/account-deletion',(_req,res)=>res.type('html').send('<!doctype html><title>Delete Save The Baby account</title><h1>Delete your Save The Baby account</h1><p>In the game, open Settings, Account &amp; Coins, then Delete Online Account. Confirm to delete your cloud save and purchased coin balance.</p><p>If you cannot access the game, email info@sbi.globalcreest.com with your Player ID and ask for account deletion. We may ask for proof of account ownership. Purchase accounting records required for fraud prevention and legal obligations may be retained; cloud progress and active sessions are deleted.</p>'));
  app.use(async(req,_res,next)=>{
@@ -24,27 +25,46 @@ export function createApp({db, client, oauth, play, baseUrl, clientId, commerceE
  const transaction=async(work)=>{const session=client.startSession(); try{return await session.withTransaction(()=>work(session),{readConcern:{level:'snapshot'},writeConcern:{w:'majority'}});}finally{await session.endSession();}};
  app.post('/auth/start',async(req,res)=>{
   const challenge=req.body.challenge; requireThat(typeof challenge==='string'&&/^[a-f0-9]{64}$/.test(challenge),400,'Invalid login challenge');
-  const id=random(); await flows.insertOne({_id:id,challenge,nonce:random(),expires:new Date(Date.now()+300000),status:'created'});
+  const accountMode=req.body.accountMode??'self';
+  requireThat(['self','guardian'].includes(accountMode),400,'Invalid account mode');
+  const id=random(); await flows.insertOne({_id:id,challenge,accountMode,nonce:random(),expires:new Date(Date.now()+300000),status:'created'});
   res.json({flow:id,url:`${baseUrl}/auth/google/start?flow=${id}`});
  });
  app.get('/auth/google/start',async(req,res)=>{
-  const browser=random();
-  const flow=await flows.findOneAndUpdate({_id:req.query.flow,status:'created',expires:{$gt:new Date()}},{$set:{status:'browser',browserHash:hash(browser)}},{returnDocument:'after'});
+  const browser=random(),noticeToken=random();
+  const flow=await flows.findOneAndUpdate({_id:req.query.flow,status:'created',expires:{$gt:new Date()}},{$set:{status:'notice',browserHash:hash(browser),noticeHash:hash(noticeToken)}},{returnDocument:'after'});
   requireThat(flow,400,'Login expired. Return to the game and try again.');
   res.cookie('sb_oauth',browser,{httpOnly:true,secure:baseUrl.startsWith('https:'),sameSite:'lax',maxAge:300000,path:'/auth/google'});
-  res.redirect(oauth.generateAuthUrl({scope:['openid','email','profile'],state:flow._id,nonce:flow.nonce,prompt:'select_account',access_type:'online'}));
+  const parent=flow.accountMode==='guardian';
+  res.type('html').send(`<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Save The Baby account</title><main><h1>${parent?'Parent or guardian account':'Your cloud account'}</h1>
+<p>${parent?'Please hand this device to a parent or legal guardian. The parent must use their own Google account, not the child’s account.':'Continue with your own Google account. If you are under 18, ask your parent or guardian to manage this account.'}</p>
+<p>S.B. Ibhadode Technologies stores the Google account identifier, display name, game progress and purchase records using Render and MongoDB Atlas. Google handles payment. Cloud saves and purchased coins belong to the signed-in account. Do not enter a child’s name or email here.</p>
+<p>Account creation does not approve future payments. Google Play applies the purchasing account’s parental controls. You can delete the online account from Settings → Account &amp; Coins → Delete Online Account, or contact info@sbi.globalcreest.com.</p>
+<p><a href="https://sbi.globalcreest.com/save-the-baby/privacy-policy">Read the privacy policy</a>. You may close this page and continue playing without an online account.</p>
+<form method="post" action="/auth/google/authorize"><input type="hidden" name="flow" value="${flow._id}"><input type="hidden" name="noticeToken" value="${noticeToken}">
+<p><label><input type="checkbox" name="acknowledged" value="yes" required> ${parent?'I am the parent or legal guardian, I am 18 or older, and I will manage this cloud account and its purchases using my own Google account.':'I am 18 or older and will manage this cloud account and its purchases.'} I have read the account notice.</label></p>
+<button type="submit">Continue to Google</button></form></main></html>`);
+ });
+ app.post('/auth/google/authorize',async(req,res)=>{
+  const cookie=(req.get('cookie')||'').split(';').map(x=>x.trim()).find(x=>x.startsWith('sb_oauth='))?.slice(9);
+  requireThat(cookie&&req.body.acknowledged==='yes'&&typeof req.body.noticeToken==='string',400,'An adult account owner must read and accept the notice.');
+  const flow=await flows.findOneAndUpdate({_id:req.body.flow,status:'notice',browserHash:hash(cookie),noticeHash:hash(req.body.noticeToken),expires:{$gt:new Date()}},{$set:{status:'browser',ownerAcknowledgedAt:new Date(),noticeVersion:1}},{returnDocument:'after'});
+  requireThat(flow,400,'Account notice expired or already used. Return to the game and try again.');
+  res.redirect(303,oauth.generateAuthUrl({scope:['openid','email','profile'],state:flow._id,nonce:flow.nonce,prompt:'select_account',access_type:'online'}));
  });
  app.get('/auth/google/callback',async(req,res)=>{
   const cookie=(req.get('cookie')||'').split(';').map(x=>x.trim()).find(x=>x.startsWith('sb_oauth='))?.slice(9);
   requireThat(cookie,400,'Login browser session is missing');
   const flow=await flows.findOneAndUpdate({_id:req.query.state,status:'browser',browserHash:hash(cookie),expires:{$gt:new Date()}},{$set:{status:'exchanging'}},{returnDocument:'after'});
   requireThat(flow,400,'Login expired or already used');
+  requireThat(flow.noticeVersion===1&&flow.ownerAcknowledgedAt,403,'Read the adult account notice before signing in.');
   requireThat(!req.query.error && typeof req.query.code==='string',400,'Google sign-in canceled');
   const {tokens}=await oauth.getToken(req.query.code);
   const ticket=await oauth.verifyIdToken({idToken:tokens.id_token,audience:clientId}); const claims=ticket.getPayload();
   requireThat(claims?.sub && claims.email_verified && claims.nonce===flow.nonce,401,'Invalid Google identity');
   const userId=hash(`google:${claims.sub}`);
-  await users.updateOne({_id:userId},{$set:{name:String(claims.name||'Player').slice(0,100)},$setOnInsert:{wallet:0,save:null,revision:0,created:new Date()}},{upsert:true});
+  // This is an adult-owner declaration, NOT verified age or verifiable parental consent.
+  await users.updateOne({_id:userId},{$set:{name:String(claims.name||'Player').slice(0,100),accountNotice:{version:1,mode:flow.accountMode,acknowledgedAt:flow.ownerAcknowledgedAt}},$setOnInsert:{wallet:0,save:null,revision:0,created:new Date()}},{upsert:true});
   await flows.updateOne({_id:flow._id,status:'exchanging'},{$set:{status:'complete',userId}});
   res.clearCookie('sb_oauth',{path:'/auth/google'});
   res.type('html').send('<!doctype html><title>Save The Baby</title><h1>Signed in</h1><p>Return to Save The Baby to finish loading your progress.</p>');

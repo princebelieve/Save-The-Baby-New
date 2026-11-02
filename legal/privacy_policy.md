@@ -28,9 +28,9 @@ When purchases are enabled, Google Play handles payment and payment-method detai
 
 The Game integrates Google Mobile Ads and Google's User Messaging Platform. Full-screen advertisements may appear at the end of a level. Optional rewarded advertisements offer the gameplay benefit shown before you choose to watch. Advertisement availability depends on network access and the advertising service.
 
-Google's advertising SDK may collect and share IP addresses (which can indicate approximate location), device and account identifiers such as the Android advertising ID, app and advertisement interactions, and diagnostic information for advertising, analytics and fraud prevention. Advertising information is processed by Google and its advertising partners under their policies; it is separate from the campaign progress stored locally by the Game. See https://policies.google.com/privacy and https://developers.google.com/admob/android/next-gen/privacy/play-data-disclosure.
+Google's advertising SDK may collect and share IP addresses (which can indicate approximate location), app and advertisement interactions, and diagnostic information for advertising, analytics and fraud prevention. Advertising information is processed by Google and its advertising partners under their policies; it is separate from the campaign progress stored locally by the Game. See https://policies.google.com/privacy and https://developers.google.com/admob/android/privacy/play-data-disclosure.
 
-Where required, the Game displays Google's consent message before requesting advertisements. When Google requires a privacy-options entry point, AD PRIVACY OPTIONS appears in the Game's settings so you can revisit your choices. You can also manage your advertising ID using Android's privacy settings. The Game does not request access to precise GPS location, contacts, photos or microphone for advertising.
+Where required, the Game displays Google's consent message before requesting advertisements. When Google requires a privacy-options entry point, AD PRIVACY OPTIONS appears in the Game's settings so you can revisit your choices. The Game does not request access to precise GPS location, contacts, photos or microphone for advertising.
 
 ## Information you send to support
 
@@ -43,6 +43,8 @@ Guest progress and local backups remain in the app's private storage. Signed-in 
 We rely on Android’s app sandbox to protect local files. No method of storage or communication is completely secure, so keep your device and email account protected.
 
 ## Children
+
+Before requesting ads, the Android game asks for an age group, including an option not to say. Only the selected category is saved on the device; it is not uploaded to our server. All players receive child-directed advertising treatment with a maximum ad content rating of G. This disables personalized advertising for these requests. The Android export removes the advertising-ID permission. Age-group answers do not remove gameplay features, ads, optional sign-in or purchases.
 
 Optional sign-in, cloud saves, purchase verification and advertising services process information as described above. If you believe a child has provided personal information through the Game or support, contact **info@sbi.globalcreest.com** so we can review the request and take appropriate action.
 

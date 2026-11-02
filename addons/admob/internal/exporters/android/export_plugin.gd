@@ -85,6 +85,11 @@ func _get_android_dependencies_maven_repos(platform: EditorExportPlatform, debug
 	return maven_repos
 
 
+func _get_android_manifest_element_contents(_platform: EditorExportPlatform, _debug: bool) -> String:
+	# All players receive child treatment; no advertising identifier is needed.
+	return '<uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove" />'
+
+
 func _get_android_manifest_application_element_contents(
 	_platform: EditorExportPlatform, _debug: bool
 ) -> String:
@@ -162,7 +167,10 @@ func _export_begin(_features: PackedStringArray, _is_debug: bool, _path: String,
 			"AdMob Android Export Error: 'Use Gradle Build' must be enabled in the Android export preset. Prebuilt APK export is not supported by the Poing AdMob plugin."
 		)
 		return
-	PluginVersion.check_version_mismatch(PluginVersion.android_version, "Android")
+	# This project intentionally pins the 4.3.1 native bridge (same used API)
+	# for the Families-listed play-services-ads SDK, retaining editor mocks.
+	if PluginVersion.android_version.trim_prefix("v") != "4.3.1":
+		push_error("AdMob: restore the pinned Families Android bridge 4.3.1 before exporting.")
 	_patch_android_gradle_file()
 	if not _is_debug:
 		_patch_android_r8()
@@ -296,9 +304,6 @@ func _patch_android_gradle_file() -> void:
 	if content.is_empty():
 		return
 
-	if 'exclude group: "com.google.android.gms", module: "play-services-ads"' in content:
-		return
-
 	var patch := """
 // Added by Poing Godot AdMob Plugin to support GMA Next-Gen SDK
 configurations.configureEach {
@@ -307,7 +312,10 @@ configurations.configureEach {
     resolutionStrategy.force "androidx.browser:browser:1.8.0"
 }
 """
-	content += patch
+	# Remove the 5.x Next-Gen exclusions: this project uses play-services-ads.
+	if not patch in content:
+		return
+	content = content.replace(patch, "")
 
 	var file := FileAccess.open(gradle_path, FileAccess.WRITE)
 	if file:

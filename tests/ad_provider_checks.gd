@@ -25,6 +25,10 @@ func _initialize() -> void:
 func _run() -> void:
 	var provider := TestProvider.new()
 	root.add_child(provider)
+	var configuration := provider._request_configuration().convert_to_dictionary()
+	assert(configuration.max_ad_content_rating == "G")
+	assert(configuration.tag_for_child_directed_treatment == 1)
+	assert(configuration.tag_for_under_age_of_consent == -1)
 	assert(not provider.is_ad_ready("rewarded"))
 	provider._initialized = true
 	provider._consent_ready = true

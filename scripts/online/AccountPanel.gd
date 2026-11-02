@@ -69,7 +69,9 @@ func show_account() -> void:
 	if not account.configured():
 		status.text += "\nOnline services await server setup. Guest play remains available."
 	if not account.signed_in():
-		_button(content,"SIGN IN WITH GOOGLE",func(): account.sign_in(),not account.configured())
+		if account.needs_parent_account():
+			status.text = "Playing as guest. Ask a parent or guardian to manage cloud saves and coin purchases with their own Google account."
+		_button(content,"PARENT / GUARDIAN SIGN IN" if account.needs_parent_account() else "SIGN IN WITH GOOGLE",_sign_in,not account.configured())
 	else:
 		var player_id := Label.new()
 		player_id.text = "Player ID: " + account.user_id
@@ -86,7 +88,7 @@ func show_account() -> void:
 		for product in purchases.PRODUCTS:
 			var offer: Dictionary = purchases.products.get(product,{})
 			var price := str(offer.get("formatted_price","Unavailable"))
-			_button(content,"%d COINS - %s" % [purchases.PRODUCTS[product],price],purchases.buy.bind(product),not purchases.available(product))
+			_button(content,"%d COINS - %s" % [purchases.PRODUCTS[product],price],_confirm_purchase.bind(product,price),not purchases.available(product))
 		var supply_label := Label.new()
 		supply_label.text = "USE PURCHASED COINS"
 		content.add_child(supply_label)
@@ -105,6 +107,33 @@ func show_account() -> void:
 	dialog.confirmed.connect(dialog.queue_free)
 	dialog.canceled.connect(dialog.queue_free)
 	dialog.popup_centered_clamped(Vector2i(int(content.custom_minimum_size.x+36),int(scroll.custom_minimum_size.y+80)))
+
+func _sign_in() -> void:
+	if not account.needs_parent_account():
+		account.sign_in()
+		return
+	var confirm := ConfirmationDialog.new()
+	game._prepare_dialog(confirm)
+	confirm.title = "ASK A PARENT OR GUARDIAN"
+	confirm.dialog_text = "Please hand this device to your parent or guardian.\n\nParent: use your own Google account to manage this save and purchased coins. Read the account notice in the browser before continuing.\n\nYou can cancel and keep playing."
+	confirm.ok_button_text = "OPEN ACCOUNT NOTICE"
+	confirm.confirmed.connect(func(): account.sign_in())
+	confirm.confirmed.connect(confirm.queue_free)
+	confirm.canceled.connect(confirm.queue_free)
+	game.add_child(confirm)
+	confirm.popup_centered_clamped(Vector2i(520,320))
+
+func _confirm_purchase(product: String, price: String) -> void:
+	var confirm := ConfirmationDialog.new()
+	game._prepare_dialog(confirm)
+	confirm.title = "GOOGLE PLAY PURCHASE"
+	confirm.dialog_text = "%d coins for %s.\n\n%sGoogle Play will handle payment and any purchase approval required by your family settings. Coins are added only after payment is confirmed.\n\nCoins belong to the signed-in game account: %s." % [purchases.PRODUCTS[product],price,"Ask your parent or guardian to continue.\n\n" if account.needs_parent_account() else "",account.player_name]
+	confirm.ok_button_text = "CONTINUE TO GOOGLE PLAY"
+	confirm.confirmed.connect(func(): purchases.buy(product))
+	confirm.confirmed.connect(confirm.queue_free)
+	confirm.canceled.connect(confirm.queue_free)
+	game.add_child(confirm)
+	confirm.popup_centered_clamped(Vector2i(520,340))
 
 func _button(parent: Control,title: String,action: Callable,disabled := false) -> void:
 	var button := game._make_menu_button(title)

@@ -7,6 +7,8 @@ const REWARDED_ID := "ca-app-pub-7480928068306811/7596260199"
 const TEST_INTERSTITIAL_ID := "ca-app-pub-3940256099942544/1033173712"
 const TEST_REWARDED_ID := "ca-app-pub-3940256099942544/5224354917"
 const MAX_AD_AGE_MS := 50 * 60 * 1000
+const AGE_SETTINGS := "user://ad_age_group.cfg"
+var _age_dialog: ConfirmationDialog
 var _initialized := false
 var _initializing := false
 var _consent_ready := false
@@ -39,7 +41,37 @@ func _ready() -> void:
 
 func start_session() -> void:
 	if OS.get_name() == "Android" and Engine.has_singleton("PoingGodotAdMob") and not _initialized and not _initializing:
-		call_deferred("_update_consent")
+		var settings := ConfigFile.new()
+		if settings.load(AGE_SETTINGS) == OK and settings.get_value("audience", "group", "") in ["under_13", "13_15", "16_17", "adult", "unknown"]:
+			call_deferred("_update_consent")
+		else:
+			_show_age_screen()
+
+func _show_age_screen() -> void:
+	if is_instance_valid(_age_dialog):
+		return
+	_age_dialog = ConfirmationDialog.new()
+	_age_dialog.title = "Your age group"
+	_age_dialog.dialog_text = "Choose your age group. You can also choose not to say."
+	_age_dialog.get_cancel_button().hide()
+	_age_dialog.get_ok_button().text = "Continue"
+	_age_dialog.get_ok_button().disabled = true
+	_age_dialog.exclusive = true
+	_age_dialog.unresizable = true
+	var choices := OptionButton.new()
+	for label in ["Choose an option", "Under 13", "13–15", "16–17", "18 or over", "Prefer not to say"]:
+		choices.add_item(label)
+	choices.set_item_disabled(0, true)
+	choices.item_selected.connect(func(_index: int): _age_dialog.get_ok_button().disabled = false)
+	_age_dialog.add_child(choices)
+	_age_dialog.confirmed.connect(func():
+		var settings := ConfigFile.new()
+		settings.set_value("audience", "group", ["", "under_13", "13_15", "16_17", "adult", "unknown"][choices.selected])
+		settings.save(AGE_SETTINGS)
+		_age_dialog.queue_free()
+		call_deferred("_update_consent"))
+	add_child(_age_dialog)
+	_age_dialog.popup_centered(Vector2i(560, 200))
 
 func _process(_delta: float) -> void:
 	if not _initialized or not _consent_ready or _showing:
@@ -53,7 +85,16 @@ func _process(_delta: float) -> void:
 			availability_changed.emit()
 
 func _update_consent() -> void:
-	UserMessagingPlatform.consent_information.update(ConsentRequestParameters.new(), _on_consent_updated, func(_error: FormError): _finish_consent())
+	var parameters := ConsentRequestParameters.new()
+	# Everyone receives child-suitable ads; do not ask children for adult consent.
+	parameters.tag_for_under_age_of_consent = true
+	UserMessagingPlatform.consent_information.update(parameters, _on_consent_updated, func(_error: FormError): _finish_consent())
+
+func _request_configuration() -> RequestConfiguration:
+	var configuration := RequestConfiguration.new()
+	configuration.max_ad_content_rating = RequestConfiguration.MAX_AD_CONTENT_RATING_G
+	configuration.tag_for_child_directed_treatment = RequestConfiguration.TagForChildDirectedTreatment.TRUE
+	return configuration
 
 func _on_consent_updated() -> void:
 	var info := UserMessagingPlatform.consent_information
@@ -74,6 +115,9 @@ func _initialize_sdk() -> void:
 	if not _consent_ready or _initialized or _initializing:
 		return
 	_initializing = true
+	# Apply before initialization, which may itself preload ads. The pinned
+	# Android bridge uses play-services-ads, whose configuration supports this.
+	MobileAds.set_request_configuration(_request_configuration())
 	var listener := OnInitializationCompleteListener.new()
 	listener.on_initialization_complete = func(_status: InitializationStatus):
 		_initializing = false

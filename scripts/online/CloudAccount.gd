@@ -46,6 +46,11 @@ func configured() -> bool:
 func signed_in() -> bool:
 	return not token.is_empty() and not user_id.is_empty()
 
+func needs_parent_account() -> bool:
+	var settings := ConfigFile.new()
+	# Unknown age receives the same parent handoff as younger players.
+	return settings.load("user://ad_age_group.cfg") != OK or settings.get_value("audience", "group", "unknown") != "adult"
+
 func api(path: String, method: HTTPClient.Method = HTTPClient.METHOD_GET, data: Dictionary = {}, authenticated := true) -> Dictionary:
 	if not configured():
 		return {"error":"Online services are not configured yet.", "status":0}
@@ -82,13 +87,16 @@ func sign_in() -> void:
 		return
 	_login_active = true
 	var verifier := Crypto.new().generate_random_bytes(32).hex_encode()
-	var start := await api("/auth/start", HTTPClient.METHOD_POST, {"challenge":verifier.sha256_text()}, false)
+	var start := await api("/auth/start", HTTPClient.METHOD_POST, {"challenge":verifier.sha256_text(),"accountMode":"guardian" if needs_parent_account() else "self"}, false)
 	if start.has("error"):
 		_login_active = false
 		message.emit(str(start.error))
 		return
-	OS.shell_open(str(start.url))
-	message.emit("Finish Google sign-in in your browser, then return to the game.")
+	if OS.shell_open(str(start.url)) != OK:
+		_login_active = false
+		message.emit("Could not open the browser. Please try signing in again.")
+		return
+	message.emit("Ask your parent to read the account notice and sign in with their own Google account, then return to the game." if needs_parent_account() else "Read the account notice and finish Google sign-in in your browser, then return to the game.")
 	for attempt in range(90):
 		await get_tree().create_timer(3.0).timeout
 		if not _login_active:

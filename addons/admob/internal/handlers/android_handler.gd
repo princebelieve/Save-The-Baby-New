@@ -29,6 +29,7 @@ const PACKAGE_PATH := "res://addons/admob/android/bin/package.gd"
 const DOWNLOAD_DIR := "res://addons/admob/downloads/android/"
 const EXTRACT_PATH := "res://addons/admob/android/bin/"
 const BASE_URL := "https://github.com/poingstudios/godot-admob-plugin/releases/download/%s/%s"
+const ANDROID_RELEASE := "v4.3.1" # Families-listed play-services-ads bridge.
 
 const DialogService := preload("res://addons/admob/internal/services/ui/dialog_service.gd")
 
@@ -50,7 +51,7 @@ func check_dependencies() -> void:
 
 func install() -> void:
 	var file_name := get_zip_file_name()
-	var url := BASE_URL % [PluginVersion.current, file_name]
+	var url := BASE_URL % [ANDROID_RELEASE, file_name]
 	var destination := DOWNLOAD_DIR.path_join(file_name)
 
 	_download_service.download_file(url, destination, "Android")
@@ -66,6 +67,8 @@ func _on_download_completed(success: bool) -> void:
 	var extract_success := ZipService.extract_zip(zip_path, EXTRACT_PATH, true)
 	if extract_success:
 		InstallerService.create_package_file(PACKAGE_PATH)
+		var package_file := FileAccess.open(PACKAGE_PATH, FileAccess.WRITE)
+		package_file.store_string('const VERSION := "4.3.1"\n')
 		(
 			_dialog_service
 			. show_message(
@@ -76,4 +79,4 @@ func _on_download_completed(success: bool) -> void:
 
 
 static func get_zip_file_name() -> String:
-	return "android-template-" + PluginVersion.godot + ".zip"
+	return "poing-godot-admob-android-" + PluginVersion.godot + ".zip"
