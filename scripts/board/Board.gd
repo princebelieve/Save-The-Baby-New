@@ -23,6 +23,7 @@ var _drag_start: Tile
 var _tap_selection: Tile
 var _press_screen_position: Vector2 = Vector2.ZERO
 var _active_touch_index := -1
+var _last_screen_touch_msec := -10000
 var _remaining_moves: int = 0
 var _required_swap: Array[Vector2i] = []
 var _required_booster_target := Vector2i(-1, -1)
@@ -910,6 +911,7 @@ func _attach_tile(tile: Tile, grid_position: Vector2i) -> void:
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch:
+		_last_screen_touch_msec = Time.get_ticks_msec()
 		if event.pressed:
 			if _locked or _active_touch_index != -1:
 				return
@@ -921,12 +923,18 @@ func _input(event: InputEvent) -> void:
 				cancel_pointer_gesture()
 			elif not _locked:
 				_finish_pointer_gesture(event.position)
+			else:
+				cancel_pointer_gesture()
 		return
 	if _locked:
+		if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed:
+			cancel_pointer_gesture()
 		return
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
-		# Touch already owns its gesture; synthesized mouse events must not replay it.
-		if event.device == InputEvent.DEVICE_ID_EMULATION or _active_touch_index != -1:
+		# Android may deliver its emulated mouse release just after touch-up,
+		# when _active_touch_index has already been cleared. Suppress that tail too.
+		var recent_touch := Time.get_ticks_msec() - _last_screen_touch_msec < 500
+		if event.device == InputEvent.DEVICE_ID_EMULATION or _active_touch_index != -1 or recent_touch:
 			return
 		if event.pressed:
 			_begin_pointer_gesture(event.position)

@@ -103,13 +103,14 @@ var _restore_tutorial_after_pause := false
 func _notification(what: int) -> void:
 	if not is_node_ready():
 		return
-	if _ads != null and _ads.busy:
-		return
-	if what == NOTIFICATION_APPLICATION_PAUSED:
+	if what == NOTIFICATION_APPLICATION_PAUSED or what == NOTIFICATION_WM_WINDOW_FOCUS_OUT:
+		# A screen switch can cancel a touch while a board tween is still active.
+		# Always clear that gesture and persist, even when a full-screen ad owns
+		# the foreground; only the ad provider should manage its own pause UI.
 		if _board != null:
 			_board.cancel_pointer_gesture()
 		_persist_campaign_progress()
-		if _board != null and _launch_layer == null and _story_layer == null and _campaign_layer == null and _result_layer == null:
+		if (_ads == null or not _ads.busy) and _board != null and _launch_layer == null and _story_layer == null and _campaign_layer == null and _result_layer == null:
 			_show_pause_menu(true)
 	elif what == NOTIFICATION_APPLICATION_RESUMED:
 		if _board != null:
