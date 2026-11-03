@@ -54,9 +54,9 @@
             18,
             18,
             18,
-            4,
-            4,
-            2
+            1,
+            1,
+            1
         ]
     },
     "difficulty": "INTRODUCTION",
@@ -90,7 +90,7 @@
         "steps": [
             {
                 "mechanic": "character_tiles",
-                "message": "Match portraits for assists and coins. The Ethan tray spends an assist to clear a five by five area."
+                "message": "Character portraits are rare. Match Ethan or Detective for one rescue assist; Victor gives ten coins. The Ethan tray spends an assist to clear a three by three area."
             }
         ]
     },

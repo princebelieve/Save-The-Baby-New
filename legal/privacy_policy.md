@@ -44,7 +44,7 @@ We rely on Android’s app sandbox to protect local files. No method of storage 
 
 ## Children
 
-Before requesting ads, the Android game asks for an age group, including an option not to say. Only the selected category is saved on the device; it is not uploaded to our server. All players receive child-directed advertising treatment with a maximum ad content rating of G. This disables personalized advertising for these requests. The Android export removes the advertising-ID permission. Age-group answers do not remove gameplay features, ads, optional sign-in or purchases.
+Before requesting ads, the Android game asks for an age group, including an option not to say. Only the selected category is saved on the device; it is not uploaded to our server. All players receive child-directed advertising treatment with a maximum ad content rating of G. These settings are applied to ad requests. The Android release includes the `AD_ID` and `ACCESS_ADSERVICES_*` permissions declared by the Google Mobile Ads SDK. Age-group answers do not remove gameplay features, ads, optional sign-in or purchases.
 
 Optional sign-in, cloud saves, purchase verification and advertising services process information as described above. If you believe a child has provided personal information through the Game or support, contact **info@sbi.globalcreest.com** so we can review the request and take appropriate action.
 

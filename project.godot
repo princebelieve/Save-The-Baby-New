@@ -17,6 +17,7 @@ general/ios/enabled=false
 
 config/name="Save The Baby"
 run/main_scene="uid://d4l6yynhehsfw"
+config/quit_on_go_back=false
 config/features=PackedStringArray("4.6", "Mobile")
 boot_splash/bg_color=Color(0.96, 0.91, 0.78, 1)
 boot_splash/image="res://assets/sb_ibhadode_splash.png"

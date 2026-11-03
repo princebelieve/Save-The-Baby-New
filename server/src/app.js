@@ -1,5 +1,5 @@
 import express from 'express';
-import {hash,random,HttpError,requireThat,PACKS,SUPPLIES,validateSave,verifyPurchase,addSupply,profile} from './domain.js';
+import {hash,random,HttpError,requireThat,PACKS,SUPPLIES,MAX_ETHAN_ASSISTS,validateSave,verifyPurchase,addSupply,profile} from './domain.js';
 
 export function createApp({db, client, oauth, play, baseUrl, clientId, commerceEnabled=false}) {
  const app=express(); app.disable('x-powered-by'); app.set('trust proxy',1);
@@ -161,6 +161,7 @@ export function createApp({db, client, oauth, play, baseUrl, clientId, commerceE
    const user=await users.findOne({_id:req.user._id},{session}); requireThat(user?.save,409,'Save progress before purchasing supplies');
    requireThat(user.revision===revision,409,'Another device has a newer save');
    const price=SUPPLIES[kind].price; requireThat(user.wallet>=price,409,'Not enough purchased coins');
+   requireThat(kind!=='ethan'||Number(user.save.campaign.ethan||0)<MAX_ETHAN_ASSISTS,409,'Ethan assists are already full');
    requireThat(kind!=='lives'||Number(user.save.campaign.lives)<5,409,'Lives are already full');
    await users.updateOne({_id:user._id,revision},{$inc:{wallet:-price,revision:1},$set:{save:addSupply(user.save,kind),updated:new Date()}},{session});
    await db.collection('spends').insertOne({_id:key,userId:user._id,kind,price,created:new Date()},{session});

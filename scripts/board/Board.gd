@@ -629,8 +629,8 @@ func use_booster_at(kind: String, position: Vector2i) -> bool:
 			for tile in _grid.values():
 				if tile.get_tile_type() == target_type: targets.append(tile)
 		"ethan":
-			for y in range(maxi(0, position.y - 2), mini(get_height(), position.y + 3)):
-				for x in range(maxi(0, position.x - 2), mini(get_width(), position.x + 3)):
+			for y in range(maxi(0, position.y - 1), mini(get_height(), position.y + 2)):
+				for x in range(maxi(0, position.x - 1), mini(get_width(), position.x + 2)):
 					var rescue_tile: Tile = get_tile(Vector2i(x, y))
 					if rescue_tile != null: targets.append(rescue_tile)
 		_:

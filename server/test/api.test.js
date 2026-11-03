@@ -1,12 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createApp} from '../src/app.js';
-import {hash,validateSave,verifyPurchase} from '../src/domain.js';
+import {hash,validateSave,verifyPurchase,addSupply,MAX_ETHAN_ASSISTS} from '../src/domain.js';
 import {MemoryDb} from '../test-support/memory.js';
 
 test('save validation rejects Mongo operators, prototype keys, large payloads and invalid numbers',()=>{
  for(const save of [{campaign:{$set:1}},JSON.parse('{"campaign":{"__proto__":{}}}'),{campaign:{coins:Infinity}},{campaign:{x:'a'.repeat(100000)}}])assert.throws(()=>validateSave(save));
  assert.deepEqual(validateSave({campaign:{coins:10,completed_levels:{'1':3}}}),{campaign:{coins:10,completed_levels:{'1':3}}});
+ assert.equal(validateSave({campaign:{ethan:99}}).campaign.ethan,MAX_ETHAN_ASSISTS);
+ assert.equal(addSupply({campaign:{ethan:MAX_ETHAN_ASSISTS}},'ethan').campaign.ethan,MAX_ETHAN_ASSISTS);
 });
 test('purchase checks reject pending, canceled, cross-account and multi-quantity payments',()=>{
  for(const payment of [{purchaseState:2},{purchaseState:1},{purchaseState:0,obfuscatedExternalAccountId:'other'},{purchaseState:0,obfuscatedExternalAccountId:'owner',quantity:2}])assert.throws(()=>verifyPurchase(payment,'owner'));

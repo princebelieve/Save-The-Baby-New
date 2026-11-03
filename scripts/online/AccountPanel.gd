@@ -94,7 +94,8 @@ func show_account() -> void:
 		content.add_child(supply_label)
 		for supply in [["rocket",35],["bomb",50],["thunder",70],["ethan",90],["lives",100]]:
 			var kind := str(supply[0])
-			_button(content,"%s - %d coins" % ["5 lives" if kind == "lives" else "+1 " + kind.capitalize(),supply[1]],_spend.bind(kind),account.wallet<int(supply[1]) or account.conflict)
+			var ethan_full := kind == "ethan" and game._economy_manager.get_ethan_count() >= EthanInventory.MAX_ASSISTS
+			_button(content,"%s - %d coins" % ["5 lives" if kind == "lives" else "+1 " + kind.capitalize(),supply[1]],_spend.bind(kind),account.wallet<int(supply[1]) or account.conflict or ethan_full)
 		_button(content,"CHECK PENDING PURCHASES",func(): purchases.restore())
 		_button(content,"SIGN OUT",func(): account.sign_out())
 		_button(content,"DELETE ONLINE ACCOUNT",_confirm_delete)

@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://8la2nbsedj03"
+path="res://.godot/imported/Fast thank_you.mp3-fb22212ceb8ae2456f7a609d49c8d423.mp3str"
+
+[deps]
+
+source_file="res://assets/audio/sfx/praise/Fast thank_you.mp3"
+dest_files=["res://.godot/imported/Fast thank_you.mp3-fb22212ceb8ae2456f7a609d49c8d423.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

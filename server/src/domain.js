@@ -4,6 +4,7 @@ export const random = () => randomBytes(32).toString('base64url');
 export class HttpError extends Error { constructor(status, message) { super(message); this.status = status; } }
 export const requireThat = (condition, status, message) => { if (!condition) throw new HttpError(status, message); };
 export const PACKS = Object.freeze({coins_500: 500, coins_1500: 1500, coins_3500: 3500});
+export const MAX_ETHAN_ASSISTS = 2;
 export const SUPPLIES = Object.freeze({rocket: {price:35, amount:1}, bomb:{price:50, amount:1}, thunder:{price:70, amount:1}, ethan:{price:90, amount:1}, lives:{price:100, amount:5}});
 export function validateSave(save) {
  requireThat(save && typeof save === 'object' && !Array.isArray(save),400,'Invalid save');
@@ -23,6 +24,7 @@ export function validateSave(save) {
  for (const [section, values] of Object.entries(save)) requireThat(values && typeof values==='object' && !Array.isArray(values),400,'Invalid save section');
  const campaign=save.campaign;
  for (const key of ['coins','ethan','total_stars','special_moves_created','life_regeneration_time']) if(key in campaign) requireThat(Number.isSafeInteger(campaign[key])&&campaign[key]>=0,400,`Invalid ${key}`);
+ if ('ethan' in campaign) campaign.ethan = Math.min(MAX_ETHAN_ASSISTS, campaign.ethan);
  if('lives' in campaign) requireThat(Number.isSafeInteger(campaign.lives)&&campaign.lives>=0&&campaign.lives<=5,400,'Invalid lives');
  if('boosters' in campaign){requireThat(campaign.boosters&&typeof campaign.boosters==='object'&&!Array.isArray(campaign.boosters),400,'Invalid boosters');for(const count of Object.values(campaign.boosters))requireThat(Number.isSafeInteger(count)&&count>=0,400,'Invalid booster count');}
  return structuredClone(save);
@@ -36,7 +38,7 @@ export function addSupply(save, kind) {
  const result = validateSave(save);
  const campaign = result.campaign;
  if (kind === 'lives') campaign.lives = Math.min(5, Math.max(0,Number(campaign.lives)||0) + 5);
- else if (kind === 'ethan') campaign.ethan = Math.max(0,Number(campaign.ethan)||0) + 1;
+ else if (kind === 'ethan') campaign.ethan = Math.min(MAX_ETHAN_ASSISTS, Math.max(0,Number(campaign.ethan)||0) + 1);
  else { campaign.boosters ??= {}; campaign.boosters[kind] = Math.max(0,Number(campaign.boosters[kind])||0) + 1; }
  return result;
 }

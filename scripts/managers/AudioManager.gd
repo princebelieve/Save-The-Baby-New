@@ -44,6 +44,7 @@ var _current_music_track := ""
 var _application_suspended := false
 var _voice_player: AudioStreamPlayer
 var _voice_current_id := ""
+var _music_volume_db_before_voice := 0.0
 var _pending_voice: Dictionary = {}
 var _voice_not_before := 0
 var _last_praise_tick := -10000
@@ -77,7 +78,7 @@ func initialize() ->void:
 	_music_player.finished.connect(_on_music_finished)
 	_voice_player = AudioStreamPlayer.new()
 	add_child(_voice_player)
-	_voice_player.finished.connect(func(): _voice_current_id = "")
+	_voice_player.finished.connect(_on_voice_finished)
 
 	_load_audio_configuration()
 	_load_preferences()
@@ -169,8 +170,9 @@ func play_sfx(sound) -> void:
 		# A new move takes precedence over optional praise. Never stack speech
 		# over a fresh explosion or resume a word halfway through.
 		if _voice_player.playing and _voice_priority(_voice_current_id) < 80:
-			_voice_player.stop()
-			_voice_current_id = ""
+			_stop_voice()
+	if _voice_player.playing:
+		return
 	var player := AudioStreamPlayer.new()
 	player.bus = _sfx_bus_name
 	player.stream = stream
@@ -194,8 +196,7 @@ func play_sfx(sound) -> void:
 func stop_sfx(sound) -> void:
 	if str(_pending_voice.get("id", "")) == str(sound): _pending_voice.clear()
 	if _voice_current_id == str(sound):
-		_voice_player.stop()
-		_voice_current_id = ""
+		_stop_voice()
 	for player in _sfx_players.duplicate():
 		if _sfx_ids_by_player.get(player) != sound:
 			continue
@@ -404,8 +405,7 @@ func _apply_bus_volumes() -> void:
 
 func _stop_all_sfx() -> void:
 	_pending_voice.clear()
-	if _voice_player != null: _voice_player.stop()
-	_voice_current_id = ""
+	_stop_voice()
 	for player in _sfx_players.duplicate():
 		_sfx_players.erase(player)
 		_sfx_ids_by_player.erase(player)
@@ -424,6 +424,30 @@ func _voice_priority(id: String) -> int:
 	return int(_audio_config.get("voice_cues", {}).get(id, {}).get("priority", 0))
 
 
+func _duck_music_for_voice() -> void:
+	if _music_player == null:
+		return
+	_music_volume_db_before_voice = _music_player.volume_db
+	_music_player.volume_db = -8.0
+
+
+func _restore_music_after_voice() -> void:
+	if _music_player != null:
+		_music_player.volume_db = _music_volume_db_before_voice
+
+
+func _stop_voice() -> void:
+	if _voice_player != null:
+		_voice_player.stop()
+	_voice_current_id = ""
+	_restore_music_after_voice()
+
+
+func _on_voice_finished() -> void:
+	_voice_current_id = ""
+	_restore_music_after_voice()
+
+
 func _queue_voice(id: String, stream: AudioStream, cue: Dictionary) -> void:
 	var now := Time.get_ticks_msec()
 	var priority := int(cue.get("priority", 10))
@@ -431,8 +455,7 @@ func _queue_voice(id: String, stream: AudioStream, cue: Dictionary) -> void:
 	if _voice_player.playing:
 		if priority < 80: return
 		if priority <= _voice_priority(_voice_current_id): return
-		_voice_player.stop()
-		_voice_current_id = ""
+		_stop_voice()
 	if not _pending_voice.is_empty() and int(_pending_voice["priority"]) > priority: return
 	_pending_voice = {"id": id, "stream": stream, "priority": priority, "expires": now + 5000, "praise": bool(cue.get("praise", false))}
 	_voice_not_before = maxi(_voice_not_before, now + 220)
@@ -446,14 +469,15 @@ func _process(_delta: float) -> void:
 		return
 	if _voice_player.playing or now < _voice_not_before: return
 	for player in _sfx_players:
-		if is_instance_valid(player) and player.playing and _is_impact_id(str(_sfx_ids_by_player.get(player, ""))):
-			_voice_not_before = now + 180
+		if is_instance_valid(player) and player.playing:
+			_voice_not_before = now + 100
 			return
 	var cue := _pending_voice.duplicate()
 	_pending_voice.clear()
 	_voice_current_id = str(cue["id"])
 	_voice_player.stream = cue["stream"]
 	_voice_player.volume_db = -1.5 if int(cue["priority"]) >= 80 else 0.0
+	_duck_music_for_voice()
 	_voice_player.play()
 	if bool(cue["praise"]): _last_praise_tick = now
 	sound_played.emit(_voice_current_id)

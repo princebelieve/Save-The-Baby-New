@@ -33,7 +33,7 @@
     },
     "ethan_assist": {
       "name": "Ethan rescue assist",
-      "description": "Choose a tile. Ethan clears a 5 by 5 rescue area.",
+      "description": "Choose a tile. Ethan clears a 3 by 3 rescue area. You can hold up to two assists.",
       "category": "special",
       "currency": "coins",
       "price": 90,

@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://cmsv0tyo0nomq"
+path="res://.godot/imported/Fast wonderful.mp3-f4504c128d5a9b6f6d822a0eba2b28c4.mp3str"
+
+[deps]
+
+source_file="res://assets/audio/sfx/praise/Fast wonderful.mp3"
+dest_files=["res://.godot/imported/Fast wonderful.mp3-f4504c128d5a9b6f6d822a0eba2b28c4.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

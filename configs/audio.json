@@ -14,13 +14,15 @@
     "invalid_move": "res://assets/audio/sfx/invalid_move.ogg",
     "booster_select": "res://assets/audio/sfx/ui_click.ogg",
     "powerup_activate": "res://assets/audio/sfx/ui_confirm.ogg",
-    "match_nice": "res://assets/audio/sfx/tile_match.ogg",
-    "match_great": "res://assets/audio/sfx/ui_confirm.ogg",
-    "match_wonderful": "res://assets/audio/sfx/kenney/coins.ogg",
+    "match_nice": "res://assets/audio/sfx/praise/Fast nice.mp3",
+    "match_great": "res://assets/audio/sfx/praise/Child excellent.mp3",
+    "match_wonderful": "res://assets/audio/sfx/praise/Fast wonderful.mp3",
+    "match_thank_you": "res://assets/audio/sfx/praise/Fast thank_you.mp3",
     "objective_collected": "res://assets/audio/sfx/kenney/coins.ogg",
     "obstacle_destroyed": "res://assets/audio/sfx/kenney/obstacle_break.ogg",
     "powerup_rocket": "res://assets/audio/sfx/ui_confirm.ogg",
     "powerup_bomb": "res://assets/audio/sfx/thunder_crack.wav",
+    "powerup_ethan": "res://assets/audio/sfx/thunder_crack.wav",
     "powerup_thunder": "res://assets/audio/sfx/thunder_crack.wav",
     "special_created": "res://assets/audio/sfx/kenney/voiceover/power_up.ogg",
     "objective_achieved": "res://assets/audio/sfx/kenney/voiceover/objective_achieved.ogg",
@@ -44,6 +46,22 @@
     "sfx": "SFX"
   },
   "voice_cues": {
+    "match_nice": {
+      "priority": 20,
+      "praise": true
+    },
+    "match_great": {
+      "priority": 25,
+      "praise": true
+    },
+    "match_wonderful": {
+      "priority": 30,
+      "praise": true
+    },
+    "match_thank_you": {
+      "priority": 35,
+      "praise": true
+    },
     "special_created": {
       "priority": 10,
       "praise": false

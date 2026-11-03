@@ -89,9 +89,9 @@ var _campaign_coach_shown := false
 var _campaign_progress := ConfigFile.new()
 var _highest_unlocked_level := 1
 var _completed_levels: Dictionary = {}
-var _match_streak := 0
 var _gameplay_effects: GameplayEffects
 var _turn_praise_rank := 0
+var _suppress_character_rewards_this_turn := false
 var _waiting_for_collection := false
 var _special_moves_created := 0
 var _objective_complete_sound_played := false
@@ -105,14 +105,53 @@ func _notification(what: int) -> void:
 	if _ads != null and _ads.busy:
 		return
 	if what == NOTIFICATION_APPLICATION_PAUSED:
+		if _board != null:
+			_board.cancel_pointer_gesture()
 		_persist_campaign_progress()
 		if _board != null and _launch_layer == null and _story_layer == null and _campaign_layer == null and _result_layer == null:
 			_show_pause_menu(true)
+	elif what == NOTIFICATION_APPLICATION_RESUMED:
+		if _board != null:
+			_board.cancel_pointer_gesture()
 	elif what == NOTIFICATION_WM_GO_BACK_REQUEST:
-		if _pause_layer != null:
-			_close_pause_menu()
-		elif _board != null and _launch_layer == null and _story_layer == null and _campaign_layer == null and _result_layer == null:
-			_show_pause_menu(true)
+		_handle_back_request()
+
+
+func _handle_back_request() -> void:
+	var dialogs := find_children("*", "AcceptDialog", true, false)
+	for index in range(dialogs.size() - 1, -1, -1):
+		var dialog := dialogs[index] as AcceptDialog
+		if dialog.visible:
+			dialog.hide()
+			return
+	if _detail_layer != null and is_instance_valid(_detail_layer):
+		_close_detail()
+	elif _case_file_layer != null and is_instance_valid(_case_file_layer):
+		_close_case_file()
+	elif _pause_layer != null:
+		_close_pause_menu()
+	elif _result_layer != null and is_instance_valid(_result_layer):
+		_return_to_campaign_map()
+	elif _campaign_layer != null and is_instance_valid(_campaign_layer):
+		if _tutorial_action == "campaign_map_intro" and _tutorial_overlay != null:
+			_tutorial_overlay.hide_tip()
+			_on_tutorial_acknowledged()
+		else:
+			_campaign_layer.queue_free()
+			_campaign_layer = null
+			_campaign_map = null
+			if _tutorial_overlay != null:
+				_tutorial_overlay.hide_tip()
+			_tutorial_action = ""
+			_show_launch_screen()
+	elif _story_layer != null and is_instance_valid(_story_layer):
+		_story_layer.queue_free()
+		_story_layer = null
+		_show_launch_screen()
+	elif _board != null and _launch_layer == null:
+		_show_pause_menu(true)
+	else:
+		get_tree().quit()
 
 
 func _ready() -> void:
@@ -2178,6 +2217,9 @@ func _save_inventory_progress() -> void:
 func _open_booster_shop(kind: String) -> void:
 	if _economy_manager == null:
 		return
+	if kind == "ethan" and _economy_manager.get_ethan_count() >= EthanInventory.MAX_ASSISTS:
+		_show_shop_notice("Ethan assists are full. Use one before collecting another.")
+		return
 	var item_id := "ethan_assist" if kind == "ethan" else "%s_booster" % kind
 	var item: Dictionary = _economy_manager.get_shop_item(item_id)
 	if item.is_empty():
@@ -2215,6 +2257,8 @@ func _open_booster_shop(kind: String) -> void:
 		purchase.free()
 	)
 	var supplies_ad := dialog.add_button("Watch ad: +1 %s" % kind.capitalize(), false, "reward")
+	if kind == "ethan" and _economy_manager.get_ethan_count() >= EthanInventory.MAX_ASSISTS:
+		supplies_ad.disabled = true
 	_bind_ad_button(supplies_ad, "supply_" + kind)
 	dialog.custom_action.connect(func(action: String):
 		if action == "reward":
@@ -2302,7 +2346,6 @@ func _persist_campaign_progress() -> void:
 
 
 func _on_tiles_matched(tile_types: Array) -> void:
-	_match_streak += 1
 	var feedback_caption := ""
 	var feedback_sound := ""
 	var shake_board := false
@@ -2311,15 +2354,16 @@ func _on_tiles_matched(tile_types: Array) -> void:
 	for tile_type in tile_types:
 		if _objective_type == "COLLECT_ITEMS" and int(tile_type) == target_enum:
 			_evidence_count += 1
-		if int(tile_type) == int(Constants.TileType.ETHAN) and _economy_manager != null:
-			_economy_manager.add_ethan(1)
-			character_rewards["ethan"] = int(character_rewards["ethan"]) + 1
-		elif int(tile_type) == int(Constants.TileType.DETECTIVE) and _economy_manager != null:
-			_economy_manager.add_ethan(1)
-			character_rewards["detective"] = int(character_rewards["detective"]) + 1
-		elif int(tile_type) == int(Constants.TileType.VICTOR) and _economy_manager != null:
-			_economy_manager.add_coins(10)
-			character_rewards["victor"] = int(character_rewards["victor"]) + 1
+		if not _suppress_character_rewards_this_turn and _economy_manager != null:
+			if int(tile_type) in [int(Constants.TileType.ETHAN), int(Constants.TileType.DETECTIVE)]:
+				var assists_before := _economy_manager.get_ethan_count()
+				_economy_manager.add_ethan(1)
+				if _economy_manager.get_ethan_count() > assists_before:
+					var character_id := "ethan" if int(tile_type) == int(Constants.TileType.ETHAN) else "detective"
+					character_rewards[character_id] = int(character_rewards[character_id]) + 1
+			elif int(tile_type) == int(Constants.TileType.VICTOR):
+				_economy_manager.add_coins(10)
+				character_rewards["victor"] = int(character_rewards["victor"]) + 1
 	var reward_notices: Array[String] = []
 	var ethan_matches := int(character_rewards["ethan"])
 	var detective_matches := int(character_rewards["detective"])
@@ -2339,20 +2383,24 @@ func _on_tiles_matched(tile_types: Array) -> void:
 	var special_reward_text := " | ".join(reward_notices)
 	SignalBus.play_sfx.emit("tile_match")
 	var rank := 0
-	if tile_types.size() >= 12 or _match_streak >= 5:
+	if tile_types.size() >= 12:
 		feedback_caption = "WONDERFUL!"
 		feedback_sound = "match_wonderful"
 		rank = 3
 		shake_board = true
-	elif tile_types.size() >= 9 or _match_streak >= 4:
+	elif tile_types.size() >= 9:
 		feedback_caption = "EXCELLENT!"
 		feedback_sound = "match_great"
 		rank = 2
 		shake_board = true
-	elif tile_types.size() >= 6 or _match_streak >= 3:
+	elif tile_types.size() >= 6:
 		feedback_caption = "NICE!"
 		feedback_sound = "match_nice"
 		rank = 1
+	if ethan_matches > 0:
+		feedback_caption = "THANK YOU!"
+		feedback_sound = "match_thank_you"
+		rank = 4
 	if rank <= _turn_praise_rank:
 		feedback_caption = ""
 	else:
@@ -2429,13 +2477,13 @@ func _on_special_activated(kind: String) -> void:
 
 func _on_board_turn_resolved() -> void:
 	_turn_praise_rank = 0
+	_suppress_character_rewards_this_turn = false
 	_discover_journal_fact("first_moves", 1)
 	_discover_journal_fact("first_moves", 2)
 	if _tutorial_skip_pending:
 		_tutorial_skip_pending = false
 		_finish_tutorial()
 		return
-	_match_streak = 0
 	if _result_layer != null:
 		return
 	var tutorial_result_pending := _tutorial_active and ["guided_swap", "booster_resolving", "activate_special"].has(_tutorial_action)
@@ -2653,7 +2701,7 @@ func _show_booster_confirmation(kind: String) -> void:
 		"rocket": "Choose a tile. Rocket clears its full row and column.",
 		"bomb": "Choose a tile. Bomb clears the tiles around it.",
 		"thunder": "Choose a tile. Thunder clears every tile of that type.",
-		"ethan": "Choose a tile. Ethan clears a 5 by 5 rescue area."
+		"ethan": "Choose a tile. Ethan clears a 3 by 3 rescue area. You can hold up to two assists."
 	}
 	var dialog := ConfirmationDialog.new()
 	_prepare_dialog(dialog)
@@ -2703,6 +2751,7 @@ func _cancel_booster_targeting() -> void:
 
 
 func _on_booster_used(kind: String) -> void:
+	_suppress_character_rewards_this_turn = true
 	_discover_journal_fact("characters" if kind == "ethan" else kind, 3 if kind == "ethan" else 2)
 	_selected_booster = ""
 	_hint_label.text = "%s USED" % kind.to_upper()

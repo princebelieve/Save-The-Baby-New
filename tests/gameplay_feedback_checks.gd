@@ -70,6 +70,15 @@ func _ready() -> void:
 	await wait(1.0)
 	check(game._effects().pending_collections == 0,"Clearing effects must cancel pending flights safely")
 	await check_voice_lane()
+	game._economy_manager.set_ethan_count(99)
+	check(game._economy_manager.get_ethan_count() == EthanInventory.MAX_ASSISTS, "Ethan assists must stop at the two-assist cap")
+	game._economy_manager.set_ethan_count(1)
+	var ethan_clear_sizes: Array[int] = []
+	board.tiles_matched_with_cells.connect(func(_type, cells): ethan_clear_sizes.append(cells.size()))
+	check(board.use_booster_at("ethan", Vector2i(3,3)), "Ethan assist must activate")
+	await settle()
+	check(not ethan_clear_sizes.is_empty() and ethan_clear_sizes[0] <= 9, "Ethan must clear at most a three by three area")
+	check(game._economy_manager.get_ethan_count() == 0, "Tiles cleared by Ethan must not generate another assist")
 	game._effects().praise("WONDERFUL!",Game.DISPLAY_FONT)
 	await capture("04_celebration")
 	# End-of-level result must wait for the visible HUD delivery and lock input.
@@ -99,13 +108,17 @@ func check_voice_lane() -> void:
 	var audio = game.get_node("Managers/AudioManager")
 	audio._stop_all_sfx()
 	audio._last_praise_tick = -10000
+	for id in ["match_nice", "match_great", "match_wonderful", "match_thank_you"]:
+		var path: String = audio._resolve_audio_id("sfx", id)
+		check(ResourceLoader.exists(path), "%s must resolve to its praise clip" % id)
+		check(ResourceManager.load_audio(path) is AudioStreamMP3, "%s must load as spoken MP3 audio" % id)
 	var heard: Array[String] = []
 	var overlap := [false]
 	audio.sound_played.connect(func(id):
 		if audio._audio_config.get("voice_cues",{}).has(str(id)):
 			heard.append(str(id))
 			for player in audio._sfx_players:
-				if player.playing and audio._is_impact_id(str(audio._sfx_ids_by_player.get(player,""))): overlap[0] = true)
+				if player.playing: overlap[0] = true)
 	audio.play_sfx("powerup_bomb")
 	audio.play_sfx("match_nice")
 	audio.play_sfx("match_wonderful")
@@ -115,12 +128,16 @@ func check_voice_lane() -> void:
 	while heard.is_empty() and Time.get_ticks_msec()<deadline:
 		await get_tree().process_frame
 	check(heard==["match_wonderful"] and not overlap[0],"Exactly one praise must start after the powerup audio has ended")
+	check(audio._music_player.volume_db <= -8.0, "Music must duck while a praise clip plays")
 	audio.play_sfx("match_nice")
 	check(audio._pending_voice.is_empty(),"Praise cooldown must reject repeated chatter")
+	audio.play_sfx("tile_match")
+	check(audio._sfx_players.is_empty(), "Gameplay effects must not overlap a spoken praise clip")
 	audio.play_sfx("level_victory")
 	check(audio._pending_voice.get("id","")=="level_victory","Mission announcement must supersede optional praise")
 	var music_stream = audio._music_player.stream
 	audio.set_sfx_enabled(false)
 	check(not audio._voice_player.playing and audio._pending_voice.is_empty(),"Effects mute must clear current and queued voices")
+	check(is_zero_approx(audio._music_player.volume_db), "Music volume must return to normal when voice playback stops")
 	check(audio._music_player.stream==music_stream and audio._music_player.playing,"Voice scheduling must preserve the working music player")
 	audio.set_sfx_enabled(true)

@@ -74,6 +74,7 @@ func _build_map() -> void:
 	var base := ColorRect.new()
 	base.color = Color("#243521")
 	base.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	base.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(base)
 	var title_background := TextureRect.new()
 	title_background.texture = ResourceManager.load_texture("res://assets/sprites/backgrounds/title_woodgrain_texture.jpeg")
@@ -88,9 +89,11 @@ func _build_map() -> void:
 	scroll.offset_top = 118.0
 	scroll.offset_bottom = -12.0
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 	add_child(scroll)
 	var map := Control.new()
 	map.name = "CampaignTrail"
+	map.mouse_filter = Control.MOUSE_FILTER_PASS
 	map.custom_minimum_size = Vector2(_map_width, _chapter_records.size() * _chapter_height)
 	map.size = map.custom_minimum_size
 	scroll.add_child(map)
@@ -161,6 +164,7 @@ func _build_chapter_art(map: Control, index: int, chapter: Dictionary, levels: A
 	grass.position = Vector2(0, top)
 	grass.size = Vector2(_map_width, _chapter_height)
 	grass.modulate = Color(0.78, 0.86, 0.70, 1)
+	grass.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	map.add_child(grass)
 	var location := TextureRect.new()
 	location.texture = ResourceManager.load_texture(_asset_path(BACKGROUND_DIR, str(chapter["background"])))
@@ -168,6 +172,7 @@ func _build_chapter_art(map: Control, index: int, chapter: Dictionary, levels: A
 	location.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	location.position = Vector2(12, top + 118)
 	location.size = Vector2(_map_width - 24, _chapter_height - 130)
+	location.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	map.add_child(location)
 	var landmark := TextureRect.new()
 	landmark.texture = ResourceManager.load_texture(_asset_path(PROP_DIR, str(chapter["landmark"])))
@@ -176,6 +181,7 @@ func _build_chapter_art(map: Control, index: int, chapter: Dictionary, levels: A
 	landmark.position = Vector2(12 if index % 2 == 0 else _map_width - 142, top + 325)
 	landmark.size = Vector2(130, 120)
 	landmark.modulate = Color(1, 1, 1, 0.96)
+	landmark.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	map.add_child(landmark)
 	var prop_set: Array = chapter.get("props", [])
 	var prop_size := _map_width * 0.15
@@ -218,6 +224,7 @@ func _build_chapter_art(map: Control, index: int, chapter: Dictionary, levels: A
 	sign_title.add_theme_color_override("font_shadow_color", Color("#102238"))
 	sign_title.add_theme_constant_override("shadow_offset_x", 1)
 	sign_title.add_theme_constant_override("shadow_offset_y", 1)
+	sign_title.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	map.add_child(sign_title)
 	var range_label := Label.new()
 	range_label.text = "LEVELS %02d-%02d" % [chapter["first"], chapter["last"]]
@@ -229,6 +236,7 @@ func _build_chapter_art(map: Control, index: int, chapter: Dictionary, levels: A
 	range_label.add_theme_color_override("font_shadow_color", Color("#102238"))
 	range_label.add_theme_constant_override("shadow_offset_x", 1)
 	range_label.add_theme_constant_override("shadow_offset_y", 1)
+	range_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	map.add_child(range_label)
 	var points := PackedVector2Array()
 	var count := levels.size()
