@@ -162,7 +162,7 @@ func play_sfx(sound) -> void:
 	var instances := 0
 	for active_id in _sfx_ids_by_player.values():
 		if str(active_id) == id: instances += 1
-	if instances >= int(limits.get("max_instances", 3)) or _sfx_players.size() >= 10:
+	if instances >= int(limits.get("max_instances", 3)) or _sfx_players.size() >= 20:
 		return
 	_last_sfx_tick[id] = now
 	if _is_impact_id(id):
@@ -176,6 +176,7 @@ func play_sfx(sound) -> void:
 	var player := AudioStreamPlayer.new()
 	player.bus = _sfx_bus_name
 	player.stream = stream
+	player.volume_db = float(_audio_config.get("sfx_gain_db", {}).get(id, 0.0))
 	player.finished.connect(
 		func():
 			_sfx_players.erase(player)
@@ -417,7 +418,10 @@ func _stop_all_sfx() -> void:
 
 
 func _is_impact_id(id: String) -> bool:
-	return id.begins_with("powerup_") or id in ["thunder_crack", "thunder_roll"]
+	return id.begins_with("powerup_") or id in [
+		"thunder_crack", "thunder_roll", "rocket_launch", "rocket_shot",
+		"tile_burst", "tile_drop", "board_rumble"
+	]
 
 
 func _voice_priority(id: String) -> int:
@@ -457,7 +461,10 @@ func _queue_voice(id: String, stream: AudioStream, cue: Dictionary) -> void:
 		if priority <= _voice_priority(_voice_current_id): return
 		_stop_voice()
 	if not _pending_voice.is_empty() and int(_pending_voice["priority"]) > priority: return
-	_pending_voice = {"id": id, "stream": stream, "priority": priority, "expires": now + 5000, "praise": bool(cue.get("praise", false))}
+	# Busy rocket salvos and multi-wave cascades can take several seconds. Keep
+	# praise queued until the effects finish instead of silently dropping it.
+	var queue_lifetime := 15000 if bool(cue.get("praise", false)) else 5000
+	_pending_voice = {"id": id, "stream": stream, "priority": priority, "expires": now + queue_lifetime, "praise": bool(cue.get("praise", false))}
 	_voice_not_before = maxi(_voice_not_before, now + 220)
 
 

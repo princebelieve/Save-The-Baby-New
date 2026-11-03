@@ -66,7 +66,8 @@ func process_animated(board) -> void:
 			board.remove_tile(grid_position)
 		var movements: Array = _gravity_solver.apply_gravity(board)
 		await board.animate_falling_tiles(movements)
-		_refill_system.refill(board)
+		var refill_movements: Array = _refill_system.refill(board, true)
+		await board.animate_falling_tiles(refill_movements)
 	_is_processing = false
 
 

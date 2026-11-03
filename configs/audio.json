@@ -11,6 +11,13 @@
     "ui_confirm": "res://assets/audio/sfx/ui_confirm.ogg",
     "ui_back": "res://assets/audio/sfx/ui_back.ogg",
     "tile_match": "res://assets/audio/sfx/tile_match.ogg",
+    "tile_swap": "res://assets/audio/sfx/generated/tile_swap.wav",
+    "tile_burst": "res://assets/audio/sfx/generated/tile_burst.wav",
+    "tile_drop": "res://assets/audio/sfx/generated/tile_drop.wav",
+    "board_rumble": "res://assets/audio/sfx/generated/board_rumble.wav",
+    "rocket_launch": "res://assets/audio/sfx/generated/rocket_launch.wav",
+    "rocket_shot": "res://assets/audio/sfx/generated/rocket_shot.wav",
+    "kung_fu_shout": "res://assets/audio/sfx/generated/kung_fu_shout.wav",
     "invalid_move": "res://assets/audio/sfx/invalid_move.ogg",
     "booster_select": "res://assets/audio/sfx/ui_click.ogg",
     "powerup_activate": "res://assets/audio/sfx/ui_confirm.ogg",
@@ -20,7 +27,8 @@
     "match_thank_you": "res://assets/audio/sfx/praise/Fast thank_you.mp3",
     "objective_collected": "res://assets/audio/sfx/kenney/coins.ogg",
     "obstacle_destroyed": "res://assets/audio/sfx/kenney/obstacle_break.ogg",
-    "powerup_rocket": "res://assets/audio/sfx/ui_confirm.ogg",
+    "powerup_rocket": "res://assets/audio/sfx/generated/rocket_launch.wav",
+    "powerup_rocket_combo": "res://assets/audio/sfx/generated/rocket_launch.wav",
     "powerup_bomb": "res://assets/audio/sfx/thunder_crack.wav",
     "powerup_ethan": "res://assets/audio/sfx/thunder_crack.wav",
     "powerup_thunder": "res://assets/audio/sfx/thunder_crack.wav",
@@ -40,6 +48,14 @@
     "master": 1.0,
     "music": 0.65,
     "sfx": 0.8
+  },
+  "sfx_gain_db": {
+    "rocket_launch": 3.0,
+    "rocket_shot": 5.0,
+    "kung_fu_shout": 2.0,
+    "tile_burst": 2.0,
+    "board_rumble": 2.0,
+    "tile_drop": 1.0
   },
   "audio_bus_mapping": {
     "music": "Music",
@@ -104,13 +120,45 @@
       "cooldown_ms": 180,
       "max_instances": 1
     },
+    "tile_swap": {
+      "cooldown_ms": 35,
+      "max_instances": 3
+    },
+    "tile_burst": {
+      "cooldown_ms": 12,
+      "max_instances": 8
+    },
+    "tile_drop": {
+      "cooldown_ms": 100,
+      "max_instances": 1
+    },
+    "board_rumble": {
+      "cooldown_ms": 120,
+      "max_instances": 1
+    },
+    "rocket_launch": {
+      "cooldown_ms": 280,
+      "max_instances": 1
+    },
+    "rocket_shot": {
+      "cooldown_ms": 18,
+      "max_instances": 8
+    },
+    "kung_fu_shout": {
+      "cooldown_ms": 700,
+      "max_instances": 1
+    },
     "powerup_bomb": {
       "cooldown_ms": 160,
       "max_instances": 1
     },
     "powerup_rocket": {
-      "cooldown_ms": 100,
-      "max_instances": 2
+      "cooldown_ms": 280,
+      "max_instances": 1
+    },
+    "powerup_rocket_combo": {
+      "cooldown_ms": 280,
+      "max_instances": 1
     }
   }
 }

@@ -2155,6 +2155,8 @@ func _on_board_created() -> void:
 	_board.special_created.connect(_on_special_created)
 	_board.special_activated.connect(_on_special_activated)
 	_board.powerup_blast.connect(_on_powerup_blast)
+	_board.rocket_combo.connect(_on_rocket_combo)
+	_board.tile_burst.connect(_on_tile_burst)
 	_board.booster_used.connect(_on_booster_used)
 	_board.obstacles_cleared.connect(_on_obstacles_cleared)
 	_board.obstacle_damaged.connect(_on_obstacle_damaged)
@@ -2344,11 +2346,39 @@ func _animate_matched_tiles(tile_types: Array, cells: Array) -> void:
 		_effects().burst(_board.get_cell_screen_rect(cells[cells.size()/2]).get_center(),75,Color("#ffe082"))
 
 
+func _on_tile_burst(cell: Vector2i) -> void:
+	if _board == null or not _board.is_inside(cell):
+		return
+	var tile: Tile = _board.get_tile(cell)
+	var tint := Color("#ffd45b")
+	if tile != null:
+		var colors := [Color("#ff8a65"),Color("#55d8ff"),Color("#e68aff"),Color("#9ff078"),Color("#ffd45b"),Color("#ff78a5")]
+		tint = colors[posmod(int(tile.get_tile_type()),colors.size())]
+	_effects().tile_burst(_board.get_cell_screen_rect(cell).get_center(),tint)
+	_effects().haptic(10,0.24)
+	SignalBus.play_sfx.emit("tile_burst")
+
+
+func _on_rocket_combo(origins: Array, cells: Array) -> void:
+	if _board == null:
+		return
+	var launch_points: Array[Vector2] = []
+	var hit_points: Array[Vector2] = []
+	for cell in origins:
+		launch_points.append(_board.get_cell_screen_rect(cell).get_center())
+	for cell in cells:
+		hit_points.append(_board.get_cell_screen_rect(cell).get_center())
+	_effects().rocket_salvo(launch_points,hit_points)
+	_effects().haptic(58,0.88)
+	_board.play_celebration_shake(1.8)
+
+
 func _on_powerup_blast(kind: String, cell: Vector2i) -> void:
 	var first := _board.get_cell_screen_rect(Vector2i.ZERO)
 	var last := _board.get_cell_screen_rect(Vector2i(_board.get_width()-1,_board.get_height()-1))
 	_effects().powerup("bomb" if kind == "ethan" else kind,_board.get_cell_screen_rect(cell).get_center(),first.merge(last))
 	_board.play_celebration_shake(1.6 if kind in ["bomb","thunder","ethan"] else 1.2)
+	_effects().haptic(38,0.68)
 
 
 func _persist_campaign_progress() -> void:
@@ -2364,6 +2394,7 @@ func _persist_campaign_progress() -> void:
 
 
 func _on_tiles_matched(tile_types: Array) -> void:
+	_effects().haptic(30 if tile_types.size() >= 6 else 17,0.56 if tile_types.size() >= 6 else 0.34)
 	var feedback_caption := ""
 	var feedback_sound := ""
 	var shake_board := false
@@ -2489,8 +2520,6 @@ func _on_special_created(kind: String) -> void:
 
 func _on_special_activated(kind: String) -> void:
 	_discover_journal_fact(kind, 1)
-	if _board != null:
-		_board.play_celebration_shake(1.5 if kind == "thunder" else 0.8)
 
 
 func _on_board_turn_resolved() -> void:

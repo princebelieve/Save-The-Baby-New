@@ -9,6 +9,7 @@ var _feedback: Control
 var _active_tweens: Array[Tween] = []
 var _pulse_targets: Dictionary = {}
 var _cutout_material: ShaderMaterial
+var _last_haptic_tick := -10000
 
 
 class Burst extends Node2D:
@@ -20,12 +21,23 @@ class Burst extends Node2D:
 		queue_redraw()
 	func _draw() -> void:
 		var fade := 1.0 - progress
-		draw_arc(Vector2.ZERO, maxf(1, radius * progress), 0, TAU, 48, Color(tint, fade * 0.8), 5.0 * fade + 1.0, true)
-		for index in 12:
-			var direction := Vector2.from_angle(index * TAU / 12.0)
+		draw_circle(Vector2.ZERO, radius * 0.22 * (1.0 - progress * 0.45), Color(1.0,0.96,0.76,fade * 0.85))
+		draw_arc(Vector2.ZERO, maxf(1, radius * progress), 0, TAU, 48, Color(tint, fade * 0.9), 6.0 * fade + 1.0, true)
+		draw_arc(Vector2.ZERO, maxf(1, radius * progress * 0.64), 0, TAU, 40, Color.WHITE * Color(1,1,1,fade * 0.7), 2.0 * fade + 1.0, true)
+		for index in 16:
+			var direction := Vector2.from_angle(index * TAU / 16.0)
 			var at := direction * radius * progress
-			draw_line(at * 0.72, at, Color(tint, fade), 4.0 * fade + 1.0, true)
-			draw_circle(at, 4.0 * fade, Color.WHITE * Color(1,1,1,fade))
+			draw_line(at * 0.58, at, Color(tint, fade), 5.0 * fade + 1.0, true)
+			draw_circle(at, 5.0 * fade, Color.WHITE * Color(1,1,1,fade))
+
+
+class RocketShot extends Node2D:
+	func _draw() -> void:
+		draw_line(Vector2(-25,0),Vector2(-5,0),Color(1.0,0.35,0.05,0.8),7.0,true)
+		draw_colored_polygon(PackedVector2Array([Vector2(17,0),Vector2(-8,-7),Vector2(-8,7)]),Color("#fff4cc"))
+		draw_colored_polygon(PackedVector2Array([Vector2(-4,-6),Vector2(-13,-12),Vector2(-11,-3)]),Color("#43c3ec"))
+		draw_colored_polygon(PackedVector2Array([Vector2(-4,6),Vector2(-13,12),Vector2(-11,3)]),Color("#43c3ec"))
+		draw_circle(Vector2(-7,0),3.5,Color("#ff802d"))
 
 
 class Flight extends TextureRect:
@@ -147,6 +159,58 @@ func burst(at: Vector2, radius: float = 90.0, tint: Color = Color("#ffd45b")) ->
 	var tween := _effect_tween()
 	tween.tween_method(effect.advance,0.0,1.0,0.48)
 	tween.tween_callback(effect.queue_free)
+
+
+func tile_burst(at: Vector2, tint: Color = Color("#ffd45b")) -> void:
+	burst(at, 48.0, tint)
+
+
+func rocket_salvo(origins: Array[Vector2], targets: Array[Vector2]) -> void:
+	if origins.is_empty() or targets.is_empty(): return
+	for origin in origins:
+		burst(origin, 54.0, Color("#ffbd52"))
+		var launcher := RocketShot.new()
+		launcher.position = origin
+		launcher.scale = Vector2(0.1,0.1)
+		add_child(launcher)
+		var pull := _effect_tween().set_parallel(true)
+		pull.tween_property(launcher,"scale",Vector2(1.7,1.7),0.13).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		pull.tween_property(launcher,"rotation",-0.12,0.08)
+		pull.tween_property(launcher,"modulate:a",0.0,0.11).set_delay(0.12)
+		pull.chain().tween_callback(launcher.queue_free)
+	SignalBus.play_sfx.emit("kung_fu_shout")
+	await get_tree().create_timer(0.24).timeout
+	SignalBus.play_sfx.emit("rocket_launch")
+	for index in targets.size():
+		var from: Vector2 = origins[index % origins.size()]
+		var to: Vector2 = targets[index]
+		var schedule := _effect_tween()
+		schedule.tween_interval(index * 0.022)
+		schedule.tween_callback(_fire_rocket.bind(from,to))
+
+
+func _fire_rocket(from: Vector2, to: Vector2) -> void:
+	var shot := RocketShot.new()
+	shot.position = from
+	shot.rotation = (to - from).angle()
+	add_child(shot)
+	SignalBus.play_sfx.emit("rocket_shot")
+	var flight := _effect_tween()
+	flight.tween_property(shot,"position",to,0.18).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	flight.tween_callback(func():
+		burst(to,39.0,Color("#ffcf68"))
+		SignalBus.play_sfx.emit("tile_burst")
+		shot.queue_free())
+
+
+func haptic(duration_ms: int = 22, strength: float = 0.45) -> void:
+	if not (OS.has_feature("mobile") or OS.has_feature("android") or OS.has_feature("ios")):
+		return
+	var now := Time.get_ticks_msec()
+	if now - _last_haptic_tick < 70:
+		return
+	_last_haptic_tick = now
+	Input.vibrate_handheld(duration_ms, clampf(strength,0.0,1.0))
 
 
 func obstacle_debris(at: Vector2, texture: Texture2D, destroyed: bool) -> void:

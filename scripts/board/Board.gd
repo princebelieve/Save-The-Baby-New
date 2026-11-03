@@ -12,6 +12,8 @@ signal tiles_matched_with_cells(tile_types: Array, cells: Array)
 signal special_created(kind: String)
 signal special_activated(kind: String)
 signal powerup_blast(kind: String, cell: Vector2i)
+signal rocket_combo(origins: Array, cells: Array)
+signal tile_burst(cell: Vector2i)
 
 var _grid: Dictionary = {}
 var _locked: bool = false
@@ -219,7 +221,7 @@ func is_inside(position: Vector2i) -> bool:
 	return position.x >= 0 and position.y >= 0 and position.x < get_width() and position.y < get_height()
 
 
-func set_tile(position: Vector2i, tile) -> void:
+func set_tile(position: Vector2i, tile, animate_spawn: bool = true) -> void:
 	if not is_inside(position):
 		return
 	if tile == null:
@@ -229,7 +231,7 @@ func set_tile(position: Vector2i, tile) -> void:
 	_grid[position] = tile
 	tile.set_grid_position(position)
 	_attach_tile(tile, position)
-	if is_new_tile:
+	if is_new_tile and animate_spawn:
 		tile.scale = Vector2.ONE * 0.45
 		var spawn_tween := create_tween()
 		spawn_tween.tween_property(tile, "scale", Vector2.ONE, 0.18).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
@@ -239,6 +241,10 @@ func get_tile(position: Vector2i):
 	if not is_inside(position):
 		return null
 	return _grid.get(position, null)
+
+
+func get_tile_size() -> int:
+	return _tile_size
 
 
 func remove_tile(position: Vector2i) -> void:
@@ -290,6 +296,7 @@ func _animate_swap_then_resolve(tile_a: Tile, tile_b: Tile, special_tile: Tile =
 	tween.tween_property(tile_a, "position", destination_a, 0.16).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	tween.tween_property(tile_b, "position", destination_b, 0.16).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	await tween.finished
+	SignalBus.play_sfx.emit("tile_swap")
 	_remaining_moves = maxi(0, _remaining_moves - 1)
 	moves_changed.emit(_remaining_moves)
 	SignalBus.moves_changed.emit(_remaining_moves)
@@ -651,11 +658,15 @@ func _resolve_special_powerup(powerup_tile: Tile, partner: Tile) -> void:
 	special_activated.emit(kind)
 	var target_type := int(partner.get_tile_type())
 	var origin := powerup_tile.get_grid_position()
-	powerup_blast.emit(kind, origin)
+	var partner_kind := str(partner.get_meta("powerup_kind", "")) if partner.has_powerup() else ""
+	var is_rocket_combo := kind == "rocket" and partner_kind == "rocket"
+	if not is_rocket_combo:
+		powerup_blast.emit(kind, origin)
 	var targets := _special_targets(kind, origin, target_type)
 	if partner.has_powerup():
-		var other_kind := str(partner.get_meta("powerup_kind", "rocket"))
-		powerup_blast.emit(other_kind, partner.get_grid_position())
+		var other_kind := partner_kind
+		if not is_rocket_combo:
+			powerup_blast.emit(other_kind, partner.get_grid_position())
 		special_activated.emit(other_kind)
 		if kind == "thunder" and other_kind == "thunder":
 			targets = get_all_tiles()
@@ -678,7 +689,8 @@ func _resolve_special_powerup(powerup_tile: Tile, partner: Tile) -> void:
 	targets.append(partner)
 	powerup_tile.clear_powerup()
 	powerup_tile.remove_meta("powerup_kind")
-	await _resolve_external_clear(targets, kind, false)
+	var combo_origins: Array = [origin, partner.get_grid_position()] if is_rocket_combo else []
+	await _resolve_external_clear(targets, "rocket_combo" if is_rocket_combo else kind, false, combo_origins)
 
 
 func _special_targets(kind: String, origin: Vector2i, target_type: int) -> Array:
@@ -726,36 +738,45 @@ func play_celebration_shake(intensity: float = 1.0) -> void:
 	else:
 		_shake_origin = position
 	position = _shake_origin
-	var strength := 30.0 * clampf(intensity, 0.5, 2.0)
+	SignalBus.play_sfx.emit("board_rumble")
+	var strength := 8.0 * clampf(intensity, 0.5, 2.0)
 	_shake_tween = create_tween()
 	for delta in [Vector2(1,0.35),Vector2(-1,-0.45),Vector2(0.8,0.55),Vector2(-0.75,-0.3),Vector2(0.5,0.4),Vector2(-0.35,-0.25),Vector2(0.2,0.15)]:
 		_shake_tween.tween_property(self,"position",_shake_origin + delta * strength,0.055)
 		_shake_tween.tween_property(self,"position",_shake_origin,0.075).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_shake_tween.finished.connect(func(): position = _shake_origin)
 
 
-func _resolve_external_clear(tiles: Array, effect: String, finish_turn: bool = true) -> void:
+func _resolve_external_clear(tiles: Array, effect: String, finish_turn: bool = true, combo_origins: Array = []) -> void:
 	var unique_tiles := expand_special_targets(tiles)
 	if unique_tiles.is_empty():
 		if finish_turn:
 			_locked = false
 			turn_resolved.emit()
 		return
-	if effect == "thunder":
+	if not combo_origins.is_empty():
+		var combo_cells: Array = []
+		for tile in unique_tiles:
+			combo_cells.append(tile.get_grid_position())
+		rocket_combo.emit(combo_origins, combo_cells)
+		await get_tree().create_timer(0.49 + combo_cells.size() * 0.022).timeout
+	elif effect == "thunder":
 		SignalBus.play_sfx.emit("thunder_crack")
 		SignalBus.play_sfx.emit("thunder_roll")
-	else:
+	elif effect != "rocket_combo":
 		SignalBus.play_sfx.emit("powerup_" + effect)
 	notify_match_tiles(unique_tiles)
 	var burst := create_tween().set_parallel(true)
 	for tile in unique_tiles:
 		burst.tween_property(tile, "scale", Vector2.ONE * 1.22, 0.08)
 	await burst.finished
-	await animate_match_tiles(unique_tiles)
+	await animate_match_tiles(unique_tiles, combo_origins.is_empty())
 	for tile in unique_tiles:
 		remove_tile(tile.get_grid_position())
 	var movements: Array = _gravity_solver.apply_gravity(self)
 	await animate_falling_tiles(movements)
-	_refill_system.refill(self)
+	var refill_movements: Array = _refill_system.refill(self, true)
+	await animate_falling_tiles(refill_movements)
 	await _cascade_processor.process_animated(self)
 	if finish_turn:
 		if _board_shuffler != null and _board_shuffler.needs_shuffle(self):
@@ -764,33 +785,41 @@ func _resolve_external_clear(tiles: Array, effect: String, finish_turn: bool = t
 		turn_resolved.emit()
 
 
-func animate_match_tiles(tiles: Array) -> void:
+func animate_match_tiles(tiles: Array, emit_bursts: bool = true) -> void:
 	if tiles.is_empty(): return
-	for tile in tiles:
+	for index in tiles.size():
+		var tile: Tile = tiles[index]
 		if is_instance_valid(tile):
+			if index > 0:
+				await get_tree().create_timer(0.012).timeout
+			if emit_bursts:
+				tile_burst.emit(tile.get_grid_position())
 			var tween := create_tween().set_parallel(true)
-			tween.tween_property(tile, "scale", Vector2(1.58,1.58),0.13).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
-			tween.tween_property(tile, "rotation", 0.22 if randi() % 2 == 0 else -0.22,0.12).set_trans(Tween.TRANS_BACK)
-			tween.tween_property(tile, "modulate", Color(1.8,1.45,0.65,1.0),0.08)
-			tween.chain().tween_property(tile,"scale",Vector2(0.72,0.72),0.09).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN_OUT)
-			tween.set_parallel(true)
-			tween.tween_property(tile, "rotation", 0.0,0.10)
-			tween.tween_property(tile, "modulate:a", 0.0,0.10)
-			tween.chain().tween_property(tile, "scale", Vector2.ZERO, 0.13).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
+			tween.tween_property(tile, "scale", Vector2(1.42,1.42),0.08).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+			tween.tween_property(tile, "rotation", 0.18 if randi() % 2 == 0 else -0.18,0.09).set_trans(Tween.TRANS_BACK)
+			tween.tween_property(tile, "modulate", Color(1.8,1.55,0.78,1.0),0.06)
+			var vanish := create_tween().set_parallel(true)
+			vanish.tween_property(tile,"scale",Vector2.ZERO,0.16).set_delay(0.08).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
+			vanish.tween_property(tile, "modulate:a", 0.0,0.13).set_delay(0.08)
+			vanish.tween_property(tile, "rotation", 0.0,0.13).set_delay(0.08)
 	var wait := create_tween()
-	wait.tween_interval(0.35)
+	wait.tween_interval(0.34 + minf(tiles.size() * 0.012, 0.16))
 	await wait.finished
 
 
 func animate_falling_tiles(movements: Array) -> void:
 	if movements.is_empty():
 		return
+	SignalBus.play_sfx.emit("tile_drop")
 	var tween := create_tween().set_parallel(true)
 	for movement in movements:
 		var tile: Tile = movement["tile"]
 		if is_instance_valid(tile):
 			tile.position = movement["from"]
-			tween.tween_property(tile, "position", movement["to"], 0.18).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
+			if bool(movement.get("new", false)):
+				tile.scale = Vector2.ONE * 0.78
+				tween.tween_property(tile, "scale", Vector2.ONE, 0.36).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
+			tween.tween_property(tile, "position", movement["to"], 0.30).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
 	await tween.finished
 
 
