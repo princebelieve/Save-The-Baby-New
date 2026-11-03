@@ -47,7 +47,7 @@ var _voice_current_id := ""
 var _music_volume_db_before_voice := 0.0
 var _pending_voice: Dictionary = {}
 var _voice_not_before := 0
-var _last_praise_tick := -10000
+var _last_praise_tick := -10000 # Kept for diagnostics; praise is no longer discarded by time cooldowns.
 var _last_sfx_tick: Dictionary = {}
 
 
@@ -166,13 +166,9 @@ func play_sfx(sound) -> void:
 		return
 	_last_sfx_tick[id] = now
 	if _is_impact_id(id):
-		_voice_not_before = now + 180
-		# A new move takes precedence over optional praise. Never stack speech
-		# over a fresh explosion or resume a word halfway through.
-		if _voice_player.playing and _voice_priority(_voice_current_id) < 80:
-			_stop_voice()
-	if _voice_player.playing:
-		return
+		# Keep feedback speech synchronized with its caption during long cascades.
+		if _pending_voice.is_empty() or not bool(_pending_voice.get("praise", false)):
+			_voice_not_before = now + 180
 	var player := AudioStreamPlayer.new()
 	player.bus = _sfx_bus_name
 	player.stream = stream
@@ -419,7 +415,7 @@ func _stop_all_sfx() -> void:
 
 func _is_impact_id(id: String) -> bool:
 	return id.begins_with("powerup_") or id in [
-		"thunder_crack", "thunder_roll", "rocket_launch", "rocket_shot",
+		"thunder_crack", "thunder_roll", "rocket_launch", "gunfire_burst", "kung_fu_shout",
 		"tile_burst", "tile_drop", "board_rumble"
 	]
 
@@ -455,17 +451,13 @@ func _on_voice_finished() -> void:
 func _queue_voice(id: String, stream: AudioStream, cue: Dictionary) -> void:
 	var now := Time.get_ticks_msec()
 	var priority := int(cue.get("priority", 10))
-	if bool(cue.get("praise", false)) and now - _last_praise_tick < 4200: return
-	if _voice_player.playing:
-		if priority < 80: return
-		if priority <= _voice_priority(_voice_current_id): return
-		_stop_voice()
+	# Never cut a spoken cue mid-word. Let the current line finish, then play
+	# the highest-priority queued line (for example, praise after "Power up!").
 	if not _pending_voice.is_empty() and int(_pending_voice["priority"]) > priority: return
-	# Busy rocket salvos and multi-wave cascades can take several seconds. Keep
-	# praise queued until the effects finish instead of silently dropping it.
-	var queue_lifetime := 15000 if bool(cue.get("praise", false)) else 5000
+	var queue_lifetime := 15000
 	_pending_voice = {"id": id, "stream": stream, "priority": priority, "expires": now + queue_lifetime, "praise": bool(cue.get("praise", false))}
-	_voice_not_before = maxi(_voice_not_before, now + 220)
+	if not _voice_player.playing:
+		_voice_not_before = maxi(_voice_not_before, now + 220)
 
 
 func _process(_delta: float) -> void:
@@ -475,10 +467,6 @@ func _process(_delta: float) -> void:
 		_pending_voice.clear()
 		return
 	if _voice_player.playing or now < _voice_not_before: return
-	for player in _sfx_players:
-		if is_instance_valid(player) and player.playing:
-			_voice_not_before = now + 100
-			return
 	var cue := _pending_voice.duplicate()
 	_pending_voice.clear()
 	_voice_current_id = str(cue["id"])

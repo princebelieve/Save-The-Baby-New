@@ -181,6 +181,7 @@ func rocket_salvo(origins: Array[Vector2], targets: Array[Vector2]) -> void:
 	SignalBus.play_sfx.emit("kung_fu_shout")
 	await get_tree().create_timer(0.24).timeout
 	SignalBus.play_sfx.emit("rocket_launch")
+	SignalBus.play_sfx.emit("gunfire_burst")
 	for index in targets.size():
 		var from: Vector2 = origins[index % origins.size()]
 		var to: Vector2 = targets[index]
@@ -194,7 +195,6 @@ func _fire_rocket(from: Vector2, to: Vector2) -> void:
 	shot.position = from
 	shot.rotation = (to - from).angle()
 	add_child(shot)
-	SignalBus.play_sfx.emit("rocket_shot")
 	var flight := _effect_tween()
 	flight.tween_property(shot,"position",to,0.18).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	flight.tween_callback(func():

@@ -14,10 +14,11 @@
     "tile_swap": "res://assets/audio/sfx/generated/tile_swap.wav",
     "tile_burst": "res://assets/audio/sfx/generated/tile_burst.wav",
     "tile_drop": "res://assets/audio/sfx/generated/tile_drop.wav",
+    "rescue_assist": "res://assets/audio/sfx/ui_confirm.ogg",
     "board_rumble": "res://assets/audio/sfx/generated/board_rumble.wav",
     "rocket_launch": "res://assets/audio/sfx/generated/rocket_launch.wav",
-    "rocket_shot": "res://assets/audio/sfx/generated/rocket_shot.wav",
-    "kung_fu_shout": "res://assets/audio/sfx/generated/kung_fu_shout.wav",
+    "gunfire_burst": "res://assets/audio/sfx/combat/machine_gun_burst.mp3",
+    "kung_fu_shout": "res://assets/audio/sfx/combat/martial_shout.mp3",
     "invalid_move": "res://assets/audio/sfx/invalid_move.ogg",
     "booster_select": "res://assets/audio/sfx/ui_click.ogg",
     "powerup_activate": "res://assets/audio/sfx/ui_confirm.ogg",
@@ -27,10 +28,10 @@
     "match_thank_you": "res://assets/audio/sfx/praise/Fast thank_you.mp3",
     "objective_collected": "res://assets/audio/sfx/kenney/coins.ogg",
     "obstacle_destroyed": "res://assets/audio/sfx/kenney/obstacle_break.ogg",
-    "powerup_rocket": "res://assets/audio/sfx/generated/rocket_launch.wav",
-    "powerup_rocket_combo": "res://assets/audio/sfx/generated/rocket_launch.wav",
+    "powerup_rocket": "res://assets/audio/sfx/combat/machine_gun_burst.mp3",
     "powerup_bomb": "res://assets/audio/sfx/thunder_crack.wav",
-    "powerup_ethan": "res://assets/audio/sfx/thunder_crack.wav",
+    "powerup_ethan": "res://assets/audio/sfx/kenney/obstacle_break.ogg",
+    "powerup_hammer": "res://assets/audio/sfx/kenney/obstacle_break.ogg",
     "powerup_thunder": "res://assets/audio/sfx/thunder_crack.wav",
     "special_created": "res://assets/audio/sfx/kenney/voiceover/power_up.ogg",
     "objective_achieved": "res://assets/audio/sfx/kenney/voiceover/objective_achieved.ogg",
@@ -51,11 +52,12 @@
   },
   "sfx_gain_db": {
     "rocket_launch": 3.0,
-    "rocket_shot": 5.0,
-    "kung_fu_shout": 2.0,
+    "gunfire_burst": 4.0,
+    "kung_fu_shout": 3.0,
     "tile_burst": 2.0,
     "board_rumble": 2.0,
-    "tile_drop": 1.0
+    "tile_drop": 1.0,
+    "rescue_assist": 2.0
   },
   "audio_bus_mapping": {
     "music": "Music",
@@ -79,7 +81,7 @@
       "praise": true
     },
     "special_created": {
-      "priority": 10,
+      "priority": 40,
       "praise": false
     },
     "objective_achieved": {
@@ -132,6 +134,10 @@
       "cooldown_ms": 100,
       "max_instances": 1
     },
+    "rescue_assist": {
+      "cooldown_ms": 120,
+      "max_instances": 1
+    },
     "board_rumble": {
       "cooldown_ms": 120,
       "max_instances": 1
@@ -140,9 +146,9 @@
       "cooldown_ms": 280,
       "max_instances": 1
     },
-    "rocket_shot": {
-      "cooldown_ms": 18,
-      "max_instances": 8
+    "gunfire_burst": {
+      "cooldown_ms": 450,
+      "max_instances": 1
     },
     "kung_fu_shout": {
       "cooldown_ms": 700,
@@ -153,10 +159,6 @@
       "max_instances": 1
     },
     "powerup_rocket": {
-      "cooldown_ms": 280,
-      "max_instances": 1
-    },
-    "powerup_rocket_combo": {
       "cooldown_ms": 280,
       "max_instances": 1
     }

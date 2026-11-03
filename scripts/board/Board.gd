@@ -739,7 +739,7 @@ func play_celebration_shake(intensity: float = 1.0) -> void:
 		_shake_origin = position
 	position = _shake_origin
 	SignalBus.play_sfx.emit("board_rumble")
-	var strength := 8.0 * clampf(intensity, 0.5, 2.0)
+	var strength := 20.0 * clampf(intensity, 0.5, 2.0)
 	_shake_tween = create_tween()
 	for delta in [Vector2(1,0.35),Vector2(-1,-0.45),Vector2(0.8,0.55),Vector2(-0.75,-0.3),Vector2(0.5,0.4),Vector2(-0.35,-0.25),Vector2(0.2,0.15)]:
 		_shake_tween.tween_property(self,"position",_shake_origin + delta * strength,0.055)

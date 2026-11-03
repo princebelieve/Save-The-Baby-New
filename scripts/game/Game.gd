@@ -92,6 +92,7 @@ var _completed_levels: Dictionary = {}
 var _gameplay_effects: GameplayEffects
 var _turn_praise_rank := 0
 var _suppress_character_rewards_this_turn := false
+var _last_character_rewards := {"ethan": 0, "detective": 0, "victor": 0}
 var _waiting_for_collection := false
 var _special_moves_created := 0
 var _objective_complete_sound_played := false
@@ -2326,6 +2327,10 @@ func _animate_matched_tiles(tile_types: Array, cells: Array) -> void:
 	for index in range(mini(tile_types.size(),cells.size())):
 		var kind := int(tile_types[index])
 		if kind != target_enum and not [int(Constants.TileType.ETHAN),int(Constants.TileType.DETECTIVE),int(Constants.TileType.VICTOR)].has(kind): continue
+		if kind != target_enum:
+			if kind == int(Constants.TileType.ETHAN) and groups.get(kind, []).size() >= int(_last_character_rewards.get("ethan",0)): continue
+			if kind == int(Constants.TileType.DETECTIVE) and groups.get(kind, []).size() >= int(_last_character_rewards.get("detective",0)): continue
+			if kind == int(Constants.TileType.VICTOR) and groups.get(kind, []).size() >= int(_last_character_rewards.get("victor",0)): continue
 		if not groups.has(kind): groups[kind] = []
 		groups[kind].append(_board.get_cell_screen_rect(cells[index]).get_center())
 	for kind in groups:
@@ -2341,7 +2346,12 @@ func _animate_matched_tiles(tile_types: Array, cells: Array) -> void:
 			texture_path = "res://assets/sprites/characters/%s" % ("ethan_portrait_cutout.png" if kind == int(Constants.TileType.ETHAN) else "detective_portrait_cutout.png")
 		var origins: Array[Vector2] = []
 		for point in groups[kind]: origins.append(point)
-		_effects().collect(ResourceManager.load_texture(texture_path),origins,target,value,"objective_collected" if kind == target_enum else "")
+		var arrival_sound := "objective_collected" if kind == target_enum else ""
+		if kind == int(Constants.TileType.VICTOR):
+			arrival_sound = "clue_collected"
+		elif kind in [int(Constants.TileType.ETHAN),int(Constants.TileType.DETECTIVE)]:
+			arrival_sound = "rescue_assist"
+		_effects().collect(ResourceManager.load_texture(texture_path),origins,target,value,arrival_sound)
 	if tile_types.size() >= 5 and not cells.is_empty():
 		_effects().burst(_board.get_cell_screen_rect(cells[cells.size()/2]).get_center(),75,Color("#ffe082"))
 
@@ -2419,6 +2429,7 @@ func _on_tiles_matched(tile_types: Array) -> void:
 	var victor_matches := int(character_rewards["victor"])
 	if ethan_matches + detective_matches + victor_matches > 0:
 		_discover_journal_fact("characters", 0)
+	_last_character_rewards = character_rewards.duplicate()
 	if ethan_matches + detective_matches > 0:
 		_discover_journal_fact("characters", 1)
 	if victor_matches > 0:
@@ -2446,6 +2457,7 @@ func _on_tiles_matched(tile_types: Array) -> void:
 		feedback_caption = "NICE!"
 		feedback_sound = "match_nice"
 		rank = 1
+		shake_board = true
 	if ethan_matches > 0:
 		feedback_caption = "THANK YOU!"
 		feedback_sound = "match_thank_you"
@@ -2477,7 +2489,9 @@ func _show_match_feedback(caption: String, sound_id: String, shake_board: bool) 
 	_hint_label.text = caption
 	_hint_label.add_theme_color_override("font_color", Color("#ffe279"))
 	_effects().praise(caption,DISPLAY_FONT)
-	if shake_board and _board != null: _board.play_celebration_shake(1.3)
+	if shake_board and _board != null:
+		var intensity := 0.9 if caption == "NICE!" else (1.5 if caption == "WONDERFUL!" else 1.2)
+		_board.play_celebration_shake(intensity)
 
 
 func _on_special_created(kind: String) -> void:

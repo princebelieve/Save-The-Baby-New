@@ -1,0 +1,12 @@
+machine_gun_burst.mp3
+  Machine Gun Burst by qubodup (Freesound sound 482121)
+  https://freesound.org/people/qubodup/sounds/482121/
+  License: CC0 1.0 / public domain dedication
+
+martial_shout.mp3
+  Heyah.WAV by swarms (Freesound sound 456051)
+  https://freesound.org/people/swarms/sounds/456051/
+  License: CC0 1.0
+
+These are low-quality Freesound preview encodings downloaded from the CC0
+source pages above. Replace with full-quality originals if acquired later.
