@@ -423,26 +423,41 @@ func _build_gameplay_hud() -> void:
 	hud.visible = true
 	var hud_scale := clampf(get_viewport_rect().size.x / 720.0, 0.72, 1.0)
 	_build_level_objective_row(hud)
-	var status_row := HBoxContainer.new()
+	var status_row := Control.new()
 	status_row.name = "StatusRow"
-	status_row.anchor_left = 0.045
-	status_row.anchor_right = 0.955
-	status_row.anchor_top = 0.108
-	status_row.anchor_bottom = 0.187
-	status_row.alignment = BoxContainer.ALIGNMENT_CENTER
-	status_row.add_theme_constant_override("separation", roundi(10 * hud_scale))
+	status_row.anchor_left = 0.025
+	status_row.anchor_right = 0.975
+	status_row.anchor_top = 0.104
+	status_row.anchor_bottom = 0.216
 	_status_panel = Panel.new()
 	_status_panel.name = "StatusRowBacking"
 	_status_panel.anchor_left = 0.025
 	_status_panel.anchor_right = 0.975
 	_status_panel.anchor_top = 0.101
-	_status_panel.anchor_bottom = 0.194
+	_status_panel.anchor_bottom = 0.219
 	_apply_hud_profile_style()
 	hud.add_child(_status_panel)
 	hud.add_child(status_row)
 	_moves_label = _make_compact_hud_panel(status_row, "MovesCounter", "0", Vector2(124, 94) * hud_scale, roundi(31 * hud_scale), Color("#38c8e5"))
-	_lives_label = _make_compact_hud_panel(status_row, "LifeHearts", "0/5", Vector2(170, 72) * hud_scale, roundi(30 * hud_scale), Color("#f06c9b"))
-	_reward_label = _make_compact_hud_panel(status_row, "CoinCounter", "0", Vector2(188, 72) * hud_scale, roundi(29 * hud_scale), Color("#e9bd55"))
+	var moves_panel := _moves_label.get_parent().get_parent() as Control
+	moves_panel.anchor_left = 0.0
+	moves_panel.anchor_right = 0.22
+	moves_panel.anchor_top = 0.0
+	moves_panel.anchor_bottom = 1.0
+	_lives_label = _make_compact_hud_panel(status_row, "LifeHearts", "0/5", Vector2(170, 46) * hud_scale, roundi(26 * hud_scale), Color("#f06c9b"))
+	_reward_label = _make_compact_hud_panel(status_row, "CoinCounter", "0", Vector2(188, 46) * hud_scale, roundi(26 * hud_scale), Color("#e9bd55"))
+	var lives_panel := _lives_label.get_parent().get_parent() as Control
+	lives_panel.anchor_left = 0.22
+	lives_panel.anchor_right = 0.89
+	lives_panel.anchor_top = 0.035
+	lives_panel.anchor_bottom = 0.49
+	lives_panel.custom_minimum_size = Vector2(0, 46 * hud_scale)
+	var coins_panel := _reward_label.get_parent().get_parent() as Control
+	coins_panel.anchor_left = 0.22
+	coins_panel.anchor_right = 0.89
+	coins_panel.anchor_top = 0.51
+	coins_panel.anchor_bottom = 0.965
+	coins_panel.custom_minimum_size = Vector2(0, 46 * hud_scale)
 	_pause_button = TextureButton.new()
 	_pause_button.name = "SettingsButton"
 	_pause_button.ignore_texture_size = true
@@ -457,12 +472,16 @@ func _build_gameplay_hud() -> void:
 	_pause_button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_pause_button.pressed.connect(_play_ui_click)
 	_pause_button.pressed.connect(_show_pause_menu)
+	_pause_button.anchor_left = 0.90
+	_pause_button.anchor_right = 1.0
+	_pause_button.anchor_top = 0.0
+	_pause_button.anchor_bottom = 1.0
 	status_row.add_child(_pause_button)
 	_hint_label = _make_label("INVESTIGATION 01 | THE FIRST CLUE", 22)
 	_hint_label.anchor_left = 0.08
 	_hint_label.anchor_right = 0.92
-	_hint_label.anchor_top = 0.192
-	_hint_label.anchor_bottom = 0.222
+	_hint_label.anchor_top = 0.219
+	_hint_label.anchor_bottom = 0.249
 	_hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_hint_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_hint_label.add_theme_color_override("font_color", Color("#fff3d5"))
@@ -622,9 +641,9 @@ func _apply_hud_profile_layout() -> void:
 		return
 	var scale_factor := clampf(get_viewport_rect().size.x / 720.0, 0.72, 1.0)
 	var sizes := {
-		"investigation": [Vector2(124, 94), Vector2(170, 72), Vector2(188, 72)],
-		"hazard": [Vector2(144, 94), Vector2(160, 72), Vector2(170, 72)],
-		"rescue": [Vector2(116, 88), Vector2(188, 78), Vector2(164, 72)]
+		"investigation": [Vector2(124, 94), Vector2(0, 46), Vector2(0, 46)],
+		"hazard": [Vector2(144, 94), Vector2(0, 46), Vector2(0, 46)],
+		"rescue": [Vector2(116, 88), Vector2(0, 46), Vector2(0, 46)]
 	}
 	var profile_sizes: Array = sizes.get(_hud_profile, sizes["investigation"])
 	_moves_label.get_parent().get_parent().custom_minimum_size = profile_sizes[0] * scale_factor
@@ -652,14 +671,13 @@ func _make_compact_hud_panel(parent: Control, panel_name: String, text: String, 
 				art_path = "res://assets/sprites/ui/hud/lives_counter_serif.png"
 		panel_art.texture = _get_cropped_hud_art(panel_name, art_path)
 		if panel_name in ["CoinCounter", "LifeHearts"]:
-			panel_art.anchor_left = 0.0
-			panel_art.anchor_right = 1.0
-			panel_art.anchor_top = 0.10
-			panel_art.anchor_bottom = 0.90
+			panel_art.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+			panel_art.stretch_mode = TextureRect.STRETCH_SCALE
 		else:
 			panel_art.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		panel_art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		panel_art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		if panel_name not in ["CoinCounter", "LifeHearts"]:
+			panel_art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		panel_art.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_apply_hud_chroma_key(panel_art)
 		panel.add_child(panel_art)
