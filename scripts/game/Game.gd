@@ -1450,10 +1450,9 @@ func _show_story_overlay() -> void:
 	title.add_theme_color_override("font_color", Color("#f4e4bd"))
 	veil.add_child(title)
 	_story_portrait = TextureRect.new()
-	_story_portrait.position = Vector2(viewport_size.x * 0.5 - 41.0, viewport_size.y * 0.405)
-	_story_portrait.size = Vector2(82, 92)
+	_position_story_portrait(0.15)
 	_story_portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	_story_portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_story_portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	_story_portrait.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	_story_portrait.z_index = 1
 	_story_portrait.texture = ResourceManager.load_portrait(str(_story.get("portrait", "")))
@@ -1463,7 +1462,7 @@ func _show_story_overlay() -> void:
 	dialogue_panel.name = "StoryDialoguePanel"
 	dialogue_panel.anchor_left = 0.045
 	dialogue_panel.anchor_right = 0.955
-	dialogue_panel.anchor_top = 0.50
+	dialogue_panel.anchor_top = 0.38
 	dialogue_panel.anchor_bottom = 0.97
 	dialogue_panel.offset_top = 58.0
 	dialogue_panel.offset_bottom = 58.0
@@ -1639,6 +1638,15 @@ func _on_dialogue_started(_dialogue_id: Variant) -> void:
 	portrait_tween.tween_property(_story_portrait, "scale", Vector2.ONE, 0.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 
+func _position_story_portrait(top_ratio: float) -> void:
+	if _story_portrait == null:
+		return
+	var viewport_size := get_viewport_rect().size
+	var portrait_size := minf(236.0, minf(viewport_size.x * 0.50, viewport_size.y * 0.265))
+	_story_portrait.position = Vector2((viewport_size.x - portrait_size) * 0.5, viewport_size.y * top_ratio)
+	_story_portrait.size = Vector2.ONE * portrait_size
+
+
 func _play_dialogue_typing_ticks() -> void:
 	while _is_dialogue_typing and is_instance_valid(_dialogue_label):
 		await get_tree().create_timer(0.075).timeout
@@ -1659,13 +1667,12 @@ func _present_route_choices(choices: Array) -> void:
 	_dialogue_label.visible_characters = -1
 	_is_dialogue_typing = false
 	_story_continue_button.hide()
-	_story_dialogue_panel.anchor_top = 0.39
+	_story_dialogue_panel.anchor_top = 0.36
 	if is_instance_valid(_story_scroll_top_roll):
-		_story_scroll_top_roll.anchor_top = 0.39
-		_story_scroll_top_roll.anchor_bottom = 0.39
+		_story_scroll_top_roll.anchor_top = 0.36
+		_story_scroll_top_roll.anchor_bottom = 0.36
 	_story_portrait.texture = ResourceManager.load_portrait("res://assets/sprites/characters/david_portrait_v2.png")
-	_story_portrait.position = Vector2(get_viewport_rect().size.x * 0.5 - 41.0, get_viewport_rect().size.y * 0.30)
-	_story_portrait.size = Vector2(82, 92)
+	_position_story_portrait(0.12)
 	_story_skip_button.hide()
 	_story_previous_button.hide()
 	for choice in choices:
@@ -2139,7 +2146,7 @@ func _objective_icon_path(target: String) -> String:
 	var normalized := target.to_upper()
 	if ["CHAIN", "LOCK", "BOMB", "MISSILE", "ELECTRIC_TRAP"].has(normalized):
 		return "res://assets/sprites/obstacles/" + str(icons[normalized])
-	return "res://assets/sprites/tiles/" + str(icons.get(normalized, "evidence_document_icon.jpeg"))
+	return "res://assets/sprites/powerups/tiles/" + str(icons.get(normalized, "evidence_document_icon.jpeg"))
 
 
 func _begin_level(_route_id: String) -> void:
@@ -2806,6 +2813,8 @@ func _on_tutorial_acknowledged() -> void:
 		_start_practice_tutorial(pending)
 		if not _tutorial_active:
 			_board.unlock()
+	elif _tutorial_action == "mission_briefing":
+		_finish_tutorial()
 	elif _tutorial_action == "explain_booster":
 		_show_tutorial_booster_selection()
 	elif _tutorial_action == "explain_goal":
@@ -3591,7 +3600,14 @@ func _start_practice_tutorial(level_data: Dictionary) -> void:
 		_tutorial_mechanic = str(tutorial_steps[0].get("mechanic", ""))
 		_tutorial_pause_open = false
 		_tutorial_booster_kind = str(tutorial_steps[0].get("booster", "")).to_lower()
-		if _tutorial_mechanic == "character_tiles":
+		if _tutorial_mechanic == "mission_briefing":
+			_tutorial_action = "mission_briefing"
+			if _board != null:
+				_board.lock()
+			_hint_label.text = "CASE %03d | DAVID'S FIELD BRIEFING" % _current_level_id
+			_refresh_tutorial_controls()
+			_show_tutorial_tip(field_tip, _objective_label.get_global_rect(), "DAVID", "res://assets/sprites/characters/david_portrait_v2.png", true)
+		elif _tutorial_mechanic == "character_tiles":
 			_tutorial_action = "explain_character_tiles"
 			if _board != null:
 				_board.lock()

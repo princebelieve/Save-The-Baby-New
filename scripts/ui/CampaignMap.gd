@@ -7,6 +7,24 @@ signal back_requested
 const GRASS_PATH := "res://assets/sprites/backgrounds/grass_terrain_texture.jpeg"
 const SIGNPOST_PATH := "res://assets/sprites/props/wooden_signpost_cutout.png"
 const NODE_PATH := "res://assets/sprites/ui/level_node_empty_cutout.png"
+const LEVEL_BADGE_PATH := "res://assets/sprites/ui/level_badge.jpeg"
+const LOCKED_BADGE_PATH := "res://assets/sprites/ui/locked_level_badge_cutout.png"
+const ONE_STAR_BADGE_PATH := "res://assets/sprites/ui/level_node_stars.jpeg"
+const TWO_STAR_BADGE_PATH := "res://assets/sprites/ui/level_select_art.jpeg"
+const THREE_STAR_BADGE_PATH := "res://assets/sprites/ui/level_node_star_frame.jpeg"
+const DAVID_PORTRAIT_PATH := "res://assets/sprites/characters/david_portrait_cutout.png"
+const WHITE_KEY_SHADER := """
+shader_type canvas_item;
+void fragment() {
+	vec4 sample_color = texture(TEXTURE, UV) * COLOR;
+	float lowest = min(sample_color.r, min(sample_color.g, sample_color.b));
+	float highest = max(sample_color.r, max(sample_color.g, sample_color.b));
+	float distance_from_white = (highest - lowest) + (1.0 - lowest) * 0.7;
+	float white_background = 1.0 - smoothstep(0.045, 0.15, distance_from_white);
+	sample_color.a *= 1.0 - white_background;
+	COLOR = sample_color;
+}
+"""
 const BACKGROUND_DIR := "res://assets/sprites/backgrounds/"
 const PROP_DIR := "res://assets/sprites/props/"
 var _route_name := ""
@@ -16,6 +34,8 @@ var _highest_unlocked_level := 1
 var _completed_levels: Dictionary = {}
 var _map_width := 720.0
 var _chapter_height := 610.0
+var _level_positions: Dictionary = {}
+var _map_scroll: ScrollContainer
 
 
 func configure(route_name: String, level_records: Array[Dictionary], highest_unlocked_level: int = 1, completed_levels: Dictionary = {}) -> void:
@@ -84,6 +104,7 @@ func _build_map() -> void:
 	title_background.stretch_mode = TextureRect.STRETCH_SCALE
 	add_child(title_background)
 	var scroll := ScrollContainer.new()
+	_map_scroll = scroll
 	scroll.name = "CampaignScroll"
 	scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	scroll.offset_top = 118.0
@@ -109,6 +130,7 @@ func _build_map() -> void:
 	for chapter_index in _chapter_records.size():
 		var chapter: Dictionary = _chapter_records[chapter_index]
 		_add_chapter_nodes(map, chapter_index, chapter, _as_typed_levels(chapter.get("levels", [])))
+	_add_david_progress_marker(map)
 
 	var header := ColorRect.new()
 	header.color = Color(0.035, 0.08, 0.075, 0.96)
@@ -273,33 +295,47 @@ func _add_chapter_nodes(map: Control, index: int, chapter: Dictionary, levels: A
 		var progress := 0.0 if count <= 1 else float(step) / float(count - 1)
 		var x := _map_width * (0.50 + 0.31 * sin(progress * TAU + index * 0.72))
 		var y := top + 225 + progress * (_chapter_height - 270)
+		_level_positions[level_id] = Vector2(x, y)
 		var node := TextureButton.new()
 		node.name = "Level%03d" % level_id
-		node.texture_normal = ResourceManager.load_texture(NODE_PATH)
+		var star_count := int(_completed_levels.get(str(level_id), 0))
+		var is_unlocked := level_id <= _highest_unlocked_level
+		var badge_path := NODE_PATH
+		if not is_unlocked:
+			badge_path = LOCKED_BADGE_PATH
+		elif star_count >= 3:
+			badge_path = THREE_STAR_BADGE_PATH
+		elif star_count == 2:
+			badge_path = TWO_STAR_BADGE_PATH
+		elif star_count == 1:
+			badge_path = ONE_STAR_BADGE_PATH
+		elif level_id == _highest_unlocked_level:
+			badge_path = LEVEL_BADGE_PATH
+		node.texture_normal = ResourceManager.load_texture(badge_path)
 		node.texture_hover = node.texture_normal
 		node.texture_pressed = node.texture_normal
 		node.ignore_texture_size = true
 		node.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
-		node.position = Vector2(x - 40, y - 40)
-		node.size = Vector2(80, 80)
-		var is_unlocked := level_id <= _highest_unlocked_level
+		node.position = Vector2(x - 49, y - 49)
+		node.size = Vector2(98, 98)
 		node.disabled = not is_unlocked
-		if not is_unlocked:
-			node.texture_normal = ResourceManager.load_texture("res://assets/sprites/ui/locked_level_badge_cutout.png")
-			node.texture_hover = node.texture_normal
-			node.texture_pressed = node.texture_normal
-		else:
+		if is_unlocked:
 			node.pressed.connect(level_selected.emit.bind(level_id))
+		if badge_path.ends_with(".jpeg"):
+			node.material = _make_white_key_material()
 		map.add_child(node)
 		var number := Label.new()
-		var star_count := int(_completed_levels.get(str(level_id), 0))
-		number.text = str(level_id) if is_unlocked else ""
-		number.position = node.position + Vector2(4, 6)
-		number.size = node.size - Vector2(8, 12)
+		number.text = str(level_id)
+		if not is_unlocked:
+			number.position = node.position + Vector2(0, 67)
+			number.size = Vector2(node.size.x, 23)
+		else:
+			number.position = node.position + Vector2(4, 8)
+			number.size = node.size - Vector2(8, 25)
 		number.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		number.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		number.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		number.add_theme_font_size_override("font_size", 25)
+		number.add_theme_font_size_override("font_size", 13 if not is_unlocked else 24)
 		number.add_theme_color_override("font_color", Color("#603515"))
 		number.add_theme_color_override("font_outline_color", Color("#fff4d1"))
 		number.add_theme_constant_override("outline_size", 3)
@@ -307,25 +343,58 @@ func _add_chapter_nodes(map: Control, index: int, chapter: Dictionary, levels: A
 		number.add_theme_constant_override("shadow_offset_x", 1)
 		number.add_theme_constant_override("shadow_offset_y", 2)
 		map.add_child(number)
-		if star_count > 0:
-			var star_frame := TextureRect.new()
-			star_frame.texture = ResourceManager.load_texture("res://assets/sprites/ui/level_node_star_frame.jpeg")
-			star_frame.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-			star_frame.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-			star_frame.position = node.position + Vector2(43, 40)
-			star_frame.size = Vector2(40, 40)
-			star_frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			map.add_child(star_frame)
-			var star_number := Label.new()
-			star_number.text = str(mini(3, star_count))
-			star_number.position = star_frame.position
-			star_number.size = star_frame.size
-			star_number.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			star_number.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-			star_number.add_theme_font_size_override("font_size", 16)
-			star_number.add_theme_color_override("font_color", Color("#603515"))
-			star_number.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			map.add_child(star_number)
+
+
+func _make_white_key_material() -> ShaderMaterial:
+	var shader := Shader.new()
+	shader.code = WHITE_KEY_SHADER
+	var material := ShaderMaterial.new()
+	material.shader = shader
+	return material
+
+
+func _add_david_progress_marker(map: Control) -> void:
+	var current_level := _highest_unlocked_level
+	if not _level_positions.has(current_level) and not _level_positions.is_empty():
+		current_level = int(_level_positions.keys().max())
+	var current_position: Vector2 = _level_positions.get(current_level, Vector2(_map_width * 0.5, 225.0))
+	var prior_level := current_level - 1
+	var has_arrival := current_level == _highest_unlocked_level and prior_level >= 1 and int(_completed_levels.get(str(prior_level), 0)) > 0 and _level_positions.has(prior_level)
+	var start_position: Vector2 = _level_positions.get(prior_level, current_position) if has_arrival else current_position
+	var portrait := TextureRect.new()
+	portrait.name = "DavidProgressPortrait"
+	portrait.texture = ResourceManager.load_portrait(DAVID_PORTRAIT_PATH)
+	portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	portrait.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	portrait.position = start_position + Vector2(-27.0, -78.0)
+	portrait.size = Vector2(54.0, 64.0)
+	portrait.z_index = 10
+	portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	map.add_child(portrait)
+	var outline := Panel.new()
+	outline.name = "DavidMarkerFrame"
+	outline.position = portrait.position - Vector2(3.0, 3.0)
+	outline.size = portrait.size + Vector2(6.0, 6.0)
+	outline.z_index = 9
+	outline.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var outline_style := StyleBoxFlat.new()
+	outline_style.bg_color = Color(0.0, 0.0, 0.0, 0.0)
+	outline_style.border_color = Color("#f5d27d")
+	outline_style.set_border_width_all(3)
+	outline_style.set_corner_radius_all(18)
+	outline.add_theme_stylebox_override("panel", outline_style)
+	map.add_child(outline)
+	var current_node := get_node_or_null("CampaignScroll/CampaignTrail/Level%03d" % current_level) as Control
+	if current_node != null:
+		var focus_y := maxf(0.0, current_position.y - _map_scroll.size.y * 0.48)
+		_map_scroll.set_deferred("scroll_vertical", int(focus_y))
+	if has_arrival:
+		await get_tree().process_frame
+		await get_tree().create_timer(0.18).timeout
+		var move := create_tween()
+		move.tween_property(portrait, "position", current_position + Vector2(-27.0, -78.0), 1.05).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+		move.parallel().tween_property(outline, "position", current_position + Vector2(-30.0, -81.0), 1.05).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
 
 
 func _draw_trail(map: Control, points: PackedVector2Array) -> void:

@@ -19,19 +19,19 @@
                     "id": "matching",
                     "title": "Matching and mission goals",
                     "fact": "match",
-                    "illustration": "res://assets/sprites/tiles/key_objective_icon.jpeg"
+                    "illustration": "res://assets/sprites/powerups/tiles/key_objective_icon.jpeg"
                 },
                 {
                     "id": "moves",
                     "title": "Planning your moves",
                     "fact": "budget",
-                    "illustration": "res://assets/sprites/tiles/key_objective_icon.jpeg"
+                    "illustration": "res://assets/sprites/powerups/tiles/key_objective_icon.jpeg"
                 },
                 {
                     "id": "moves",
                     "title": "Planning your moves",
                     "fact": "goal",
-                    "illustration": "res://assets/sprites/tiles/key_objective_icon.jpeg"
+                    "illustration": "res://assets/sprites/powerups/tiles/key_objective_icon.jpeg"
                 },
                 {
                     "id": "lives_rewards",
@@ -216,7 +216,7 @@
                     "id": "matching",
                     "title": "Matching and mission goals",
                     "fact": "blockers",
-                    "illustration": "res://assets/sprites/tiles/key_objective_icon.jpeg"
+                    "illustration": "res://assets/sprites/powerups/tiles/key_objective_icon.jpeg"
                 }
             ]
         },
@@ -246,7 +246,7 @@
                     "id": "matching",
                     "title": "Matching and mission goals",
                     "fact": "blockers",
-                    "illustration": "res://assets/sprites/tiles/key_objective_icon.jpeg"
+                    "illustration": "res://assets/sprites/powerups/tiles/key_objective_icon.jpeg"
                 }
             ]
         },
@@ -296,7 +296,7 @@
                     "id": "planning",
                     "title": "Planning ahead",
                     "fact": "reach",
-                    "illustration": "res://assets/sprites/tiles/key_objective_icon.jpeg"
+                    "illustration": "res://assets/sprites/powerups/tiles/key_objective_icon.jpeg"
                 }
             ]
         },
@@ -388,19 +388,19 @@
                     "id": "planning",
                     "title": "Planning ahead",
                     "fact": "setup",
-                    "illustration": "res://assets/sprites/tiles/key_objective_icon.jpeg"
+                    "illustration": "res://assets/sprites/powerups/tiles/key_objective_icon.jpeg"
                 },
                 {
                     "id": "planning",
                     "title": "Planning ahead",
                     "fact": "gravity",
-                    "illustration": "res://assets/sprites/tiles/key_objective_icon.jpeg"
+                    "illustration": "res://assets/sprites/powerups/tiles/key_objective_icon.jpeg"
                 },
                 {
                     "id": "planning",
                     "title": "Planning ahead",
                     "fact": "reach",
-                    "illustration": "res://assets/sprites/tiles/key_objective_icon.jpeg"
+                    "illustration": "res://assets/sprites/powerups/tiles/key_objective_icon.jpeg"
                 }
             ]
         },

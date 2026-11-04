@@ -111,8 +111,13 @@
     },
     "description": "Follow David's trail through Victor's Factory and gather the evidence that can lead to Ethan.",
     "tutorial": {
-        "enabled": false,
-        "steps": []
+        "enabled": true,
+        "steps": [
+            {
+                "mechanic": "mission_briefing",
+                "message": "CASE 042 | THE OUTER FENCE\n\nCollect 28 fingerprints and clear all 7 blockers within 24 moves. You must finish both goals.\n\nMatch on or beside a blocker to damage it; each blocker here has two layers. Locks prevent swapping the tile they cover until the lock breaks. Rockets, bombs and thunder can help reach blocked areas.\n\nPlan matches beside blockers while collecting fingerprints. The dark corner cells are gaps, not tiles. The Case File has earlier lessons on chains, locks, missiles and electric traps."
+            }
+        ]
     },
     "obstacles": {
         "items": [

@@ -75,13 +75,15 @@ export function createApp({db, client, oauth, play, baseUrl, clientId, commerceE
   res.cookie('sb_oauth',browser,{httpOnly:true,secure:baseUrl.startsWith('https:'),sameSite:'lax',maxAge:300000,path:'/auth/google'});
   const parent=flow.accountMode==='guardian';
   res.type('html').send(`<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Save The Baby account</title><main><h1>${parent?'Parent or guardian account':'Your cloud account'}</h1>
+<p><strong>Account setup — step 1 of 2</strong></p>
 <p>${parent?'Please hand this device to a parent or legal guardian. The parent must use their own Google account, not the child’s account.':'Continue with your own Google account. If you are under 18, ask your parent or guardian to manage this account.'}</p>
 <p>S.B. Ibhadode Technologies stores the Google account identifier, display name, game progress and purchase records using Render and MongoDB Atlas. Google handles payment. Cloud saves and purchased coins belong to the signed-in account. Do not enter a child’s name or email here.</p>
 <p>Account creation does not approve future payments. Google Play applies the purchasing account’s parental controls. You can delete the online account from Settings → Account &amp; Coins → Delete Online Account, or contact info@sbi.globalcreest.com.</p>
 <p><a href="https://sbi.globalcreest.com/save-the-baby/privacy-policy">Read the privacy policy</a>. You may close this page and continue playing without an online account.</p>
 <form method="post" action="/auth/google/authorize"><input type="hidden" name="flow" value="${flow._id}"><input type="hidden" name="noticeToken" value="${noticeToken}">
 <p><label><input type="checkbox" name="acknowledged" value="yes" required> ${parent?'I am the parent or legal guardian, I am 18 or older, and I will manage this cloud account and its purchases using my own Google account.':'I am 18 or older and will manage this cloud account and its purchases.'} I have read the account notice.</label></p>
-<button type="submit">Continue to Google</button></form></main></html>`);
+<p><strong>Step 2:</strong> Google will let you choose an existing account or choose “Create account”. The Save The Baby cloud account is created automatically after the first successful Google sign-in.</p>
+<button type="submit">Continue to Google sign-in</button></form></main></html>`);
  });
  app.post('/auth/google/authorize',async(req,res)=>{
   const cookie=(req.get('cookie')||'').split(';').map(x=>x.trim()).find(x=>x.startsWith('sb_oauth='))?.slice(9);

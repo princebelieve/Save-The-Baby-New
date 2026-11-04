@@ -6,6 +6,7 @@ signal logged_out
 signal message(text: String)
 
 const SESSION_PATH := "user://online_session.cfg"
+const OWNER_MODE_PATH := "user://account_owner_mode.cfg"
 var base_url := ""
 var token := ""
 var user_id := ""
@@ -47,15 +48,26 @@ func signed_in() -> bool:
 	return not token.is_empty() and not user_id.is_empty()
 
 func needs_parent_account() -> bool:
+	var owner_mode := ConfigFile.new()
+	if owner_mode.load(OWNER_MODE_PATH) == OK:
+		var saved_mode := str(owner_mode.get_value("account", "mode", ""))
+		if saved_mode in ["adult", "guardian"]:
+			return saved_mode == "guardian"
 	var settings := ConfigFile.new()
-	# Unknown age receives the same parent handoff as younger players.
 	return settings.load("user://ad_age_group.cfg") != OK or settings.get_value("audience", "group", "unknown") != "adult"
 
-func api(path: String, method: HTTPClient.Method = HTTPClient.METHOD_GET, data: Dictionary = {}, authenticated := true) -> Dictionary:
+func set_account_owner_mode(mode: String) -> void:
+	if mode not in ["adult", "guardian"]:
+		return
+	var settings := ConfigFile.new()
+	settings.set_value("account", "mode", mode)
+	CampaignProgressStore.write(settings, OWNER_MODE_PATH)
+
+func api(path: String, method: HTTPClient.Method = HTTPClient.METHOD_GET, data: Dictionary = {}, authenticated := true, timeout_seconds := 25.0) -> Dictionary:
 	if not configured():
 		return {"error":"Online services are not configured yet.", "status":0}
 	var request := HTTPRequest.new()
-	request.timeout = 25.0
+	request.timeout = timeout_seconds
 	add_child(request)
 	var headers := PackedStringArray(["Content-Type: application/json"])
 	if authenticated:
@@ -82,12 +94,17 @@ func api(path: String, method: HTTPClient.Method = HTTPClient.METHOD_GET, data: 
 		body["error"] = "Connection failed. Your local progress is safe."
 	return body
 
-func sign_in() -> void:
+func sign_in(account_mode := "") -> void:
 	if _login_active or busy:
 		return
+	var selected_mode := account_mode
+	if selected_mode not in ["self", "guardian"]:
+		selected_mode = "guardian" if needs_parent_account() else "self"
+	var guardian_flow := selected_mode == "guardian"
 	_login_active = true
 	var verifier := Crypto.new().generate_random_bytes(32).hex_encode()
-	var start := await api("/auth/start", HTTPClient.METHOD_POST, {"challenge":verifier.sha256_text(),"accountMode":"guardian" if needs_parent_account() else "self"}, false)
+	# The hosted API may be waking from an idle period; allow its cold start to complete.
+	var start := await api("/auth/start", HTTPClient.METHOD_POST, {"challenge":verifier.sha256_text(),"accountMode":selected_mode}, false, 75.0)
 	if start.has("error"):
 		_login_active = false
 		message.emit(str(start.error))
@@ -96,7 +113,7 @@ func sign_in() -> void:
 		_login_active = false
 		message.emit("Could not open the browser. Please try signing in again.")
 		return
-	message.emit("Ask your parent to read the account notice and sign in with their own Google account, then return to the game." if needs_parent_account() else "Read the account notice and finish Google sign-in in your browser, then return to the game.")
+	message.emit("Hand the device to your parent or guardian. They will read the account notice and use their own Google account in the browser." if guardian_flow else "The browser will show the account notice, then Google sign-in. On your first successful sign-in, the game creates your cloud account automatically.")
 	for attempt in range(90):
 		await get_tree().create_timer(3.0).timeout
 		if not _login_active:

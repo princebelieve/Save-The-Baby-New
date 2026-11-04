@@ -86,7 +86,7 @@ class SavePaths:
 # =========================================================
 
 class ResourcePaths:
-	const TILE_SPRITES: String = "res://assets/sprites/tiles/"
+	const TILE_SPRITES: String = "res://assets/sprites/powerups/tiles/"
 	const UI_SPRITES: String = "res://assets/sprites/ui/"
 	const POWERUP_SPRITES: String = "res://assets/sprites/powerups/"
 	const OBSTACLE_SPRITES: String = "res://assets/sprites/obstacles/"

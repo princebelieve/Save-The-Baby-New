@@ -64,14 +64,13 @@ func show_account() -> void:
 	content.add_theme_constant_override("separation",8)
 	var status := Label.new()
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	status.text = ("%s | Purchased coins: %d" % [account.player_name,account.wallet]) if account.signed_in() else "Playing as guest. Sign in with Google to save progress across devices."
+	status.text = ("%s | Purchased coins: %d" % [account.player_name,account.wallet]) if account.signed_in() else "Playing as guest. Online accounts use Google. Adults can create or connect their own account; a parent or guardian can manage a child's save. You can also keep playing as a guest."
 	content.add_child(status)
 	if not account.configured():
-		status.text += "\nOnline services await server setup. Guest play remains available."
+		status.text += "\nOnline services are unavailable until the account server is configured. Guest play remains available."
 	if not account.signed_in():
-		if account.needs_parent_account():
-			status.text = "Playing as guest. Ask a parent or guardian to manage cloud saves and coin purchases with their own Google account."
-		_button(content,"PARENT / GUARDIAN SIGN IN" if account.needs_parent_account() else "SIGN IN WITH GOOGLE",_sign_in,not account.configured())
+		_button(content,"ADULT: CREATE OR CONNECT GOOGLE ACCOUNT",_sign_in.bind("adult"),not account.configured())
+		_button(content,"PARENT / GUARDIAN ACCOUNT",_sign_in.bind("guardian"),not account.configured())
 	else:
 		var player_id := Label.new()
 		player_id.text = "Player ID: " + account.user_id
@@ -109,16 +108,17 @@ func show_account() -> void:
 	dialog.canceled.connect(dialog.queue_free)
 	dialog.popup_centered_clamped(Vector2i(int(content.custom_minimum_size.x+36),int(scroll.custom_minimum_size.y+80)))
 
-func _sign_in() -> void:
-	if not account.needs_parent_account():
-		account.sign_in()
+func _sign_in(owner_mode: String) -> void:
+	account.set_account_owner_mode(owner_mode)
+	if owner_mode == "adult":
+		account.sign_in("self")
 		return
 	var confirm := ConfirmationDialog.new()
 	game._prepare_dialog(confirm)
 	confirm.title = "ASK A PARENT OR GUARDIAN"
-	confirm.dialog_text = "Please hand this device to your parent or guardian.\n\nParent: use your own Google account to manage this save and purchased coins. Read the account notice in the browser before continuing.\n\nYou can cancel and keep playing."
-	confirm.ok_button_text = "OPEN ACCOUNT NOTICE"
-	confirm.confirmed.connect(func(): account.sign_in())
+	confirm.dialog_text = "Please hand this device to your parent or guardian. They will use their own Google account to manage the cloud save and purchased coins. The browser will first show the account notice, then continue to Google sign-in.\n\nYou can cancel and keep playing as a guest."
+	confirm.ok_button_text = "CONTINUE TO ACCOUNT NOTICE"
+	confirm.confirmed.connect(func(): account.sign_in("guardian"))
 	confirm.confirmed.connect(confirm.queue_free)
 	confirm.canceled.connect(confirm.queue_free)
 	game.add_child(confirm)
