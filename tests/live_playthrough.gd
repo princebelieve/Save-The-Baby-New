@@ -52,11 +52,16 @@ func _ready() -> void:
 	await capture("07_route_choices")
 	if game._choice_box.get_child_count() > 0:
 		await click(game._choice_box.get_child(0))
+	await confirm_illustrated_popup()
 	await capture("08_route_response")
 	await click(game._story_continue_button)
+	for _page in 5:
+		if not is_instance_valid(game._story_layer):
+			break
+		await click(game._story_continue_button)
 	await capture("09_campaign_coaching")
 	if game._tutorial_overlay != null and game._tutorial_overlay.visible:
-		await click(game._tutorial_overlay._acknowledge_button)
+		await finish_visible_tutorial()
 	await capture("10_campaign")
 	await click_named(game._campaign_map, "Level001")
 	await capture("11_chapter_story")
@@ -69,7 +74,7 @@ func _ready() -> void:
 	await wait(1.4)
 	await capture("14_tutorial_goal")
 	if game._tutorial_overlay != null and game._tutorial_overlay._acknowledge_button.visible:
-		await click(game._tutorial_overlay._acknowledge_button)
+		await finish_visible_tutorial()
 	await capture("15_tutorial_pause_prompt")
 	await click(game._pause_button)
 	await capture("16_pause")
@@ -90,7 +95,7 @@ func _ready() -> void:
 	await sample_audio("gameplay_music")
 	game._show_booster_confirmation("rocket")
 	await capture("21_booster_confirmation")
-	await click(game._booster_confirm.get_cancel_button())
+	await click(game._booster_confirm._skip_button)
 	game._open_booster_shop("bomb")
 	await capture("22_supply_shop")
 	await dismiss_dialog(false)
@@ -108,7 +113,11 @@ func _ready() -> void:
 	if game._briefing_layer != null:
 		await click_named(game._briefing_layer, "PlayButton")
 	game._finish_tutorial()
-	game._show_level_result(true)
+	game._current_level_points = 1200
+	var leftover_special := game._board.get_tile(Vector2i.ZERO) as Tile
+	if leftover_special != null:
+		leftover_special.set_powerup(Constants.PowerupType.ROCKET)
+	await game._show_level_result(true)
 	await capture("26_victory")
 	await click_text(game._result_layer, "CAMPAIGN MAP")
 	await capture("27_map_progress")
@@ -132,6 +141,23 @@ func _ready() -> void:
 
 func wait(seconds: float) -> void:
 	await get_tree().create_timer(seconds, true).timeout
+
+
+func confirm_illustrated_popup() -> void:
+	for _page in 8:
+		if not is_instance_valid(game._detail_layer):
+			return
+		var popup := game._detail_layer.get_node_or_null("IllustratedDetailCard") as IllustratedPopup
+		if popup == null:
+			return
+		await click(popup._acknowledge_button)
+
+
+func finish_visible_tutorial() -> void:
+	for _page in 12:
+		if game._tutorial_overlay == null or not game._tutorial_overlay.visible:
+			return
+		await click(game._tutorial_overlay._acknowledge_button)
 
 
 func click(button: BaseButton) -> void:

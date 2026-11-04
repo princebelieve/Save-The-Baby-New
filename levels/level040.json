@@ -1,7 +1,7 @@
 {
     "story": {
         "return_to_map": true,
-        "after_level": "",
+        "after_level": "season08",
         "before_level": "",
         "first_clear": ""
     },

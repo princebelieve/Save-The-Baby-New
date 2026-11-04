@@ -29,6 +29,7 @@ var _story_previous_button: Button
 var _launch_layer: CanvasLayer
 var _story_portrait: TextureRect
 var _story_dialogue_panel: PanelContainer
+var _story_scroll_top_roll: Panel
 var _pause_layer: CanvasLayer
 var _briefing_layer: CanvasLayer
 var _campaign_layer: CanvasLayer
@@ -58,6 +59,10 @@ var _case_file_was_board_locked := false
 var _booster_dock: PanelContainer
 var _booster_buttons: Dictionary = {}
 var _result_layer: CanvasLayer
+var _result_in_progress := false
+var _result_stars_earned := 1
+var _current_level_points := 0
+var _clear_bonus_coins := 0
 var _evidence_count: int = 0
 var _evidence_goal: int = 10
 var _objective_target := "KEY"
@@ -992,15 +997,15 @@ func _make_menu_button(caption: String) -> Button:
 	button.custom_minimum_size = Vector2(350, 66)
 	button.add_theme_font_size_override("font_size", 22)
 	button.add_theme_font_override("font", DISPLAY_FONT)
-	button.add_theme_color_override("font_color", Color("#fff3d5"))
+	button.add_theme_color_override("font_color", Color("#4b2d1a"))
 	var normal := StyleBoxFlat.new()
-	normal.bg_color = Color("#21466a")
-	normal.border_color = Color("#d6b66e")
+	normal.bg_color = Color("#d8b77b")
+	normal.border_color = Color("#8b572b")
 	normal.set_border_width_all(2)
 	normal.set_corner_radius_all(16)
 	button.add_theme_stylebox_override("normal", normal)
 	var hover := normal.duplicate() as StyleBoxFlat
-	hover.bg_color = Color("#2f628f")
+	hover.bg_color = Color("#ead09b")
 	button.add_theme_stylebox_override("hover", hover)
 	button.pressed.connect(_play_ui_click)
 	return button
@@ -1337,7 +1342,7 @@ func _legal_markdown_to_plain_text(markdown: String) -> String:
 		while line.begins_with("#"):
 			line = line.substr(1).strip_edges()
 		if line.begins_with("- "):
-			line = "• " + line.substr(2)
+			line = String.chr(0x2022) + " " + line.substr(2)
 		line = line.replace("**", "")
 		lines.append(line)
 	return "\n".join(lines)
@@ -1432,7 +1437,7 @@ func _show_story_overlay() -> void:
 	_apply_opening_background_blur(background)
 	var veil := ColorRect.new()
 	veil.name = "StoryVeil"
-	veil.color = Color(0.008, 0.02, 0.045, 0.66)
+	veil.color = Color(0.09, 0.07, 0.045, 0.25)
 	veil.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_story_layer.add_child(veil)
 	var title := _make_label(str(_story.get("title", "The Night Ethan Vanished")), 24)
@@ -1442,10 +1447,11 @@ func _show_story_overlay() -> void:
 	title.anchor_bottom = 0.075
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.z_index = 2
+	title.add_theme_color_override("font_color", Color("#f4e4bd"))
 	veil.add_child(title)
 	_story_portrait = TextureRect.new()
-	_story_portrait.position = Vector2(viewport_size.x * 0.10, viewport_size.y * 0.09)
-	_story_portrait.size = Vector2(viewport_size.x * 0.80, viewport_size.y * 0.43)
+	_story_portrait.position = Vector2(viewport_size.x * 0.5 - 41.0, viewport_size.y * 0.405)
+	_story_portrait.size = Vector2(82, 92)
 	_story_portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_story_portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	_story_portrait.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
@@ -1457,20 +1463,38 @@ func _show_story_overlay() -> void:
 	dialogue_panel.name = "StoryDialoguePanel"
 	dialogue_panel.anchor_left = 0.045
 	dialogue_panel.anchor_right = 0.955
-	dialogue_panel.anchor_top = 0.54
+	dialogue_panel.anchor_top = 0.50
 	dialogue_panel.anchor_bottom = 0.97
 	dialogue_panel.offset_top = 58.0
 	dialogue_panel.offset_bottom = 58.0
 	var panel_style := StyleBoxFlat.new()
-	panel_style.bg_color = Color(0.025, 0.065, 0.115, 0.97)
-	panel_style.border_color = Color("#d9b86f")
-	panel_style.set_border_width_all(3)
-	panel_style.set_corner_radius_all(24)
+	panel_style.bg_color = Color("#f4e4bd")
+	panel_style.border_color = Color("#8b572b")
+	panel_style.set_border_width_all(5)
+	panel_style.set_corner_radius_all(10)
 	panel_style.set_content_margin_all(22)
 	panel_style.shadow_color = Color(0, 0, 0, 0.55)
 	panel_style.shadow_size = 14
 	dialogue_panel.add_theme_stylebox_override("panel", panel_style)
 	veil.add_child(dialogue_panel)
+	for roll_y in [0.50, 0.95]:
+		var scroll_roll := Panel.new()
+		scroll_roll.anchor_left = 0.035
+		scroll_roll.anchor_right = 0.965
+		scroll_roll.anchor_top = roll_y
+		scroll_roll.anchor_bottom = roll_y
+		scroll_roll.offset_top = -7.0
+		scroll_roll.offset_bottom = 9.0
+		var roll_style := StyleBoxFlat.new()
+		roll_style.bg_color = Color("#b27a3e")
+		roll_style.border_color = Color("#70421f")
+		roll_style.set_border_width_all(2)
+		roll_style.set_corner_radius_all(8)
+		scroll_roll.add_theme_stylebox_override("panel", roll_style)
+		scroll_roll.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		veil.add_child(scroll_roll)
+		if is_equal_approx(roll_y, 0.50):
+			_story_scroll_top_roll = scroll_roll
 	var layout := VBoxContainer.new()
 	layout.add_theme_constant_override("separation", 14)
 	dialogue_panel.add_child(layout)
@@ -1484,7 +1508,7 @@ func _show_story_overlay() -> void:
 	scroll.add_child(content)
 	_speaker_label = _make_label("", 23)
 	_speaker_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	_speaker_label.add_theme_color_override("font_color", Color("#f2ce7c"))
+	_speaker_label.add_theme_color_override("font_color", Color("#713d1e"))
 	content.add_child(_speaker_label)
 	_dialogue_label = _make_label("", 25)
 	_dialogue_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -1492,8 +1516,8 @@ func _show_story_overlay() -> void:
 	_dialogue_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_dialogue_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	_dialogue_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_dialogue_label.add_theme_color_override("font_color", Color("#fff8e8"))
-	_dialogue_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.4))
+	_dialogue_label.add_theme_color_override("font_color", Color("#4b2d1a"))
+	_dialogue_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0))
 	content.add_child(_dialogue_label)
 	_choice_box = VBoxContainer.new()
 	_choice_box.add_theme_constant_override("separation", 8)
@@ -1527,15 +1551,15 @@ func _make_story_action_button(caption: String, width: float) -> Button:
 	button.custom_minimum_size = Vector2(width, 64)
 	button.add_theme_font_size_override("font_size", 21)
 	button.add_theme_font_override("font", DISPLAY_FONT)
-	button.add_theme_color_override("font_color", Color("#fff5db"))
+	button.add_theme_color_override("font_color", Color("#4b2d1a"))
 	var normal := StyleBoxFlat.new()
-	normal.bg_color = Color("#244d70")
-	normal.border_color = Color("#d9b86f")
+	normal.bg_color = Color("#d8b77b")
+	normal.border_color = Color("#8b572b")
 	normal.set_border_width_all(2)
 	normal.set_corner_radius_all(14)
 	button.add_theme_stylebox_override("normal", normal)
 	var hover := normal.duplicate() as StyleBoxFlat
-	hover.bg_color = Color("#3475a2")
+	hover.bg_color = Color("#ead09b")
 	button.add_theme_stylebox_override("hover", hover)
 	button.pressed.connect(_play_ui_click)
 	return button
@@ -1550,6 +1574,8 @@ func _advance_story() -> void:
 
 
 func _finish_dialogue_typing() -> void:
+	if _dialogue_tween != null and _dialogue_tween.is_running():
+		_dialogue_tween.kill()
 	if _dialogue_label != null:
 		_dialogue_label.visible_characters = -1
 	_is_dialogue_typing = false
@@ -1574,6 +1600,7 @@ func _on_dialogue_started(_dialogue_id: Variant) -> void:
 	if _story_manager == null:
 		return
 	var line := _story_manager.get_current_dialogue()
+	SignalBus.play_sfx.emit("case_open")
 	var story_sound := str(line.get("sfx", ""))
 	if not story_sound.is_empty():
 		SignalBus.play_sfx.emit(story_sound)
@@ -1633,9 +1660,12 @@ func _present_route_choices(choices: Array) -> void:
 	_is_dialogue_typing = false
 	_story_continue_button.hide()
 	_story_dialogue_panel.anchor_top = 0.39
+	if is_instance_valid(_story_scroll_top_roll):
+		_story_scroll_top_roll.anchor_top = 0.39
+		_story_scroll_top_roll.anchor_bottom = 0.39
 	_story_portrait.texture = ResourceManager.load_portrait("res://assets/sprites/characters/david_portrait_v2.png")
-	_story_portrait.position = Vector2(get_viewport_rect().size.x * 0.17, get_viewport_rect().size.y * 0.075)
-	_story_portrait.size = Vector2(get_viewport_rect().size.x * 0.66, get_viewport_rect().size.y * 0.32)
+	_story_portrait.position = Vector2(get_viewport_rect().size.x * 0.5 - 41.0, get_viewport_rect().size.y * 0.30)
+	_story_portrait.size = Vector2(82, 92)
 	_story_skip_button.hide()
 	_story_previous_button.hide()
 	for choice in choices:
@@ -1646,12 +1676,12 @@ func _present_route_choices(choices: Array) -> void:
 		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		button.add_theme_font_size_override("font_size", 21)
-		button.add_theme_color_override("font_color", Color("#fff7e6"))
-		button.add_theme_color_override("font_hover_color", Color("#ffffff"))
+		button.add_theme_color_override("font_color", Color("#4b2d1a"))
+		button.add_theme_color_override("font_hover_color", Color("#2d1d12"))
 		button.add_theme_constant_override("h_separation", 12)
 		var choice_style := StyleBoxFlat.new()
-		choice_style.bg_color = Color("#1c3f5f")
-		choice_style.border_color = Color("#c9a865")
+		choice_style.bg_color = Color("#e6cd98")
+		choice_style.border_color = Color("#8b572b")
 		choice_style.set_border_width_all(2)
 		choice_style.set_corner_radius_all(14)
 		choice_style.set_content_margin(SIDE_LEFT, 14)
@@ -1660,7 +1690,7 @@ func _present_route_choices(choices: Array) -> void:
 		choice_style.set_content_margin(SIDE_BOTTOM, 8)
 		button.add_theme_stylebox_override("normal", choice_style)
 		var choice_hover := choice_style.duplicate() as StyleBoxFlat
-		choice_hover.bg_color = Color("#2d628e")
+		choice_hover.bg_color = Color("#f0dfb6")
 		button.add_theme_stylebox_override("hover", choice_hover)
 		button.pressed.connect(_preview_story_choice.bind(choice))
 		button.pressed.connect(_play_ui_confirm)
@@ -1702,10 +1732,8 @@ func _on_route_selected(choice: Dictionary) -> void:
 		_story_portrait.texture = ResourceManager.load_portrait("res://assets/sprites/characters/amara_police_portrait_cutout.png")
 	else:
 		_story_portrait.texture = ResourceManager.load_portrait("res://assets/sprites/characters/david_portrait_v2.png")
-	_speaker_label.text = str(choice.get("label", ""))
-	_dialogue_label.text = str(choice.get("response", "The search begins."))
-	_dialogue_label.visible_characters = -1
-	_is_dialogue_typing = false
+	_speaker_label.text = str(choice.get("speaker", choice.get("label", ""))).to_upper()
+	_begin_story_typing(str(choice.get("response", "The search begins.")))
 	var story_id := str(_story_manager.get_story_data().get("story_id", "opening_story"))
 	var history: Dictionary = _campaign_progress.get_value("story_choices", "history", {})
 	history[story_id] = choice.duplicate(true)
@@ -1719,12 +1747,38 @@ func _on_route_selected(choice: Dictionary) -> void:
 	if _story_continue_button.pressed.is_connected(_advance_story):
 		_story_continue_button.pressed.disconnect(_advance_story)
 	_story_continue_button.text = "CONTINUE"
-	if _pending_level_id > 0:
-		_pending_route_id = route_id
-		_story_continue_button.pressed.connect(_story_manager.goto_next_scene, CONNECT_ONE_SHOT)
-	else:
-		_story_continue_button.pressed.connect(_show_campaign_map.bind(route_id), CONNECT_ONE_SHOT)
+	_pending_route_id = route_id
+	_story_continue_button.pressed.connect(_advance_selected_story_choice.bind(route_id))
 	set_meta("chosen_route", route_id)
+
+
+func _advance_selected_story_choice(route_id: String) -> void:
+	if _is_dialogue_typing:
+		_finish_dialogue_typing()
+		return
+	if _pending_level_id == 0:
+		if _story_manager != null:
+			_story_manager.end_story()
+		_show_campaign_map(route_id)
+		return
+	if _story_manager != null:
+		_story_manager.goto_next_scene()
+
+
+func _begin_story_typing(copy: String) -> void:
+	if _dialogue_tween != null and _dialogue_tween.is_running():
+		_dialogue_tween.kill()
+	_dialogue_label.text = copy
+	SignalBus.play_sfx.emit("case_open")
+	_dialogue_label.visible_characters = 0
+	_is_dialogue_typing = true
+	_story_continue_button.disabled = false
+	_story_continue_button.text = "TAP TO REVEAL"
+	_dialogue_tween = create_tween()
+	_dialogue_tween.tween_property(_dialogue_label, "visible_characters", copy.length(), maxf(0.45, copy.length() * 0.028))
+	_dialogue_tween.finished.connect(_finish_dialogue_typing)
+	_last_typing_tick_character = 0
+	_play_dialogue_typing_ticks()
 
 
 func _show_campaign_map(route_id: String) -> void:
@@ -2173,6 +2227,8 @@ func _on_board_created() -> void:
 	if created_board == null or created_board == _board:
 		return
 	_ad_attempt += 1
+	_current_level_points = 0
+	_clear_bonus_coins = 0
 	_ad_revived = false
 	_result_ad_shown = false
 	_board = created_board
@@ -2390,7 +2446,7 @@ func _update_objective_hud() -> void:
 		return
 	var progress_text := "%d / %d" % [mini(_evidence_count, _evidence_goal), _evidence_goal]
 	if _obstacles_goal > 0:
-		progress_text += "  •  %d / %d BLOCKERS" % [_obstacles_cleared, _obstacles_goal]
+		progress_text += "  %s  %d / %d BLOCKERS" % [String.chr(0x2022), _obstacles_cleared, _obstacles_goal]
 	_objective_label.text = progress_text
 	if _blocker_label != null:
 		_blocker_label.text = ""
@@ -2492,6 +2548,7 @@ func _persist_campaign_progress() -> void:
 
 
 func _on_tiles_matched(tile_types: Array) -> void:
+	_current_level_points += tile_types.size() * 100
 	_effects().haptic(30 if tile_types.size() >= 6 else 17,0.56 if tile_types.size() >= 6 else 0.34)
 	var feedback_caption := ""
 	var feedback_sound := ""
@@ -3008,7 +3065,7 @@ func _play_objective_complete_sound() -> void:
 
 
 func _evaluate_level_end() -> void:
-	if _result_layer != null or _current_level_id <= 0:
+	if _result_layer != null or _result_in_progress or _current_level_id <= 0:
 		return
 	if (_mission_objectives_complete() or _moves_remaining <= 0) and is_instance_valid(_gameplay_effects) and _gameplay_effects.pending_collections > 0:
 		_waiting_for_collection = true
@@ -3030,10 +3087,16 @@ func _evaluate_level_end() -> void:
 
 
 func _show_level_result(won: bool) -> void:
+	if _result_in_progress or _result_layer != null:
+		return
+	_result_in_progress = true
 	if _board != null:
 		_board.lock()
 	_tutorial_active = false
 	_tutorial_action = ""
+	if won:
+		_result_stars_earned = _calculate_level_stars()
+		await _play_board_clear_celebration()
 	var first_clear := false
 	if won:
 		first_clear = _record_level_completion()
@@ -3043,64 +3106,93 @@ func _show_level_result(won: bool) -> void:
 	_result_layer.process_mode = Node.PROCESS_MODE_ALWAYS
 	add_child(_result_layer)
 	var veil := ColorRect.new()
-	veil.color = Color(0.01, 0.025, 0.05, 0.82)
+	veil.color = Color(0.08, 0.06, 0.035, 0.76)
 	veil.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_result_layer.add_child(veil)
 	var center := CenterContainer.new()
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	veil.add_child(center)
 	var card := PanelContainer.new()
-	card.custom_minimum_size = Vector2(minf(500.0, get_viewport_rect().size.x * 0.88), 380)
+	card.custom_minimum_size = Vector2(minf(520.0, get_viewport_rect().size.x * 0.90), 430)
 	var card_style := StyleBoxFlat.new()
-	card_style.bg_color = Color("#10263d")
-	card_style.border_color = Color("#e2bf72")
-	card_style.set_border_width_all(3)
-	card_style.set_corner_radius_all(26)
-	card_style.set_content_margin_all(28)
+	card_style.bg_color = Color("#f4e4bd")
+	card_style.border_color = Color("#8b572b")
+	card_style.set_border_width_all(5)
+	card_style.set_corner_radius_all(12)
+	card_style.set_content_margin_all(24)
 	card.add_theme_stylebox_override("panel", card_style)
 	center.add_child(card)
 	card.scale = Vector2(0.72, 0.72)
 	var content := VBoxContainer.new()
 	content.alignment = BoxContainer.ALIGNMENT_CENTER
-	content.add_theme_constant_override("separation", 18)
+	content.add_theme_constant_override("separation", 12)
 	card.add_child(content)
-	var heading := _make_label("MISSION COMPLETED!" if won else "THE TRAIL WENT COLD", 32)
+	var heading := _make_label("CASE WON!" if won else "THE TRAIL WENT COLD", 32)
 	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	heading.add_theme_color_override("font_color", Color("#633718"))
 	content.add_child(heading)
 	var result_manager := get_node_or_null("Managers/LevelManager")
 	var result_data: Dictionary = result_manager.get_level_data() if result_manager != null else {}
 	if won and _is_story_final_level(result_data):
 		var story_complete := _make_label("STORY OBJECTIVE COMPLETE!", 22)
 		story_complete.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		story_complete.add_theme_color_override("font_color", Color("#ffe279"))
+		story_complete.add_theme_color_override("font_color", Color("#8b572b"))
 		content.add_child(story_complete)
 	var reward_info: Dictionary = result_data.get("rewards", {})
 	var has_next_level := JsonLoader.file_exists("res://levels/level%03d.json" % (_current_level_id + 1))
 	var has_after_story := not str(result_data.get("story", {}).get("after_level", "")).is_empty()
 	if won:
-		var stars := _make_label("★".repeat(clampi(int(reward_info.get("stars", 3)), 1, 3)), 48)
-		stars.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		stars.add_theme_color_override("font_color", Color("#ffe279"))
+		var trophy := TextureRect.new()
+		var trophy_atlas := AtlasTexture.new()
+		trophy_atlas.atlas = ResourceManager.load_texture("res://assets/sprites/ui/screens/victory_screen.png")
+		trophy_atlas.region = Rect2(118, 88, 132, 102)
+		trophy.texture = trophy_atlas
+		trophy.custom_minimum_size = Vector2(108, 68)
+		trophy.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		trophy.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		trophy.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		content.add_child(trophy)
+		var stars := HBoxContainer.new()
+		stars.alignment = BoxContainer.ALIGNMENT_CENTER
+		stars.add_theme_constant_override("separation", 12)
 		content.add_child(stars)
+		for star_index in 3:
+			var star_mark := String.chr(0x2605) if star_index < _result_stars_earned else String.chr(0x2606)
+			var star := _make_label(star_mark, 46)
+			star.add_theme_color_override("font_color", Color("#b67b22"))
+			stars.add_child(star)
+			star.scale = Vector2(0.08, 0.08)
+			var stamp := create_tween()
+			stamp.tween_interval(0.20 + star_index * 0.52)
+			stamp.tween_property(star, "scale", Vector2(1.30, 0.80), 0.11).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+			stamp.tween_property(star, "scale", Vector2.ONE, 0.16).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
+			if star_index < _result_stars_earned:
+				stamp.tween_callback(_play_star_stamp_feedback)
+	var coins_earned := (int(reward_info.get("coins", 0)) + _clear_bonus_coins) if first_clear else 0
+	var total_coins := _economy_manager.get_coins() if _economy_manager != null else 0
+	var total_points := int(_campaign_progress.get_value("campaign", "total_points", 0))
 	var detail_text: String
 	if not won:
 		detail_text = "The remaining moves ran out. You lost one life. Try again or visit the Life Shop."
-	elif first_clear:
-		detail_text = "Case %03d unlocked. +%d Ethan Coins and %d stars added." % [mini(_highest_unlocked_level, _current_level_id + 1), int(reward_info.get("coins", 0)), maxi(1, int(reward_info.get("stars", 3)))]
 	else:
-		detail_text = "Case %03d unlocked. First-clear rewards were already collected." % mini(_highest_unlocked_level, _current_level_id + 1)
-	if won and not has_next_level:
-		detail_text = "You cleared all currently available cases. David's search continues as new investigations are added. Replay a case on the map while the next chapter is prepared."
-		if first_clear:
-			detail_text += " +%d Ethan Coins and %d stars added." % [int(reward_info.get("coins", 0)), maxi(1, int(reward_info.get("stars", 3)))]
-	if won and _is_story_final_level(result_data):
-		detail_text = "Story objective achieved. " + detail_text
-	var detail := _make_label(detail_text, 19)
+		detail_text = "LEVEL POINTS: %d\nTOTAL POINTS: %d\nCOINS: +%d   TOTAL: %d\nSTARS EARNED: %d" % [_current_level_points, total_points, coins_earned, total_coins, _result_stars_earned]
+		if has_next_level:
+			detail_text += "\nCase %03d is now unlocked." % mini(_highest_unlocked_level, _current_level_id + 1)
+		else:
+			detail_text += "\nDavid's search continues as new investigations are added."
+	var detail := _make_label(detail_text, 17)
 	detail.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	detail.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	detail.add_theme_color_override("font_color", Color("#4b2d1a"))
+	detail.add_theme_color_override("font_outline_color", Color("#b89564"))
+	detail.add_theme_color_override("font_shadow_color", Color("#c9ad7b"))
+	detail.add_theme_constant_override("outline_size", 1)
+	detail.add_theme_constant_override("shadow_offset_x", 1)
+	detail.add_theme_constant_override("shadow_offset_y", 1)
+	detail.add_theme_font_size_override("font_size", 16)
 	content.add_child(detail)
 	if won:
-		var next := _make_menu_button("CONTINUE STORY" if has_after_story else ("NEXT LEVEL" if has_next_level else "RETURN TO MAP"))
+		var next := _make_menu_button("NEXT CHAPTER" if has_after_story else ("NEXT LEVEL" if has_next_level else "RETURN TO MAP"))
 		next.pressed.connect(_next_level_after_win)
 		content.add_child(next)
 	else:
@@ -3132,6 +3224,50 @@ func _show_level_result(won: bool) -> void:
 			_play_story_objective_sound_after_mission()
 	else:
 		SignalBus.play_sfx.emit("level_failure")
+
+
+func _calculate_level_stars() -> int:
+	var level_manager := get_node_or_null("Managers/LevelManager")
+	var data: Dictionary = level_manager.get_level_data() if level_manager != null else {}
+	var total_moves := maxi(1, int(data.get("moves", {}).get("total", 1)))
+	var remaining_ratio := float(_moves_remaining) / float(total_moves)
+	if remaining_ratio >= 0.50:
+		return 3
+	if remaining_ratio >= 0.20:
+		return 2
+	return 1
+
+
+func _play_star_stamp_feedback() -> void:
+	SignalBus.play_sfx.emit("case_close")
+	_effects().haptic(52, 0.68)
+
+
+func _play_board_clear_celebration() -> void:
+	if _board == null:
+		return
+	var remaining_specials: Array[Tile] = []
+	for value in _board._grid.values():
+		var tile := value as Tile
+		if is_instance_valid(tile) and tile.has_powerup():
+			remaining_specials.append(tile)
+	_current_level_points += remaining_specials.size() * 250
+	_clear_bonus_coins = remaining_specials.size() * 5
+	for special in remaining_specials:
+		SignalBus.play_sfx.emit("powerup_activate")
+		var blast := create_tween()
+		blast.tween_property(special, "scale", Vector2(1.55, 0.15), 0.12).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
+		blast.tween_property(special, "scale", Vector2.ZERO, 0.12)
+		await blast.finished
+	for value in _board._grid.values():
+		var tile := value as Tile
+		if is_instance_valid(tile):
+			var leave := create_tween()
+			leave.tween_property(tile, "position:y", tile.position.y + get_viewport_rect().size.y, 0.34).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
+			leave.parallel().tween_property(tile, "rotation", randf_range(-0.24, 0.24), 0.34)
+	await get_tree().create_timer(0.38).timeout
+	_board.clear()
+	_board.queue_redraw()
 
 
 func _play_story_objective_sound_after_mission() -> void:
@@ -3222,6 +3358,7 @@ func _dismiss_level_result() -> void:
 	if _result_layer != null and is_instance_valid(_result_layer):
 		_result_layer.queue_free()
 	_result_layer = null
+	_result_in_progress = false
 
 
 func _next_level_after_win() -> void:
@@ -3280,18 +3417,36 @@ func _record_level_completion() -> bool:
 	var level_manager := get_node_or_null("Managers/LevelManager")
 	var level_data: Dictionary = level_manager.get_level_data() if level_manager != null else {}
 	var rewards: Dictionary = level_data.get("rewards", {})
-	var stars_earned := maxi(1, int(rewards.get("stars", 3)))
+	var stars_earned := _result_stars_earned
 	var old_stars := int(_completed_levels.get(str(_current_level_id), 0))
 	_completed_levels[str(_current_level_id)] = maxi(stars_earned, old_stars)
+	var star_delta := maxi(0, stars_earned - old_stars)
 	_highest_unlocked_level = maxi(_highest_unlocked_level, _current_level_id + 1)
+	var point_records_value: Variant = _campaign_progress.get_value("campaign", "level_points", {})
+	var point_records: Dictionary = point_records_value if typeof(point_records_value) == TYPE_DICTIONARY else {}
+	point_records[str(_current_level_id)] = maxi(_current_level_points, int(point_records.get(str(_current_level_id), 0)))
+	_campaign_progress.set_value("campaign", "level_points", point_records)
+	var total_points := 0
+	for points in point_records.values():
+		total_points += int(points)
+	_campaign_progress.set_value("campaign", "total_points", total_points)
 	if old_stars == 0:
 		if _reward_manager != null:
-			_reward_manager.calculate_level_rewards({"level": _current_level_id})
-			_reward_manager.claim_rewards()
+			var level_rewards: Array = _reward_manager.calculate_level_rewards({"level": _current_level_id})
+			for reward in level_rewards:
+				if int(reward.get("type", -1)) == int(Constants.RewardType.STARS):
+					reward["amount"] = stars_earned
+			_reward_manager.clear_pending_rewards()
+			_reward_manager.grant_rewards(level_rewards)
 		elif _economy_manager != null:
 			_economy_manager.add_coins(int(rewards.get("coins", 0)))
-			_economy_manager.add_stars(stars_earned)
-		_campaign_progress.set_value("campaign", "total_stars", int(_campaign_progress.get_value("campaign", "total_stars", 0)) + stars_earned)
+			_economy_manager.add_stars(star_delta)
+		if _economy_manager != null and _clear_bonus_coins > 0:
+			_economy_manager.add_coins(_clear_bonus_coins)
+	elif star_delta > 0 and _economy_manager != null:
+		_economy_manager.add_stars(star_delta)
+	if star_delta > 0:
+		_campaign_progress.set_value("campaign", "total_stars", int(_campaign_progress.get_value("campaign", "total_stars", 0)) + star_delta)
 	_persist_campaign_progress()
 	return old_stars == 0
 

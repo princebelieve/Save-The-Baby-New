@@ -1,0 +1,89 @@
+{
+  "story_id": "season01",
+  "title": "The Key Under the Gate",
+  "background_music": "suspense_opening",
+  "default_background": "res://assets/sprites/backgrounds/garden_map_tile.jpeg",
+  "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+  "characters": [
+    "david",
+    "amara",
+    "victor",
+    "detective_morris",
+    "ethan"
+  ],
+  "scenes": [
+    {
+      "scene_id": "season01_reveal",
+      "route_dialogues": {
+        "police": [
+          {
+            "speaker": "Detective Morris",
+            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
+            "text": "Morris finds the car registered to a shell company. The record is real; the owner is not."
+          }
+        ],
+        "signal": [
+          {
+            "speaker": "Amara",
+            "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+            "text": "The depot mark matches an old shipping code Amara saw on Victor's phone."
+          }
+        ],
+        "alone": [
+          {
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+            "text": "The tire tracks lead away from the road and end beside a covered drain."
+          }
+        ]
+      },
+      "dialogues": [
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "David finds a brass key stamped with a mark from the old river depot. The garden gate had not been forced; someone inside opened it for Victor."
+        },
+        {
+          "speaker": "Amara",
+          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+          "text": "A camera frame catches a second car leaving just before Victor. Its driver turns toward the depot and looks straight at the lens."
+        },
+        {
+          "speaker": "Victor",
+          "portrait": "res://assets/sprites/characters/victor_portrait_v2.png",
+          "text": "The camera goes dark. A voice from the depot speaker says: \"You are already late.\""
+        }
+      ],
+      "choices": [
+        {
+          "id": "police",
+          "label": "Ask Morris to trace the car",
+          "impact": "Morris can trace the shell company, but visible patrol cars could tip off its driver.",
+          "response": "Morris: I will check the company records quietly and put one officer at the depot road.",
+          "speaker": "Detective Morris"
+        },
+        {
+          "id": "signal",
+          "label": "Have Amara decode the depot mark",
+          "impact": "Amara can match the mark to a freight route before the rain erases the tracks.",
+          "response": "Amara: I will compare the stamp with Victor's old shipping records and mark the route.",
+          "speaker": "Amara"
+        },
+        {
+          "id": "alone",
+          "label": "Follow the driver's tire tracks",
+          "impact": "David can reach the covered drain first, but the tracks may lead into a trap.",
+          "response": "David: I will follow the tracks to the drain and send you my location before I go in.",
+          "speaker": "David"
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "version": 1,
+    "chapter": 1,
+    "season": 1,
+    "campaign_levels": "001-005",
+    "episode": "A continuing rescue mystery; the final clue opens the next episode."
+  }
+}

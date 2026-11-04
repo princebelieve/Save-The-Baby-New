@@ -1,6 +1,6 @@
 {
     "story_id": "chapter06",
-    "title": "Victor\u00e2\u20ac\u2122s Factory",
+    "title": "Victor’s Factory",
     "background_music": "suspense_opening",
     "default_background": "res://assets/sprites/backgrounds/factory_cage_art.jpeg",
     "portrait": "res://assets/sprites/characters/victor_portrait_v2.png",
@@ -18,19 +18,22 @@
                     "id": "police",
                     "label": "Coordinate with Morris outside",
                     "impact": "Morris covers the perimeter while David checks the service route. Morris can watch for danger, but he needs you to share each clue before he can act.",
-                    "response": "Morris covers the perimeter while David checks the service route. Ethan must come home alive."
+                    "response": "Morris covers the perimeter while David checks the service route. Ethan must come home alive.",
+                    "speaker": "Detective Morris"
                 },
                 {
                     "id": "signal",
                     "label": "Keep Amara on the factory signal",
                     "impact": "Amara listens for Ethan while David checks the service route. Amara stays involved, but the signal could be a decoy. David will still need physical evidence.",
-                    "response": "Amara listens for Ethan while David checks the service route. Ethan must come home alive."
+                    "response": "Amara listens for Ethan while David checks the service route. Ethan must come home alive.",
+                    "speaker": "Amara"
                 },
                 {
                     "id": "alone",
                     "label": "Scout the service entrance myself",
                     "impact": "David scouts quietly and sends his findings to Amara. You can investigate quietly, but no one will be close enough to help immediately if Victor is waiting.",
-                    "response": "David scouts quietly and sends his findings to Amara. Ethan must come home alive."
+                    "response": "David scouts quietly and sends his findings to Amara. Ethan must come home alive.",
+                    "speaker": "David"
                 }
             ],
             "dialogues": [

@@ -1,0 +1,89 @@
+{
+  "story_id": "season04",
+  "title": "The Freight Ledger",
+  "background_music": "suspense_opening",
+  "default_background": "res://assets/sprites/backgrounds/factory_map_section.jpeg",
+  "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+  "characters": [
+    "david",
+    "amara",
+    "victor",
+    "detective_morris",
+    "ethan"
+  ],
+  "scenes": [
+    {
+      "scene_id": "season04_reveal",
+      "route_dialogues": {
+        "police": [
+          {
+            "speaker": "Detective Morris",
+            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
+            "text": "Morris gets the order, but the factory has been emptied by the time officers arrive."
+          }
+        ],
+        "signal": [
+          {
+            "speaker": "Amara",
+            "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+            "text": "The code names a quarry road that does not appear on current maps."
+          }
+        ],
+        "alone": [
+          {
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+            "text": "David reaches the loading door just as it locks from the other side."
+          }
+        ]
+      },
+      "dialogues": [
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "A freight ledger links Victor's shell company to the old factory. One entry is written in a child's handwriting and circles a departure time."
+        },
+        {
+          "speaker": "Amara",
+          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+          "text": "The factory has no power, yet a light blinks behind a sealed loading door. Someone is keeping time inside."
+        },
+        {
+          "speaker": "Victor",
+          "portrait": "res://assets/sprites/characters/victor_portrait_v2.png",
+          "text": "A toy rolls back through the door by itself. Its speaker whispers: \"Come alone.\""
+        }
+      ],
+      "choices": [
+        {
+          "id": "police",
+          "label": "Ask Morris to obtain a search order",
+          "impact": "A search order protects the team, but the factory could be emptied while it is approved.",
+          "response": "Morris: I will request the order and keep the outer road watched.",
+          "speaker": "Detective Morris"
+        },
+        {
+          "id": "signal",
+          "label": "Use the ledger code to identify the shipment",
+          "impact": "The ledger code may reveal the true shipment, but decoding it will cost time.",
+          "response": "Amara: I will check the code against the old freight list before Victor can move it.",
+          "speaker": "Amara"
+        },
+        {
+          "id": "alone",
+          "label": "Slip through the loading bay before the signal stops",
+          "impact": "The loading bay is open now, but someone may be waiting beyond the sealed door.",
+          "response": "David: I will enter the bay and leave the door marked for Morris.",
+          "speaker": "David"
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "version": 1,
+    "chapter": 4,
+    "season": 1,
+    "campaign_levels": "016-020",
+    "episode": "A continuing rescue mystery; the final clue opens the next episode."
+  }
+}

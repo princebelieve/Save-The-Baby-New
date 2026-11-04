@@ -1,6 +1,6 @@
 {
     "story_id": "chapter01",
-    "title": "Amara\u00e2\u20ac\u2122s Garden",
+    "title": "Amara’s Garden",
     "background_music": "suspense_opening",
     "default_background": "res://assets/sprites/backgrounds/garden_map_tile.jpeg",
     "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
@@ -18,19 +18,22 @@
                     "id": "police",
                     "label": "Ask Morris to secure the gate",
                     "impact": "Morris keeps Amara safe at the house while David follows the trail. Morris can watch for danger, but he needs you to share each clue before he can act.",
-                    "response": "Morris keeps Amara safe at the house while David follows the trail. Ethan must come home alive."
+                    "response": "Morris keeps Amara safe at the house while David follows the trail. Ethan must come home alive.",
+                    "speaker": "Detective Morris"
                 },
                 {
                     "id": "signal",
                     "label": "Ask Amara to trace the call",
                     "impact": "Amara stays on the line and checks the location data. Amara stays involved, but the signal could be a decoy. David will still need physical evidence.",
-                    "response": "Amara stays on the line and checks the location data. Ethan must come home alive."
+                    "response": "Amara stays on the line and checks the location data. Ethan must come home alive.",
+                    "speaker": "Amara"
                 },
                 {
                     "id": "alone",
                     "label": "Follow the footprints quietly",
                     "impact": "David approaches quietly while Amara waits for his next call. You can investigate quietly, but no one will be close enough to help immediately if Victor is waiting.",
-                    "response": "David approaches quietly while Amara waits for his next call. Ethan must come home alive."
+                    "response": "David approaches quietly while Amara waits for his next call. Ethan must come home alive.",
+                    "speaker": "David"
                 }
             ],
             "dialogues": [

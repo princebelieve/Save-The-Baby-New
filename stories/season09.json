@@ -1,0 +1,89 @@
+{
+  "story_id": "season09",
+  "title": "The Flood Channel",
+  "background_music": "suspense_opening",
+  "default_background": "res://assets/sprites/backgrounds/river_waterfall_map_tile.jpeg",
+  "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+  "characters": [
+    "david",
+    "amara",
+    "victor",
+    "detective_morris",
+    "ethan"
+  ],
+  "scenes": [
+    {
+      "scene_id": "season09_reveal",
+      "route_dialogues": {
+        "police": [
+          {
+            "speaker": "Detective Morris",
+            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
+            "text": "Morris evacuates the upper floor and finds a second hidden exit."
+          }
+        ],
+        "signal": [
+          {
+            "speaker": "Amara",
+            "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+            "text": "Amara maps a dry pocket behind the eastern retaining wall."
+          }
+        ],
+        "alone": [
+          {
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+            "text": "David finds three scratches at a child's height behind the wall panel."
+          }
+        ]
+      },
+      "dialogues": [
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "The flood channel runs under a warehouse that is marked for demolition. Water is rising through the lower stairwell."
+        },
+        {
+          "speaker": "Amara",
+          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+          "text": "A toy boat floats past with a new message: \"Not the room. The wall.\""
+        },
+        {
+          "speaker": "Victor",
+          "portrait": "res://assets/sprites/characters/victor_portrait_v2.png",
+          "text": "The panel opens. From the other side, Ethan whispers: \"Dad\" Don't come in yet."
+        }
+      ],
+      "choices": [
+        {
+          "id": "police",
+          "label": "Call Morris to clear the upper floor",
+          "impact": "Morris can evacuate the upper floor, but the hidden room may be lost in the search.",
+          "response": "Morris: I will clear the building and keep the eastern exit open.",
+          "speaker": "Detective Morris"
+        },
+        {
+          "id": "signal",
+          "label": "Ask Amara to map the channel flow",
+          "impact": "Amara can find the dry pocket, but rising water may close the route behind David.",
+          "response": "Amara: I will map the current and tell you when the water changes.",
+          "speaker": "Amara"
+        },
+        {
+          "id": "alone",
+          "label": "Search the wall before the water rises",
+          "impact": "David can inspect the wall now, but there may be no time to wait for backup.",
+          "response": "David: I will check the scratches and stop if the water reaches the stairs.",
+          "speaker": "David"
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "version": 1,
+    "chapter": 9,
+    "season": 2,
+    "campaign_levels": "041-045",
+    "episode": "A continuing rescue mystery; the final clue opens the next episode."
+  }
+}

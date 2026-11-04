@@ -1,0 +1,89 @@
+{
+  "story_id": "season07",
+  "title": "The Three Windows",
+  "background_music": "suspense_opening",
+  "default_background": "res://assets/sprites/backgrounds/river_map_section.jpeg",
+  "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+  "characters": [
+    "david",
+    "amara",
+    "victor",
+    "detective_morris",
+    "ethan"
+  ],
+  "scenes": [
+    {
+      "scene_id": "season07_reveal",
+      "route_dialogues": {
+        "police": [
+          {
+            "speaker": "Detective Morris",
+            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
+            "text": "Morris spots a watcher leaving the real signal house with a radio."
+          }
+        ],
+        "signal": [
+          {
+            "speaker": "Amara",
+            "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+            "text": "The hidden ink says: \"The river remembers what the road forgets.\""
+          }
+        ],
+        "alone": [
+          {
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+            "text": "David finds a fresh footprint beside the cup, then hears a lock turn downstairs."
+          }
+        ]
+      },
+      "dialogues": [
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "The drawing matches a row of abandoned signal houses. Only one has three dark windows; the other two are freshly painted black."
+        },
+        {
+          "speaker": "Amara",
+          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+          "text": "Inside, David finds a cup still warm and a note addressed to Amara, not him."
+        },
+        {
+          "speaker": "Victor",
+          "portrait": "res://assets/sprites/characters/victor_portrait_v2.png",
+          "text": "The note's reverse side carries Amara's handwriting, though she swears she never saw it."
+        }
+      ],
+      "choices": [
+        {
+          "id": "police",
+          "label": "Ask Morris to watch the painted houses",
+          "impact": "Morris can watch the false houses, but Victor may use them to draw officers away.",
+          "response": "Morris: I will watch the painted windows and keep the real house clear.",
+          "speaker": "Detective Morris"
+        },
+        {
+          "id": "signal",
+          "label": "Check the note for hidden ink",
+          "impact": "Amara can reveal the hidden ink, but the message may be a trap written for her.",
+          "response": "Amara: I will check the note under the lamp and tell you what it says before you move.",
+          "speaker": "Amara"
+        },
+        {
+          "id": "alone",
+          "label": "Search the warm room before the trail cools",
+          "impact": "The warm room may hold a fresh clue, but someone could still be downstairs.",
+          "response": "David: I will search the room quickly and keep the stairway in view.",
+          "speaker": "David"
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "version": 1,
+    "chapter": 7,
+    "season": 2,
+    "campaign_levels": "031-035",
+    "episode": "A continuing rescue mystery; the final clue opens the next episode."
+  }
+}

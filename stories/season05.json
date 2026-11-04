@@ -1,0 +1,89 @@
+{
+  "story_id": "season05",
+  "title": "Amara's Recording",
+  "background_music": "suspense_opening",
+  "default_background": "res://assets/sprites/backgrounds/factory_cage_art.jpeg",
+  "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+  "characters": [
+    "david",
+    "amara",
+    "victor",
+    "detective_morris",
+    "ethan"
+  ],
+  "scenes": [
+    {
+      "scene_id": "season05_reveal",
+      "route_dialogues": {
+        "police": [
+          {
+            "speaker": "Detective Morris",
+            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
+            "text": "Morris identifies a radio channel used by the quarry security team."
+          }
+        ],
+        "signal": [
+          {
+            "speaker": "Amara",
+            "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+            "text": "Amara removes the noise and hears a train crossing bell beneath Ethan's signal."
+          }
+        ],
+        "alone": [
+          {
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+            "text": "David hears the same four beats through the factory wall. Something answers from below."
+          }
+        ]
+      },
+      "dialogues": [
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "Amara finds an old voice memo from the night Ethan vanished. Behind Victor's threat, a second voice counts four slow beats."
+        },
+        {
+          "speaker": "Amara",
+          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+          "text": "Ethan used those beats to signal when he was hiding during their games. He may have been close enough to leave the clue himself."
+        },
+        {
+          "speaker": "Victor",
+          "portrait": "res://assets/sprites/characters/victor_portrait_v2.png",
+          "text": "The recovered file ends with Victor saying, \"You taught him that signal.\""
+        }
+      ],
+      "choices": [
+        {
+          "id": "police",
+          "label": "Send the recording to Morris for analysis",
+          "impact": "Morris can analyze the recording safely, but the signal may be too faint to recover.",
+          "response": "Morris: I will send the audio to the lab and keep a copy out of the station system.",
+          "speaker": "Detective Morris"
+        },
+        {
+          "id": "signal",
+          "label": "Clean the audio with Amara's equipment",
+          "impact": "Amara can clean the audio here, but Victor may notice the old phone reconnecting.",
+          "response": "Amara: I will filter the recording and listen for the sound beneath Ethan's signal.",
+          "speaker": "Amara"
+        },
+        {
+          "id": "alone",
+          "label": "Return to the factory and listen on site",
+          "impact": "The factory may reveal the source, but returning could lead Victor straight to David.",
+          "response": "David: I will go back to the factory and check the wall while Amara stays on the call.",
+          "speaker": "David"
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "version": 1,
+    "chapter": 5,
+    "season": 1,
+    "campaign_levels": "021-025",
+    "episode": "A continuing rescue mystery; the final clue opens the next episode."
+  }
+}

@@ -5,11 +5,13 @@ signal acknowledged
 signal skipped
 signal page_presented(index: int, message: String)
 
-const SHADE := Color(0.015, 0.025, 0.06, 0.78)
+const SHADE := Color(0.10, 0.065, 0.03, 0.78)
 
 var _spotlight := Rect2()
 var _shade_panels: Array[ColorRect] = []
 var _bubble: Panel
+var _top_scroll_roll: Panel
+var _bottom_scroll_roll: Panel
 var _speaker_portrait: TextureRect
 var _heading: Label
 var _body_label: Label
@@ -17,6 +19,7 @@ var _pointer: Polygon2D
 var _gesture_hand: Polygon2D
 var _gesture_outline: Line2D
 var _gesture_tween: Tween
+var _page_typing_tween: Tween
 var _acknowledge_button: Button
 var _body_scroll: ScrollContainer
 var _skip_button: Button
@@ -94,6 +97,8 @@ func show_tip(message: String, target_rect: Rect2, speaker_name: String = "DAVID
 
 func hide_tip() -> void:
 	hide()
+	if _page_typing_tween != null and _page_typing_tween.is_running():
+		_page_typing_tween.kill()
 	if _gesture_tween != null and _gesture_tween.is_running():
 		_gesture_tween.kill()
 	_gesture_hand.hide()
@@ -161,7 +166,7 @@ func _build_bubble() -> void:
 	_body_label.add_theme_font_size_override("font_size", 22)
 	_body_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_body_label.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
-	_body_label.add_theme_color_override("font_color", Color("#26364d"))
+	_body_label.add_theme_color_override("font_color", Color("#4b2d1a"))
 	_body_label.add_theme_color_override("font_outline_color", Color("#fffaf0"))
 	_body_label.add_theme_constant_override("outline_size", 1)
 	_body_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -175,15 +180,15 @@ func _build_bubble() -> void:
 	_acknowledge_button.custom_minimum_size = Vector2(178, 58)
 	_acknowledge_button.size_flags_horizontal = Control.SIZE_SHRINK_END
 	_acknowledge_button.add_theme_font_size_override("font_size", 22)
-	_acknowledge_button.add_theme_color_override("font_color", Color("#fff8e9"))
+	_acknowledge_button.add_theme_color_override("font_color", Color("#4b2d1a"))
 	var ack_style := StyleBoxFlat.new()
-	ack_style.bg_color = Color("#245a70")
+	ack_style.bg_color = Color("#d8b77b")
 	ack_style.border_color = Color("#dc8735")
 	ack_style.set_border_width_all(2)
 	ack_style.set_corner_radius_all(12)
 	_acknowledge_button.add_theme_stylebox_override("normal", ack_style)
 	var ack_hover := ack_style.duplicate() as StyleBoxFlat
-	ack_hover.bg_color = Color("#347e94")
+	ack_hover.bg_color = Color("#ead09b")
 	_acknowledge_button.add_theme_stylebox_override("hover", ack_hover)
 	_acknowledge_button.pressed.connect(_next_page)
 	var footer := HBoxContainer.new()
@@ -203,10 +208,15 @@ func _build_bubble() -> void:
 	_skip_button.text = "X"
 	_skip_button.custom_minimum_size = Vector2(44, 44)
 	_skip_button.tooltip_text = "Skip coaching"
+	_skip_button.add_theme_color_override("font_color", Color("#4b2d1a"))
 	_skip_button.pressed.connect(func():
 		hide_tip()
 		skipped.emit())
 	_bubble.add_child(_skip_button)
+	_top_scroll_roll = _make_scroll_roll()
+	_bottom_scroll_roll = _make_scroll_roll()
+	_bubble.add_child(_top_scroll_roll)
+	_bubble.add_child(_bottom_scroll_roll)
 	_pointer = Polygon2D.new()
 	_pointer.color = Color("#fff3cf")
 	add_child(_pointer)
@@ -250,18 +260,61 @@ func _layout_tip() -> void:
 		_pointer.position = Vector2(clampf(hole.get_center().x - 14.0, 20.0, viewport.x - 48.0), bubble_y + bubble_height - 2.0)
 	_pointer.polygon = pointer_points
 	_bubble.position = Vector2(bubble_x, bubble_y)
+	_top_scroll_roll.position = Vector2(5, 0)
+	_top_scroll_roll.size = Vector2(bubble_width - 10, 13)
+	_bottom_scroll_roll.position = Vector2(5, bubble_height - 13)
+	_bottom_scroll_roll.size = Vector2(bubble_width - 10, 13)
 	_skip_button.position = Vector2(bubble_width - 50, 6)
+	_skip_button.z_index = 3
+
+
+func _make_scroll_roll() -> Panel:
+	var roll := Panel.new()
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color("#b27a3e")
+	style.border_color = Color("#70421f")
+	style.set_border_width_all(2)
+	style.set_corner_radius_all(7)
+	roll.add_theme_stylebox_override("panel", style)
+	roll.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	roll.z_index = 2
+	return roll
 
 
 func _update_page() -> void:
 	_body_label.text = _pages[_page]
+	_body_label.visible_characters = 0
+	SignalBus.play_sfx.emit("case_open")
+	if _page_typing_tween != null and _page_typing_tween.is_running():
+		_page_typing_tween.kill()
+	_page_typing_tween = create_tween()
+	_page_typing_tween.tween_property(_body_label, "visible_characters", _body_label.text.length(), maxf(0.35, _body_label.text.length() * 0.022))
+	_tutorial_typing_ticks(_page)
 	_body_scroll.scroll_vertical = 0
 	_acknowledge_button.visible = _page < _pages.size() - 1 or _needs_ack
 	_acknowledge_button.text = "NEXT" if _page < _pages.size() - 1 else "CONTINUE"
 	_previous_button.visible = _page > 0
 
 
+func _tutorial_typing_ticks(page_index: int) -> void:
+	var target_count := _body_label.text.length()
+	var last_tick := 0
+	while is_inside_tree() and page_index == _page and _body_label.visible_characters >= 0 and _body_label.visible_characters < target_count:
+		await get_tree().create_timer(0.09).timeout
+		if not is_inside_tree():
+			return
+		var visible_count := _body_label.visible_characters
+		if visible_count - last_tick >= 3:
+			last_tick = visible_count
+			SignalBus.play_sfx.emit("dialogue_type")
+
+
 func _next_page() -> void:
+	if _body_label.visible_characters < _body_label.text.length():
+		if _page_typing_tween != null and _page_typing_tween.is_running():
+			_page_typing_tween.kill()
+		_body_label.visible_characters = -1
+		return
 	if _page < _pages.size() - 1:
 		_page += 1
 		_update_page()
@@ -316,7 +369,7 @@ func _build_gesture_hand() -> void:
 	closed.append(points[0])
 	_gesture_outline.points = closed
 	_gesture_outline.width = 3.0
-	_gesture_outline.default_color = Color("#18304a")
+	_gesture_outline.default_color = Color("#70421f")
 	_gesture_outline.z_index = 9
 	_gesture_outline.hide()
 	add_child(_gesture_outline)

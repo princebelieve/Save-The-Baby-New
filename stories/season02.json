@@ -1,0 +1,89 @@
+{
+  "story_id": "season02",
+  "title": "The False Signal",
+  "background_music": "suspense_opening",
+  "default_background": "res://assets/sprites/backgrounds/iron_gate_map_tile.jpeg",
+  "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+  "characters": [
+    "david",
+    "amara",
+    "victor",
+    "detective_morris",
+    "ethan"
+  ],
+  "scenes": [
+    {
+      "scene_id": "season02_reveal",
+      "route_dialogues": {
+        "police": [
+          {
+            "speaker": "Detective Morris",
+            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
+            "text": "Morris finds the station was searched minutes before they arrived."
+          }
+        ],
+        "signal": [
+          {
+            "speaker": "Amara",
+            "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+            "text": "Amara isolates a second signal, moving beneath the village rather than across it."
+          }
+        ],
+        "alone": [
+          {
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+            "text": "David discovers fresh fingerprints on the hatch, small enough to belong to a child."
+          }
+        ]
+      },
+      "dialogues": [
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "Amara traces the signal to a shuttered relay station. Three phones there repeat the same call, each with a different timestamp."
+        },
+        {
+          "speaker": "Amara",
+          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+          "text": "One recording contains Ethan humming the tune Amara used to calm him. The final note is cut off by a metallic slam."
+        },
+        {
+          "speaker": "Victor",
+          "portrait": "res://assets/sprites/characters/victor_portrait_v2.png",
+          "text": "A new message arrives from Victor: \"Good. Now stop asking the wrong question.\""
+        }
+      ],
+      "choices": [
+        {
+          "id": "police",
+          "label": "Bring Morris to secure the relay",
+          "impact": "Morris can secure the relay station, though a formal search may make the caller move.",
+          "response": "Morris: I will keep the station covered while you check the recording.",
+          "speaker": "Detective Morris"
+        },
+        {
+          "id": "signal",
+          "label": "Triangulate the original recording",
+          "impact": "Amara can isolate the signal beneath the village, but it may disappear if Victor changes phones.",
+          "response": "Amara: I will trace the second signal now and keep the line open.",
+          "speaker": "Amara"
+        },
+        {
+          "id": "alone",
+          "label": "Enter through the service hatch",
+          "impact": "David can enter through the hatch before anyone clears the station, with no backup inside.",
+          "response": "David: I will check the hatch first. If it is a decoy, I will get out.",
+          "speaker": "David"
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "version": 1,
+    "chapter": 2,
+    "season": 1,
+    "campaign_levels": "006-010",
+    "episode": "A continuing rescue mystery; the final clue opens the next episode."
+  }
+}

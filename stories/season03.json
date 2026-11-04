@@ -1,0 +1,89 @@
+{
+  "story_id": "season03",
+  "title": "The Quiet Informant",
+  "background_music": "suspense_opening",
+  "default_background": "res://assets/sprites/backgrounds/level_map_landscape.jpeg",
+  "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+  "characters": [
+    "david",
+    "amara",
+    "victor",
+    "detective_morris",
+    "ethan"
+  ],
+  "scenes": [
+    {
+      "scene_id": "season03_reveal",
+      "route_dialogues": {
+        "police": [
+          {
+            "speaker": "Detective Morris",
+            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
+            "text": "The witness gives Morris a badge number, then disappears before the statement is signed."
+          }
+        ],
+        "signal": [
+          {
+            "speaker": "Amara",
+            "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+            "text": "Amara matches the witness's phrase to a dispatch call logged inside the station."
+          }
+        ],
+        "alone": [
+          {
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+            "text": "David sees a plain-clothes officer leave with the missing file page."
+          }
+        ]
+      },
+      "dialogues": [
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "The tunnel signal leads to a witness who saw a child carried past the police station. The witness refuses to speak while uniforms are nearby."
+        },
+        {
+          "speaker": "Amara",
+          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+          "text": "Morris recognizes the route from an old case file, then notices that the page listing the destination has been torn out."
+        },
+        {
+          "speaker": "Victor",
+          "portrait": "res://assets/sprites/characters/victor_portrait_v2.png",
+          "text": "The witness calls back once: \"There is someone inside your team.\" Then the line breaks."
+        }
+      ],
+      "choices": [
+        {
+          "id": "police",
+          "label": "Let Morris question the witness privately",
+          "impact": "Morris can protect the witness, but the leaked file may warn the officer involved.",
+          "response": "Morris: I will move the witness somewhere safe and keep the badge number off the radio.",
+          "speaker": "Detective Morris"
+        },
+        {
+          "id": "signal",
+          "label": "Ask Amara to compare the voice recording",
+          "impact": "Amara can compare the witness voice to dispatch, but that could expose her access to the files.",
+          "response": "Amara: I will compare the phrase with the dispatch recording and leave the original untouched.",
+          "speaker": "Amara"
+        },
+        {
+          "id": "alone",
+          "label": "Wait nearby and watch who visits",
+          "impact": "David can watch the station quietly, but the officer may leave before he identifies them.",
+          "response": "David: I will watch the exits and follow whoever carries that missing page.",
+          "speaker": "David"
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "version": 1,
+    "chapter": 3,
+    "season": 1,
+    "campaign_levels": "011-015",
+    "episode": "A continuing rescue mystery; the final clue opens the next episode."
+  }
+}

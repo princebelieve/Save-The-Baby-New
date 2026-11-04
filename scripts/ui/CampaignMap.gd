@@ -280,8 +280,8 @@ func _add_chapter_nodes(map: Control, index: int, chapter: Dictionary, levels: A
 		node.texture_pressed = node.texture_normal
 		node.ignore_texture_size = true
 		node.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
-		node.position = Vector2(x - 35, y - 35)
-		node.size = Vector2(70, 70)
+		node.position = Vector2(x - 40, y - 40)
+		node.size = Vector2(80, 80)
 		var is_unlocked := level_id <= _highest_unlocked_level
 		node.disabled = not is_unlocked
 		if not is_unlocked:
@@ -293,13 +293,13 @@ func _add_chapter_nodes(map: Control, index: int, chapter: Dictionary, levels: A
 		map.add_child(node)
 		var number := Label.new()
 		var star_count := int(_completed_levels.get(str(level_id), 0))
-		number.text = "%d\n%s" % [level_id, "★".repeat(mini(3, star_count))] if star_count > 0 else (str(level_id) if is_unlocked else "")
-		number.position = node.position + Vector2(4, 5)
-		number.size = node.size - Vector2(8, 10)
+		number.text = str(level_id) if is_unlocked else ""
+		number.position = node.position + Vector2(4, 6)
+		number.size = node.size - Vector2(8, 12)
 		number.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		number.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		number.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		number.add_theme_font_size_override("font_size", 19 if star_count > 0 else 24)
+		number.add_theme_font_size_override("font_size", 25)
 		number.add_theme_color_override("font_color", Color("#603515"))
 		number.add_theme_color_override("font_outline_color", Color("#fff4d1"))
 		number.add_theme_constant_override("outline_size", 3)
@@ -307,6 +307,25 @@ func _add_chapter_nodes(map: Control, index: int, chapter: Dictionary, levels: A
 		number.add_theme_constant_override("shadow_offset_x", 1)
 		number.add_theme_constant_override("shadow_offset_y", 2)
 		map.add_child(number)
+		if star_count > 0:
+			var star_frame := TextureRect.new()
+			star_frame.texture = ResourceManager.load_texture("res://assets/sprites/ui/level_node_star_frame.jpeg")
+			star_frame.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			star_frame.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			star_frame.position = node.position + Vector2(43, 40)
+			star_frame.size = Vector2(40, 40)
+			star_frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			map.add_child(star_frame)
+			var star_number := Label.new()
+			star_number.text = str(mini(3, star_count))
+			star_number.position = star_frame.position
+			star_number.size = star_frame.size
+			star_number.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			star_number.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+			star_number.add_theme_font_size_override("font_size", 16)
+			star_number.add_theme_color_override("font_color", Color("#603515"))
+			star_number.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			map.add_child(star_number)
 
 
 func _draw_trail(map: Control, points: PackedVector2Array) -> void:

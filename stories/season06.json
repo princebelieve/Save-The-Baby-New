@@ -1,0 +1,89 @@
+{
+  "story_id": "season06",
+  "title": "Tracks in the Forest",
+  "background_music": "suspense_opening",
+  "default_background": "res://assets/sprites/backgrounds/riverbank_map_section.jpeg",
+  "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+  "characters": [
+    "david",
+    "amara",
+    "victor",
+    "detective_morris",
+    "ethan"
+  ],
+  "scenes": [
+    {
+      "scene_id": "season06_reveal",
+      "route_dialogues": {
+        "police": [
+          {
+            "speaker": "Detective Morris",
+            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
+            "text": "Morris's team finds a lookout, but the person escapes toward the river."
+          }
+        ],
+        "signal": [
+          {
+            "speaker": "Amara",
+            "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+            "text": "The bell rhythm points to an abandoned rail spur hidden beyond the trees."
+          }
+        ],
+        "alone": [
+          {
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+            "text": "David finds Ethan's drawing beneath a stone: a bridge and three dark windows."
+          }
+        ]
+      },
+      "dialogues": [
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "The quarry road divides at the forest. One track is heavy with mud; the other is nearly invisible beneath fallen leaves."
+        },
+        {
+          "speaker": "Amara",
+          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+          "text": "Amara finds a small shoe lace tied around a branch. Ethan used that knot to mark the way home."
+        },
+        {
+          "speaker": "Victor",
+          "portrait": "res://assets/sprites/characters/victor_portrait_v2.png",
+          "text": "The trail reaches a fork. Victor's voice comes from both directions at once."
+        }
+      ],
+      "choices": [
+        {
+          "id": "police",
+          "label": "Ask Morris to cover both trails",
+          "impact": "Morris can cover both forest paths, but splitting the team leaves each group smaller.",
+          "response": "Morris: I will take the upper path and send a second team toward the river.",
+          "speaker": "Detective Morris"
+        },
+        {
+          "id": "signal",
+          "label": "Use the train bell to choose the lower path",
+          "impact": "Amara can use the crossing bell to pick a route, but the signal is fading.",
+          "response": "Amara: I will count the bell rhythm and guide you toward the rail spur.",
+          "speaker": "Amara"
+        },
+        {
+          "id": "alone",
+          "label": "Follow Ethan's marked trail without backup",
+          "impact": "Ethan's knot may lead home, but following it means David moves alone.",
+          "response": "David: I will follow Ethan's mark and call out before I leave the trail.",
+          "speaker": "David"
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "version": 1,
+    "chapter": 6,
+    "season": 2,
+    "campaign_levels": "026-030",
+    "episode": "A continuing rescue mystery; the final clue opens the next episode."
+  }
+}

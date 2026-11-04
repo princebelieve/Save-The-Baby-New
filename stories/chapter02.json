@@ -18,19 +18,22 @@
                     "id": "police",
                     "label": "Request a bridge lookout",
                     "impact": "Morris watches the crossing while David examines the riverbank. Morris can watch for danger, but he needs you to share each clue before he can act.",
-                    "response": "Morris watches the crossing while David examines the riverbank. Ethan must come home alive."
+                    "response": "Morris watches the crossing while David examines the riverbank. Ethan must come home alive.",
+                    "speaker": "Detective Morris"
                 },
                 {
                     "id": "signal",
                     "label": "Check the van call records",
                     "impact": "Amara follows a call record toward the workshop. Amara stays involved, but the signal could be a decoy. David will still need physical evidence.",
-                    "response": "Amara follows a call record toward the workshop. Ethan must come home alive."
+                    "response": "Amara follows a call record toward the workshop. Ethan must come home alive.",
+                    "speaker": "Amara"
                 },
                 {
                     "id": "alone",
                     "label": "Inspect the riverbank myself",
                     "impact": "David follows fresh tire marks, keeping his location on Amara's phone. You can investigate quietly, but no one will be close enough to help immediately if Victor is waiting.",
-                    "response": "David follows fresh tire marks, keeping his location on Amara's phone. Ethan must come home alive."
+                    "response": "David follows fresh tire marks, keeping his location on Amara's phone. Ethan must come home alive.",
+                    "speaker": "David"
                 }
             ],
             "dialogues": [

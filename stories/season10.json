@@ -1,0 +1,89 @@
+{
+  "story_id": "season10",
+  "title": "Beyond the Wall",
+  "background_music": "suspense_opening",
+  "default_background": "res://assets/sprites/backgrounds/factory_map_section.jpeg",
+  "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+  "characters": [
+    "david",
+    "amara",
+    "victor",
+    "detective_morris",
+    "ethan"
+  ],
+  "scenes": [
+    {
+      "scene_id": "season10_reveal",
+      "route_dialogues": {
+        "police": [
+          {
+            "speaker": "Detective Morris",
+            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
+            "text": "Morris arrives with the missing case file, and the officer who tore it out."
+          }
+        ],
+        "signal": [
+          {
+            "speaker": "Amara",
+            "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+            "text": "Amara maps the knock to a moving service lift beneath the dam."
+          }
+        ],
+        "alone": [
+          {
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+            "text": "David follows the scrape to a lift descending into darkness."
+          }
+        ]
+      },
+      "dialogues": [
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "The hidden room is empty except for Ethan's drawing, still damp at the edges. The far wall carries fresh scrape marks."
+        },
+        {
+          "speaker": "Amara",
+          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+          "text": "Amara hears a knock from beyond the concrete: two quick, one slow. Their family's old signal."
+        },
+        {
+          "speaker": "Victor",
+          "portrait": "res://assets/sprites/characters/victor_portrait_v2.png",
+          "text": "The lift stops below the flood line. A small hand reaches through the gap, then vanishes."
+        }
+      ],
+      "choices": [
+        {
+          "id": "police",
+          "label": "Wait for Morris and open the wall together",
+          "impact": "Waiting for Morris is safer, but the lift may descend below the flood line.",
+          "response": "Morris: I am bringing the missing file and the officer who removed it. Hold your position.",
+          "speaker": "Detective Morris"
+        },
+        {
+          "id": "signal",
+          "label": "Trace the knock through the adjoining channel",
+          "impact": "Amara can trace the knock, but the service lift is moving and may not return.",
+          "response": "Amara: I will follow the knock through the channel and call when the lift stops.",
+          "speaker": "Amara"
+        },
+        {
+          "id": "alone",
+          "label": "Answer the signal and follow the moving scrape",
+          "impact": "David can follow the scrape now, but the lift could close before anyone reaches him.",
+          "response": "David: I hear it too. I am going down one level and keeping the door open.",
+          "speaker": "David"
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "version": 1,
+    "chapter": 10,
+    "season": 2,
+    "campaign_levels": "046-050",
+    "episode": "A continuing rescue mystery; the final clue opens the next episode."
+  }
+}

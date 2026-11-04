@@ -46,7 +46,9 @@ func load_story(id: String) -> bool:
 		DebugLogger.error("StoryManager: Story not found -> %s" % path)
 		return false
 
-	var data := JsonLoader.load_file(path)
+	# JsonLoader may return a cached dictionary. Branch insertion is runtime-only,
+	# so work on a deep copy to prevent repeated loads from duplicating route lines.
+	var data: Dictionary = JsonLoader.load_file(path).duplicate(true)
 
 	if not _validate_story(data):
 		DebugLogger.error("StoryManager: Invalid story -> %s" % path)
