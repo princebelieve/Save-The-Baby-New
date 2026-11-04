@@ -73,7 +73,11 @@ test('API login, save conflicts, payment replay, atomic spending and logout',asy
  const stored=await db.collection('flows').findOne({_id:flow});
  oauth.claims.code={sub:'google-user',name:'Google Player',nonce:stored.nonce};
  assert.equal((await fetch(base+`/auth/google/callback?state=${flow}&code=code`,{redirect:'manual'})).status,400);
- assert.equal((await fetch(base+`/auth/google/callback?state=${flow}&code=code`,{headers:{Cookie:browserCookie}})).status,200);
+ const callback=await fetch(base+`/auth/google/callback?state=${flow}&code=code`,{headers:{Cookie:browserCookie}});
+ assert.equal(callback.status,200);
+ const callbackPage=await callback.text();
+ assert.match(callbackPage,/http-equiv="refresh" content="0;url=savethebaby:\/\/auth\/complete"/);
+ assert.match(callbackPage,/href="savethebaby:\/\/auth\/complete"/);
  const login=await request('/auth/poll','POST',{flow,verifier},'');assert.equal(login.status,200);assert.ok(login.body.token);
  const owner=await db.collection('users').findOne({_id:login.body.userId});
  assert.equal(owner.accountNotice.mode,'guardian');assert.equal(owner.accountNotice.version,1);

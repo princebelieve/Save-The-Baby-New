@@ -50,6 +50,9 @@ func configured() -> bool:
 func signed_in() -> bool:
 	return not token.is_empty() and not user_id.is_empty()
 
+func login_in_progress() -> bool:
+	return _login_active
+
 func needs_parent_account() -> bool:
 	var owner_mode := ConfigFile.new()
 	if owner_mode.load(OWNER_MODE_PATH) == OK:

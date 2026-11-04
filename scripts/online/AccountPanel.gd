@@ -68,20 +68,22 @@ func show_account() -> void:
 	_login_buttons.clear()
 	dialog.set_meta("custom_heading", true)
 	game._prepare_dialog(dialog)
-	dialog.title = "ACCOUNT & COINS"
+	dialog.title = ""
 	var content := VBoxContainer.new()
-	content.custom_minimum_size = Vector2(minf(500,game.get_viewport_rect().size.x*0.82),0)
-	content.add_theme_constant_override("separation",12)
+	content.custom_minimum_size = Vector2(minf(600,game.get_viewport_rect().size.x*0.9),0)
+	content.add_theme_constant_override("separation",16)
 	var heading := Label.new()
 	heading.text = "ACCOUNT & COINS"
 	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	heading.add_theme_font_override("font",Game.DISPLAY_FONT)
-	heading.add_theme_font_size_override("font_size",26)
-	heading.add_theme_color_override("font_color",Color("#f2ce7c"))
+	heading.add_theme_font_size_override("font_size",30)
+	heading.add_theme_color_override("font_color",Color("#80502b"))
 	content.add_child(heading)
 	var status := Label.new()
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	status.add_theme_font_size_override("font_size",20)
+	status.add_theme_font_override("font",Game.DISPLAY_FONT)
+	status.add_theme_font_size_override("font_size",23)
+	status.add_theme_color_override("font_color",Color("#4b3424"))
 	status.text = ("%s · %d purchased coins" % [account.player_name,account.wallet]) if account.signed_in() else "Play as a guest, or connect a Google account to sync progress."
 	content.add_child(status)
 	if not account.configured():
@@ -93,25 +95,31 @@ func show_account() -> void:
 		_login_spinner.indeterminate = true
 		_login_spinner.custom_minimum_size = Vector2(0,20)
 		_login_spinner.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var spinner_track := StyleBoxFlat.new()
+		spinner_track.bg_color = Color("#e8dcc2")
+		spinner_track.set_corner_radius_all(8)
+		_login_spinner.add_theme_stylebox_override("background",spinner_track)
+		var spinner_fill := StyleBoxFlat.new()
+		spinner_fill.bg_color = Color("#946333")
+		spinner_fill.set_corner_radius_all(8)
+		_login_spinner.add_theme_stylebox_override("fill",spinner_fill)
 		_login_spinner.hide()
 		content.add_child(_login_spinner)
 		_login_status = Label.new()
 		_login_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		_login_status.add_theme_font_size_override("font_size",18)
+		_login_status.add_theme_font_override("font",Game.DISPLAY_FONT)
+		_login_status.add_theme_font_size_override("font_size",21)
+		_login_status.add_theme_color_override("font_color",Color("#4b3424"))
 		_login_status.hide()
 		content.add_child(_login_status)
 	else:
-		var player_id := Label.new()
-		player_id.text = "Player ID: " + account.user_id
-		player_id.autowrap_mode = TextServer.AUTOWRAP_ARBITRARY
-		player_id.add_theme_font_size_override("font_size",12)
-		content.add_child(player_id)
 		_button(content,"SAVE TO CLOUD",_upload)
 		_button(content,"LOAD CLOUD PROGRESS",_confirm_download)
 		if account.conflict:
 			status.text += "\nAnother device has newer progress. Load the cloud save to resolve the conflict."
 		var pack_label := Label.new()
 		pack_label.text = "BUY COINS (GOOGLE PLAY)"
+		_style_section_label(pack_label)
 		content.add_child(pack_label)
 		for product in purchases.PRODUCTS:
 			var offer: Dictionary = purchases.products.get(product,{})
@@ -119,6 +127,7 @@ func show_account() -> void:
 			_button(content,"%d COINS - %s" % [purchases.PRODUCTS[product],price],_confirm_purchase.bind(product,price),not purchases.available(product))
 		var supply_label := Label.new()
 		supply_label.text = "USE PURCHASED COINS"
+		_style_section_label(supply_label)
 		content.add_child(supply_label)
 		for supply in [["rocket",35],["bomb",50],["thunder",70],["ethan",90],["lives",100]]:
 			var kind := str(supply[0])
@@ -128,15 +137,32 @@ func show_account() -> void:
 		_button(content,"SIGN OUT",func(): account.sign_out())
 		_button(content,"DELETE ONLINE ACCOUNT",_confirm_delete)
 	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(content.custom_minimum_size.x,mini(740,int(game.get_viewport_rect().size.y*0.7)))
+	scroll.custom_minimum_size = Vector2(content.custom_minimum_size.x,mini(940,int(game.get_viewport_rect().size.y*0.76)))
+	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(content)
+	_style_account_scrollbar(scroll.get_v_scroll_bar())
 	dialog.add_child(scroll)
 	game.add_child(dialog)
 	dialog.confirmed.connect(dialog.queue_free)
 	dialog.get_ok_button().text = "CLOSE"
 	dialog.canceled.connect(dialog.queue_free)
-	dialog.popup_centered_clamped(Vector2i(int(content.custom_minimum_size.x+36),int(scroll.custom_minimum_size.y+80)))
+	dialog.popup_centered_clamped(Vector2i(int(content.custom_minimum_size.x+56),int(scroll.custom_minimum_size.y+112)))
+
+func _style_section_label(label: Label) -> void:
+	label.add_theme_font_override("font",Game.DISPLAY_FONT)
+	label.add_theme_font_size_override("font_size",22)
+	label.add_theme_color_override("font_color",Color("#80502b"))
+
+func _style_account_scrollbar(scrollbar: VScrollBar) -> void:
+	for style_name in ["scroll", "grabber", "grabber_highlight", "grabber_pressed"]:
+		var style := StyleBoxFlat.new()
+		style.set_corner_radius_all(8)
+		style.set_content_margin_all(3)
+		style.bg_color = Color("#e8dcc2") if style_name == "scroll" else Color("#b58a52")
+		if style_name == "grabber_highlight":
+			style.bg_color = Color("#946333")
+		scrollbar.add_theme_stylebox_override(style_name,style)
 
 func _sign_in(owner_mode: String) -> void:
 	account.set_account_owner_mode(owner_mode)
@@ -178,9 +204,9 @@ func _confirm_purchase(product: String, price: String) -> void:
 
 func _button(parent: Control,title: String,action: Callable,disabled := false,keep_open := false) -> void:
 	var button := game._make_menu_button(title)
-	button.custom_minimum_size = Vector2(0,76)
+	button.custom_minimum_size = Vector2(0,88)
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	button.add_theme_font_size_override("font_size",22)
+	button.add_theme_font_size_override("font_size",26)
 	button.disabled = disabled
 	if keep_open: _login_buttons.append(button)
 	button.pressed.connect(func():

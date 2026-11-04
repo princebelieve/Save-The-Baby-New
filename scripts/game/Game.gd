@@ -117,7 +117,7 @@ func _notification(what: int) -> void:
 		if _board != null:
 			_board.cancel_pointer_gesture()
 		_persist_campaign_progress()
-		if (_ads == null or not _ads.busy) and _board != null and _launch_layer == null and _story_layer == null and _campaign_layer == null and _result_layer == null:
+		if (_ads == null or not _ads.busy) and not CloudAccount.login_in_progress() and _board != null and _launch_layer == null and _story_layer == null and _campaign_layer == null and _result_layer == null:
 			_show_pause_menu(true)
 	elif what == NOTIFICATION_APPLICATION_RESUMED:
 		if _board != null:
@@ -943,24 +943,18 @@ func _show_pause_menu(force_pause: bool = false) -> void:
 	_pause_layer.process_mode = Node.PROCESS_MODE_ALWAYS
 	add_child(_pause_layer)
 	var veil := ColorRect.new()
-	veil.color = Color(0.015, 0.025, 0.035, 0.82)
+	veil.color = Color(0.12, 0.075, 0.035, 0.78)
 	veil.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_pause_layer.add_child(veil)
 	var center := CenterContainer.new()
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	veil.add_child(center)
 	var frame := PanelContainer.new()
-	frame.custom_minimum_size = Vector2(minf(520.0, get_viewport_rect().size.x * 0.9), 580 if _tutorial_active else 470)
-	var panel_style := StyleBoxFlat.new()
-	panel_style.bg_color = Color("#102338")
-	panel_style.border_color = Color("#d6b66e")
-	panel_style.set_border_width_all(4)
-	panel_style.set_corner_radius_all(28)
-	panel_style.set_content_margin_all(28)
-	frame.add_theme_stylebox_override("panel", panel_style)
+	frame.custom_minimum_size = Vector2(minf(580.0, get_viewport_rect().size.x * 0.92), 700 if _tutorial_active else 620)
+	frame.add_theme_stylebox_override("panel", _make_parchment_panel_style(78, 90))
 	center.add_child(frame)
 	var actions := VBoxContainer.new()
-	actions.add_theme_constant_override("separation", 18)
+	actions.add_theme_constant_override("separation", 16)
 	frame.add_child(actions)
 	var heading := _make_label("PAUSED", 34)
 	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -986,6 +980,7 @@ func _show_pause_menu(force_pause: bool = false) -> void:
 	var title := _make_menu_button("RETURN TO TITLE")
 	title.pressed.connect(_return_to_title)
 	actions.add_child(title)
+	_apply_parchment_text(actions)
 	if audio_manager != null:
 		music.text = "MUSIC: OFF" if not audio_manager.is_music_enabled() else "MUSIC: ON"
 		effects.text = "SOUND FX: OFF" if not audio_manager.is_sfx_enabled() else "SOUND FX: ON"
@@ -1007,8 +1002,38 @@ func _make_menu_button(caption: String) -> Button:
 	var hover := normal.duplicate() as StyleBoxFlat
 	hover.bg_color = Color("#ead09b")
 	button.add_theme_stylebox_override("hover", hover)
+	var pressed := normal.duplicate() as StyleBoxFlat
+	pressed.bg_color = Color("#c89d5f")
+	button.add_theme_stylebox_override("pressed", pressed)
+	var disabled := normal.duplicate() as StyleBoxFlat
+	disabled.bg_color = Color("#e9dfca")
+	disabled.border_color = Color("#cbb994")
+	button.add_theme_stylebox_override("disabled", disabled)
+	button.add_theme_color_override("font_disabled_color", Color("#75634d"))
 	button.pressed.connect(_play_ui_click)
 	return button
+
+
+func _make_parchment_panel_style(horizontal_margin: float, vertical_margin: float) -> StyleBoxTexture:
+	var style := StyleBoxTexture.new()
+	style.texture = ResourceManager.load_texture("res://assets/sprites/ui/wooden_dialogue_panel_cutout.png")
+	style.texture_margin_left = 150
+	style.texture_margin_right = 150
+	style.texture_margin_top = 140
+	style.texture_margin_bottom = 140
+	style.content_margin_left = horizontal_margin
+	style.content_margin_right = horizontal_margin
+	style.content_margin_top = vertical_margin
+	style.content_margin_bottom = vertical_margin
+	return style
+
+
+func _apply_parchment_text(parent: Node) -> void:
+	for label in parent.find_children("*", "Label", true, false):
+		label.add_theme_color_override("font_color", Color("#56351f"))
+		label.add_theme_color_override("font_outline_color", Color("#f4e2bd"))
+		label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0))
+		label.add_theme_constant_override("outline_size", 1)
 
 
 func _play_ui_click() -> void:
@@ -1062,7 +1087,7 @@ func _show_case_file() -> void:
 	_case_file_layer.process_mode = Node.PROCESS_MODE_ALWAYS
 	add_child(_case_file_layer)
 	var veil := ColorRect.new()
-	veil.color = Color(0.008, 0.025, 0.05, 0.88)
+	veil.color = Color(0.12, 0.08, 0.04, 0.78)
 	veil.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_case_file_layer.add_child(veil)
 	var center := CenterContainer.new()
@@ -1071,8 +1096,8 @@ func _show_case_file() -> void:
 	var card := PanelContainer.new()
 	card.custom_minimum_size = Vector2(minf(650.0, get_viewport_rect().size.x * 0.92), minf(1000.0, get_viewport_rect().size.y * 0.88))
 	var card_style := StyleBoxFlat.new()
-	card_style.bg_color = Color("#10263d")
-	card_style.border_color = Color("#e2bf72")
+	card_style.bg_color = Color("#fff8e8")
+	card_style.border_color = Color("#c79b55")
 	card_style.set_border_width_all(3)
 	card_style.set_corner_radius_all(26)
 	card_style.set_content_margin_all(24)
@@ -1124,6 +1149,10 @@ func _show_case_file() -> void:
 	for story_id in decisions:
 		var decision: Dictionary = decisions[story_id]
 		_add_case_card(content, str(decision.get("label", "Decision")), "Story decision | " + str(story_id), str(decision.get("response", "")), "res://assets/sprites/props/evidence_briefcase.jpeg")
+	for case_label in content.find_children("*", "Label", true, false):
+		case_label.add_theme_color_override("font_color", Color("#4b3424"))
+		case_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0))
+		case_label.add_theme_color_override("font_outline_color", Color("#f3e7ca"))
 	var close := _make_story_action_button("BACK TO SEARCH", 240)
 	close.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	close.pressed.connect(_close_case_file)
@@ -1171,8 +1200,8 @@ func _prepare_dialog(dialog: AcceptDialog) -> void:
 	dialog.dialog_autowrap = true
 	dialog.borderless = true
 	dialog.transparent_bg = true
-	dialog.add_theme_constant_override("buttons_min_width", 174)
-	dialog.add_theme_constant_override("buttons_min_height", 62)
+	dialog.add_theme_constant_override("buttons_min_width", 200)
+	dialog.add_theme_constant_override("buttons_min_height", 72)
 	dialog.add_theme_constant_override("buttons_separation", 18)
 	dialog.about_to_popup.connect(func():
 		if not dialog.has_meta("custom_heading"):
@@ -1181,48 +1210,54 @@ func _prepare_dialog(dialog: AcceptDialog) -> void:
 	dialog.add_theme_font_override("title_font", DISPLAY_FONT)
 	dialog.add_theme_font_size_override("title_font_size", 24)
 	dialog.add_theme_constant_override("title_height", 48)
-	dialog.add_theme_color_override("title_color", Color("#f2ce7c"))
+	dialog.add_theme_color_override("title_color", Color("#80502b"))
 	var border := StyleBoxFlat.new()
-	border.bg_color = Color("#10263d")
-	border.border_color = Color("#e3c275")
+	border.bg_color = Color("#f3e7ca")
+	border.border_color = Color("#c79b55")
 	border.set_border_width_all(2)
 	border.set_corner_radius_all(18)
-	border.content_margin_top = 48
+	border.content_margin_top = 14 if dialog.has_meta("custom_heading") else 48
 	border.content_margin_left = 12
 	border.content_margin_right = 12
 	border.content_margin_bottom = 12
 	dialog.add_theme_stylebox_override("embedded_border", border)
 	var panel := StyleBoxFlat.new()
-	panel.bg_color = Color("#10263d")
-	panel.border_color = Color("#e3c275")
+	panel.bg_color = Color("#fff8e8")
+	panel.border_color = Color("#c79b55")
 	panel.set_border_width_all(2)
 	panel.set_corner_radius_all(20)
 	panel.set_content_margin_all(24)
+	panel.content_margin_top = 18 if dialog.has_meta("custom_heading") else 24
 	dialog.add_theme_stylebox_override("panel", panel)
 	var label := dialog.get_label()
 	label.add_theme_font_override("font", DISPLAY_FONT)
 	label.add_theme_font_size_override("font_size", 24)
-	label.add_theme_color_override("font_color", Color("#fff3d5"))
+	label.add_theme_color_override("font_color", Color("#4b3424"))
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	var buttons: Array[Button] = [dialog.get_ok_button()]
 	if dialog is ConfirmationDialog:
 		buttons.append(dialog.get_cancel_button())
 	for button in buttons:
-		button.custom_minimum_size = Vector2(174, 62)
-		button.add_theme_font_size_override("font_size", 22)
+		button.custom_minimum_size = Vector2(200, 72)
+		button.add_theme_font_size_override("font_size", 24)
 		button.add_theme_font_override("font", DISPLAY_FONT)
-		button.add_theme_color_override("font_color", Color("#fff3d5"))
+		button.add_theme_color_override("font_color", Color("#4b2d1a"))
 		var style := StyleBoxFlat.new()
-		style.bg_color = Color("#245a70")
-		style.border_color = Color("#e3c275")
+		style.bg_color = Color("#d8b77b")
+		style.border_color = Color("#8b572b")
 		style.set_border_width_all(2)
 		style.set_corner_radius_all(14)
 		style.set_content_margin_all(12)
 		button.add_theme_stylebox_override("normal", style)
 		var hover := style.duplicate() as StyleBoxFlat
-		hover.bg_color = Color("#347e94")
+		hover.bg_color = Color("#ead09b")
 		button.add_theme_stylebox_override("hover", hover)
-		button.add_theme_stylebox_override("pressed", hover)
+		button.add_theme_stylebox_override("pressed", style)
+		var disabled := style.duplicate() as StyleBoxFlat
+		disabled.bg_color = Color("#e9dfca")
+		disabled.border_color = Color("#cbb994")
+		button.add_theme_stylebox_override("disabled", disabled)
+		button.add_theme_color_override("font_disabled_color", Color("#75634d"))
 
 
 func _show_audio_settings(parent_layer: Node) -> void:
@@ -1944,7 +1979,7 @@ func _show_level_briefing(route_id: String) -> void:
 	_briefing_layer.layer = 10
 	add_child(_briefing_layer)
 	var veil := ColorRect.new()
-	veil.color = Color(0.008, 0.02, 0.035, 0.78)
+	veil.color = Color(0.12, 0.075, 0.035, 0.76)
 	veil.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_briefing_layer.add_child(veil)
 	var center := CenterContainer.new()
@@ -1953,16 +1988,8 @@ func _show_level_briefing(route_id: String) -> void:
 
 	var panel := PanelContainer.new()
 	panel.name = "MissionCard"
-	panel.custom_minimum_size = Vector2(minf(610.0, get_viewport_rect().size.x * 0.9), minf(940.0, get_viewport_rect().size.y * 0.9))
-	var panel_style := StyleBoxFlat.new()
-	panel_style.bg_color = Color("#102238")
-	panel_style.border_color = Color("#d0ac67")
-	panel_style.set_border_width_all(3)
-	panel_style.set_corner_radius_all(24)
-	panel_style.set_content_margin_all(28)
-	panel_style.shadow_color = Color(0, 0, 0, 0.55)
-	panel_style.shadow_size = 16
-	panel.add_theme_stylebox_override("panel", panel_style)
+	panel.custom_minimum_size = Vector2(minf(610.0, get_viewport_rect().size.x * 0.92), minf(1020.0, get_viewport_rect().size.y * 0.94))
+	panel.add_theme_stylebox_override("panel", _make_parchment_panel_style(82, 100))
 	center.add_child(panel)
 	panel.modulate.a = 0.0
 	panel.scale = Vector2(0.94, 0.94)
@@ -2025,8 +2052,8 @@ func _show_level_briefing(route_id: String) -> void:
 	var objective := _get_primary_objective(level_data)
 	var objective_panel := PanelContainer.new()
 	var objective_style := StyleBoxFlat.new()
-	objective_style.bg_color = Color("#1b3952")
-	objective_style.border_color = Color("#bb985d")
+	objective_style.bg_color = Color("#f4e4bd")
+	objective_style.border_color = Color("#b58a52")
 	objective_style.set_border_width_all(2)
 	objective_style.set_corner_radius_all(16)
 	objective_style.set_content_margin_all(14)
@@ -2054,12 +2081,14 @@ func _show_level_briefing(route_id: String) -> void:
 	var difficulty := str(level_data.get("difficulty", "NORMAL")).replace("_", " ")
 	var difficulty_label := _make_label("DIFFICULTY | " + difficulty, 17)
 	difficulty_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	difficulty_label.add_theme_color_override("font_color", Color("#f2ce7c"))
+	difficulty_label.add_theme_color_override("font_color", Color("#80502b"))
 	content.add_child(difficulty_label)
 	var moves := _make_label("MATCH THE GOAL | %d MOVES" % moves_total, 18)
 	moves.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	content.add_child(moves)
-	var play := _make_texture_button("play", Vector2(250, 112))
+	_apply_parchment_text(content)
+	var play := _make_menu_button("PLAY")
+	play.custom_minimum_size = Vector2(350, 82)
 	play.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	play.pressed.connect(_play_ui_confirm)
 	play.pressed.connect(_begin_level.bind(route_id), CONNECT_ONE_SHOT)

@@ -23,7 +23,11 @@ const accountPageStyles = `<style>
 </style>`;
 
 function sendAuthError(res) {
- res.set('Content-Security-Policy',"default-src 'none'; style-src 'unsafe-inline'; frame-ancestors 'none'").status(400).type('html').send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#e8dfca"><title>Sign-in expired · Save The Baby</title>${accountPageStyles}</head><body><main><p class="brand">S. B. Ibhadode Technologies</p><h1>Start sign-in again</h1><p class="intro">This sign-in step expired or was already used.</p><p>Return to Save The Baby and tap <strong>Create or Connect Google Account</strong> to open a fresh sign-in.</p></main></body></html>`);
+ res.set('Content-Security-Policy',"default-src 'none'; style-src 'unsafe-inline'; frame-ancestors 'none'").status(400).type('html').send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#e8dfca"><meta http-equiv="refresh" content="0;url=savethebaby://auth/complete?error=expired"><title>Sign-in expired · Save The Baby</title>${accountPageStyles}</head><body><main><p class="brand">Save The Baby account</p><h1>Sign-in expired</h1><p class="intro">This sign-in link has expired. Opening the game so you can start again.</p><a class="button" href="savethebaby://auth/complete?error=expired">Open Save The Baby</a></main></body></html>`);
+}
+
+function escapeHtml(value) {
+ return String(value).replace(/[&<>"']/g, character => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[character]));
 }
 
 export function createApp({db, client, oauth, play, baseUrl, clientId, commerceEnabled=false}) {
@@ -96,7 +100,7 @@ export function createApp({db, client, oauth, play, baseUrl, clientId, commerceE
  app.get('/auth/google/start',async(req,res)=>{
   const browser=random(),noticeToken=random();
   const flow=await flows.findOneAndUpdate({_id:req.query.flow,status:'created',expires:{$gt:new Date()}},{$set:{status:'notice',browserHash:hash(browser),noticeHash:hash(noticeToken)}},{returnDocument:'after'});
-  requireThat(flow,400,'Login expired. Return to the game and try again.');
+  requireThat(flow,400,'Sign-in expired. Start again from Account & Coins.');
   res.cookie('sb_oauth',browser,{httpOnly:true,secure:baseUrl.startsWith('https:'),sameSite:'lax',maxAge:300000,path:'/auth/google'});
   const parent=flow.accountMode==='guardian';
   // This page posts its acknowledgement to the API's own /auth/google/authorize
@@ -152,7 +156,7 @@ export function createApp({db, client, oauth, play, baseUrl, clientId, commerceE
   await users.updateOne({_id:userId},{$set:{name:String(claims.name||'Player').slice(0,100),accountNotice:{version:1,mode:flow.accountMode,acknowledgedAt:flow.ownerAcknowledgedAt}},$setOnInsert:{wallet:0,save:null,revision:0,created:new Date()}},{upsert:true});
   await flows.updateOne({_id:flow._id,status:'exchanging'},{$set:{status:'complete',userId}});
   res.clearCookie('sb_oauth',{path:'/auth/google'});
-  res.set('Content-Security-Policy',"default-src 'none'; style-src 'unsafe-inline'; frame-ancestors 'none'").type('html').send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#e8dfca"><title>Signed in · Save The Baby</title>${accountPageStyles}</head><body><main><p class="brand">S. B. Ibhadode Technologies</p><h1>You’re signed in</h1><p class="intro">Your Google account is connected to Save The Baby.</p><p>Return to the game to finish loading your cloud account and progress.</p></main></body></html>`);
+  res.set('Content-Security-Policy',"default-src 'none'; style-src 'unsafe-inline'; frame-ancestors 'none'").type('html').send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#e8dfca"><meta http-equiv="refresh" content="0;url=savethebaby://auth/complete"><title>Signed in · Save The Baby</title>${accountPageStyles}</head><body><main><p class="brand">S. B. Ibhadode Technologies</p><h1>You’re signed in</h1><p class="intro">Your Google account is connected to Save The Baby. Opening the game…</p><p>If the game does not open automatically, use this link:</p><a class="button" href="savethebaby://auth/complete">Open Save The Baby</a></main></body></html>`);
  });
  app.post('/auth/poll',async(req,res)=>{
   const {flow:id,verifier}=req.body; requireThat(typeof verifier==='string' && verifier.length>=32 && verifier.length<=256,400,'Invalid login proof');
@@ -215,6 +219,14 @@ export function createApp({db, client, oauth, play, baseUrl, clientId, commerceE
   });
   res.json(profile(await users.findOne({_id:req.user._id})));
  });
- app.use((error,_req,res,_next)=>{const status=error.status||500; if(status>=500) console.error('Request failed:',error.name);res.status(status).json({error:status>=500?'Service unavailable. Please retry.':error.message});});
+ app.use((error,req,res,_next)=>{
+  const status=error.status||500;
+  if(status>=500) console.error('Request failed:',error.name);
+  if(req.path.startsWith('/auth/google/') && req.path!=='/auth/google/poll') {
+   const message=status>=500?'Sign-in could not be completed. Opening the game.':error.message;
+   res.set('Content-Security-Policy',"default-src 'none'; style-src 'unsafe-inline'; frame-ancestors 'none'").status(status).type('html').send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#e8dfca"><meta http-equiv="refresh" content="0;url=savethebaby://auth/complete?error=login"><title>Sign-in · Save The Baby</title>${accountPageStyles}</head><body><main><p class="brand">Save The Baby account</p><h1>Sign-in needs attention</h1><p class="intro">${escapeHtml(message)}</p><p>Opening the game…</p><a class="button" href="savethebaby://auth/complete?error=login">Open Save The Baby</a></main></body></html>`);
+  }
+  res.status(status).json({error:status>=500?'Service unavailable. Please retry.':error.message});
+ });
  return app;
 }
