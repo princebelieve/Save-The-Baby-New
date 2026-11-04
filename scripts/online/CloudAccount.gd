@@ -2,6 +2,9 @@ extends Node
 
 signal changed
 signal login_completed(profile: Dictionary)
+signal login_starting
+signal login_browser_opened
+signal login_start_failed(text: String)
 signal logged_out
 signal message(text: String)
 
@@ -100,20 +103,20 @@ func sign_in(account_mode := "") -> void:
 	var selected_mode := account_mode
 	if selected_mode not in ["self", "guardian"]:
 		selected_mode = "guardian" if needs_parent_account() else "self"
-	var guardian_flow := selected_mode == "guardian"
 	_login_active = true
+	login_starting.emit()
 	var verifier := Crypto.new().generate_random_bytes(32).hex_encode()
 	# The hosted API may be waking from an idle period; allow its cold start to complete.
 	var start := await api("/auth/start", HTTPClient.METHOD_POST, {"challenge":verifier.sha256_text(),"accountMode":selected_mode}, false, 75.0)
 	if start.has("error"):
 		_login_active = false
-		message.emit(str(start.error))
+		login_start_failed.emit(str(start.error))
 		return
 	if OS.shell_open(str(start.url)) != OK:
 		_login_active = false
-		message.emit("Could not open the browser. Please try signing in again.")
+		login_start_failed.emit("Could not open the browser. Check that a browser is installed, then try again.")
 		return
-	message.emit("Hand the device to your parent or guardian. They will read the account notice and use their own Google account in the browser." if guardian_flow else "The browser will show the account notice, then Google sign-in. On your first successful sign-in, the game creates your cloud account automatically.")
+	login_browser_opened.emit()
 	for attempt in range(90):
 		await get_tree().create_timer(3.0).timeout
 		if not _login_active:

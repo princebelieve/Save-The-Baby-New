@@ -21,7 +21,8 @@ test('API login, save conflicts, payment replay, atomic spending and logout',asy
  await db.collection('users').insertOne({_id:userId,name:'Test',wallet:0,revision:0,save:null});
  await db.collection('sessions').insertOne({_id:hash(token),userId,expires:new Date(Date.now()+60000)});
  const play={async verify(_product,purchaseToken){verified++;return {purchaseState:purchaseToken.includes('pending')?2:0,obfuscatedExternalAccountId:hash(userId),consumptionState:0};},async consume(){consumed++;}};
- const oauth={claims:{},generateAuthUrl({state}){return `https://accounts.google.com/?state=${state}`;},async getToken(code){return {tokens:{id_token:code}};},async verifyIdToken({idToken}){return {getPayload:()=>oauth.claims[idToken]};}};
+ let authScopes=[];
+ const oauth={claims:{},generateAuthUrl({state,scope}){authScopes=scope;return `https://accounts.google.com/?state=${state}`;},async getToken(code){return {tokens:{id_token:code}};},async verifyIdToken({idToken}){return {getPayload:()=>oauth.claims[idToken]};}};
  const app=createApp({db,client:db,oauth,play,baseUrl:'http://localhost:3000',clientId:'client',commerceEnabled:true});
  const server=app.listen(0,'127.0.0.1');await new Promise(resolve=>server.once('listening',resolve));
  t.after(()=>new Promise(resolve=>server.close(resolve)));
@@ -56,8 +57,8 @@ test('API login, save conflicts, payment replay, atomic spending and logout',asy
  const flow=started.body.flow;
  assert.equal((await request('/auth/poll','POST',{flow,verifier:'wrong'.repeat(10)},'')).status,400);
  const browser=await fetch(base+`/auth/google/start?flow=${flow}`,{redirect:'manual'});assert.equal(browser.status,200);
- const notice=await browser.text();assert.match(notice,/parent or legal guardian/);assert.match(notice,/not the child’s account/);
- assert.match(browser.headers.get('content-security-policy'),/form-action 'self'/);
+ const notice=await browser.text();assert.match(notice,/Use your own Google account to manage cloud saves/);assert.match(notice,/service providers/);assert.doesNotMatch(notice,/Render|MongoDB Atlas/);
+ assert.match(browser.headers.get('content-security-policy'),/form-action http:\/\/localhost:3000/);
  const cookie=browser.headers.get('set-cookie').split(';')[0];
  const noticeToken=notice.match(/name="noticeToken" value="([^"]+)"/)[1];
  const authorize=async(body,sessionCookie=cookie)=>fetch(base+'/auth/google/authorize',{method:'POST',redirect:'manual',headers:{'Content-Type':'application/x-www-form-urlencoded',Cookie:sessionCookie},body:new URLSearchParams({flow,noticeToken,...body})});
@@ -65,10 +66,11 @@ test('API login, save conflicts, payment replay, atomic spending and logout',asy
  assert.equal((await authorize({})).status,400);
  assert.equal((await authorize({acknowledged:'yes',noticeToken:'wrong'})).status,400);
  const authorized=await authorize({acknowledged:'yes'},'');assert.equal(authorized.status,303);assert.match(authorized.headers.get('location'),/^https:\/\/accounts.google.com/);
+ assert.deepEqual(authScopes,['openid','profile']);
  const browserCookie=authorized.headers.get('set-cookie').split(';')[0];
  assert.equal((await authorize({acknowledged:'yes'},browserCookie)).status,303,'repeated form submission should continue the existing OAuth flow');
  const stored=await db.collection('flows').findOne({_id:flow});
- oauth.claims.code={sub:'google-user',email_verified:true,name:'Google Player',nonce:stored.nonce};
+ oauth.claims.code={sub:'google-user',name:'Google Player',nonce:stored.nonce};
  assert.equal((await fetch(base+`/auth/google/callback?state=${flow}&code=code`,{redirect:'manual'})).status,400);
  assert.equal((await fetch(base+`/auth/google/callback?state=${flow}&code=code`,{headers:{Cookie:browserCookie}})).status,200);
  const login=await request('/auth/poll','POST',{flow,verifier},'');assert.equal(login.status,200);assert.ok(login.body.token);

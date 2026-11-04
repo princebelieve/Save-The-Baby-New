@@ -22,7 +22,7 @@ Use a Google Cloud project for Save The Baby. In Google Auth Platform:
 
 1. Complete Branding (app name, support email, homepage, privacy-policy and terms URLs).
 2. Choose the appropriate Audience. For external testing, add the Google accounts that will test login. Complete Google's publishing/verification steps before public rollout as applicable.
-3. Under Data Access, request only `openid`, `email`, and `profile`. Do not enable Gmail API or request mailbox scopes.
+3. Under Data Access, request only `openid` and `profile`. The game does not need the player's email address or Gmail access.
 4. Create an OAuth client with application type **Web application**, because the backend handles the browser callback. Name it `Save The Baby backend`.
 5. Keep the Client ID and Client secret for the Render environment. For local development you may authorize `http://localhost:3000/auth/google/callback`. After Render assigns your real HTTPS hostname, add this exact production redirect URI:
 

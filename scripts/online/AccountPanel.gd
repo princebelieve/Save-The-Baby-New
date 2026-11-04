@@ -5,6 +5,10 @@ var account: Node
 var purchases: Node
 var _owner := ""
 var _pending_login: Dictionary = {}
+var _login_dialog: AcceptDialog
+var _login_spinner: ProgressBar
+var _login_status: Label
+var _login_buttons: Array[Button] = []
 const OWNER_PATH := "user://progress_owner.cfg"
 
 func initialize(current_game: Game) -> void:
@@ -15,6 +19,9 @@ func initialize(current_game: Game) -> void:
 	if owner.load(OWNER_PATH) == OK:
 		_owner = str(owner.get_value("profile","owner",""))
 	account.login_completed.connect(_on_login_completed)
+	account.login_starting.connect(_on_login_starting)
+	account.login_browser_opened.connect(_on_login_browser_opened)
+	account.login_start_failed.connect(_on_login_start_failed)
 	account.logged_out.connect(_on_logout)
 	account.message.connect(_notice)
 	purchases.message.connect(_notice)
@@ -57,6 +64,8 @@ func show_account() -> void:
 		_notice("A purchase or sync is still running. Try again when it finishes.")
 		return
 	var dialog := AcceptDialog.new()
+	_login_dialog = dialog
+	_login_buttons.clear()
 	dialog.set_meta("custom_heading", true)
 	game._prepare_dialog(dialog)
 	dialog.title = "ACCOUNT & COINS"
@@ -78,8 +87,19 @@ func show_account() -> void:
 	if not account.configured():
 		status.text = "Google account sign-in is unavailable right now. You can continue playing as a guest."
 	if not account.signed_in():
-		_button(content,"CREATE OR CONNECT GOOGLE ACCOUNT",_sign_in.bind("adult"),not account.configured())
-		_button(content,"PARENT / GUARDIAN ACCOUNT",_sign_in.bind("guardian"),not account.configured())
+		_button(content,"CREATE OR CONNECT GOOGLE ACCOUNT",_sign_in.bind("adult"),not account.configured(),true)
+		_button(content,"PARENT / GUARDIAN ACCOUNT",_sign_in.bind("guardian"),not account.configured(),true)
+		_login_spinner = ProgressBar.new()
+		_login_spinner.indeterminate = true
+		_login_spinner.custom_minimum_size = Vector2(0,20)
+		_login_spinner.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		_login_spinner.hide()
+		content.add_child(_login_spinner)
+		_login_status = Label.new()
+		_login_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		_login_status.add_theme_font_size_override("font_size",18)
+		_login_status.hide()
+		content.add_child(_login_status)
 	else:
 		var player_id := Label.new()
 		player_id.text = "Player ID: " + account.user_id
@@ -114,12 +134,35 @@ func show_account() -> void:
 	dialog.add_child(scroll)
 	game.add_child(dialog)
 	dialog.confirmed.connect(dialog.queue_free)
+	dialog.get_ok_button().text = "CLOSE"
 	dialog.canceled.connect(dialog.queue_free)
 	dialog.popup_centered_clamped(Vector2i(int(content.custom_minimum_size.x+36),int(scroll.custom_minimum_size.y+80)))
 
 func _sign_in(owner_mode: String) -> void:
 	account.set_account_owner_mode(owner_mode)
 	account.sign_in("self" if owner_mode == "adult" else "guardian")
+
+func _on_login_starting() -> void:
+	if not is_instance_valid(_login_dialog): return
+	for button in _login_buttons: button.disabled = true
+	_login_dialog.get_ok_button().disabled = true
+	_login_spinner.show()
+	_login_status.text = "Preparing Google sign-in..."
+	_login_status.show()
+
+func _on_login_browser_opened() -> void:
+	if is_instance_valid(_login_dialog):
+		_login_dialog.hide()
+		_login_dialog.queue_free()
+	_login_dialog = null
+
+func _on_login_start_failed(text: String) -> void:
+	if not is_instance_valid(_login_dialog): return
+	_login_spinner.hide()
+	_login_status.text = text
+	_login_status.show()
+	for button in _login_buttons: button.disabled = false
+	_login_dialog.get_ok_button().disabled = false
 
 func _confirm_purchase(product: String, price: String) -> void:
 	var confirm := ConfirmationDialog.new()
@@ -133,13 +176,17 @@ func _confirm_purchase(product: String, price: String) -> void:
 	game.add_child(confirm)
 	confirm.popup_centered_clamped(Vector2i(520,340))
 
-func _button(parent: Control,title: String,action: Callable,disabled := false) -> void:
+func _button(parent: Control,title: String,action: Callable,disabled := false,keep_open := false) -> void:
 	var button := game._make_menu_button(title)
 	button.custom_minimum_size = Vector2(0,76)
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	button.add_theme_font_size_override("font_size",22)
 	button.disabled = disabled
+	if keep_open: _login_buttons.append(button)
 	button.pressed.connect(func():
+		if keep_open:
+			action.call()
+			return
 		var window := button.get_window()
 		window.hide()
 		window.queue_free()

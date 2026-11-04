@@ -99,16 +99,14 @@ export function createApp({db, client, oauth, play, baseUrl, clientId, commerceE
   requireThat(flow,400,'Login expired. Return to the game and try again.');
   res.cookie('sb_oauth',browser,{httpOnly:true,secure:baseUrl.startsWith('https:'),sameSite:'lax',maxAge:300000,path:'/auth/google'});
   const parent=flow.accountMode==='guardian';
-  res.set('Content-Security-Policy',"default-src 'none'; style-src 'unsafe-inline'; frame-ancestors 'none'; form-action 'self'").type('html').send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#e8dfca"><title>Save The Baby account</title>${accountPageStyles}</head><body><main>
-<p><strong>Account setup — step 1 of 2</strong></p>
-<p>${parent?'Please hand this device to a parent or legal guardian. The parent must use their own Google account, not the child’s account.':'Continue with your own Google account. If you are under 18, ask your parent or guardian to manage this account.'}</p>
-<p>S.B. Ibhadode Technologies stores the Google account identifier, display name, game progress and purchase records using Render and MongoDB Atlas. Google handles payment. Cloud saves and purchased coins belong to the signed-in account. Do not enter a child’s name or email here.</p>
-<p>Account creation does not approve future payments. Google Play applies the purchasing account’s parental controls. You can delete the online account from Settings → Account &amp; Coins → Delete Online Account, or contact info@sbi.globalcreest.com.</p>
-<p><a href="https://sbi.globalcreest.com/save-the-baby/privacy-policy">Read the privacy policy</a>. You may close this page and continue playing without an online account.</p>
+  res.set('Content-Security-Policy',`default-src 'none'; style-src 'unsafe-inline'; frame-ancestors 'none'; form-action ${new URL(baseUrl).origin}`).type('html').send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#e8dfca"><title>Save The Baby account</title>${accountPageStyles}</head><body><main>
+<p class="brand">Save The Baby account</p><h1>${parent?'Parent or guardian account':'Connect your Google account'}</h1><span class="step">Account setup: step 1 of 2</span>
+<p class="intro">${parent?'Use your own Google account to manage cloud saves for a child who plays this game.':'Sign in to back up your progress and restore it on another device. Google handles your password; Save The Baby never receives it.'}</p>
+<section class="details"><p>When you use cloud saves, we use your Google account ID and profile name to identify your account. We store game progress and purchase records with service providers so you can restore progress and manage purchased coins. Google Play handles payments; we do not receive your card details.</p></section>
+<p>Cloud saves are optional. You can continue playing as a guest. You can delete your online account in Settings &rarr; Account &amp; Coins &rarr; Delete Online Account. For details about data use and retention, read the <a href="https://sbi.globalcreest.com/save-the-baby/privacy-policy">Privacy Policy</a>.</p>
 <form method="post" action="/auth/google/authorize"><input type="hidden" name="flow" value="${flow._id}"><input type="hidden" name="noticeToken" value="${noticeToken}">
-<p><label><input type="checkbox" name="acknowledged" value="yes" required> ${parent?'I am the parent or legal guardian, I am 18 or older, and I will manage this cloud account and its purchases using my own Google account.':'I am 18 or older and will manage this cloud account and its purchases.'} I have read the account notice.</label></p>
-<p><strong>Step 2:</strong> Google will let you choose an existing account or choose “Create account”. The Save The Baby cloud account is created automatically after the first successful Google sign-in.</p>
-<button class="button" type="submit">Continue to Google sign-in</button></form></main></body></html>`);
+<label class="consent"><input type="checkbox" name="acknowledged" value="yes" required><span>${parent?'I am 18 or older and am the parent or legal guardian managing this account.':'I am 18 or older and am creating or managing this account.'} I have read this notice.</span></label>
+<button class="button" type="submit">Continue with Google</button></form></main></body></html>`);
  });
  app.post('/auth/google/authorize',async(req,res)=>{
   const cookie=(req.get('cookie')||'').split(';').map(x=>x.trim()).find(x=>x.startsWith('sb_oauth='))?.slice(9);
@@ -133,7 +131,7 @@ export function createApp({db, client, oauth, play, baseUrl, clientId, commerceE
    if(!rebound.modifiedCount) return sendAuthError(res);
   }
   res.cookie('sb_oauth',browserToken,{httpOnly:true,secure:baseUrl.startsWith('https:'),sameSite:'lax',maxAge:300000,path:'/auth/google'});
-  res.redirect(303,oauth.generateAuthUrl({scope:['openid','email','profile'],state:flow._id,nonce:flow.nonce,prompt:'select_account',access_type:'online'}));
+  res.redirect(303,oauth.generateAuthUrl({scope:['openid','profile'],state:flow._id,nonce:flow.nonce,prompt:'select_account',access_type:'online'}));
  });
  app.get('/auth/google/callback',async(req,res)=>{
   const cookie=(req.get('cookie')||'').split(';').map(x=>x.trim()).find(x=>x.startsWith('sb_oauth='))?.slice(9);
@@ -144,7 +142,7 @@ export function createApp({db, client, oauth, play, baseUrl, clientId, commerceE
   requireThat(!req.query.error && typeof req.query.code==='string',400,'Google sign-in canceled');
   const {tokens}=await oauth.getToken(req.query.code);
   const ticket=await oauth.verifyIdToken({idToken:tokens.id_token,audience:clientId}); const claims=ticket.getPayload();
-  requireThat(claims?.sub && claims.email_verified && claims.nonce===flow.nonce,401,'Invalid Google identity');
+  requireThat(claims?.sub && claims.nonce===flow.nonce,401,'Invalid Google identity');
   const userId=hash(`google:${claims.sub}`);
   // This is an adult-owner declaration, NOT verified age or verifiable parental consent.
   await users.updateOne({_id:userId},{$set:{name:String(claims.name||'Player').slice(0,100),accountNotice:{version:1,mode:flow.accountMode,acknowledgedAt:flow.ownerAcknowledgedAt}},$setOnInsert:{wallet:0,save:null,revision:0,created:new Date()}},{upsert:true});
