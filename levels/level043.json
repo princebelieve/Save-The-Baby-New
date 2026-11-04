@@ -64,7 +64,7 @@
         {
             "type": "COLLECT_ITEMS",
             "target": "RECORDER",
-            "amount": 30
+            "amount": 32
         }
     ],
     "audio": {

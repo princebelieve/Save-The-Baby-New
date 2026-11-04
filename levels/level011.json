@@ -58,7 +58,7 @@
         {
             "type": "COLLECT_ITEMS",
             "target": "FINGERPRINT",
-            "amount": 32
+            "amount": 35
         }
     ],
     "audio": {
@@ -103,7 +103,7 @@
         "image": "res://assets/sprites/backgrounds/grass_board_background.jpeg"
     },
     "moves": {
-        "total": 25
+        "total": 22
     },
     "rewards": {
         "powerups": [],

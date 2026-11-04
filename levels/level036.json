@@ -64,7 +64,7 @@
         {
             "type": "COLLECT_ITEMS",
             "target": "KEY",
-            "amount": 26
+            "amount": 30
         }
     ],
     "audio": {
@@ -134,7 +134,7 @@
         "image": "res://assets/sprites/backgrounds/dirt_board_background.jpeg"
     },
     "moves": {
-        "total": 24
+        "total": 23
     },
     "rewards": {
         "powerups": [],

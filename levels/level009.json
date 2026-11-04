@@ -58,7 +58,7 @@
         {
             "type": "COLLECT_ITEMS",
             "target": "PHONE",
-            "amount": 24
+            "amount": 27
         }
     ],
     "audio": {
@@ -102,7 +102,7 @@
         "image": "res://assets/sprites/backgrounds/grass_board_background.jpeg"
     },
     "moves": {
-        "total": 26
+        "total": 23
     },
     "rewards": {
         "powerups": [],

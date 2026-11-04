@@ -14,6 +14,7 @@ signal special_activated(kind: String)
 signal powerup_blast(kind: String, cell: Vector2i)
 signal rocket_combo(origins: Array, cells: Array)
 signal tile_burst(cell: Vector2i)
+signal player_interacted
 
 var _grid: Dictionary = {}
 var _locked: bool = false
@@ -33,6 +34,9 @@ var _obstacle_database: ObstacleDatabase
 var _obstacle_factory: ObstacleFactory
 var _shake_tween: Tween
 var _shake_origin := Vector2.ZERO
+var _suggested_move_tween: Tween
+var _suggested_move_tiles: Array[Tile] = []
+var _suggested_move_origins: Array[Vector2] = []
 
 var _tile_database: TileDatabase
 var _tile_factory: TileFactory
@@ -46,6 +50,7 @@ var _board_shuffler: BoardShuffler
 
 
 func initialize(level_data: Dictionary) -> bool:
+	clear_suggested_move_hint()
 	if _shake_tween != null and _shake_tween.is_running(): _shake_tween.kill()
 	_level_data = level_data.duplicate(true)
 	_locked = false
@@ -222,6 +227,24 @@ func is_inside(position: Vector2i) -> bool:
 	return position.x >= 0 and position.y >= 0 and position.x < get_width() and position.y < get_height()
 
 
+func would_form_match_with_type(position: Vector2i, tile_type: int) -> bool:
+	if not is_inside(position):
+		return false
+	for direction in [Vector2i.RIGHT, Vector2i.DOWN]:
+		var count := 1
+		for sign_value in [-1, 1]:
+			var cursor: Vector2i = position + direction * sign_value
+			while is_inside(cursor):
+				var neighbor: Tile = get_tile(cursor)
+				if neighbor == null or int(neighbor.get_tile_type()) != tile_type:
+					break
+				count += 1
+				cursor += direction * sign_value
+		if count >= 3:
+			return true
+	return false
+
+
 func set_tile(position: Vector2i, tile, animate_spawn: bool = true) -> void:
 	if not is_inside(position):
 		return
@@ -264,6 +287,7 @@ func has_tile(position: Vector2i) -> bool:
 func swap_tiles(position_a: Vector2i, position_b: Vector2i) -> bool:
 	if _locked or _move_validator == null or not is_inside(position_a) or not is_inside(position_b):
 		return false
+	clear_suggested_move_hint()
 	var tile_a: Tile = get_tile(position_a)
 	var tile_b: Tile = get_tile(position_b)
 	if tile_a == null or tile_b == null:
@@ -298,10 +322,7 @@ func _animate_swap_then_resolve(tile_a: Tile, tile_b: Tile, special_tile: Tile =
 	tween.tween_property(tile_b, "position", destination_b, 0.16).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	await tween.finished
 	SignalBus.play_sfx.emit("tile_swap")
-	_remaining_moves = maxi(0, _remaining_moves - 1)
-	moves_changed.emit(_remaining_moves)
-	SignalBus.moves_changed.emit(_remaining_moves)
-	SignalBus.move_used.emit(_remaining_moves)
+	_spend_move()
 	if special_tile != null:
 		var partner := tile_b if special_tile == tile_a else tile_a
 		await _resolve_special_powerup(special_tile, partner)
@@ -357,6 +378,49 @@ func find_valid_swap() -> Array[Vector2i]:
 					result.append(second)
 					return result
 	return result
+
+
+func show_suggested_move_hint(cells: Array[Vector2i]) -> void:
+	clear_suggested_move_hint()
+	if _locked or cells.size() != 2:
+		return
+	for cell in cells:
+		var tile: Tile = get_tile(cell)
+		if tile != null:
+			_suggested_move_tiles.append(tile)
+	if _suggested_move_tiles.size() != 2:
+		clear_suggested_move_hint()
+		return
+	for tile in _suggested_move_tiles:
+		_suggested_move_origins.append(tile.position)
+	_suggested_move_tween = create_tween().set_loops(3)
+	for index in 2:
+		var other_index := 1 - index
+		_suggested_move_tween.parallel().tween_property(_suggested_move_tiles[index], "position", _suggested_move_origins[other_index], 0.28).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+		_suggested_move_tween.parallel().tween_property(_suggested_move_tiles[index], "scale", Vector2.ONE * 1.14, 0.28).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		_suggested_move_tween.parallel().tween_property(_suggested_move_tiles[index], "modulate", Color(1.4, 1.25, 0.62, 1.0), 0.28)
+	_suggested_move_tween.chain()
+	for index in 2:
+		_suggested_move_tween.parallel().tween_property(_suggested_move_tiles[index], "position", _suggested_move_origins[index], 0.24).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+		_suggested_move_tween.parallel().tween_property(_suggested_move_tiles[index], "scale", Vector2.ONE, 0.24)
+		_suggested_move_tween.parallel().tween_property(_suggested_move_tiles[index], "modulate", Color.WHITE, 0.24)
+	_suggested_move_tween.tween_interval(0.2)
+	_suggested_move_tween.finished.connect(clear_suggested_move_hint)
+
+
+func clear_suggested_move_hint() -> void:
+	if _suggested_move_tween != null and _suggested_move_tween.is_running():
+		_suggested_move_tween.kill()
+	_suggested_move_tween = null
+	for index in _suggested_move_tiles.size():
+		var tile := _suggested_move_tiles[index]
+		if is_instance_valid(tile):
+			if index < _suggested_move_origins.size():
+				tile.position = _suggested_move_origins[index]
+			tile.scale = Vector2.ONE
+			tile.reset_tile_modulate()
+	_suggested_move_tiles.clear()
+	_suggested_move_origins.clear()
 
 
 func find_valid_swap_for_type(target_type: int, minimum_match_size: int = 3) -> Array[Vector2i]:
@@ -650,8 +714,16 @@ func use_booster_at(kind: String, position: Vector2i) -> bool:
 	_required_booster_target = Vector2i(-1, -1)
 	booster_used.emit(kind)
 	powerup_blast.emit(kind, position)
+	_spend_move()
 	_resolve_external_clear(targets, kind)
 	return true
+
+
+func _spend_move() -> void:
+	_remaining_moves = maxi(0, _remaining_moves - 1)
+	moves_changed.emit(_remaining_moves)
+	SignalBus.moves_changed.emit(_remaining_moves)
+	SignalBus.move_used.emit(_remaining_moves)
 
 
 func _resolve_special_powerup(powerup_tile: Tile, partner: Tile) -> void:
@@ -915,6 +987,7 @@ func _input(event: InputEvent) -> void:
 		if event.pressed:
 			if _locked or _active_touch_index != -1:
 				return
+			player_interacted.emit()
 			_active_touch_index = event.index
 			_begin_pointer_gesture(event.position)
 		elif event.index == _active_touch_index:
@@ -937,6 +1010,7 @@ func _input(event: InputEvent) -> void:
 		if event.device == InputEvent.DEVICE_ID_EMULATION or _active_touch_index != -1 or recent_touch:
 			return
 		if event.pressed:
+			player_interacted.emit()
 			_begin_pointer_gesture(event.position)
 		else:
 			_finish_pointer_gesture(event.position)
@@ -951,6 +1025,7 @@ func cancel_pointer_gesture() -> void:
 
 
 func _begin_pointer_gesture(screen_position: Vector2) -> void:
+	clear_suggested_move_hint()
 	_drag_start = _tile_at_screen_position(screen_position)
 	_press_screen_position = screen_position
 	if _drag_start == null:

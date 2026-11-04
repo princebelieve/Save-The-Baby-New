@@ -59,12 +59,12 @@
             1
         ]
     },
-    "difficulty": "INTRODUCTION",
+    "difficulty": "STANDARD",
     "objectives": [
         {
             "type": "COLLECT_ITEMS",
             "target": "CLOCK",
-            "amount": 26
+            "amount": 30
         }
     ],
     "audio": {
@@ -134,7 +134,7 @@
         "image": "res://assets/sprites/backgrounds/dirt_board_background.jpeg"
     },
     "moves": {
-        "total": 26
+        "total": 25
     },
     "rewards": {
         "powerups": [],

@@ -74,7 +74,8 @@ var _obstacles_cleared := 0
 var _displayed_coins := 0
 var _coin_count_tween: Tween
 var _selected_booster := ""
-var _booster_confirm: ConfirmationDialog
+var _booster_confirm: IllustratedPopup
+var _booster_confirm_layer: CanvasLayer
 var _academy_pending_level: Dictionary = {}
 var _academy_lesson_id := ""
 var _detail_layer: CanvasLayer
@@ -86,6 +87,7 @@ var _tutorial_pause_open := false
 var _tutorial_booster_kind := ""
 var _tutorial_target_cell := Vector2i(-1, -1)
 var _campaign_coach_shown := false
+var _idle_hint_timer: Timer
 var _campaign_progress := ConfigFile.new()
 var _highest_unlocked_level := 1
 var _completed_levels: Dictionary = {}
@@ -159,10 +161,13 @@ func _handle_back_request() -> void:
 func _ready() -> void:
 	_ads = AdManager.new()
 	add_child(_ads)
+	if not SignalBus.board_shuffled.is_connected(_on_board_shuffled):
+		SignalBus.board_shuffled.connect(_on_board_shuffled)
 	var provider := get_node_or_null("/root/AdProvider")
 	if provider != null:
 		_ads.configure(provider)
 	_load_campaign_progress()
+	_campaign_coach_shown = bool(_campaign_progress.get_value("tutorials", "campaign_map_intro", false))
 	_special_moves_created = int(_campaign_progress.get_value("campaign", "special_moves_created", 0))
 	_economy_manager = get_node_or_null("Managers/EconomyManager") as EconomyManager
 	_reward_manager = get_node_or_null("Managers/RewardManager") as RewardManager
@@ -284,14 +289,15 @@ func _show_loading_screen() -> void:
 	layer.add_child(wash)
 	var stack := VBoxContainer.new()
 	stack.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	stack.position = Vector2(-170, -175)
-	stack.size = Vector2(340, 350)
+	var logo_side := minf(get_viewport_rect().size.x * 0.9, 560.0)
+	stack.size = Vector2(logo_side + 40.0, logo_side + 100.0)
+	stack.position = -stack.size * 0.5
 	stack.alignment = BoxContainer.ALIGNMENT_CENTER
 	stack.add_theme_constant_override("separation", 12)
 	wash.add_child(stack)
 	var logo := TextureRect.new()
 	logo.texture = ResourceManager.load_texture("res://assets/sprites/ui/game_logo_cutout.png")
-	logo.custom_minimum_size = Vector2(280, 280)
+	logo.custom_minimum_size = Vector2.ONE * logo_side
 	logo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	logo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	logo.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
@@ -305,6 +311,12 @@ func _show_loading_screen() -> void:
 	progress.max_value = 100
 	progress.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	stack.add_child(progress)
+	_idle_hint_timer = Timer.new()
+	_idle_hint_timer.name = "IdleMoveHintTimer"
+	_idle_hint_timer.one_shot = true
+	_idle_hint_timer.wait_time = 14.0
+	_idle_hint_timer.timeout.connect(_show_idle_move_hint)
+	add_child(_idle_hint_timer)
 	var tween := create_tween()
 	tween.tween_property(progress, "value", 100.0, 1.6)
 	tween.tween_callback(func():
@@ -1030,6 +1042,8 @@ func _close_pause_menu() -> void:
 func _show_case_file() -> void:
 	if _case_file_layer != null or (_tutorial_active and _tutorial_action != "field_guide"):
 		return
+	if _idle_hint_timer != null:
+		_idle_hint_timer.stop()
 	if _tutorial_overlay != null:
 		_tutorial_overlay.hide_tip()
 	_case_file_was_board_locked = _board != null and _board.is_locked()
@@ -1123,6 +1137,7 @@ func _close_case_file() -> void:
 		_finish_tutorial()
 	elif _board != null and not _case_file_was_board_locked:
 		_board.unlock()
+	_reset_idle_hint_timer()
 
 
 func _toggle_audio_bus(button: Button, kind: String) -> void:
@@ -1749,11 +1764,17 @@ func _show_campaign_map(route_id: String) -> void:
 
 
 func _show_campaign_map_coach() -> void:
+	if _campaign_coach_shown and bool(_campaign_progress.get_value("tutorials", "campaign_map_intro", false)):
+		return
 	if _campaign_map == null or not is_instance_valid(_campaign_map):
 		return
 	var target_rect: Rect2 = _campaign_map.get_level_screen_rect(1)
 	if target_rect.size == Vector2.ZERO:
 		return
+	_campaign_coach_shown = true
+	_campaign_progress.set_value("tutorials", "campaign_map_intro", true)
+	CaseJournal.discover(_campaign_progress, "map", "Using the campaign map", "navigation", "Each marker opens an investigation; chapters show where the search moves next.", "res://assets/sprites/props/evidence_briefcase.jpeg", 1)
+	_persist_campaign_progress()
 	_tutorial_action = "campaign_map_intro"
 	_show_tutorial_tip(
 		"This is the campaign trail. Each marker opens an investigation; chapters show where the search moves next. Start with the glowing first case.",
@@ -2132,11 +2153,13 @@ func _begin_level(_route_id: String) -> void:
 		(entry["button"] as BaseButton).disabled = false
 	_start_academy_lesson(level_data)
 	_refresh_tutorial_controls()
+	_reset_idle_hint_timer()
 	if level_manager != null:
 		level_manager.start_level()
 	if _board != null:
 		if not (_tutorial_active and ["academy_lesson", "explain_booster", "booster_select", "explain_character_tiles"].has(_tutorial_action)):
 			_board.unlock()
+	_reset_idle_hint_timer()
 	var active_hud := get_node_or_null("HUD") as CanvasLayer
 	if active_hud != null:
 		active_hud.visible = true
@@ -2151,6 +2174,7 @@ func _on_board_created() -> void:
 	_result_ad_shown = false
 	_board = created_board
 	_board.moves_changed.connect(_on_moves_changed)
+	_board.player_interacted.connect(_on_board_player_interacted)
 	_board.match_collected.connect(_on_tiles_matched)
 	_board.move_rejected.connect(_on_move_rejected)
 	_board.turn_resolved.connect(_on_board_turn_resolved)
@@ -2170,6 +2194,66 @@ func _on_board_created() -> void:
 func _on_moves_changed(remaining: int) -> void:
 	_moves_remaining = remaining
 	_moves_label.text = str(remaining)
+
+
+func _on_board_player_interacted() -> void:
+	_reset_idle_hint_timer()
+	if _hint_label != null and _hint_label.text.begins_with("TRY THIS SWAP"):
+		_hint_label.text = "MATCH %s | PLAN YOUR NEXT MOVE" % _objective_target.replace("_", " ")
+
+
+func _reset_idle_hint_timer() -> void:
+	if _idle_hint_timer == null:
+		return
+	_idle_hint_timer.stop()
+	if _board != null:
+		_board.clear_suggested_move_hint()
+	if _tutorial_active or _board == null or _board.is_locked() or _result_layer != null or _case_file_layer != null or _pause_layer != null or _story_layer != null or _briefing_layer != null or _launch_layer != null or (_ads != null and _ads.busy):
+		return
+	_idle_hint_timer.start()
+
+
+func _show_idle_move_hint() -> void:
+	if _board == null or _board.is_locked() or _tutorial_active or _result_layer != null or _case_file_layer != null or _pause_layer != null or (_ads != null and _ads.busy):
+		return
+	var target_type := int(Constants.TileType.get(_objective_target, -1)) if _objective_type == "COLLECT_ITEMS" else -1
+	var suggested := _board.find_valid_swap_for_type(target_type) if target_type >= 0 else []
+	if suggested.is_empty():
+		suggested = _board.find_valid_swap()
+	if suggested.size() != 2:
+		return
+	_board.show_suggested_move_hint(suggested)
+	_hint_label.text = "TRY THIS SWAP | MATCH %s" % _objective_target.replace("_", " ")
+	_hint_label.show()
+	_idle_hint_timer.start()
+
+
+func _on_board_shuffled() -> void:
+	if _board == null or _result_layer != null or _launch_layer != null or _campaign_layer != null:
+		return
+	var hud := get_node_or_null("HUD") as CanvasLayer
+	if hud == null:
+		return
+	var center := _board.get_cell_screen_rect(Vector2i(_board.get_width() / 2, _board.get_height() / 2)).get_center()
+	var notice := Label.new()
+	notice.name = "NoMoveNotice"
+	notice.text = "NO MOVE!"
+	notice.position = center - Vector2(130, 34)
+	notice.size = Vector2(260, 68)
+	notice.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	notice.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	notice.add_theme_font_override("font", DISPLAY_FONT)
+	notice.add_theme_font_size_override("font_size", 38)
+	notice.add_theme_color_override("font_color", Color("#fff1b6"))
+	notice.add_theme_color_override("font_outline_color", Color("#26394b"))
+	notice.add_theme_constant_override("outline_size", 7)
+	notice.scale = Vector2(0.65, 0.65)
+	notice.pivot_offset = notice.size * 0.5
+	hud.add_child(notice)
+	var pop := create_tween().set_parallel(true)
+	pop.tween_property(notice, "scale", Vector2.ONE, 0.14).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	pop.tween_property(notice, "modulate:a", 0.0, 0.68).set_delay(0.18)
+	pop.chain().tween_callback(notice.queue_free)
 
 
 func _on_coins_changed(coins: int) -> void:
@@ -2568,6 +2652,8 @@ func _on_board_turn_resolved() -> void:
 			_show_tutorial_special_result()
 	if not tutorial_result_pending:
 		_evaluate_level_end()
+	if _result_layer == null:
+		_reset_idle_hint_timer()
 
 
 func _show_tutorial_goal_feedback() -> void:
@@ -2708,6 +2794,7 @@ func _finish_tutorial() -> void:
 		_board.cancel_booster_mode()
 		_board.unlock()
 	_selected_booster = ""
+	_reset_idle_hint_timer()
 	call_deferred("_evaluate_level_end")
 
 
@@ -2765,32 +2852,33 @@ func _show_booster_confirmation(kind: String) -> void:
 		"thunder": "Choose a tile. Thunder clears every tile of that type.",
 		"ethan": "Choose a tile. Ethan clears a 3 by 3 rescue area. You can hold up to two assists."
 	}
-	var dialog := ConfirmationDialog.new()
-	_prepare_dialog(dialog)
-	dialog.name = "BoosterUseConfirmation"
-	dialog.title = "%s | %d available" % [kind.capitalize(), int(_booster_inventory.get(kind, 0))]
-	dialog.dialog_text = "%s\n\nUse one now? After you choose Use, tap a tile on the board to set the target." % descriptions.get(kind, "Choose a board tile to use this booster.")
-	dialog.size = Vector2i(380, 230)
-	dialog.get_ok_button().text = "USE BOOSTER"
-	dialog.get_cancel_button().text = "CANCEL"
-	dialog.get_ok_button().custom_minimum_size = Vector2(160, 48)
-	dialog.get_cancel_button().custom_minimum_size = Vector2(140, 48)
-	dialog.get_ok_button().add_theme_font_size_override("font_size", 20)
-	dialog.get_cancel_button().add_theme_font_size_override("font_size", 20)
-	for dialog_label in dialog.find_children("*", "Label", true, false):
-		dialog_label.add_theme_font_override("font", DISPLAY_FONT)
-		dialog_label.add_theme_font_size_override("font_size", 22)
-	dialog.confirmed.connect(_confirm_booster_use.bind(kind))
-	dialog.confirmed.connect(dialog.queue_free)
-	dialog.canceled.connect(_cancel_booster_dialog)
-	dialog.canceled.connect(dialog.queue_free)
-	add_child(dialog)
-	_booster_confirm = dialog
-	_booster_confirm.popup_centered_clamped(Vector2i(mini(560, int(get_viewport_rect().size.x * 0.9)), 340))
+	_booster_confirm_layer = CanvasLayer.new()
+	_booster_confirm_layer.name = "BoosterConfirmationLayer"
+	_booster_confirm_layer.layer = 38
+	_booster_confirm_layer.process_mode = Node.PROCESS_MODE_ALWAYS
+	add_child(_booster_confirm_layer)
+	_booster_confirm = IllustratedPopup.new()
+	_booster_confirm.name = "BoosterUseConfirmation"
+	_booster_confirm_layer.add_child(_booster_confirm)
+	var booster_art := "res://assets/sprites/characters/ethan_portrait_cutout.png" if kind == "ethan" else "res://assets/sprites/powerups/%s_powerup_icon.jpeg" % kind
+	_booster_confirm.set_card_context(
+		"%s BOOSTER | %d AVAILABLE" % [kind.capitalize(), int(_booster_inventory.get(kind, 0))],
+		booster_art,
+		"USE BOOSTER"
+	)
+	_booster_confirm.acknowledged.connect(_confirm_booster_use.bind(kind), CONNECT_ONE_SHOT)
+	_booster_confirm.skipped.connect(_cancel_booster_dialog, CONNECT_ONE_SHOT)
+	_booster_confirm.show_tip(
+		"%s\n\nUsing a booster spends one move. Choose USE BOOSTER, then tap a board tile. Tap X to cancel without spending it." % descriptions.get(kind, "Choose a board tile to use this booster."),
+		Rect2(), "DAVID", "res://assets/sprites/characters/david_portrait_v2.png", true
+	)
 
 
 func _confirm_booster_use(kind: String) -> void:
 	_booster_confirm = null
+	if is_instance_valid(_booster_confirm_layer):
+		_booster_confirm_layer.queue_free()
+	_booster_confirm_layer = null
 	_selected_booster = kind
 	_board.unlock()
 	_board.set_booster_mode(kind)
@@ -2799,6 +2887,9 @@ func _confirm_booster_use(kind: String) -> void:
 
 func _cancel_booster_dialog() -> void:
 	_booster_confirm = null
+	if is_instance_valid(_booster_confirm_layer):
+		_booster_confirm_layer.queue_free()
+	_booster_confirm_layer = null
 	_selected_booster = ""
 	if _board != null:
 		_board.unlock()
@@ -3215,8 +3306,40 @@ func _start_academy_lesson(level_data: Dictionary) -> void:
 			continue
 		if bool(_campaign_progress.get_value("academy_completed", str(lesson["id"]), false)):
 			break
-		# Archive on first presentation, including when an experienced player skips.
-		_campaign_progress.set_value("academy", str(lesson["id"]), true)
+		# Mark on presentation so retrying or relaunching never forces the lesson again.
+		# The complete pages are archived in the case file for optional review.
+		_campaign_progress.set_value("academy_completed", str(lesson["id"]), true)
+		# The Academy already teaches this case. Archive its short practice prompt
+		# so it can be reviewed, but do not put the player through both tutorials.
+		_campaign_progress.set_value("tutorials", str(_current_level_id), true)
+		var level_tutorial: Dictionary = level_data.get("tutorial", {})
+		var level_steps: Array = level_tutorial.get("steps", [])
+		if not level_steps.is_empty():
+			var practice_message := str(level_steps[0].get("message", ""))
+			if not practice_message.is_empty():
+				CaseJournal.discover(
+					_campaign_progress,
+					"field_briefing_%03d" % _current_level_id,
+					"Case %03d field briefing" % _current_level_id,
+					"briefing",
+					practice_message,
+					"res://assets/sprites/props/evidence_briefcase.jpeg",
+					_current_level_id
+				)
+		var journal_pages: Array = lesson.get("journal_pages", [])
+		var lesson_pages: Array = lesson.get("pages", [])
+		for page_index in range(mini(journal_pages.size(), lesson_pages.size())):
+			var fact: Dictionary = journal_pages[page_index]
+			if fact.is_empty(): continue
+			CaseJournal.discover(
+				_campaign_progress,
+				str(fact.get("id", "")),
+				str(fact.get("title", lesson.get("title", "Case lesson"))),
+				str(fact.get("fact", "")),
+				str(lesson_pages[page_index]),
+				str(fact.get("illustration", "")),
+				_current_level_id
+			)
 		_persist_campaign_progress()
 		_academy_pending_level = level_data
 		_academy_lesson_id = str(lesson["id"])
@@ -3291,6 +3414,21 @@ func _start_practice_tutorial(level_data: Dictionary) -> void:
 	var raw_steps: Variant = tutorial.get("steps", [])
 	var tutorial_steps: Array = raw_steps if raw_steps is Array else []
 	if bool(tutorial.get("enabled", false)) and not tutorial_steps.is_empty() and not bool(_campaign_progress.get_value("tutorials", str(_current_level_id), false)):
+		# Save before showing: interrupted tutorials stay in the case file and do
+		# not force players through the same opening flow on their next attempt.
+		_campaign_progress.set_value("tutorials", str(_current_level_id), true)
+		var field_tip := str(tutorial_steps[0].get("message", ""))
+		if not field_tip.is_empty():
+			CaseJournal.discover(
+				_campaign_progress,
+				"field_briefing_%03d" % _current_level_id,
+				"Case %03d field briefing" % _current_level_id,
+				"briefing",
+				field_tip,
+				"res://assets/sprites/props/evidence_briefcase.jpeg",
+				_current_level_id
+			)
+		_persist_campaign_progress()
 		_tutorial_active = true
 		_tutorial_mechanic = str(tutorial_steps[0].get("mechanic", ""))
 		_tutorial_pause_open = false

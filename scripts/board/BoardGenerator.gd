@@ -65,6 +65,19 @@ func generate_tile(position: Vector2i) -> Tile:
 	return _tile_factory.create_tile_at(definition["enum"], position)
 
 
+func generate_refill_tile(position: Vector2i, board) -> Tile:
+	if _tile_factory == null or _level_tile_definitions.is_empty() or board == null:
+		return generate_tile(position)
+	# Keep the configured spawn weights while avoiding a match created solely by
+	# a lucky refill. Matches made by falling tiles still cascade as usual.
+	for definition in _weighted_candidate_order():
+		if board.would_form_match_with_type(position, int(definition["enum"])):
+			continue
+		return _tile_factory.create_tile_at(definition["enum"], position)
+	# Sparse custom pools can leave no safe type; preserve playability as a fallback.
+	return generate_tile(position)
+
+
 func _load_level_tile_pool(tile_pool) -> void:
 	if typeof(tile_pool) != TYPE_DICTIONARY:
 		return

@@ -64,7 +64,7 @@
         {
             "type": "COLLECT_ITEMS",
             "target": "KEY",
-            "amount": 28
+            "amount": 30
         }
     ],
     "audio": {
