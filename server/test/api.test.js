@@ -58,7 +58,7 @@ test('API login, save conflicts, payment replay, atomic spending and logout',asy
  assert.equal((await request('/auth/poll','POST',{flow,verifier:'wrong'.repeat(10)},'')).status,400);
  const browser=await fetch(base+`/auth/google/start?flow=${flow}`,{redirect:'manual'});assert.equal(browser.status,200);
  const notice=await browser.text();assert.match(notice,/Use your own Google account to manage cloud saves/);assert.match(notice,/service providers/);assert.doesNotMatch(notice,/Render|MongoDB Atlas/);
- assert.match(notice,/Step 2:<\/strong> On the next screen, choose an existing Google account or create one/);
+ assert.match(notice,/sign in with your existing Google account/);
  assert.doesNotMatch(browser.headers.get('content-security-policy'),/form-action/);
  const cookie=browser.headers.get('set-cookie').split(';')[0];
  const noticeToken=notice.match(/name="noticeToken" value="([^"]+)"/)[1];
@@ -76,14 +76,16 @@ test('API login, save conflicts, payment replay, atomic spending and logout',asy
  const callback=await fetch(base+`/auth/google/callback?state=${flow}&code=code`,{headers:{Cookie:browserCookie}});
  assert.equal(callback.status,200);
  const callbackPage=await callback.text();
- assert.match(callbackPage,/http-equiv="refresh" content="0;url=savethebaby:\/\/auth\/complete"/);
+ assert.doesNotMatch(callbackPage,/http-equiv="refresh"/);
+ assert.match(callbackPage,/Return to game/);
  assert.match(callbackPage,/href="savethebaby:\/\/auth\/complete"/);
  const login=await request('/auth/poll','POST',{flow,verifier},'');assert.equal(login.status,200);assert.ok(login.body.token);
  const owner=await db.collection('users').findOne({_id:login.body.userId});
  assert.equal(owner.accountNotice.mode,'guardian');assert.equal(owner.accountNotice.version,1);
  assert.ok(owner.accountNotice.acknowledgedAt instanceof Date);
  assert.equal(owner.parentalConsentVerified,undefined);
- assert.equal((await request('/auth/poll','POST',{flow,verifier},'')).status,400);
+ const repeated=await request('/auth/poll','POST',{flow,verifier},'');
+ assert.equal(repeated.status,200);assert.equal(repeated.body.token,login.body.token);
  assert.equal((await request('/v1/account','DELETE',{},login.body.token)).status,200);
  assert.equal((await request('/v1/me','GET',undefined,login.body.token)).status,401);
  assert.ok(await db.collection('purchases').findOne({_id:hash(payment.purchaseToken)}));

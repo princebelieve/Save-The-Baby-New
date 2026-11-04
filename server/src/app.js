@@ -22,8 +22,20 @@ const accountPageStyles = `<style>
   @media (prefers-reduced-motion: no-preference) { .button { transition: background-color .15s ease, transform .15s ease; } .button:hover { transform: translateY(-1px); } }
 </style>`;
 
-function sendAuthError(res) {
- res.set('Content-Security-Policy',"default-src 'none'; style-src 'unsafe-inline'; frame-ancestors 'none'").status(400).type('html').send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#e8dfca"><meta http-equiv="refresh" content="0;url=savethebaby://auth/complete?error=expired"><title>Sign-in expired · Save The Baby</title>${accountPageStyles}</head><body><main><p class="brand">Save The Baby account</p><h1>Sign-in expired</h1><p class="intro">This sign-in link has expired. Opening the game so you can start again.</p><a class="button" href="savethebaby://auth/complete?error=expired">Open Save The Baby</a></main></body></html>`);
+const LOGIN_LIFETIME_MS = 15 * 60 * 1000;
+
+function sendAuthReturn(req,res,{title='Return to Save The Baby',message='Open the game to continue your sign-in.',status=200,baseUrl='',complete=false}={}) {
+ const android=/Android/i.test(req.get('user-agent')||'');
+ const appLink='savethebaby://auth/complete';
+ const fallback=encodeURIComponent(`${baseUrl}/auth/return`);
+ const returnLink=android?`intent://auth/complete#Intent;scheme=savethebaby;package=com.savethebaby.game;S.browser_fallback_url=${fallback};end`:appLink;
+ // Chrome requires a user gesture to launch another app. Keep the completion
+ // page and its button visible instead of immediately navigating away.
+ return res.set('Content-Security-Policy',"default-src 'none'; style-src 'unsafe-inline'; frame-ancestors 'none'; base-uri 'none'").status(status).type('html').send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#e8dfca"><title>${escapeHtml(title)} - Save The Baby</title>${accountPageStyles}</head><body><main data-sign-in-state="${complete?'complete':'return'}"><p class="brand">Save The Baby account</p><h1>${escapeHtml(title)}</h1><p class="intro">${escapeHtml(message)}</p><a id="return-to-game" class="button" href="${escapeHtml(returnLink)}">Return to game</a><p>Tap the button to open Save The Baby. If your browser does not open the game, switch back to the game yourself. Your pending sign-in will resume there.</p><p><a href="${appLink}">Open using the app link</a></p></main></body></html>`);
+}
+
+function sendAuthError(req,res,baseUrl) {
+ return sendAuthReturn(req,res,{title:'Sign-in expired',message:'This sign-in link has expired. Return to the game and start sign-in again.',status:400,baseUrl});
 }
 
 function escapeHtml(value) {
@@ -37,6 +49,7 @@ export function createApp({db, client, oauth, play, baseUrl, clientId, commerceE
  app.use((req,_res,next)=>{req.body ??= {}; next();});
  app.use((req,res,next)=>{res.set({'Cache-Control':'no-store','Referrer-Policy':'no-referrer','X-Content-Type-Options':'nosniff','Content-Security-Policy':"default-src 'none'; frame-ancestors 'none'; form-action 'self'"}); next();});
  app.get('/health',(_req,res)=>res.json({ok:true}));
+ app.get('/auth/return',(req,res)=>sendAuthReturn(req,res,{baseUrl}));
  app.get('/account-deletion',(_req,res)=>res.set('Content-Security-Policy',"default-src 'none'; style-src 'unsafe-inline'; frame-ancestors 'none'; form-action 'self'").type('html').send(`<!doctype html>
 <html lang="en">
 <head>
@@ -94,51 +107,51 @@ export function createApp({db, client, oauth, play, baseUrl, clientId, commerceE
   const challenge=req.body.challenge; requireThat(typeof challenge==='string'&&/^[a-f0-9]{64}$/.test(challenge),400,'Invalid login challenge');
   const accountMode=req.body.accountMode??'self';
   requireThat(['self','guardian'].includes(accountMode),400,'Invalid account mode');
-  const id=random(); await flows.insertOne({_id:id,challenge,accountMode,nonce:random(),expires:new Date(Date.now()+300000),status:'created'});
-  res.json({flow:id,url:`${baseUrl}/auth/google/start?flow=${id}`});
+  const id=random(); await flows.insertOne({_id:id,challenge,accountMode,nonce:random(),expires:new Date(Date.now()+LOGIN_LIFETIME_MS),status:'created'});
+  res.json({flow:id,url:`${baseUrl}/auth/google/start?flow=${id}`,expiresIn:LOGIN_LIFETIME_MS/1000});
  });
  app.get('/auth/google/start',async(req,res)=>{
   const browser=random(),noticeToken=random();
   const flow=await flows.findOneAndUpdate({_id:req.query.flow,status:'created',expires:{$gt:new Date()}},{$set:{status:'notice',browserHash:hash(browser),noticeHash:hash(noticeToken)}},{returnDocument:'after'});
   requireThat(flow,400,'Sign-in expired. Start again from Account & Coins.');
-  res.cookie('sb_oauth',browser,{httpOnly:true,secure:baseUrl.startsWith('https:'),sameSite:'lax',maxAge:300000,path:'/auth/google'});
+  res.cookie('sb_oauth',browser,{httpOnly:true,secure:baseUrl.startsWith('https:'),sameSite:'lax',maxAge:LOGIN_LIFETIME_MS,path:'/auth/google'});
   const parent=flow.accountMode==='guardian';
   // This page posts its acknowledgement to the API's own /auth/google/authorize
   // route. Chrome still blocked the configured origin under form-action, so this
   // narrowly scoped page omits that directive; default-src does not govern forms.
   res.set('Content-Security-Policy',"default-src 'none'; style-src 'unsafe-inline'; frame-ancestors 'none'").type('html').send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#e8dfca"><title>Save The Baby account</title>${accountPageStyles}</head><body><main>
-<p class="brand">Save The Baby account</p><h1>${parent?'Parent or guardian account':'Connect your Google account'}</h1><span class="step">Account setup: step 1 of 2</span>
+<p class="brand">Save The Baby account</p><h1>${parent?'Parent or guardian sign-in':'Sign in with Google'}</h1><span class="step">Google sign-in: step 1 of 2</span>
 <p class="intro">${parent?'Use your own Google account to manage cloud saves for a child who plays this game.':'Sign in to back up your progress and restore it on another device. Google handles your password; Save The Baby never receives it.'}</p>
 <section class="details"><p>When you use cloud saves, we use your Google account ID and profile name to identify your account. We store game progress and purchase records with service providers so you can restore progress and manage purchased coins. Google Play handles payments; we do not receive your card details.</p></section>
 <p>Cloud saves are optional. You can continue playing as a guest. You can delete your online account in Settings &rarr; Account &amp; Coins &rarr; Delete Online Account. For details about data use and retention, read the <a href="https://sbi.globalcreest.com/save-the-baby/privacy-policy">Privacy Policy</a>.</p>
-<p><strong>Step 2:</strong> On the next screen, choose an existing Google account or create one.</p>
+<p><strong>Step 2:</strong> On the next screen, sign in with your existing Google account. New players use the same sign-in button to connect their account.</p>
 <form method="post" action="/auth/google/authorize"><input type="hidden" name="flow" value="${flow._id}"><input type="hidden" name="noticeToken" value="${noticeToken}">
-<label class="consent"><input type="checkbox" name="acknowledged" value="yes" required><span>${parent?'I am 18 or older and am the parent or legal guardian managing this account.':'I am 18 or older and am creating or managing this account.'} I have read this notice.</span></label>
-<button class="button" type="submit">Continue with Google</button></form></main></body></html>`);
+<label class="consent"><input type="checkbox" name="acknowledged" value="yes" required><span>${parent?'I am 18 or older and am the parent or legal guardian managing this account.':'I am 18 or older and am signing in to my account.'} I have read this notice.</span></label>
+<button class="button" type="submit">Sign in with Google</button></form></main></body></html>`);
  });
  app.post('/auth/google/authorize',async(req,res)=>{
   const cookie=(req.get('cookie')||'').split(';').map(x=>x.trim()).find(x=>x.startsWith('sb_oauth='))?.slice(9);
-  if(req.body.acknowledged!=='yes'||typeof req.body.flow!=='string'||typeof req.body.noticeToken!=='string') return sendAuthError(res);
+  if(req.body.acknowledged!=='yes'||typeof req.body.flow!=='string'||typeof req.body.noticeToken!=='string') return sendAuthError(req,res,baseUrl);
   // The single-use notice token proves the form came from the notice page. Do
   // not require the original cookie to survive the external browser handoff;
   // establish/refresh the callback cookie here before redirecting to Google.
   const flowQuery={_id:req.body.flow,noticeHash:hash(req.body.noticeToken),expires:{$gt:new Date()}};
   let flow=await flows.findOne(flowQuery);
-  if(!flow||!['notice','browser'].includes(flow.status)) return sendAuthError(res);
+  if(!flow||!['notice','browser'].includes(flow.status)) return sendAuthError(req,res,baseUrl);
   let browserToken='';
   if(flow.status==='notice') {
    browserToken=random();
    const advanced=await flows.findOneAndUpdate({...flowQuery,status:'notice'},{$set:{status:'browser',browserHash:hash(browserToken),ownerAcknowledgedAt:new Date(),noticeVersion:1}},{returnDocument:'after'});
    flow=advanced||await flows.findOne({...flowQuery,status:'browser'});
-   if(!flow?.noticeVersion||!flow?.ownerAcknowledgedAt) return sendAuthError(res);
+   if(!flow?.noticeVersion||!flow?.ownerAcknowledgedAt) return sendAuthError(req,res,baseUrl);
   }
   if(!browserToken&&cookie&&hash(cookie)===flow.browserHash) browserToken=cookie;
   if(!browserToken) {
    browserToken=random();
    const rebound=await flows.updateOne({...flowQuery,status:'browser',browserHash:flow.browserHash},{$set:{browserHash:hash(browserToken)}});
-   if(!rebound.modifiedCount) return sendAuthError(res);
+   if(!rebound.modifiedCount) return sendAuthError(req,res,baseUrl);
   }
-  res.cookie('sb_oauth',browserToken,{httpOnly:true,secure:baseUrl.startsWith('https:'),sameSite:'lax',maxAge:300000,path:'/auth/google'});
+  res.cookie('sb_oauth',browserToken,{httpOnly:true,secure:baseUrl.startsWith('https:'),sameSite:'lax',maxAge:LOGIN_LIFETIME_MS,path:'/auth/google'});
   res.redirect(303,oauth.generateAuthUrl({scope:['openid','profile'],state:flow._id,nonce:flow.nonce,prompt:'select_account',access_type:'online'}));
  });
  app.get('/auth/google/callback',async(req,res)=>{
@@ -146,6 +159,7 @@ export function createApp({db, client, oauth, play, baseUrl, clientId, commerceE
   requireThat(cookie,400,'Login browser session is missing');
   const flow=await flows.findOneAndUpdate({_id:req.query.state,status:'browser',browserHash:hash(cookie),expires:{$gt:new Date()}},{$set:{status:'exchanging'}},{returnDocument:'after'});
   requireThat(flow,400,'Login expired or already used');
+  req.authFlowId=flow._id;
   requireThat(flow.noticeVersion===1&&flow.ownerAcknowledgedAt,403,'Read the adult account notice before signing in.');
   requireThat(!req.query.error && typeof req.query.code==='string',400,'Google sign-in canceled');
   const {tokens}=await oauth.getToken(req.query.code);
@@ -154,18 +168,39 @@ export function createApp({db, client, oauth, play, baseUrl, clientId, commerceE
   const userId=hash(`google:${claims.sub}`);
   // This is an adult-owner declaration, NOT verified age or verifiable parental consent.
   await users.updateOne({_id:userId},{$set:{name:String(claims.name||'Player').slice(0,100),accountNotice:{version:1,mode:flow.accountMode,acknowledgedAt:flow.ownerAcknowledgedAt}},$setOnInsert:{wallet:0,save:null,revision:0,created:new Date()}},{upsert:true});
-  await flows.updateOne({_id:flow._id,status:'exchanging'},{$set:{status:'complete',userId}});
+  await flows.updateOne({_id:flow._id,status:'exchanging'},{$set:{status:'complete',userId,expires:new Date(Date.now()+10*60*1000)}});
   res.clearCookie('sb_oauth',{path:'/auth/google'});
-  res.set('Content-Security-Policy',"default-src 'none'; style-src 'unsafe-inline'; frame-ancestors 'none'").type('html').send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#e8dfca"><meta http-equiv="refresh" content="0;url=savethebaby://auth/complete"><title>Signed in · Save The Baby</title>${accountPageStyles}</head><body><main><p class="brand">S. B. Ibhadode Technologies</p><h1>You’re signed in</h1><p class="intro">Your Google account is connected to Save The Baby. Opening the game…</p><p>If the game does not open automatically, use this link:</p><a class="button" href="savethebaby://auth/complete">Open Save The Baby</a></main></body></html>`);
+  return sendAuthReturn(req,res,{title:"You're signed in",message:'Your Google account is connected. Return to the game to finish loading your account.',baseUrl,complete:true});
  });
  app.post('/auth/poll',async(req,res)=>{
-  const {flow:id,verifier}=req.body; requireThat(typeof verifier==='string' && verifier.length>=32 && verifier.length<=256,400,'Invalid login proof');
-  const flow=await flows.findOne({_id:id,challenge:hash(verifier),expires:{$gt:new Date()}}); requireThat(flow,400,'Login expired');
-  if(flow.status!=='complete') return res.status(202).json({pending:true});
-  const claimed=await flows.findOneAndDelete({_id:id,status:'complete'}); requireThat(claimed,409,'Login already completed');
-  const token=random(); await sessions.insertOne({_id:hash(token),userId:flow.userId,expires:new Date(Date.now()+30*86400000)});
-  res.json({token,...profile(await users.findOne({_id:flow.userId}))});
+  const {flow:id,verifier}=req.body;
+  requireThat(typeof id==='string'&&/^[A-Za-z0-9_-]{43}$/.test(id),400,'Invalid login flow');
+  requireThat(typeof verifier==='string'&&verifier.length>=32&&verifier.length<=256,400,'Invalid login proof');
+  const query={_id:id,challenge:hash(verifier),expires:{$gt:new Date()}};
+  const flow=await flows.findOne(query); requireThat(flow,400,'Google sign-in expired. Please start again from the game.');
+  if(flow.status==='failed') throw new HttpError(400,flow.failure||'Google sign-in was not completed. Please try again.');
+  if(!['complete','claimed'].includes(flow.status)) return res.status(202).json({pending:true});
+  // Bind a stable session to this high-entropy client proof. A lost HTTP response
+  // can be retried; neither the browser nor the database stores the proof/token.
+  const token=hash(`google-flow:${id}:${verifier}`),sessionHash=hash(token);
+  const result=await transaction(async session=>{
+   const current=await flows.findOne(query,{session});
+   requireThat(current&&['complete','claimed'].includes(current.status),400,'Google sign-in expired. Please try again.');
+   if(current.status==='complete') {
+    const claimed=await flows.findOneAndUpdate({...query,status:'complete'},{$set:{status:'claimed',sessionHash}},{session,returnDocument:'after'});
+    requireThat(claimed,409,'Sign-in is finishing. Please retry.');
+    await sessions.insertOne({_id:sessionHash,userId:current.userId,expires:new Date(Date.now()+30*86400000)},{session});
+   } else {
+    const saved=await sessions.findOne({_id:sessionHash,expires:{$gt:new Date()}},{session});
+    requireThat(current.sessionHash===sessionHash&&saved?.userId===current.userId,401,'This sign-in session ended. Please sign in again.');
+   }
+   const user=await users.findOne({_id:current.userId},{session});
+   requireThat(user,401,'Account not found. Please sign in again.');
+   return {token,...profile(user)};
+  });
+  res.json(result);
  });
+
  app.get('/v1/me',auth,(req,res)=>res.json(profile(req.user)));
  app.post('/v1/logout',auth,async(req,res)=>{await sessions.deleteOne({_id:req.sessionHash});res.json({ok:true});});
  app.delete('/v1/account',auth,async(req,res)=>{
@@ -219,14 +254,18 @@ export function createApp({db, client, oauth, play, baseUrl, clientId, commerceE
   });
   res.json(profile(await users.findOne({_id:req.user._id})));
  });
- app.use((error,req,res,_next)=>{
+ app.use(async(error,req,res,_next)=>{
   const status=error.status||500;
   if(status>=500) console.error('Request failed:',error.name);
-  if(req.path.startsWith('/auth/google/') && req.path!=='/auth/google/poll') {
-   const message=status>=500?'Sign-in could not be completed. Opening the game.':error.message;
-   res.set('Content-Security-Policy',"default-src 'none'; style-src 'unsafe-inline'; frame-ancestors 'none'").status(status).type('html').send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#e8dfca"><meta http-equiv="refresh" content="0;url=savethebaby://auth/complete?error=login"><title>Sign-in · Save The Baby</title>${accountPageStyles}</head><body><main><p class="brand">Save The Baby account</p><h1>Sign-in needs attention</h1><p class="intro">${escapeHtml(message)}</p><p>Opening the game…</p><a class="button" href="savethebaby://auth/complete?error=login">Open Save The Baby</a></main></body></html>`);
+  const message=status>=500?'Sign-in could not be completed. Please try again.':error.message;
+  if(req.authFlowId) {
+   try {await flows.updateOne({_id:req.authFlowId,status:'exchanging'},{$set:{status:'failed',failure:message}});} catch { /* Retain the original error response. */ }
   }
-  res.status(status).json({error:status>=500?'Service unavailable. Please retry.':error.message});
+  if(req.path.startsWith('/auth/google/')) {
+   return sendAuthReturn(req,res,{title:'Sign-in needs attention',message,status,baseUrl});
+  }
+  return res.status(status).json({error:status>=500?'Service unavailable. Please retry.':error.message});
  });
+
  return app;
 }
