@@ -105,7 +105,7 @@
             {
                 "x": 2,
                 "y": 5,
-                "type": "bomb",
+                "type": "missile",
                 "health": 1
             }
         ]

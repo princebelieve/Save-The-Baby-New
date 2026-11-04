@@ -1,0 +1,32 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+D3D12 12_0 - Forward Mobile - Using Device #0: Intel - Intel(R) Iris(R) Xe Graphics
+
+ERROR: Failed to read the root certificate store.
+   at: get_system_ca_certificates (platform/windows/os_windows.cpp:2570)
+ERROR: Could not save campaign progress: Can't open file
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] _persist_campaign_progress (res://scripts/game/Game.gd:2486)
+       [1] _on_coins_changed (res://scripts/game/Game.gd:2267)
+       [2] _ready (res://scripts/game/Game.gd:201)
+       [3] create_game_scene (res://scripts/boot/Boot.gd:98)
+       [4] initialize (res://scripts/boot/Boot.gd:22)
+ERROR: Could not save campaign progress: Can't open file
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] _persist_campaign_progress (res://scripts/game/Game.gd:2486)
+       [1] _on_lives_changed (res://scripts/game/Game.gd:2285)
+       [2] _ready (res://scripts/game/Game.gd:202)
+       [3] create_game_scene (res://scripts/boot/Boot.gd:98)
+       [4] initialize (res://scripts/boot/Boot.gd:22)
+ERROR: Could not save campaign progress: Can't open file
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] _persist_campaign_progress (res://scripts/game/Game.gd:2486)
+       [1] _on_ethan_changed (res://scripts/game/Game.gd:2297)
+       [2] _ready (res://scripts/game/Game.gd:203)
+       [3] create_game_scene (res://scripts/boot/Boot.gd:98)
+       [4] initialize (res://scripts/boot/Boot.gd:22)
+[INFO] StoryManager: Loaded story -> opening_story
+[INFO] Loaded level 001.
+[INFO] Started level 001.

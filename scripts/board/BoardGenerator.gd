@@ -5,6 +5,7 @@ var _tile_factory: TileFactory
 var _tile_database: TileDatabase
 var _level_tile_definitions: Array[Dictionary] = []
 var _level_tile_weights: Array[float] = []
+var _blocked_cells: Dictionary = {}
 var _generated_grid: Dictionary = {}
 var _tile_size: int = 64
 
@@ -23,6 +24,11 @@ func generate(level_data: Dictionary) -> Dictionary:
 	var width := int(board_data.get("columns", 0))
 	var height := int(board_data.get("rows", 0))
 	_tile_size = int(board_data.get("tile_size", 64))
+	_blocked_cells.clear()
+	for cell_value in board_data.get("blocked_cells", []):
+		var cell := _read_cell(cell_value)
+		if cell.x >= 0 and cell.y >= 0 and cell.x < width and cell.y < height:
+			_blocked_cells[cell] = true
 	if width < 3 or height < 3 or _tile_size <= 0:
 		push_error("BoardGenerator: Board dimensions must be at least 3 by 3.")
 		return {}
@@ -40,6 +46,8 @@ func generate(level_data: Dictionary) -> Dictionary:
 	for y in range(height):
 		for x in range(width):
 			var position := Vector2i(x, y)
+			if _blocked_cells.has(position):
+				continue
 			var definition: Dictionary = _definition_for_type(type_grid[position])
 			var tile := _tile_factory.create_tile_at(definition["enum"], position)
 			if tile == null:
@@ -48,6 +56,16 @@ func generate(level_data: Dictionary) -> Dictionary:
 			_generated_grid[position] = tile
 
 	return _generated_grid.duplicate()
+
+
+func _read_cell(value: Variant) -> Vector2i:
+	if value is Vector2i:
+		return value
+	if value is Array and value.size() >= 2:
+		return Vector2i(int(value[0]), int(value[1]))
+	if value is Dictionary:
+		return Vector2i(int(value.get("x", -1)), int(value.get("y", -1)))
+	return Vector2i(-1, -1)
 
 
 func get_generated_grid() -> Dictionary:
@@ -119,6 +137,8 @@ func _generate_type_grid(width: int, height: int) -> Dictionary:
 		for y in range(height):
 			for x in range(width):
 				var position := Vector2i(x, y)
+				if _blocked_cells.has(position):
+					continue
 				var candidates := _weighted_candidate_order()
 				var selected_type := -1
 				for candidate in candidates:
@@ -158,6 +178,8 @@ func _has_valid_move(grid: Dictionary, width: int, height: int) -> bool:
 	for y in range(height):
 		for x in range(width):
 			var position := Vector2i(x, y)
+			if not grid.has(position):
+				continue
 			for offset in [Vector2i.RIGHT, Vector2i.DOWN]:
 				var neighbor: Vector2i = position + offset
 				if not grid.has(neighbor):

@@ -2032,7 +2032,10 @@ func _format_hud_objective_summary(level_data: Dictionary) -> String:
 			var target := str(objective.get("target", "CLUES")).replace("_", " ").to_upper()
 			match str(objective.get("type", "")).to_upper():
 				"DESTROY_OBSTACLES":
-					summaries.append("CLEAR %d %s" % [amount, target if not target.is_empty() else "OBSTACLES"])
+					var obstacle_name := target if not target.is_empty() else "OBSTACLE"
+					if amount != 1 and not obstacle_name.ends_with("S"):
+						obstacle_name += "S"
+					summaries.append("CLEAR %d %s" % [amount, obstacle_name])
 				"UNLOCK_DOORS":
 					summaries.append("OPEN %d DOORS" % amount)
 				"DEFUSE_BOMBS":
@@ -2966,7 +2969,7 @@ func _on_obstacle_damaged(cell: Vector2i, remaining_health: int, destroyed: bool
 		_board.play_celebration_shake(1.4)
 	var obstacle: Obstacle = _board._obstacles.get(cell)
 	if is_instance_valid(obstacle):
-		var kinds := {Constants.ObstacleType.CHAIN: ["chain", 1], Constants.ObstacleType.LOCK: ["lock", 0], Constants.ObstacleType.BOMB: ["hazard", 1], Constants.ObstacleType.ELECTRIC_TRAP: ["electric", 1]}
+		var kinds := {Constants.ObstacleType.CHAIN: ["chain", 1], Constants.ObstacleType.LOCK: ["lock", 0], Constants.ObstacleType.BOMB: ["hazard", 1], Constants.ObstacleType.MISSILE: ["hazard", 1], Constants.ObstacleType.ELECTRIC_TRAP: ["electric", 1]}
 		var source: Array = kinds.get(obstacle.get_obstacle_type(), [])
 		if not source.is_empty(): _discover_journal_fact(str(source[0]), int(source[1]))
 	var rect := _board.get_cell_screen_rect(cell)

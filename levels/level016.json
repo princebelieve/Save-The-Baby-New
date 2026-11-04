@@ -26,7 +26,32 @@
         "spawn_points": [],
         "tile_size": 64,
         "locked_cells": [],
-        "blocked_cells": [],
+        "blocked_cells": [
+            [
+                0,
+                0
+            ],
+            [
+                0,
+                1
+            ],
+            [
+                1,
+                1
+            ],
+            [
+                7,
+                6
+            ],
+            [
+                6,
+                7
+            ],
+            [
+                7,
+                7
+            ]
+        ],
         "rows": 8
     },
     "powerups": {
@@ -53,12 +78,12 @@
             20
         ]
     },
-    "difficulty": "INTRODUCTION",
+    "difficulty": "HARD",
     "objectives": [
         {
-            "type": "COLLECT_ITEMS",
-            "target": "CLOCK",
-            "amount": 29
+            "type": "DESTROY_OBSTACLES",
+            "target": "MISSILE",
+            "amount": 4
         }
     ],
     "audio": {
@@ -77,13 +102,13 @@
             "thunder"
         ]
     },
-    "description": "Follow David's trail through Technician's Office and gather the evidence that can lead to Ethan.",
+    "description": "Clear the four missile hazards in the Technician's Office. They are board obstacles, separate from the Bomb power-up in your inventory.",
     "tutorial": {
         "enabled": true,
         "steps": [
             {
                 "mechanic": "damage_obstacle",
-                "message": "Make the glowing match beside the blocker. Watch its remaining health."
+                "message": "Clear all four missile hazards. They are board obstacles, separate from the Bomb power-up in your inventory. Each needs two hits; match beside one or hit it with a blast. Its covered tile cannot be swapped. You have 16 moves."
             }
         ]
     },
@@ -91,9 +116,27 @@
         "items": [
             {
                 "x": 2,
-                "y": 2,
-                "type": "bomb",
-                "health": 1
+                "y": 1,
+                "type": "missile",
+                "health": 2
+            },
+            {
+                "x": 5,
+                "y": 1,
+                "type": "missile",
+                "health": 2
+            },
+            {
+                "x": 2,
+                "y": 6,
+                "type": "missile",
+                "health": 2
+            },
+            {
+                "x": 5,
+                "y": 6,
+                "type": "missile",
+                "health": 2
             }
         ]
     },
@@ -102,7 +145,7 @@
         "image": "res://assets/sprites/backgrounds/dirt_board_background.jpeg"
     },
     "moves": {
-        "total": 22
+        "total": 16
     },
     "rewards": {
         "powerups": [],

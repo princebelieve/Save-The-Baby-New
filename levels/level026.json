@@ -26,7 +26,32 @@
         "spawn_points": [],
         "tile_size": 64,
         "locked_cells": [],
-        "blocked_cells": [],
+        "blocked_cells": [
+            [
+                3,
+                0
+            ],
+            [
+                4,
+                0
+            ],
+            [
+                0,
+                3
+            ],
+            [
+                7,
+                3
+            ],
+            [
+                0,
+                4
+            ],
+            [
+                7,
+                4
+            ]
+        ],
         "rows": 8
     },
     "powerups": {
@@ -94,7 +119,7 @@
             {
                 "x": 2,
                 "y": 5,
-                "type": "bomb",
+                "type": "missile",
                 "health": 1
             },
             {

@@ -26,7 +26,24 @@
         "spawn_points": [],
         "tile_size": 64,
         "locked_cells": [],
-        "blocked_cells": [],
+        "blocked_cells": [
+            [
+                0,
+                0
+            ],
+            [
+                7,
+                0
+            ],
+            [
+                0,
+                7
+            ],
+            [
+                7,
+                7
+            ]
+        ],
         "rows": 8
     },
     "powerups": {
@@ -53,12 +70,12 @@
             20
         ]
     },
-    "difficulty": "STANDARD",
+    "difficulty": "HARD",
     "objectives": [
         {
-            "type": "COLLECT_ITEMS",
-            "target": "FINGERPRINT",
-            "amount": 33
+            "type": "DESTROY_OBSTACLES",
+            "target": "CHAIN",
+            "amount": 2
         }
     ],
     "audio": {
@@ -79,8 +96,13 @@
     },
     "description": "Follow David's trail through Village Road and gather the evidence that can lead to Ethan.",
     "tutorial": {
-        "enabled": false,
-        "steps": []
+        "enabled": true,
+        "steps": [
+            {
+                "mechanic": "damage_obstacle",
+                "message": "This case is won by breaking both chains, not by collecting clues. Each chain needs two hits. Match beside it; a chain-covered tile cannot be swapped. Plan carefully across 15 moves."
+            }
+        ]
     },
     "obstacles": {
         "items": [
@@ -103,7 +125,7 @@
         "image": "res://assets/sprites/backgrounds/grass_board_background.jpeg"
     },
     "moves": {
-        "total": 22
+        "total": 15
     },
     "rewards": {
         "powerups": [],

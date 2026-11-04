@@ -76,7 +76,7 @@
     "missile": {
       "id": "missile",
       "enum": 4,
-      "name": "Missile",
+      "name": "Missile Hazard",
       "texture": "res://resources/obstacles/missile.tres",
       "animation_set": {
         "spawn": "spawn",
@@ -90,7 +90,7 @@
       "blocks_matching": false,
       "removable": true,
       "hidden": false,
-      "description": "A timed threat whose level behavior is configured per level."
+      "description": "A board missile hazard. Match beside it or hit it with a blast to reduce its health."
     },
     "electric_trap": {
       "id": "electric_trap",

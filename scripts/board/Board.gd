@@ -24,7 +24,11 @@ var _drag_start: Tile
 var _tap_selection: Tile
 var _press_screen_position: Vector2 = Vector2.ZERO
 var _active_touch_index := -1
+var _locked_touch_index := -1
+var _locked_touch_start := Vector2.ZERO
+var _locked_touch_started_msec := -1
 var _last_screen_touch_msec := -10000
+var _blocked_cells: Dictionary = {}
 var _remaining_moves: int = 0
 var _required_swap: Array[Vector2i] = []
 var _required_booster_target := Vector2i(-1, -1)
@@ -53,6 +57,12 @@ func initialize(level_data: Dictionary) -> bool:
 	clear_suggested_move_hint()
 	if _shake_tween != null and _shake_tween.is_running(): _shake_tween.kill()
 	_level_data = level_data.duplicate(true)
+	_blocked_cells.clear()
+	var board_config: Dictionary = _level_data.get("board", {})
+	for cell_value in board_config.get("blocked_cells", []):
+		var cell := _read_board_cell(cell_value)
+		if cell.x >= 0 and cell.y >= 0 and cell.x < int(board_config.get("columns", 0)) and cell.y < int(board_config.get("rows", 0)):
+			_blocked_cells[cell] = true
 	_locked = false
 	_tap_selection = null
 	_remaining_moves = int(_level_data.get("moves", {}).get("total", 0))
@@ -86,6 +96,8 @@ func initialize(level_data: Dictionary) -> bool:
 		spawn_tween.tween_property(tile, "scale", Vector2.ONE * 1.28, 0.24).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
 		spawn_tween.tween_property(tile, "scale", Vector2.ONE, 0.12).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
 	_load_obstacles()
+	if _board_shuffler != null and _board_shuffler.needs_shuffle(self):
+		_board_shuffler.shuffle(self)
 
 	position = Vector2(
 		(viewport_size.x - get_width() * _tile_size) * 0.5,
@@ -114,11 +126,15 @@ func _draw() -> void:
 	draw_style_box(frame, Rect2(Vector2(-10, -10), board_size + Vector2(20, 20)))
 	for y in get_height():
 		for x in get_width():
+			var position := Vector2i(x, y)
 			var inset := 2.0
 			var cell := Rect2(Vector2(x * _tile_size + inset, y * _tile_size + inset), Vector2(_tile_size - inset * 2.0, _tile_size - inset * 2.0))
-			var fill := Color("#18354b") if (x + y) % 2 == 0 else Color("#1c3b50")
+			var fill := Color("#091724") if _blocked_cells.has(position) else (Color("#18354b") if (x + y) % 2 == 0 else Color("#1c3b50"))
 			draw_rect(cell, fill, true)
-			draw_rect(cell, Color(0.55, 0.75, 0.82, 0.16), false, 1.0)
+			draw_rect(cell, Color(0.36, 0.54, 0.63, 0.26) if _blocked_cells.has(position) else Color(0.55, 0.75, 0.82, 0.16), false, 1.0)
+			if _blocked_cells.has(position):
+				draw_line(cell.position + Vector2(8, 8), cell.end - Vector2(8, 8), Color(0.36, 0.54, 0.63, 0.18), 2.0)
+				draw_line(Vector2(cell.end.x - 8, cell.position.y + 8), Vector2(cell.position.x + 8, cell.end.y - 8), Color(0.36, 0.54, 0.63, 0.18), 2.0)
 
 
 func reset() -> void:
@@ -227,6 +243,24 @@ func is_inside(position: Vector2i) -> bool:
 	return position.x >= 0 and position.y >= 0 and position.x < get_width() and position.y < get_height()
 
 
+func is_playable_cell(position: Vector2i) -> bool:
+	return is_inside(position) and not _blocked_cells.has(position)
+
+
+func is_swap_blocked(position: Vector2i) -> bool:
+	return not is_playable_cell(position) or _obstacles.has(position)
+
+
+func _read_board_cell(value: Variant) -> Vector2i:
+	if value is Vector2i:
+		return value
+	if value is Array and value.size() >= 2:
+		return Vector2i(int(value[0]), int(value[1]))
+	if value is Dictionary:
+		return Vector2i(int(value.get("x", -1)), int(value.get("y", -1)))
+	return Vector2i(-1, -1)
+
+
 func would_form_match_with_type(position: Vector2i, tile_type: int) -> bool:
 	if not is_inside(position):
 		return false
@@ -246,7 +280,7 @@ func would_form_match_with_type(position: Vector2i, tile_type: int) -> bool:
 
 
 func set_tile(position: Vector2i, tile, animate_spawn: bool = true) -> void:
-	if not is_inside(position):
+	if not is_playable_cell(position):
 		return
 	if tile == null:
 		_grid.erase(position)
@@ -286,6 +320,9 @@ func has_tile(position: Vector2i) -> bool:
 
 func swap_tiles(position_a: Vector2i, position_b: Vector2i) -> bool:
 	if _locked or _move_validator == null or not is_inside(position_a) or not is_inside(position_b):
+		return false
+	if is_swap_blocked(position_a) or is_swap_blocked(position_b):
+		move_rejected.emit()
 		return false
 	clear_suggested_move_hint()
 	var tile_a: Tile = get_tile(position_a)
@@ -985,11 +1022,26 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch:
 		_last_screen_touch_msec = Time.get_ticks_msec()
 		if event.pressed:
-			if _locked or _active_touch_index != -1:
+			if _active_touch_index != -1:
+				return
+			if _locked:
+				_locked_touch_index = event.index
+				_locked_touch_start = event.position
+				_locked_touch_started_msec = Time.get_ticks_msec()
 				return
 			player_interacted.emit()
 			_active_touch_index = event.index
 			_begin_pointer_gesture(event.position)
+		elif event.index == _locked_touch_index:
+			var queued_start := _locked_touch_start
+			var queued_age := Time.get_ticks_msec() - _locked_touch_started_msec
+			_locked_touch_index = -1
+			_locked_touch_started_msec = -1
+			if not event.canceled and not _locked and queued_age <= 900:
+				player_interacted.emit()
+				_begin_pointer_gesture(queued_start)
+				_finish_pointer_gesture(event.position)
+			return
 		elif event.index == _active_touch_index:
 			_active_touch_index = -1
 			if event.canceled:
@@ -1018,6 +1070,8 @@ func _input(event: InputEvent) -> void:
 
 func cancel_pointer_gesture() -> void:
 	_active_touch_index = -1
+	_locked_touch_index = -1
+	_locked_touch_started_msec = -1
 	_drag_start = null
 	if is_instance_valid(_tap_selection):
 		_tap_selection.reset_tile_modulate()

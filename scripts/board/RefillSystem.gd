@@ -15,7 +15,7 @@ func refill(board, animate: bool = false) -> Array:
 	for y in range(board.get_height()):
 		for x in range(board.get_width()):
 			var position := Vector2i(x, y)
-			if board.get_tile(position) == null:
+			if board.is_playable_cell(position) and board.get_tile(position) == null:
 				var tile: Tile = _board_generator.generate_refill_tile(position, board)
 				board.set_tile(position, tile, false)
 				if animate:
@@ -39,7 +39,7 @@ func spawn_column(column: int, board) -> void:
 		return
 	for y in range(board.get_height()):
 		var position := Vector2i(column, y)
-		if board.get_tile(position) == null:
+		if board.is_playable_cell(position) and board.get_tile(position) == null:
 			board.set_tile(position, _board_generator.generate_refill_tile(position, board))
 
 
@@ -48,6 +48,7 @@ func needs_refill(board) -> bool:
 		return false
 	for y in range(board.get_height()):
 		for x in range(board.get_width()):
-			if board.get_tile(Vector2i(x, y)) == null:
+			var position := Vector2i(x, y)
+			if board.is_playable_cell(position) and board.get_tile(position) == null:
 				return true
 	return false

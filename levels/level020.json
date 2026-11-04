@@ -26,7 +26,24 @@
         "spawn_points": [],
         "tile_size": 64,
         "locked_cells": [],
-        "blocked_cells": [],
+        "blocked_cells": [
+            [
+                0,
+                0
+            ],
+            [
+                7,
+                0
+            ],
+            [
+                0,
+                7
+            ],
+            [
+                7,
+                7
+            ]
+        ],
         "rows": 8
     },
     "powerups": {
@@ -53,12 +70,12 @@
             20
         ]
     },
-    "difficulty": "INTRODUCTION",
+    "difficulty": "HARD",
     "objectives": [
         {
-            "type": "COLLECT_ITEMS",
-            "target": "KEY",
-            "amount": 32
+            "type": "DESTROY_OBSTACLES",
+            "target": "ELECTRIC_TRAP",
+            "amount": 4
         }
     ],
     "audio": {
@@ -83,17 +100,35 @@
         "steps": [
             {
                 "mechanic": "damage_obstacle",
-                "message": "Make the glowing match beside the blocker. Watch its remaining health."
+                "message": "Disable all four electric traps. This case has no tile-collection goal. Each trap needs two hits. Match beside one or use a blast. The tile under a trap is locked until it breaks; you have 16 moves."
             }
         ]
     },
     "obstacles": {
         "items": [
             {
-                "x": 3,
-                "y": 3,
+                "x": 1,
+                "y": 2,
                 "type": "electric_trap",
-                "health": 1
+                "health": 2
+            },
+            {
+                "x": 6,
+                "y": 2,
+                "type": "electric_trap",
+                "health": 2
+            },
+            {
+                "x": 1,
+                "y": 5,
+                "type": "electric_trap",
+                "health": 2
+            },
+            {
+                "x": 6,
+                "y": 5,
+                "type": "electric_trap",
+                "health": 2
             }
         ]
     },
@@ -102,7 +137,7 @@
         "image": "res://assets/sprites/backgrounds/dirt_board_background.jpeg"
     },
     "moves": {
-        "total": 22
+        "total": 16
     },
     "rewards": {
         "powerups": [],

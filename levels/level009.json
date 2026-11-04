@@ -26,7 +26,7 @@
         "spawn_points": [],
         "tile_size": 64,
         "locked_cells": [],
-        "blocked_cells": [],
+        "blocked_cells": [[0,0],[7,0],[0,1],[7,1]],
         "rows": 8
     },
     "powerups": {
@@ -58,7 +58,7 @@
         {
             "type": "COLLECT_ITEMS",
             "target": "PHONE",
-            "amount": 27
+            "amount": 34
         }
     ],
     "audio": {
@@ -102,7 +102,7 @@
         "image": "res://assets/sprites/backgrounds/grass_board_background.jpeg"
     },
     "moves": {
-        "total": 23
+        "total": 20
     },
     "rewards": {
         "powerups": [],

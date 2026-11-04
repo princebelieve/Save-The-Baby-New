@@ -28,7 +28,11 @@ func can_swap(tile_a, tile_b) -> bool:
 func would_create_match(board, tile_a, tile_b) -> bool:
 	if board == null:
 		return false
-	return _simulate_swap(board, tile_a.get_grid_position(), tile_b.get_grid_position())
+	var first_position: Vector2i = tile_a.get_grid_position()
+	var second_position: Vector2i = tile_b.get_grid_position()
+	if board.has_method("is_swap_blocked") and (board.is_swap_blocked(first_position) or board.is_swap_blocked(second_position)):
+		return false
+	return _simulate_swap(board, first_position, second_position)
 
 
 func _simulate_swap(board, first_position: Vector2i, second_position: Vector2i) -> bool:

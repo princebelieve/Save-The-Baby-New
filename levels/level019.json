@@ -93,7 +93,7 @@
             {
                 "x": 3,
                 "y": 3,
-                "type": "bomb",
+                "type": "missile",
                 "health": 1
             },
             {

@@ -193,8 +193,8 @@
             "id": "chain",
             "title": "Chains: plan nearby matches",
             "pages": [
-                "Victor has chained the path. Evidence alone will not finish this case.",
-                "Match on or beside a chain to damage it once per clearing wave.",
+                "Victor has chained the path. Evidence alone will not finish this case. The dark corner spaces are gaps: pieces cannot be swapped there or fall through them.",
+                "Match on or beside a chain to damage it once per clearing wave. The tile under a chain is locked and cannot be swapped until the chain breaks.",
                 "Durable chains need more than one hit. Blasts can reach them too.",
                 "You must clear every blocker as well as collecting the goal evidence."
             ],
@@ -225,9 +225,9 @@
             "id": "lock",
             "title": "Locks: open a route",
             "pages": [
-                "These locks cover the trail. Match on or beside them to break them.",
-                "A blast can damage locks too. Position specials near blocked areas.",
-                "Check both counters: the evidence goal and remaining blockers."
+                "Clear all four locks. Each needs two hits, and tiles beneath locks cannot be swapped.",
+                "Blasts also damage locks. Position a special near a blocked cell when ordinary matches cannot reach it.",
+                "The lock counter is the whole objective in this case; there is no separate evidence-collection goal."
             ],
             "journal_pages": [
                 {
@@ -253,11 +253,11 @@
         {
             "level": 16,
             "id": "hazard",
-            "title": "Hazards: clear the dangerous area",
+            "title": "Missile hazards: clear the board devices",
             "pages": [
-                "Victor has left devices on the board. Plan a route through them.",
-                "Match on or beside a device, or hit it with a special blast.",
-                "These missions use moves, not a hidden timer. Clear all devices."
+                "These olive missiles are board obstacles, separate from the red Bomb power-up in your inventory.",
+                "Match beside a missile or hit it with a blast. Each missile needs two hits, and the covered tile cannot be swapped.",
+                "Clear all four missiles within 16 moves. This case has no tile-collection goal."
             ],
             "journal_pages": [
                 {},
