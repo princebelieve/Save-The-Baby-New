@@ -63,14 +63,14 @@ test('API login, save conflicts, payment replay, atomic spending and logout',asy
  const authorize=async(body,sessionCookie=cookie)=>fetch(base+'/auth/google/authorize',{method:'POST',redirect:'manual',headers:{'Content-Type':'application/x-www-form-urlencoded',Cookie:sessionCookie},body:new URLSearchParams({flow,noticeToken,...body})});
  assert.equal((await fetch(base+`/auth/google/callback?state=${flow}&code=code`,{headers:{Cookie:cookie}})).status,400);
  assert.equal((await authorize({})).status,400);
- assert.equal((await authorize({acknowledged:'yes'},'sb_oauth=wrong')).status,400);
  assert.equal((await authorize({acknowledged:'yes',noticeToken:'wrong'})).status,400);
- const authorized=await authorize({acknowledged:'yes'});assert.equal(authorized.status,303);assert.match(authorized.headers.get('location'),/^https:\/\/accounts.google.com/);
- assert.equal((await authorize({acknowledged:'yes'})).status,303,'repeated form submission should continue the existing OAuth flow');
+ const authorized=await authorize({acknowledged:'yes'},'');assert.equal(authorized.status,303);assert.match(authorized.headers.get('location'),/^https:\/\/accounts.google.com/);
+ const browserCookie=authorized.headers.get('set-cookie').split(';')[0];
+ assert.equal((await authorize({acknowledged:'yes'},browserCookie)).status,303,'repeated form submission should continue the existing OAuth flow');
  const stored=await db.collection('flows').findOne({_id:flow});
  oauth.claims.code={sub:'google-user',email_verified:true,name:'Google Player',nonce:stored.nonce};
  assert.equal((await fetch(base+`/auth/google/callback?state=${flow}&code=code`,{redirect:'manual'})).status,400);
- assert.equal((await fetch(base+`/auth/google/callback?state=${flow}&code=code`,{headers:{Cookie:cookie}})).status,200);
+ assert.equal((await fetch(base+`/auth/google/callback?state=${flow}&code=code`,{headers:{Cookie:browserCookie}})).status,200);
  const login=await request('/auth/poll','POST',{flow,verifier},'');assert.equal(login.status,200);assert.ok(login.body.token);
  const owner=await db.collection('users').findOne({_id:login.body.userId});
  assert.equal(owner.accountNotice.mode,'guardian');assert.equal(owner.accountNotice.version,1);

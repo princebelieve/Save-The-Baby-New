@@ -112,15 +112,27 @@ export function createApp({db, client, oauth, play, baseUrl, clientId, commerceE
  });
  app.post('/auth/google/authorize',async(req,res)=>{
   const cookie=(req.get('cookie')||'').split(';').map(x=>x.trim()).find(x=>x.startsWith('sb_oauth='))?.slice(9);
-  if(!cookie||req.body.acknowledged!=='yes'||typeof req.body.noticeToken!=='string') return sendAuthError(res);
-  const flowQuery={_id:req.body.flow,browserHash:hash(cookie),noticeHash:hash(req.body.noticeToken),expires:{$gt:new Date()}};
+  if(req.body.acknowledged!=='yes'||typeof req.body.flow!=='string'||typeof req.body.noticeToken!=='string') return sendAuthError(res);
+  // The single-use notice token proves the form came from the notice page. Do
+  // not require the original cookie to survive the external browser handoff;
+  // establish/refresh the callback cookie here before redirecting to Google.
+  const flowQuery={_id:req.body.flow,noticeHash:hash(req.body.noticeToken),expires:{$gt:new Date()}};
   let flow=await flows.findOne(flowQuery);
   if(!flow||!['notice','browser'].includes(flow.status)) return sendAuthError(res);
+  let browserToken='';
   if(flow.status==='notice') {
-   const advanced=await flows.findOneAndUpdate({...flowQuery,status:'notice'},{$set:{status:'browser',ownerAcknowledgedAt:new Date(),noticeVersion:1}},{returnDocument:'after'});
+   browserToken=random();
+   const advanced=await flows.findOneAndUpdate({...flowQuery,status:'notice'},{$set:{status:'browser',browserHash:hash(browserToken),ownerAcknowledgedAt:new Date(),noticeVersion:1}},{returnDocument:'after'});
    flow=advanced||await flows.findOne({...flowQuery,status:'browser'});
    if(!flow?.noticeVersion||!flow?.ownerAcknowledgedAt) return sendAuthError(res);
   }
+  if(!browserToken&&cookie&&hash(cookie)===flow.browserHash) browserToken=cookie;
+  if(!browserToken) {
+   browserToken=random();
+   const rebound=await flows.updateOne({...flowQuery,status:'browser',browserHash:flow.browserHash},{$set:{browserHash:hash(browserToken)}});
+   if(!rebound.modifiedCount) return sendAuthError(res);
+  }
+  res.cookie('sb_oauth',browserToken,{httpOnly:true,secure:baseUrl.startsWith('https:'),sameSite:'lax',maxAge:300000,path:'/auth/google'});
   res.redirect(303,oauth.generateAuthUrl({scope:['openid','email','profile'],state:flow._id,nonce:flow.nonce,prompt:'select_account',access_type:'online'}));
  });
  app.get('/auth/google/callback',async(req,res)=>{
