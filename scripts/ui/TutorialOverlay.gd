@@ -289,11 +289,26 @@ func _update_page() -> void:
 		_page_typing_tween.kill()
 	_page_typing_tween = create_tween()
 	_page_typing_tween.tween_property(_body_label, "visible_characters", _body_label.text.length(), maxf(0.35, _body_label.text.length() * 0.022))
+	_page_typing_tween.finished.connect(_on_page_typing_finished.bind(_page))
 	_tutorial_typing_ticks(_page)
 	_body_scroll.scroll_vertical = 0
 	_acknowledge_button.visible = _page < _pages.size() - 1 or _needs_ack
-	_acknowledge_button.text = "NEXT" if _page < _pages.size() - 1 else "CONTINUE"
+	_acknowledge_button.text = "SHOW TEXT" if _acknowledge_button.visible else ""
 	_previous_button.visible = _page > 0
+	_update_page_button(_page)
+
+
+func _on_page_typing_finished(page_index: int) -> void:
+	_update_page_button(page_index)
+
+
+func _update_page_button(page_index: int) -> void:
+	if page_index != _page or _acknowledge_button == null or not _acknowledge_button.visible:
+		return
+	if _body_label.visible_characters == -1 or _body_label.visible_characters >= _body_label.text.length():
+		_acknowledge_button.text = "NEXT" if _page < _pages.size() - 1 else "CONTINUE"
+	else:
+		_acknowledge_button.text = "SHOW TEXT"
 
 
 func _tutorial_typing_ticks(page_index: int) -> void:
@@ -310,10 +325,11 @@ func _tutorial_typing_ticks(page_index: int) -> void:
 
 
 func _next_page() -> void:
-	if _body_label.visible_characters < _body_label.text.length():
+	if _body_label.visible_characters != -1 and _body_label.visible_characters < _body_label.text.length():
 		if _page_typing_tween != null and _page_typing_tween.is_running():
 			_page_typing_tween.kill()
 		_body_label.visible_characters = -1
+		_update_page_button(_page)
 		return
 	if _page < _pages.size() - 1:
 		_page += 1

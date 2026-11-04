@@ -1,6 +1,27 @@
 import express from 'express';
 import {hash,random,HttpError,requireThat,PACKS,SUPPLIES,MAX_ETHAN_ASSISTS,validateSave,verifyPurchase,addSupply,profile} from './domain.js';
 
+const accountPageStyles = `<style>
+  :root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; color: #342719; background: #e8dfca; }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; padding: 28px 16px; display: grid; place-items: center; background: radial-gradient(ellipse at top, #fff8e8 0%, #e8dfca 78%); }
+  main { width: min(100%, 680px); padding: clamp(24px, 5vw, 44px); border: 1px solid #c7a76c; border-radius: 22px; background: #fffaf0; box-shadow: 0 18px 48px #3a271b30, inset 0 0 0 5px #f1e4c8; }
+  .brand { margin: 0 0 18px; color: #8b5127; font-size: .76rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+  h1 { margin: 0; color: #48301c; font-family: Georgia, "Times New Roman", serif; font-size: clamp(1.9rem, 6vw, 2.65rem); line-height: 1.12; }
+  .step { display: inline-block; margin: 18px 0 4px; padding: 7px 11px; border: 1px solid #d2ad69; border-radius: 999px; background: #f4e7c8; color: #6f431f; font-size: .82rem; font-weight: 750; }
+  p { color: #594a3b; font-size: 1rem; line-height: 1.65; }
+  .intro { margin: 12px 0 18px; font-size: 1.08rem; }
+  .details { margin: 18px 0; padding: 4px 18px; border-left: 4px solid #c47b37; border-radius: 4px 12px 12px 4px; background: #f7eedc; }
+  .details p { margin: 12px 0; }
+  .consent { display: flex; align-items: flex-start; gap: 12px; margin: 22px 0; padding: 16px; border: 1px solid #ddc99d; border-radius: 14px; background: #fffdf7; color: #403326; font-size: .96rem; line-height: 1.5; }
+  .consent input { width: 20px; height: 20px; margin: 1px 0 0; flex: 0 0 auto; accent-color: #80502b; }
+  .button { display: inline-flex; min-height: 52px; align-items: center; justify-content: center; padding: 12px 20px; border: 1px solid #68401f; border-radius: 12px; background: linear-gradient(#9b6333, #744520); color: #fff8e8; font: inherit; font-weight: 750; text-decoration: none; cursor: pointer; box-shadow: 0 4px 0 #4f301b; }
+  .button:hover, .button:focus-visible { background: #603b20; outline: 3px solid #e0b45e; outline-offset: 3px; }
+  a:not(.button) { color: #76502b; font-weight: 650; }
+  @media (max-width: 480px) { body { padding: 12px; } main { padding: 24px 20px; border-radius: 18px; } .button { width: 100%; text-align: center; } }
+  @media (prefers-reduced-motion: no-preference) { .button { transition: background-color .15s ease, transform .15s ease; } .button:hover { transform: translateY(-1px); } }
+</style>`;
+
 export function createApp({db, client, oauth, play, baseUrl, clientId, commerceEnabled=false}) {
  const app=express(); app.disable('x-powered-by'); app.set('trust proxy',1);
  app.use(express.json({limit:'100kb'}));
@@ -74,7 +95,7 @@ export function createApp({db, client, oauth, play, baseUrl, clientId, commerceE
   requireThat(flow,400,'Login expired. Return to the game and try again.');
   res.cookie('sb_oauth',browser,{httpOnly:true,secure:baseUrl.startsWith('https:'),sameSite:'lax',maxAge:300000,path:'/auth/google'});
   const parent=flow.accountMode==='guardian';
-  res.type('html').send(`<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Save The Baby account</title><main><h1>${parent?'Parent or guardian account':'Your cloud account'}</h1>
+  res.set('Content-Security-Policy',"default-src 'none'; style-src 'unsafe-inline'; frame-ancestors 'none'; form-action 'self'").type('html').send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#e8dfca"><title>Save The Baby account</title>${accountPageStyles}</head><body><main>
 <p><strong>Account setup — step 1 of 2</strong></p>
 <p>${parent?'Please hand this device to a parent or legal guardian. The parent must use their own Google account, not the child’s account.':'Continue with your own Google account. If you are under 18, ask your parent or guardian to manage this account.'}</p>
 <p>S.B. Ibhadode Technologies stores the Google account identifier, display name, game progress and purchase records using Render and MongoDB Atlas. Google handles payment. Cloud saves and purchased coins belong to the signed-in account. Do not enter a child’s name or email here.</p>
@@ -83,7 +104,7 @@ export function createApp({db, client, oauth, play, baseUrl, clientId, commerceE
 <form method="post" action="/auth/google/authorize"><input type="hidden" name="flow" value="${flow._id}"><input type="hidden" name="noticeToken" value="${noticeToken}">
 <p><label><input type="checkbox" name="acknowledged" value="yes" required> ${parent?'I am the parent or legal guardian, I am 18 or older, and I will manage this cloud account and its purchases using my own Google account.':'I am 18 or older and will manage this cloud account and its purchases.'} I have read the account notice.</label></p>
 <p><strong>Step 2:</strong> Google will let you choose an existing account or choose “Create account”. The Save The Baby cloud account is created automatically after the first successful Google sign-in.</p>
-<button type="submit">Continue to Google sign-in</button></form></main></html>`);
+<button class="button" type="submit">Continue to Google sign-in</button></form></main></body></html>`);
  });
  app.post('/auth/google/authorize',async(req,res)=>{
   const cookie=(req.get('cookie')||'').split(';').map(x=>x.trim()).find(x=>x.startsWith('sb_oauth='))?.slice(9);
@@ -107,7 +128,7 @@ export function createApp({db, client, oauth, play, baseUrl, clientId, commerceE
   await users.updateOne({_id:userId},{$set:{name:String(claims.name||'Player').slice(0,100),accountNotice:{version:1,mode:flow.accountMode,acknowledgedAt:flow.ownerAcknowledgedAt}},$setOnInsert:{wallet:0,save:null,revision:0,created:new Date()}},{upsert:true});
   await flows.updateOne({_id:flow._id,status:'exchanging'},{$set:{status:'complete',userId}});
   res.clearCookie('sb_oauth',{path:'/auth/google'});
-  res.type('html').send('<!doctype html><title>Save The Baby</title><h1>Signed in</h1><p>Return to Save The Baby to finish loading your progress.</p>');
+  res.set('Content-Security-Policy',"default-src 'none'; style-src 'unsafe-inline'; frame-ancestors 'none'").type('html').send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#e8dfca"><title>Signed in · Save The Baby</title>${accountPageStyles}</head><body><main><p class="brand">S. B. Ibhadode Technologies</p><h1>You’re signed in</h1><p class="intro">Your Google account is connected to Save The Baby.</p><p>Return to the game to finish loading your cloud account and progress.</p></main></body></html>`);
  });
  app.post('/auth/poll',async(req,res)=>{
   const {flow:id,verifier}=req.body; requireThat(typeof verifier==='string' && verifier.length>=32 && verifier.length<=256,400,'Invalid login proof');
