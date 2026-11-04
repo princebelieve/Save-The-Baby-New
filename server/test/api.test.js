@@ -66,7 +66,7 @@ test('API login, save conflicts, payment replay, atomic spending and logout',asy
  assert.equal((await authorize({acknowledged:'yes'},'sb_oauth=wrong')).status,400);
  assert.equal((await authorize({acknowledged:'yes',noticeToken:'wrong'})).status,400);
  const authorized=await authorize({acknowledged:'yes'});assert.equal(authorized.status,303);assert.match(authorized.headers.get('location'),/^https:\/\/accounts.google.com/);
- assert.equal((await authorize({acknowledged:'yes'})).status,400);
+ assert.equal((await authorize({acknowledged:'yes'})).status,303,'repeated form submission should continue the existing OAuth flow');
  const stored=await db.collection('flows').findOne({_id:flow});
  oauth.claims.code={sub:'google-user',email_verified:true,name:'Google Player',nonce:stored.nonce};
  assert.equal((await fetch(base+`/auth/google/callback?state=${flow}&code=code`,{redirect:'manual'})).status,400);

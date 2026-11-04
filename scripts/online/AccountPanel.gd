@@ -54,22 +54,31 @@ func show_account() -> void:
 		_on_login_completed(pending)
 		return
 	if purchases.busy or account.busy:
-		_notice("Please wait for the current purchase or sync to finish.")
+		_notice("A purchase or sync is still running. Try again when it finishes.")
 		return
 	var dialog := AcceptDialog.new()
+	dialog.set_meta("custom_heading", true)
 	game._prepare_dialog(dialog)
 	dialog.title = "ACCOUNT & COINS"
 	var content := VBoxContainer.new()
-	content.custom_minimum_size = Vector2(minf(480,game.get_viewport_rect().size.x*0.78),0)
-	content.add_theme_constant_override("separation",8)
+	content.custom_minimum_size = Vector2(minf(500,game.get_viewport_rect().size.x*0.82),0)
+	content.add_theme_constant_override("separation",12)
+	var heading := Label.new()
+	heading.text = "ACCOUNT & COINS"
+	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	heading.add_theme_font_override("font",Game.DISPLAY_FONT)
+	heading.add_theme_font_size_override("font_size",26)
+	heading.add_theme_color_override("font_color",Color("#f2ce7c"))
+	content.add_child(heading)
 	var status := Label.new()
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	status.text = ("%s | Purchased coins: %d" % [account.player_name,account.wallet]) if account.signed_in() else "Playing as guest. Online accounts use Google. Adults can create or connect their own account; a parent or guardian can manage a child's save. You can also keep playing as a guest."
+	status.add_theme_font_size_override("font_size",20)
+	status.text = ("%s · %d purchased coins" % [account.player_name,account.wallet]) if account.signed_in() else "Play as a guest, or connect a Google account to sync progress."
 	content.add_child(status)
 	if not account.configured():
-		status.text += "\nOnline services are unavailable until the account server is configured. Guest play remains available."
+		status.text = "Google account sign-in is unavailable right now. You can continue playing as a guest."
 	if not account.signed_in():
-		_button(content,"ADULT: CREATE OR CONNECT GOOGLE ACCOUNT",_sign_in.bind("adult"),not account.configured())
+		_button(content,"CREATE OR CONNECT GOOGLE ACCOUNT",_sign_in.bind("adult"),not account.configured())
 		_button(content,"PARENT / GUARDIAN ACCOUNT",_sign_in.bind("guardian"),not account.configured())
 	else:
 		var player_id := Label.new()
@@ -99,7 +108,7 @@ func show_account() -> void:
 		_button(content,"SIGN OUT",func(): account.sign_out())
 		_button(content,"DELETE ONLINE ACCOUNT",_confirm_delete)
 	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(content.custom_minimum_size.x,mini(740,int(game.get_viewport_rect().size.y*0.65)))
+	scroll.custom_minimum_size = Vector2(content.custom_minimum_size.x,mini(740,int(game.get_viewport_rect().size.y*0.7)))
 	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(content)
 	dialog.add_child(scroll)
@@ -110,19 +119,7 @@ func show_account() -> void:
 
 func _sign_in(owner_mode: String) -> void:
 	account.set_account_owner_mode(owner_mode)
-	if owner_mode == "adult":
-		account.sign_in("self")
-		return
-	var confirm := ConfirmationDialog.new()
-	game._prepare_dialog(confirm)
-	confirm.title = "ASK A PARENT OR GUARDIAN"
-	confirm.dialog_text = "Please hand this device to your parent or guardian. They will use their own Google account to manage the cloud save and purchased coins. The browser will first show the account notice, then continue to Google sign-in.\n\nYou can cancel and keep playing as a guest."
-	confirm.ok_button_text = "CONTINUE TO ACCOUNT NOTICE"
-	confirm.confirmed.connect(func(): account.sign_in("guardian"))
-	confirm.confirmed.connect(confirm.queue_free)
-	confirm.canceled.connect(confirm.queue_free)
-	game.add_child(confirm)
-	confirm.popup_centered_clamped(Vector2i(520,320))
+	account.sign_in("self" if owner_mode == "adult" else "guardian")
 
 func _confirm_purchase(product: String, price: String) -> void:
 	var confirm := ConfirmationDialog.new()
@@ -138,8 +135,9 @@ func _confirm_purchase(product: String, price: String) -> void:
 
 func _button(parent: Control,title: String,action: Callable,disabled := false) -> void:
 	var button := game._make_menu_button(title)
-	button.custom_minimum_size.y = 48
-	button.add_theme_font_size_override("font_size",17)
+	button.custom_minimum_size = Vector2(0,76)
+	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	button.add_theme_font_size_override("font_size",22)
 	button.disabled = disabled
 	button.pressed.connect(func():
 		var window := button.get_window()

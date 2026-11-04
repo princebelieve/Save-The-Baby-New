@@ -102,7 +102,6 @@ func sign_in(account_mode := "") -> void:
 		selected_mode = "guardian" if needs_parent_account() else "self"
 	var guardian_flow := selected_mode == "guardian"
 	_login_active = true
-	message.emit("Connecting to the account service. The browser will open after the sign-in request is ready.")
 	var verifier := Crypto.new().generate_random_bytes(32).hex_encode()
 	# The hosted API may be waking from an idle period; allow its cold start to complete.
 	var start := await api("/auth/start", HTTPClient.METHOD_POST, {"challenge":verifier.sha256_text(),"accountMode":selected_mode}, false, 75.0)

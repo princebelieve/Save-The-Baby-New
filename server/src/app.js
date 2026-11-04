@@ -22,6 +22,10 @@ const accountPageStyles = `<style>
   @media (prefers-reduced-motion: no-preference) { .button { transition: background-color .15s ease, transform .15s ease; } .button:hover { transform: translateY(-1px); } }
 </style>`;
 
+function sendAuthError(res) {
+ res.set('Content-Security-Policy',"default-src 'none'; style-src 'unsafe-inline'; frame-ancestors 'none'").status(400).type('html').send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#e8dfca"><title>Sign-in expired · Save The Baby</title>${accountPageStyles}</head><body><main><p class="brand">S. B. Ibhadode Technologies</p><h1>Start sign-in again</h1><p class="intro">This sign-in step expired or was already used.</p><p>Return to Save The Baby and tap <strong>Create or Connect Google Account</strong> to open a fresh sign-in.</p></main></body></html>`);
+}
+
 export function createApp({db, client, oauth, play, baseUrl, clientId, commerceEnabled=false}) {
  const app=express(); app.disable('x-powered-by'); app.set('trust proxy',1);
  app.use(express.json({limit:'100kb'}));
@@ -108,9 +112,15 @@ export function createApp({db, client, oauth, play, baseUrl, clientId, commerceE
  });
  app.post('/auth/google/authorize',async(req,res)=>{
   const cookie=(req.get('cookie')||'').split(';').map(x=>x.trim()).find(x=>x.startsWith('sb_oauth='))?.slice(9);
-  requireThat(cookie&&req.body.acknowledged==='yes'&&typeof req.body.noticeToken==='string',400,'An adult account owner must read and accept the notice.');
-  const flow=await flows.findOneAndUpdate({_id:req.body.flow,status:'notice',browserHash:hash(cookie),noticeHash:hash(req.body.noticeToken),expires:{$gt:new Date()}},{$set:{status:'browser',ownerAcknowledgedAt:new Date(),noticeVersion:1}},{returnDocument:'after'});
-  requireThat(flow,400,'Account notice expired or already used. Return to the game and try again.');
+  if(!cookie||req.body.acknowledged!=='yes'||typeof req.body.noticeToken!=='string') return sendAuthError(res);
+  const flowQuery={_id:req.body.flow,browserHash:hash(cookie),noticeHash:hash(req.body.noticeToken),expires:{$gt:new Date()}};
+  let flow=await flows.findOne(flowQuery);
+  if(!flow||!['notice','browser'].includes(flow.status)) return sendAuthError(res);
+  if(flow.status==='notice') {
+   const advanced=await flows.findOneAndUpdate({...flowQuery,status:'notice'},{$set:{status:'browser',ownerAcknowledgedAt:new Date(),noticeVersion:1}},{returnDocument:'after'});
+   flow=advanced||await flows.findOne({...flowQuery,status:'browser'});
+   if(!flow?.noticeVersion||!flow?.ownerAcknowledgedAt) return sendAuthError(res);
+  }
   res.redirect(303,oauth.generateAuthUrl({scope:['openid','email','profile'],state:flow._id,nonce:flow.nonce,prompt:'select_account',access_type:'online'}));
  });
  app.get('/auth/google/callback',async(req,res)=>{
