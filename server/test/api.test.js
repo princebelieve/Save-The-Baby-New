@@ -58,7 +58,8 @@ test('API login, save conflicts, payment replay, atomic spending and logout',asy
  assert.equal((await request('/auth/poll','POST',{flow,verifier:'wrong'.repeat(10)},'')).status,400);
  const browser=await fetch(base+`/auth/google/start?flow=${flow}`,{redirect:'manual'});assert.equal(browser.status,200);
  const notice=await browser.text();assert.match(notice,/Use your own Google account to manage cloud saves/);assert.match(notice,/service providers/);assert.doesNotMatch(notice,/Render|MongoDB Atlas/);
- assert.match(browser.headers.get('content-security-policy'),/form-action http:\/\/localhost:3000/);
+ assert.match(notice,/Step 2:<\/strong> On the next screen, choose an existing Google account or create one/);
+ assert.doesNotMatch(browser.headers.get('content-security-policy'),/form-action/);
  const cookie=browser.headers.get('set-cookie').split(';')[0];
  const noticeToken=notice.match(/name="noticeToken" value="([^"]+)"/)[1];
  const authorize=async(body,sessionCookie=cookie)=>fetch(base+'/auth/google/authorize',{method:'POST',redirect:'manual',headers:{'Content-Type':'application/x-www-form-urlencoded',Cookie:sessionCookie},body:new URLSearchParams({flow,noticeToken,...body})});

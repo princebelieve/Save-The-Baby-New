@@ -99,11 +99,15 @@ export function createApp({db, client, oauth, play, baseUrl, clientId, commerceE
   requireThat(flow,400,'Login expired. Return to the game and try again.');
   res.cookie('sb_oauth',browser,{httpOnly:true,secure:baseUrl.startsWith('https:'),sameSite:'lax',maxAge:300000,path:'/auth/google'});
   const parent=flow.accountMode==='guardian';
-  res.set('Content-Security-Policy',`default-src 'none'; style-src 'unsafe-inline'; frame-ancestors 'none'; form-action ${new URL(baseUrl).origin}`).type('html').send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#e8dfca"><title>Save The Baby account</title>${accountPageStyles}</head><body><main>
+  // This page posts its acknowledgement to the API's own /auth/google/authorize
+  // route. Chrome still blocked the configured origin under form-action, so this
+  // narrowly scoped page omits that directive; default-src does not govern forms.
+  res.set('Content-Security-Policy',"default-src 'none'; style-src 'unsafe-inline'; frame-ancestors 'none'").type('html').send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#e8dfca"><title>Save The Baby account</title>${accountPageStyles}</head><body><main>
 <p class="brand">Save The Baby account</p><h1>${parent?'Parent or guardian account':'Connect your Google account'}</h1><span class="step">Account setup: step 1 of 2</span>
 <p class="intro">${parent?'Use your own Google account to manage cloud saves for a child who plays this game.':'Sign in to back up your progress and restore it on another device. Google handles your password; Save The Baby never receives it.'}</p>
 <section class="details"><p>When you use cloud saves, we use your Google account ID and profile name to identify your account. We store game progress and purchase records with service providers so you can restore progress and manage purchased coins. Google Play handles payments; we do not receive your card details.</p></section>
 <p>Cloud saves are optional. You can continue playing as a guest. You can delete your online account in Settings &rarr; Account &amp; Coins &rarr; Delete Online Account. For details about data use and retention, read the <a href="https://sbi.globalcreest.com/save-the-baby/privacy-policy">Privacy Policy</a>.</p>
+<p><strong>Step 2:</strong> On the next screen, choose an existing Google account or create one.</p>
 <form method="post" action="/auth/google/authorize"><input type="hidden" name="flow" value="${flow._id}"><input type="hidden" name="noticeToken" value="${noticeToken}">
 <label class="consent"><input type="checkbox" name="acknowledged" value="yes" required><span>${parent?'I am 18 or older and am the parent or legal guardian managing this account.':'I am 18 or older and am creating or managing this account.'} I have read this notice.</span></label>
 <button class="button" type="submit">Continue with Google</button></form></main></body></html>`);
