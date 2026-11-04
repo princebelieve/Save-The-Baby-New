@@ -953,9 +953,14 @@ func _show_pause_menu(force_pause: bool = false) -> void:
 	frame.custom_minimum_size = Vector2(minf(580.0, get_viewport_rect().size.x * 0.92), 700 if _tutorial_active else 620)
 	frame.add_theme_stylebox_override("panel", _make_parchment_panel_style(78, 90))
 	center.add_child(frame)
+	var pause_paper := PanelContainer.new()
+	pause_paper.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	pause_paper.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	pause_paper.add_theme_stylebox_override("panel", _make_parchment_sheet_style())
+	frame.add_child(pause_paper)
 	var actions := VBoxContainer.new()
 	actions.add_theme_constant_override("separation", 16)
-	frame.add_child(actions)
+	pause_paper.add_child(actions)
 	var heading := _make_label("PAUSED", 34)
 	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	actions.add_child(heading)
@@ -1025,6 +1030,16 @@ func _make_parchment_panel_style(horizontal_margin: float, vertical_margin: floa
 	style.content_margin_right = horizontal_margin
 	style.content_margin_top = vertical_margin
 	style.content_margin_bottom = vertical_margin
+	return style
+
+
+func _make_parchment_sheet_style() -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color("#f5e8ca")
+	style.border_color = Color("#b58a52")
+	style.set_border_width_all(1)
+	style.set_corner_radius_all(10)
+	style.set_content_margin_all(18)
 	return style
 
 
@@ -1280,11 +1295,14 @@ func _show_audio_settings(parent_layer: Node) -> void:
 	settings.add_theme_constant_override("separation", 12)
 	var heading := _make_label("AUDIO SETTINGS", 28)
 	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	heading.add_theme_color_override("font_color", Color("#f2ce7c"))
+	heading.add_theme_color_override("font_color", Color("#80502b"))
+	heading.add_theme_color_override("font_outline_color", Color("#f4e2bd"))
 	settings.add_child(heading)
 	for bus_kind in ["music", "sfx"]:
 		var volume_label := Label.new()
+		volume_label.add_theme_font_override("font", DISPLAY_FONT)
 		volume_label.add_theme_font_size_override("font_size", 23)
+		volume_label.add_theme_color_override("font_color", Color("#4b3424"))
 		volume_label.text = "Background music" if bus_kind == "music" else "Sound effects"
 		settings.add_child(volume_label)
 		var volume := HSlider.new()
@@ -1298,6 +1316,11 @@ func _show_audio_settings(parent_layer: Node) -> void:
 		settings.add_child(volume)
 		var enabled := CheckButton.new()
 		enabled.add_theme_font_size_override("font_size", 23)
+		enabled.add_theme_font_override("font", DISPLAY_FONT)
+		enabled.add_theme_color_override("font_color", Color("#4b3424"))
+		enabled.add_theme_color_override("font_hover_color", Color("#4b3424"))
+		enabled.add_theme_color_override("font_pressed_color", Color("#4b3424"))
+		enabled.add_theme_color_override("font_focus_color", Color("#4b3424"))
 		enabled.name = "MusicEnabled" if bus_kind == "music" else "EffectsEnabled"
 		enabled.custom_minimum_size.y = 52
 		enabled.button_pressed = audio_manager.is_music_enabled() if bus_kind == "music" else audio_manager.is_sfx_enabled()
@@ -1311,9 +1334,9 @@ func _show_audio_settings(parent_layer: Node) -> void:
 		{"title": "TERMS AND CONDITIONS", "path": "res://legal/terms_and_conditions.md"}
 	]:
 		var legal_button := _make_menu_button(str(legal_page["title"]))
-		legal_button.custom_minimum_size = Vector2(0, 54)
+		legal_button.custom_minimum_size = Vector2(0, 62)
 		legal_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		legal_button.add_theme_font_size_override("font_size", 15)
+		legal_button.add_theme_font_size_override("font_size", 19)
 		legal_button.pressed.connect(_show_legal_document.bind(parent_layer, str(legal_page["title"]), str(legal_page["path"])))
 		legal_links.add_child(legal_button)
 	settings.add_child(legal_links)
@@ -2004,11 +2027,17 @@ func _show_level_briefing(route_id: String) -> void:
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	layout.add_child(scroll)
+	var paper_sheet := PanelContainer.new()
+	paper_sheet.name = "BriefingPaperSheet"
+	paper_sheet.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	paper_sheet.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	paper_sheet.add_theme_stylebox_override("panel", _make_parchment_sheet_style())
+	scroll.add_child(paper_sheet)
 	var content := VBoxContainer.new()
 	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	content.alignment = BoxContainer.ALIGNMENT_CENTER
 	content.add_theme_constant_override("separation", 10)
-	scroll.add_child(content)
+	paper_sheet.add_child(content)
 	var level_id := int(level_data.get("level_id", 1))
 	var level_title := _make_label("INVESTIGATION %02d" % level_id, 18)
 	level_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -2029,10 +2058,10 @@ func _show_level_briefing(route_id: String) -> void:
 	}
 	portrait.texture = ResourceManager.load_portrait(str(portrait_paths.get(route_id, portrait_paths["alone"])))
 	content.add_child(portrait)
-	var route_label := _make_label("APPROACH | " + _chosen_route_label.to_upper(), 17)
+	var route_label := _make_label("APPROACH | " + _chosen_route_label.to_upper(), 20)
 	route_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	content.add_child(route_label)
-	var description := _make_label(str(level_data.get("description", "")), 19)
+	var description := _make_label(str(level_data.get("description", "")), 22)
 	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	description.custom_minimum_size.x = 0
 	description.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -2042,7 +2071,7 @@ func _show_level_briefing(route_id: String) -> void:
 		"signal": "Amara is tracing Victor's phone. The clues you collect will narrow her search.",
 		"alone": "David is following the trail alone. Every clue must point him toward Ethan."
 	}
-	var route_detail := _make_label(str(route_briefings.get(route_id, route_briefings["alone"])), 17)
+	var route_detail := _make_label(str(route_briefings.get(route_id, route_briefings["alone"])), 20)
 	route_detail.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	route_detail.custom_minimum_size.x = 0
 	route_detail.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -2071,7 +2100,7 @@ func _show_level_briefing(route_id: String) -> void:
 	objective_row.add_child(objective_icon)
 	var objective_copy := VBoxContainer.new()
 	objective_copy.alignment = BoxContainer.ALIGNMENT_CENTER
-	var objective_heading := _make_label("MISSION OBJECTIVE", 15)
+	var objective_heading := _make_label("MISSION OBJECTIVE", 20)
 	objective_copy.add_child(objective_heading)
 	var objective_text := _make_label(_format_objective(objective), 22)
 	objective_copy.add_child(objective_text)
@@ -2079,11 +2108,11 @@ func _show_level_briefing(route_id: String) -> void:
 
 	var moves_total := int(level_data.get("moves", {}).get("total", 0))
 	var difficulty := str(level_data.get("difficulty", "NORMAL")).replace("_", " ")
-	var difficulty_label := _make_label("DIFFICULTY | " + difficulty, 17)
+	var difficulty_label := _make_label("DIFFICULTY | " + difficulty, 20)
 	difficulty_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	difficulty_label.add_theme_color_override("font_color", Color("#80502b"))
 	content.add_child(difficulty_label)
-	var moves := _make_label("MATCH THE GOAL | %d MOVES" % moves_total, 18)
+	var moves := _make_label("MATCH THE GOAL | %d MOVES" % moves_total, 21)
 	moves.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	content.add_child(moves)
 	_apply_parchment_text(content)
@@ -2092,7 +2121,7 @@ func _show_level_briefing(route_id: String) -> void:
 	play.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	play.pressed.connect(_play_ui_confirm)
 	play.pressed.connect(_begin_level.bind(route_id), CONNECT_ONE_SHOT)
-	layout.add_child(play)
+	content.add_child(play)
 
 
 func _get_primary_objective(level_data: Dictionary) -> Dictionary:
