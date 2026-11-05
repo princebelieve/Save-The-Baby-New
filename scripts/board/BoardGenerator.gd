@@ -8,6 +8,8 @@ var _level_tile_weights: Array[float] = []
 var _blocked_cells: Dictionary = {}
 var _generated_grid: Dictionary = {}
 var _tile_size: int = 64
+var _seeded_rng: RandomNumberGenerator
+var _unmatchable: Dictionary = {}
 
 
 func initialize(tile_factory: TileFactory, tile_database: TileDatabase) -> void:
@@ -16,6 +18,10 @@ func initialize(tile_factory: TileFactory, tile_database: TileDatabase) -> void:
 
 
 func generate(level_data: Dictionary) -> Dictionary:
+	_seeded_rng = null
+	if level_data.get("metadata", {}).has("seed"):
+		_seeded_rng = RandomNumberGenerator.new()
+		_seeded_rng.seed = int(level_data.metadata.seed)
 	_generated_grid.clear()
 	_level_tile_definitions.clear()
 	_level_tile_weights.clear()
@@ -25,6 +31,11 @@ func generate(level_data: Dictionary) -> Dictionary:
 	var height := int(board_data.get("rows", 0))
 	_tile_size = int(board_data.get("tile_size", 64))
 	_blocked_cells.clear()
+	_unmatchable.clear()
+	var obstacle_definitions: Dictionary = JsonLoader.load_file("res://configs/obstacles.json").get("obstacles", {})
+	for obstacle in level_data.get("obstacles", {}).get("items", []):
+		if bool(obstacle_definitions.get(str(obstacle.get("type", "")), {}).get("blocks_matching", false)):
+			_unmatchable[Vector2i(int(obstacle.x), int(obstacle.y))] = true
 	for cell_value in board_data.get("blocked_cells", []):
 		var cell := _read_cell(cell_value)
 		if cell.x >= 0 and cell.y >= 0 and cell.x < width and cell.y < height:
@@ -121,7 +132,7 @@ func _load_level_tile_pool(tile_pool) -> void:
 
 
 func _choose_definition() -> Dictionary:
-	return RandomGenerator.weighted_choice(_level_tile_definitions, _level_tile_weights)
+	return _weighted_choice(_level_tile_definitions, _level_tile_weights)
 
 
 func _definition_for_type(tile_type: int) -> Dictionary:
@@ -158,12 +169,26 @@ func _weighted_candidate_order() -> Array:
 	var definitions := _level_tile_definitions.duplicate()
 	var weights := _level_tile_weights.duplicate()
 	while not definitions.is_empty():
-		var chosen: Dictionary = RandomGenerator.weighted_choice(definitions, weights)
+		var chosen: Dictionary = _weighted_choice(definitions, weights)
 		var index := definitions.find(chosen)
 		candidates.append(chosen)
 		definitions.remove_at(index)
 		weights.remove_at(index)
 	return candidates
+
+
+func _weighted_choice(definitions: Array, weights: Array) -> Dictionary:
+	if _seeded_rng == null:
+		return RandomGenerator.weighted_choice(definitions, weights)
+	var total := 0.0
+	for weight in weights:
+		total += float(weight)
+	var value := _seeded_rng.randf() * total
+	for index in definitions.size():
+		value -= float(weights[index])
+		if value <= 0.0:
+			return definitions[index]
+	return definitions.back()
 
 
 func _would_form_initial_match(grid: Dictionary, position: Vector2i, tile_type: int) -> bool:
@@ -178,11 +203,11 @@ func _has_valid_move(grid: Dictionary, width: int, height: int) -> bool:
 	for y in range(height):
 		for x in range(width):
 			var position := Vector2i(x, y)
-			if not grid.has(position):
+			if not grid.has(position) or _unmatchable.has(position):
 				continue
 			for offset in [Vector2i.RIGHT, Vector2i.DOWN]:
 				var neighbor: Vector2i = position + offset
-				if not grid.has(neighbor):
+				if not grid.has(neighbor) or _unmatchable.has(neighbor):
 					continue
 				var first_type: int = grid[position]
 				var second_type: int = grid[neighbor]
@@ -198,13 +223,13 @@ func _has_valid_move(grid: Dictionary, width: int, height: int) -> bool:
 
 func _has_match_at(grid: Dictionary, position: Vector2i, width: int, height: int) -> bool:
 	var tile_type: int = grid.get(position, -1)
-	if tile_type < 0:
+	if tile_type < 0 or _unmatchable.has(position):
 		return false
 	for direction in [Vector2i.RIGHT, Vector2i.DOWN]:
 		var count := 1
 		for sign_value in [-1, 1]:
 			var cursor: Vector2i = position + direction * sign_value
-			while cursor.x >= 0 and cursor.y >= 0 and cursor.x < width and cursor.y < height and grid.get(cursor, -1) == tile_type:
+			while cursor.x >= 0 and cursor.y >= 0 and cursor.x < width and cursor.y < height and not _unmatchable.has(cursor) and grid.get(cursor, -1) == tile_type:
 				count += 1
 				cursor += direction * sign_value
 		if count >= 3:

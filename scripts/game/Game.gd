@@ -6,6 +6,13 @@ const DISPLAY_FONT: FontFile = preload("res://assets/fonts/Baloo2-Variable.ttf")
 const OPENING_STORY_PATH := "res://stories/opening_story.json"
 const CAMPAIGN_PROGRESS_PATH := "user://campaign_progress.cfg"
 
+var _campaign_page_start := -1
+var _daily_rewards_layer: CanvasLayer
+var _portrait_layer: CanvasLayer
+var _portrait_puzzle: PortraitPuzzle
+var _progress_transaction := false
+var _last_daily_stamp: Dictionary = {}
+
 var _ads: AdManager
 var _ad_attempt := 0
 var _ad_revived := false
@@ -127,6 +134,12 @@ func _notification(what: int) -> void:
 
 
 func _handle_back_request() -> void:
+	if _daily_rewards_layer != null and is_instance_valid(_daily_rewards_layer):
+		_close_daily_rewards()
+		return
+	if _portrait_layer != null and is_instance_valid(_portrait_layer):
+		_close_portrait_puzzle()
+		return
 	var dialogs := find_children("*", "AcceptDialog", true, false)
 	for index in range(dialogs.size() - 1, -1, -1):
 		var dialog := dialogs[index] as AcceptDialog
@@ -1873,6 +1886,10 @@ func _show_campaign_map(route_id: String) -> void:
 	_campaign_map.configure(_chosen_route_label, _load_campaign_level_records(), _highest_unlocked_level, _completed_levels)
 	_campaign_map.level_selected.connect(_on_campaign_level_selected.bind(route_id))
 	_campaign_map.back_requested.connect(_show_launch_screen)
+	_campaign_map.page_requested.connect(_change_campaign_page)
+	_campaign_map.portrait_requested.connect(_open_portrait_puzzle)
+	_campaign_map.configure_daily(_campaign_progress)
+	_campaign_map.daily_rewards_requested.connect(_show_daily_rewards)
 	_campaign_layer.add_child(_campaign_map)
 	_campaign_map.modulate.a = 0.0
 	var entrance := create_tween()
@@ -1906,18 +1923,22 @@ func _show_campaign_map_coach() -> void:
 
 func _load_campaign_level_records() -> Array[Dictionary]:
 	var records: Array[Dictionary] = []
-	var level_directory := DirAccess.open("res://levels")
-	if level_directory == null:
-		DebugLogger.error("Game: Could not read campaign level data.")
-		return records
-	for file_name in level_directory.get_files():
-		if not file_name.begins_with("level") or not file_name.ends_with(".json"):
-			continue
-		var record: Dictionary = JsonLoader.load_file("res://levels/" + file_name)
+	var page_size := int(ConfigLoader.load_config(Constants.ConfigPaths.GAME).get("campaign_page_size", 50))
+	if _campaign_page_start < 1:
+		_campaign_page_start = (mini(_highest_unlocked_level, int(ConfigLoader.load_config(Constants.ConfigPaths.GAME).get("max_levels", 50))) - 1) / page_size * page_size + 1
+	for level_id in range(_campaign_page_start, mini(_campaign_page_start + page_size, int(ConfigLoader.load_config(Constants.ConfigPaths.GAME).get("max_levels", 50)) + 1)):
+		var path := "res://levels/level%03d.json" % level_id
+		var record: Dictionary = JsonLoader.load_file(path) if JsonLoader.file_exists(path) else {}
 		if not record.is_empty():
 			records.append(record)
-	records.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return int(a.get("level_id", 0)) < int(b.get("level_id", 0)))
 	return records
+
+
+func _change_campaign_page(direction: int) -> void:
+	var page_size := int(ConfigLoader.load_config(Constants.ConfigPaths.GAME).get("campaign_page_size", 50))
+	_campaign_page_start = clampi(_campaign_page_start + direction * page_size, 1, int(ConfigLoader.load_config(Constants.ConfigPaths.GAME).get("max_levels", 50)) - page_size + 1)
+	_show_campaign_map(_current_route_id)
+
 
 
 func _on_campaign_level_selected(level_id: int, route_id: String) -> void:
@@ -1926,6 +1947,7 @@ func _on_campaign_level_selected(level_id: int, route_id: String) -> void:
 	if _economy_manager != null and _economy_manager.get_lives() <= 0:
 		_show_life_shop()
 		return
+	_campaign_page_start = (level_id - 1) / int(ConfigLoader.load_config(Constants.ConfigPaths.GAME).get("campaign_page_size", 50)) * int(ConfigLoader.load_config(Constants.ConfigPaths.GAME).get("campaign_page_size", 50)) + 1
 	SignalBus.play_sfx.emit("door_open")
 	if _tutorial_overlay != null:
 		_tutorial_overlay.hide_tip()
@@ -2601,6 +2623,8 @@ func _on_powerup_blast(kind: String, cell: Vector2i) -> void:
 
 
 func _persist_campaign_progress() -> void:
+	if _progress_transaction:
+		return
 	_campaign_progress.set_value("campaign", "highest_unlocked_level", _highest_unlocked_level)
 	_campaign_progress.set_value("campaign", "completed_levels", _completed_levels)
 	if _economy_manager != null:
@@ -2705,6 +2729,7 @@ func _show_match_feedback(caption: String, sound_id: String, shake_board: bool) 
 
 
 func _on_special_created(kind: String) -> void:
+	_record_daily_mission("specials", 1)
 	_discover_journal_fact(kind, 0)
 	SignalBus.play_sfx.emit("special_created")
 	_special_moves_created += 1
@@ -3075,6 +3100,7 @@ func _button_screen_rect(button: Control) -> Rect2:
 
 
 func _on_obstacles_cleared(amount: int) -> void:
+	_record_daily_mission("blockers", amount)
 	if _objective_type == "DESTROY_OBSTACLES":
 		_evidence_count = mini(_evidence_goal, _evidence_count + amount)
 	else:
@@ -3206,7 +3232,7 @@ func _show_level_result(won: bool) -> void:
 		story_complete.add_theme_color_override("font_color", Color("#8b572b"))
 		content.add_child(story_complete)
 	var reward_info: Dictionary = result_data.get("rewards", {})
-	var has_next_level := JsonLoader.file_exists("res://levels/level%03d.json" % (_current_level_id + 1))
+	var has_next_level := _current_level_id < int(ConfigLoader.load_config(Constants.ConfigPaths.GAME).get("max_levels", 50))
 	var has_after_story := not str(result_data.get("story", {}).get("after_level", "")).is_empty()
 	if won:
 		var trophy := TextureRect.new()
@@ -3243,6 +3269,8 @@ func _show_level_result(won: bool) -> void:
 		detail_text = "The remaining moves ran out. You lost one life. Try again or visit the Life Shop."
 	else:
 		detail_text = "LEVEL POINTS: %d\nTOTAL POINTS: %d\nCOINS: +%d   TOTAL: %d\nSTARS EARNED: %d" % [_current_level_points, total_points, coins_earned, total_coins, _result_stars_earned]
+		if not _last_daily_stamp.is_empty():
+			detail_text += "\nDAILY STAMP: +%d coins | Streak: %d" % [int(_last_daily_stamp.coins), int(_last_daily_stamp.streak)]
 		if has_next_level:
 			detail_text += "\nCase %03d is now unlocked." % mini(_highest_unlocked_level, _current_level_id + 1)
 		else:
@@ -3436,7 +3464,6 @@ func _next_level_after_win() -> void:
 	var level_data: Dictionary = level_manager.get_level_data() if level_manager != null else {}
 	var after_story := str(level_data.get("story", {}).get("after_level", ""))
 	var next_id := _current_level_id + 1
-	var path := "res://levels/level%03d.json" % next_id
 	_dismiss_level_result()
 	get_tree().paused = false
 	if not after_story.is_empty():
@@ -3444,7 +3471,7 @@ func _next_level_after_win() -> void:
 		_pending_story_id = after_story
 		_start_campaign_story(after_story)
 		return
-	if JsonLoader.file_exists(path):
+	if level_manager != null and level_manager.has_level(next_id):
 		_on_campaign_level_selected(next_id, _current_route_id)
 	else:
 		_show_campaign_map(_current_route_id)
@@ -3481,6 +3508,8 @@ func _load_campaign_progress() -> void:
 
 
 func _record_level_completion() -> bool:
+	_last_daily_stamp = {}
+	_progress_transaction = true
 	var level_manager := get_node_or_null("Managers/LevelManager")
 	var level_data: Dictionary = level_manager.get_level_data() if level_manager != null else {}
 	var rewards: Dictionary = level_data.get("rewards", {})
@@ -3488,7 +3517,8 @@ func _record_level_completion() -> bool:
 	var old_stars := int(_completed_levels.get(str(_current_level_id), 0))
 	_completed_levels[str(_current_level_id)] = maxi(stars_earned, old_stars)
 	var star_delta := maxi(0, stars_earned - old_stars)
-	_highest_unlocked_level = maxi(_highest_unlocked_level, _current_level_id + 1)
+	_highest_unlocked_level = mini(int(ConfigLoader.load_config(Constants.ConfigPaths.GAME).get("max_levels", 50)), maxi(_highest_unlocked_level, _current_level_id + 1))
+	_campaign_page_start = -1
 	var point_records_value: Variant = _campaign_progress.get_value("campaign", "level_points", {})
 	var point_records: Dictionary = point_records_value if typeof(point_records_value) == TYPE_DICTIONARY else {}
 	point_records[str(_current_level_id)] = maxi(_current_level_points, int(point_records.get(str(_current_level_id), 0)))
@@ -3514,6 +3544,11 @@ func _record_level_completion() -> bool:
 		_economy_manager.add_stars(star_delta)
 	if star_delta > 0:
 		_campaign_progress.set_value("campaign", "total_stars", int(_campaign_progress.get_value("campaign", "total_stars", 0)) + star_delta)
+	var stamp := DailyActivities.stamp(_campaign_progress, TimeHelper.current_unix_time())
+	_last_daily_stamp = stamp
+	if not stamp.is_empty():
+		_grant_activity_coins(int(stamp.coins))
+	_progress_transaction = false
 	_persist_campaign_progress()
 	return old_stars == 0
 
@@ -3849,3 +3884,155 @@ func _bind_ad_button(button: Button, placement: String) -> void:
 			_ads.availability_changed.disconnect(refresh)
 	)
 	refresh.call()
+
+
+func _grant_activity_coins(amount: int) -> void:
+	if _reward_manager != null:
+		_reward_manager.grant_rewards([{"type": Constants.RewardType.COINS, "amount": amount}])
+	elif _economy_manager != null:
+		_economy_manager.add_coins(amount)
+
+
+func _open_portrait_puzzle() -> void:
+	if _portrait_layer != null and is_instance_valid(_portrait_layer):
+		return
+	var now := TimeHelper.current_unix_time()
+	var attempt := DailyActivities.active_attempt(_campaign_progress, now)
+	if not attempt.is_empty():
+		_show_portrait_attempt(attempt)
+		return
+	var dialog := ConfirmationDialog.new()
+	dialog.title = "Roadside evidence puzzle"
+	var collection: Dictionary = _campaign_progress.get_value("daily", "portraits", {})
+	var config := DailyActivities.settings()
+	dialog.dialog_text = "Restore a portrait in %d seconds for %d coins.\nTwo puzzles daily, at 00:00 and 12:00 UTC.\nStarting uses this slot. The timer continues when you leave.\nThe attempt ends at the next reset if sooner.\nPortrait collection: %d / %d\nComplete a puzzle or campaign level for your daily stamp." % [int(config.portrait_seconds), int(config.portrait_coins), collection.size(), config.portraits.size()]
+	dialog.ok_button_text = "Start timed puzzle"
+	dialog.get_ok_button().disabled = not DailyActivities.available(_campaign_progress, now)
+	dialog.confirmed.connect(_start_portrait_attempt)
+	dialog.confirmed.connect(dialog.queue_free)
+	dialog.canceled.connect(dialog.queue_free)
+	add_child(dialog)
+	dialog.popup_centered(Vector2i(mini(600, int(get_viewport_rect().size.x) - 32), 260))
+
+
+func _start_portrait_attempt() -> void:
+	var attempt := DailyActivities.start_portrait(_campaign_progress, TimeHelper.current_unix_time())
+	if attempt.is_empty():
+		return
+	_persist_campaign_progress()
+	_show_portrait_attempt(attempt)
+
+
+func _show_portrait_attempt(attempt: Dictionary) -> void:
+	_portrait_layer = CanvasLayer.new()
+	_portrait_layer.layer = 20
+	_portrait_layer.name = "PortraitPuzzleLayer"
+	add_child(_portrait_layer)
+	_portrait_puzzle = PortraitPuzzle.new()
+	_portrait_puzzle.configure(attempt)
+	_portrait_puzzle.closed.connect(_close_portrait_puzzle)
+	_portrait_puzzle.pieces_changed.connect(_save_portrait_pieces)
+	_portrait_puzzle.completed.connect(_complete_portrait_puzzle)
+	_portrait_layer.add_child(_portrait_puzzle)
+
+
+func _save_portrait_pieces(slot: int, pieces: Array) -> void:
+	var now := TimeHelper.current_unix_time()
+	var attempt := DailyActivities.active_attempt(_campaign_progress, now)
+	if attempt.is_empty() or int(attempt.slot) != slot:
+		return
+	attempt.pieces = pieces.duplicate()
+	_campaign_progress.set_value("daily", "attempt", attempt)
+	_campaign_progress.set_value("daily", "last_seen", now)
+	_persist_campaign_progress()
+
+
+func _complete_portrait_puzzle(slot: int) -> void:
+	_progress_transaction = true
+	var result := DailyActivities.finish_portrait(_campaign_progress, slot, TimeHelper.current_unix_time())
+	if not result.is_empty():
+		_grant_activity_coins(int(result.coins))
+	_progress_transaction = false
+	_persist_campaign_progress()
+	if not result.is_empty() and _portrait_puzzle != null:
+		_portrait_puzzle.show_reward(int(result.coins), int(result.streak))
+
+
+func _close_portrait_puzzle() -> void:
+	if _portrait_layer != null and is_instance_valid(_portrait_layer):
+		_portrait_layer.queue_free()
+	_portrait_layer = null
+	_portrait_puzzle = null
+
+
+func _record_daily_mission(kind: String, amount: int) -> void:
+	_progress_transaction = true
+	var coins := DailyActivities.record_mission(_campaign_progress, kind, amount, TimeHelper.current_unix_time())
+	if coins > 0:
+		_grant_activity_coins(coins)
+	_progress_transaction = false
+	_persist_campaign_progress()
+
+
+func _show_daily_rewards() -> void:
+	if _daily_rewards_layer != null and is_instance_valid(_daily_rewards_layer):
+		return
+	var layer := CanvasLayer.new()
+	_daily_rewards_layer = layer
+	layer.layer = 20
+	var panel := PanelContainer.new()
+	panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var daily_style := StyleBoxFlat.new()
+	daily_style.bg_color = Color("#102c2b")
+	daily_style.content_margin_left = 20
+	daily_style.content_margin_right = 20
+	daily_style.content_margin_top = 20
+	daily_style.content_margin_bottom = 20
+	panel.add_theme_stylebox_override("panel", daily_style)
+	var scroll := ScrollContainer.new()
+	panel.add_child(scroll)
+	var content := VBoxContainer.new()
+	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	content.add_theme_constant_override("separation", 12)
+	scroll.add_child(content)
+	var close := _make_menu_button("BACK TO TRAIL")
+	close.pressed.connect(_close_daily_rewards)
+	content.add_child(close)
+	var config := DailyActivities.settings()
+	var text := "DAILY REWARDS\nComplete a campaign case or portrait puzzle to earn a stamp.\n"
+	for index in config.streak_coins.size():
+		text += "Day %d: %d coins\n" % [index + 1, int(config.streak_coins[index])]
+	text += "The reward cycle repeats every 7 stamps.\nOne missed day is protected once every %d days.\nEarn %d stamps in a UTC Monday to Sunday week: +%d coins.\nDaily reset: 00:00 UTC. Portrait slots: 00:00 and 12:00 UTC.\n\nTODAY'S GOALS\n" % [int(config.grace_cooldown_days), int(config.weekly_days), int(config.weekly_coins)]
+	var today := DailyActivities.day_at(TimeHelper.current_unix_time())
+	var counts: Dictionary = _campaign_progress.get_value("daily", "missions", {}) if int(_campaign_progress.get_value("daily", "mission_day", -1)) == today else {}
+	for mission in config.missions:
+		text += "%s: %d / %d (+%d coins)\n" % [str(mission.title), mini(int(mission.target), int(counts.get(str(mission.id), 0))), int(mission.target), int(mission.coins)]
+	text += "\nPORTRAIT ALBUM"
+	var label := _make_label(text, 21)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	content.add_child(label)
+	var collection: Dictionary = _campaign_progress.get_value("daily", "portraits", {})
+	for portrait in config.portraits:
+		var count := int(collection.get(str(portrait), 0))
+		var image := TextureRect.new()
+		image.texture = ResourceManager.load_texture(str(portrait))
+		image.custom_minimum_size = Vector2(120, 140)
+		image.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		image.modulate = Color.WHITE if count > 0 else Color(0.15, 0.15, 0.15)
+		content.add_child(image)
+		var caption := _make_label("Restored %d times" % count if count > 0 else "Not restored yet", 18)
+		caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		content.add_child(caption)
+	var back := _make_menu_button("BACK TO TRAIL")
+	back.pressed.connect(_close_daily_rewards)
+	content.add_child(back)
+	layer.add_child(panel)
+	add_child(layer)
+
+
+func _close_daily_rewards() -> void:
+	if _daily_rewards_layer != null and is_instance_valid(_daily_rewards_layer):
+		_daily_rewards_layer.queue_free()
+	_daily_rewards_layer = null

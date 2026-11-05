@@ -1,0 +1,11 @@
+// Applied only to Android release variants; debug exports keep their existing behavior.
+android {
+    buildTypes {
+        release {
+            minifyEnabled true
+            // Godot and plugins load Android resources dynamically.
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'save-the-baby-proguard-rules.pro'
+        }
+    }
+}

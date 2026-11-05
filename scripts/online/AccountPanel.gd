@@ -22,6 +22,7 @@ func initialize(current_game: Game) -> void:
 	account.login_starting.connect(_on_login_starting)
 	account.login_browser_opened.connect(_on_login_browser_opened)
 	account.login_start_failed.connect(_on_login_start_failed)
+	account.login_status_changed.connect(_on_login_status_changed)
 	account.logged_out.connect(_on_logout)
 	account.message.connect(_notice)
 	purchases.message.connect(_notice)
@@ -84,13 +85,13 @@ func show_account() -> void:
 	status.add_theme_font_override("font",Game.DISPLAY_FONT)
 	status.add_theme_font_size_override("font_size",23)
 	status.add_theme_color_override("font_color",Color("#4b3424"))
-	status.text = ("%s · %d purchased coins" % [account.player_name,account.wallet]) if account.signed_in() else "Play as a guest, or connect a Google account to sync progress."
+	status.text = ("%s · %d purchased coins" % [account.player_name,account.wallet]) if account.signed_in() else "Sign in with your existing Google account to sync progress, or continue playing as a guest."
 	content.add_child(status)
 	if not account.configured():
 		status.text = "Google account sign-in is unavailable right now. You can continue playing as a guest."
 	if not account.signed_in():
-		_button(content,"CREATE OR CONNECT GOOGLE ACCOUNT",_sign_in.bind("adult"),not account.configured(),true)
-		_button(content,"PARENT / GUARDIAN ACCOUNT",_sign_in.bind("guardian"),not account.configured(),true)
+		_button(content,"SIGN IN WITH GOOGLE",_sign_in.bind("adult"),not account.configured(),true)
+		_button(content,"PARENT / GUARDIAN SIGN-IN",_sign_in.bind("guardian"),not account.configured(),true)
 		_login_spinner = ProgressBar.new()
 		_login_spinner.indeterminate = true
 		_login_spinner.custom_minimum_size = Vector2(0,20)
@@ -112,6 +113,11 @@ func show_account() -> void:
 		_login_status.add_theme_color_override("font_color",Color("#4b3424"))
 		_login_status.hide()
 		content.add_child(_login_status)
+		if account.login_in_progress():
+			_on_login_starting()
+			_on_login_status_changed("Waiting for Google sign-in. Finish in your browser, then tap Return to game.")
+			_button(content,"CHECK SIGN-IN STATUS",account.resume_login,false,true)
+			_button(content,"CANCEL SIGN-IN",_cancel_sign_in,false,true)
 	else:
 		_button(content,"SAVE TO CLOUD",_upload)
 		_button(content,"LOAD CLOUD PROGRESS",_confirm_download)
@@ -171,19 +177,31 @@ func _sign_in(owner_mode: String) -> void:
 func _on_login_starting() -> void:
 	if not is_instance_valid(_login_dialog): return
 	for button in _login_buttons: button.disabled = true
-	_login_dialog.get_ok_button().disabled = true
+	_login_dialog.get_ok_button().disabled = false
 	_login_spinner.show()
 	_login_status.text = "Preparing Google sign-in..."
 	_login_status.show()
 
 func _on_login_browser_opened() -> void:
-	if is_instance_valid(_login_dialog):
-		_login_dialog.hide()
-		_login_dialog.queue_free()
-	_login_dialog = null
+	_on_login_status_changed("Finish signing in with Google, then tap Return to game in the browser.")
+	if is_instance_valid(_login_dialog) and _login_dialog.find_child("CancelGoogleLogin", true, false) == null:
+		var cancel := _login_dialog.add_button("CANCEL SIGN-IN", false, "cancel_login")
+		cancel.name = "CancelGoogleLogin"
+		cancel.pressed.connect(_cancel_sign_in)
+
+func _on_login_status_changed(text: String) -> void:
+	if is_instance_valid(_login_dialog) and is_instance_valid(_login_status):
+		_login_status.text = text
+		_login_status.show()
+
+func _cancel_sign_in() -> void:
+	account.cancel_login()
+	_on_login_start_failed("Sign-in canceled. You can sign in again or continue as a guest.")
 
 func _on_login_start_failed(text: String) -> void:
-	if not is_instance_valid(_login_dialog): return
+	if not is_instance_valid(_login_dialog):
+		_notice(text)
+		return
 	_login_spinner.hide()
 	_login_status.text = text
 	_login_status.show()
@@ -236,6 +254,10 @@ func _set_owner(owner: String) -> void:
 	CampaignProgressStore.write(saved,OWNER_PATH)
 
 func _on_login_completed(profile: Dictionary) -> void:
+	if is_instance_valid(_login_dialog):
+		_login_dialog.hide()
+		_login_dialog.queue_free()
+	_login_dialog = null
 	if not _safe_menu():
 		_pending_login = profile
 		_notice("Signed in. Open Account & Coins from the map to load cloud progress.")

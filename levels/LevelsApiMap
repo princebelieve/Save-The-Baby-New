@@ -10,12 +10,14 @@ levels/
     level001.json
     level002.json
     ...
-    level050.json
+    level1050.json
+
+The campaign currently contains 1,050 numbered level files. Cases 001 through 050 are preserved; cases 051 through 1050 use the same complete JSON schema. Missing files are not generated at runtime.
 
 Future versions can simply add:
 
-level051.json
-level052.json
+level1051.json
+level1052.json
 ...
 
 without modifying the engine.

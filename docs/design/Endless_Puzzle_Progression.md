@@ -36,9 +36,11 @@ Every case must be winnable from at least one legal move sequence within its mov
 
 ## Endless generation contract
 
-The shipped campaign currently has authored JSON files through level 050. LevelManager loads numbered files, while CampaignMap scans the files that exist. That supports adding more authored files; it does not yet generate endless cases.
+The campaign contains 1,050 numbered JSON files in levels/: level001.json through level1050.json. The original 50 files remain intact. Cases 051 through 1050 were composed offline and written as complete, editable files using the existing Levels API schema. LevelManager and the map read these files directly; missing files are not generated at runtime, and saved generation snapshots do not override them. Reward entries for the additional cases live in configs/rewards.json. The map displays 50 cases per page.
 
-Endless play should be implemented as a data-driven extension, not as a second hard-coded game:
+The optional content-building tool is tools/materialize_campaign.tscn, backed by tools/CampaignLevelBuilder.gd and configs/endless_progression.json. It skips existing files to preserve manual edits and is never called by gameplay. To add or tune a shipped case, edit its numbered JSON file and reward entry using the existing project system.
+
+The following is a future endless-play proposal, separate from the current file-backed campaign:
 
 1. Add configs/endless_progression.json for chapter length, difficulty cadence, objective pools, board templates, allowed modifiers, reward bands, and caps.
 2. Add an EndlessLevelGenerator that accepts a level number and stable seed and returns the same full Level JSON schema used by authored files.
@@ -98,8 +100,19 @@ Each authored case should have a short design note naming the rule it teaches or
 The current runtime still has these known extension points:
 
 - _get_primary_objective() and the gameplay HUD primarily model one evidence objective; the added blocker requirement is a secondary counter. Full objectives[] support needs a generalized objective tracker rather than more conditionals in Game.gd.
-- Endless generation, virtual map pages, deterministic seeds, and generated-board feasibility validation are not implemented yet.
+- The campaign is file-backed through level 1050, with paged map sections and seeded board generation. Automated checks cover every added JSON file and runtime board opening; full solution search and difficulty calibration remain open. Runtime endless generation is not enabled.
 - Store purchases and ads are not integrated with real platform services.
 - Difficulty definitions and progression cadence need a playable tuning pass across device sizes.
 
 Implement those gaps through the named APIs. Do not solve them by embedding level numbers, prices, reward amounts, or asset filename guesses in gameplay code.
+
+
+## Daily activities implemented
+
+`configs/daily_activities.json` configures a seven-stamp coin cycle, one missed-day protection per seven days, a five-stamp weekly bonus, and daily goals for special creation and blocker clearing. A completed campaign case (including a replay) or restored portrait earns a stamp once per UTC calendar day. Goal rewards do not themselves earn a stamp.
+
+The campaign footer opens the portrait game and the daily rewards/portrait album screen. Portraits are nine-piece tap-to-swap puzzles with a 120-second timer and no lives, moves, or campaign progress cost. Slots reset at 00:00 and 12:00 UTC (01:00 and 13:00 in Lagos). Starting consumes the current slot; exiting preserves the arrangement and deadline so a player can resume until expiry. Attempts stop at the next slot boundary. A slot can pay only once, and restored portraits accumulate in the album.
+
+Daily claims and economy changes are written together through CampaignProgressStore. Clock rollback is rejected against the last recorded activity time; the live countdown also checks monotonic time. This is an offline device-clock design, not server-authoritative scheduling or cross-device anti-cheat. The existing account snapshot includes the new save sections.
+
+Run `tools/run_checks.ps1 -Suite progression_daily_checks` to check the 1,000 added level files and runtime board openings, calendar/claim rules, map pagination, portrait completion, and persistent rewards. This checks valid starting boards and integration, not a proof that every case has a winning sequence within its move budget. The generated cadence and economy still need a human playtesting pass before release.

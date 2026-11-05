@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "reset_timezone": "UTC",
+  "slot_hours": 12,
+  "portrait_seconds": 120,
+  "portrait_coins": 30,
+  "streak_coins": [
+    10,
+    15,
+    20,
+    25,
+    30,
+    40,
+    60
+  ],
+  "grace_cooldown_days": 7,
+  "weekly_days": 5,
+  "weekly_coins": 75,
+  "portraits": [
+    "res://assets/sprites/characters/ethan_portrait_cutout.png",
+    "res://assets/sprites/characters/david_portrait_cutout.png",
+    "res://assets/sprites/characters/victor_portrait_badge_cutout.png"
+  ],
+  "missions": [
+    {
+      "id": "specials",
+      "title": "Create 2 special pieces",
+      "target": 2,
+      "coins": 20
+    },
+    {
+      "id": "blockers",
+      "title": "Clear 3 blockers",
+      "target": 3,
+      "coins": 25
+    }
+  ]
+}

@@ -132,6 +132,15 @@ func calculate_reward_set(type: String, data) -> Array:
 		_:
 			return []
 
+	# Godot's JSON reader represents numbers as floats. Normalize whole-number
+	# enum IDs and counts before the integer-only reward validator/distributor.
+	for reward in rewards:
+		if reward is not Dictionary:
+			continue
+		for field in ["type", "amount"]:
+			var value: Variant = reward.get(field)
+			if value is float and is_finite(value) and value == floor(value):
+				reward[field] = int(value)
 	if not _validator.validate_reward_list(rewards):
 		return []
 	return rewards

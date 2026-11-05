@@ -3,6 +3,34 @@ class_name CampaignMap
 
 signal level_selected(level_id: int)
 signal back_requested
+signal page_requested(direction: int)
+signal portrait_requested
+signal daily_rewards_requested
+
+var _daily_progress: ConfigFile
+var _daily_label: Label
+var _portrait_button: Button
+var _daily_tick := 0.0
+
+
+func configure_daily(progress: ConfigFile) -> void:
+	_daily_progress = progress
+
+
+func _process(delta: float) -> void:
+	_daily_tick -= delta
+	if _daily_tick > 0.0 or _daily_label == null or _daily_progress == null:
+		return
+	_daily_tick = 1.0
+	var now := TimeHelper.current_unix_time()
+	var config := DailyActivities.settings()
+	var seconds := (DailyActivities.slot_at(now) + 1) * int(config.slot_hours) * 3600 - now
+	var active := not DailyActivities.active_attempt(_daily_progress, now).is_empty()
+	var ready := DailyActivities.available(_daily_progress, now)
+	_portrait_button.text = "Resume portrait" if active else ("Play portrait: +%d coins" % int(config.portrait_coins) if ready else "Next portrait in %02d:%02d:%02d" % [seconds / 3600, (seconds % 3600) / 60, seconds % 60])
+	_portrait_button.disabled = not active and not ready
+	var stamped := DailyActivities.day_at(now) == int(_daily_progress.get_value("daily", "last_day", -1))
+	_daily_label.text = "Streak: %d days | %s | Week: %d / %d" % [int(_daily_progress.get_value("daily", "streak", 0)), "Stamped today" if stamped else "Play to earn today's stamp", int(_daily_progress.get_value("daily", "weekly_count", 0)) if int(_daily_progress.get_value("daily", "week", -1)) == int(floor(float(DailyActivities.day_at(now) + 3) / 7)) else 0, int(config.weekly_days)]
 
 const GRASS_PATH := "res://assets/sprites/backgrounds/grass_terrain_texture.jpeg"
 const SIGNPOST_PATH := "res://assets/sprites/props/wooden_signpost_cutout.png"
@@ -108,7 +136,7 @@ func _build_map() -> void:
 	scroll.name = "CampaignScroll"
 	scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	scroll.offset_top = 118.0
-	scroll.offset_bottom = -12.0
+	scroll.offset_bottom = -225.0
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 	add_child(scroll)
@@ -164,17 +192,50 @@ func _build_map() -> void:
 	back.pressed.connect(back_requested.emit)
 	header.add_child(back)
 
-	var hint := Label.new()
-	hint.text = "Follow the trail to find Ethan"
-	hint.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
-	hint.offset_top = -45
-	hint.offset_left = 12
-	hint.offset_right = -12
-	hint.offset_bottom = -4
-	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	hint.add_theme_font_size_override("font_size", 20)
-	hint.add_theme_color_override("font_color", Color("#fff1ca"))
-	add_child(hint)
+	var footer_background := ColorRect.new()
+	footer_background.color = Color("#102c2b")
+	footer_background.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	footer_background.offset_top = -225
+	add_child(footer_background)
+	var footer := VBoxContainer.new()
+	footer.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	footer.offset_top = -220
+	footer.offset_left = 16
+	footer.offset_right = -16
+	footer.add_theme_constant_override("separation", 5)
+	add_child(footer)
+	var pages := HBoxContainer.new()
+	footer.add_child(pages)
+	var first := int(_level_records.front().level_id) if not _level_records.is_empty() else 1
+	var last := int(_level_records.back().level_id) if not _level_records.is_empty() else 50
+	for direction in [-1, 1]:
+		var page := Button.new()
+		page.text = "Earlier cases" if direction < 0 else "Later cases"
+		page.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		page.custom_minimum_size.y = 42
+		page.disabled = first <= 1 if direction < 0 else last >= int(ConfigLoader.load_config(Constants.ConfigPaths.GAME).get("max_levels", 50))
+		page.pressed.connect(func(): page_requested.emit(direction))
+		pages.add_child(page)
+	var range_label := Label.new()
+	range_label.text = "Cases %d–%d of %d" % [first, last, int(ConfigLoader.load_config(Constants.ConfigPaths.GAME).get("max_levels", 50))]
+	range_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	footer.add_child(range_label)
+	_portrait_button = Button.new()
+	_portrait_button.custom_minimum_size.y = 48
+	_portrait_button.text = "Roadside portrait puzzle"
+	_portrait_button.pressed.connect(portrait_requested.emit)
+	footer.add_child(_portrait_button)
+	_daily_label = Label.new()
+	_daily_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_daily_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_daily_label.add_theme_font_size_override("font_size", 16)
+	footer.add_child(_daily_label)
+	var daily_details := Button.new()
+	daily_details.text = "Daily rewards & portrait album"
+	daily_details.custom_minimum_size.y = 36
+	daily_details.pressed.connect(daily_rewards_requested.emit)
+	footer.add_child(daily_details)
+
 
 
 func _build_chapter_art(map: Control, index: int, chapter: Dictionary, levels: Array[Dictionary]) -> PackedVector2Array:
@@ -355,6 +416,8 @@ func _make_white_key_material() -> ShaderMaterial:
 
 func _add_david_progress_marker(map: Control) -> void:
 	var current_level := _highest_unlocked_level
+	if not _level_positions.has(current_level) and current_level < int(_level_positions.keys().min()):
+		return
 	if not _level_positions.has(current_level) and not _level_positions.is_empty():
 		current_level = int(_level_positions.keys().max())
 	var current_position: Vector2 = _level_positions.get(current_level, Vector2(_map_width * 0.5, 225.0))

@@ -35,11 +35,10 @@ func _run() -> void:
 	game._account_panel._set_owner("test-user")
 	game._account_panel.show_account()
 	await get_tree().process_frame
-	var found := false
-	for child in game.get_children():
-		if child is AcceptDialog and child.title == "ACCOUNT & COINS":
-			found = true
-			child.queue_free()
+	var dialog = game._account_panel._login_dialog
+	var found: bool = is_instance_valid(dialog) and dialog.visible
+	if found:
+		dialog.queue_free()
 	assert(found)
 	var catalog: Dictionary = await account.api("/v1/catalog")
 	assert(catalog.packs.coins_500 == 500)

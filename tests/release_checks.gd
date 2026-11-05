@@ -93,9 +93,9 @@ func _run() -> void:
 		var shuffler := BoardShuffler.new()
 		shuffler.initialize()
 		check(not shuffler.needs_shuffle(board), "Level %d must have a legal opening move" % level_id)
-		var first: Tile = board.get_tile(Vector2i.ZERO)
+		var first: Tile = board.get_all_tiles()[0]
 		first.set_powerup(Constants.PowerupType.ROCKET)
-		check(not board.swap_tiles(Vector2i.ZERO, Vector2i(3, 3)), "Specials must reject distant swaps")
+		check(not board.swap_tiles(first.get_grid_position(), Vector2i(3, 3)), "Specials must reject distant swaps")
 		check(board.get_remaining_moves() == int(data["moves"]["total"]), "Rejected swaps must not spend moves")
 		first.clear_powerup()
 		if level_id in [1, 8, 22, 40, 50]:
@@ -114,7 +114,7 @@ func _run() -> void:
 				await get_tree().process_frame
 			check(not board.is_locked(), "Level %d must finish its cascades" % level_id)
 			check(board.is_stable(), "Level %d must resolve to a stable board" % level_id)
-			check(board.get_all_tiles().size() == board.get_width() * board.get_height(), "Gravity must refill every cell")
+			check(board.get_all_tiles().size() == board.get_width() * board.get_height() - board._blocked_cells.size(), "Gravity must refill every playable cell")
 			check(board.get_remaining_moves() == int(data["moves"]["total"]) - 1, "One legal swap must cost exactly one move")
 			validator.free()
 		shuffler.free()
@@ -162,20 +162,20 @@ func _check_story_flow() -> void:
 	await get_tree().process_frame
 	check(game._launch_layer == null, "Starting play must clear the launch-screen reference")
 	check(game._campaign_layer != null, "Skipping opening must reach the campaign map")
-	game.get_node("Managers/LevelManager").load_level(50)
+	game.get_node("Managers/LevelManager").load_level(1050)
 	game._begin_level("alone")
 	game._finish_tutorial()
 	game._show_booster_confirmation("rocket")
 	check(game._board.is_locked(), "Booster confirmation must block board input")
-	game._booster_confirm.canceled.emit()
+	game._booster_confirm.skipped.emit()
 	check(not game._board.is_locked(), "Canceling confirmation must restore play")
 	game._selected_booster = "rocket"
 	game._board.set_booster_mode("rocket")
 	game._cancel_booster_targeting()
 	check(not game._board.is_locked(), "Canceling a booster target must not freeze the board")
-	game._show_level_result(true)
-	check(game._completed_levels.has("50"), "Final case completion must persist")
-	game._next_level_after_win()
+	await game._show_level_result(true)
+	check(game._completed_levels.has("1050"), "Final case completion must persist")
+	await game._next_level_after_win()
 	await get_tree().process_frame
 	check(game._pending_level_id == 0 and game._campaign_layer != null, "The last available case must return to the continuing campaign map")
 	check(audio._music_player.stream != null and audio._current_music_track == "suspense_opening", "Resuming the campaign must request background music")

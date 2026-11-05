@@ -1,0 +1,131 @@
+{
+    "audio": {
+        "game_over": "",
+        "music": "",
+        "victory": ""
+    },
+    "background": {
+        "image": "res://assets/sprites/backgrounds/dirt_board_background.jpeg",
+        "parallax": false
+    },
+    "board": {
+        "blocked_cells": [
+            [
+                0,
+                7
+            ],
+            [
+                7,
+                7
+            ]
+        ],
+        "columns": 8,
+        "locked_cells": [],
+        "rows": 8,
+        "spawn_points": [],
+        "tile_size": 64
+    },
+    "description": "Gather fingerprint evidence and clear every blocker on this patrol.",
+    "difficulty": "EASY",
+    "level_id": 106,
+    "metadata": {
+        "chapter_end_level": 110,
+        "chapter_id": 12,
+        "chapter_start_level": 101,
+        "chapter_title": "Factory Patrol",
+        "generator_version": 1,
+        "map_background": "factory_map_section_cutout.png",
+        "map_landmark": "police_car_topdown_cutout.png",
+        "map_props": [
+            "wooden_bridge_cutout.png",
+            "police_car_topdown_cutout.png"
+        ],
+        "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
+        "seed": 1581317
+    },
+    "moves": {
+        "total": 32
+    },
+    "name": "Evidence Patrol 106",
+    "objectives": [
+        {
+            "amount": 18,
+            "target": "FINGERPRINT",
+            "type": "COLLECT_ITEMS"
+        }
+    ],
+    "obstacles": {
+        "items": [
+            {
+                "health": 1,
+                "type": "chain",
+                "x": 5,
+                "y": 3
+            },
+            {
+                "health": 1,
+                "type": "tape",
+                "x": 2,
+                "y": 4
+            }
+        ]
+    },
+    "powerups": {
+        "available": [
+            "ROCKET",
+            "BOMB",
+            "THUNDER"
+        ],
+        "enabled": true
+    },
+    "rewards": {
+        "coins": 50,
+        "first_try_bonus": 10,
+        "perfect_bonus": 20,
+        "powerups": [],
+        "stars": 3
+    },
+    "settings": {
+        "allow_boosters": true,
+        "allow_shuffle": true,
+        "available_boosters": [
+            "rocket",
+            "bomb",
+            "thunder",
+            "ethan"
+        ],
+        "time_limit": 0
+    },
+    "story": {
+        "after_level": "",
+        "before_level": "",
+        "first_clear": "",
+        "return_to_map": true
+    },
+    "tile_pool": {
+        "tiles": [
+            "key",
+            "phone",
+            "fingerprint",
+            "recorder",
+            "clock",
+            "ethan",
+            "detective",
+            "victor"
+        ],
+        "weights": [
+            16,
+            17,
+            18,
+            16,
+            16,
+            1,
+            1,
+            1
+        ]
+    },
+    "tutorial": {
+        "enabled": false,
+        "steps": []
+    }
+}

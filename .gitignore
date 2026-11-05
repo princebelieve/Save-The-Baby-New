@@ -3,6 +3,11 @@
 /android/
 /build/
 /.test-data/
+/.gradle-cache/
+
+# Generated Python bytecode from local release tools.
+__pycache__/
+*.py[cod]
 
 /.tmp/
 

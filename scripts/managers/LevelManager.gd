@@ -110,6 +110,10 @@ func is_last_level() -> bool:
 	return _current_level >= max_levels
 
 
+func has_level(level_id: int) -> bool:
+	return level_id > 0 and JsonLoader.file_exists(_build_level_path(level_id))
+
+
 func _build_level_path(level_id: int) -> String:
 	return "%s%s%03d%s" % [
 		Constants.LevelPaths.DIRECTORY,

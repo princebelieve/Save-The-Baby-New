@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "first_level": 51,
+  "last_level": 1050,
+  "chapter_length": 10,
+  "page_size": 50,
+  "seed": 741903,
+  "base_level": 41,
+  "targets": [
+    "KEY",
+    "PHONE",
+    "FINGERPRINT",
+    "RECORDER",
+    "CLOCK"
+  ],
+  "cadence": [
+    "EASY",
+    "EASY",
+    "MEDIUM",
+    "MEDIUM",
+    "HARD",
+    "EASY",
+    "MEDIUM",
+    "HARD",
+    "MEDIUM",
+    "HARD"
+  ],
+  "bands": {
+    "EASY": {
+      "moves": 32,
+      "amount": 18,
+      "obstacles": 2
+    },
+    "MEDIUM": {
+      "moves": 30,
+      "amount": 24,
+      "obstacles": 4
+    },
+    "HARD": {
+      "moves": 28,
+      "amount": 30,
+      "obstacles": 6
+    }
+  },
+  "shapes": [
+    [
+      8,
+      8
+    ],
+    [
+      7,
+      8
+    ],
+    [
+      8,
+      7
+    ]
+  ],
+  "themes": [
+    {
+      "title": "River Watch",
+      "background": "river_map_section_cutout.png",
+      "landmark": "wooden_bridge_cutout.png"
+    },
+    {
+      "title": "Factory Patrol",
+      "background": "factory_map_section_cutout.png",
+      "landmark": "police_car_topdown_cutout.png"
+    }
+  ],
+  "obstacles": [
+    "lock",
+    "chain",
+    "tape"
+  ],
+  "coins": 50
+}

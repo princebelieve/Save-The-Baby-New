@@ -1,6 +1,7 @@
 import {spawn} from 'node:child_process';
 import {writeFile} from 'node:fs/promises';
-import {resolve} from 'node:path';
+import {resolve,dirname} from 'node:path';
+import {fileURLToPath} from 'node:url';
 import {createApp} from '../src/app.js';
 import {hash} from '../src/domain.js';
 import {MemoryDb} from './memory.js';
@@ -9,7 +10,7 @@ await db.collection('users').insertOne({_id:'test-user',name:'Test Player',walle
 await db.collection('sessions').insertOne({_id:hash(token),userId:'test-user',expires:new Date(Date.now()+300000)});
 const app=createApp({db,client:db,oauth:{},play:{},baseUrl:'http://localhost:3000',clientId:'test'});
 const server=app.listen(0,'127.0.0.1');await new Promise(resolve=>server.once('listening',resolve));
-const root=resolve('..');
+const root=resolve(dirname(fileURLToPath(import.meta.url)),'../..');
 const executable=process.env.GODOT_EXECUTABLE||'C:/Users/ASUS/My Tools/Godot/4.6.3/Godot_v4.6.3-stable_win64.exe';
 const child=spawn(executable,['--headless','--path',root,'res://tests/cloud_account_checks.tscn','--',`--test-api=http://127.0.0.1:${server.address().port}`],{env:{...process.env,APPDATA:resolve(root,'.test-data/online')},windowsHide:true});
 let output=''; const receive=chunk=>{output+=chunk; process.stdout.write(chunk);}; child.stdout.on('data',receive);child.stderr.on('data',receive);
