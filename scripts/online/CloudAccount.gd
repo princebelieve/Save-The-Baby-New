@@ -34,6 +34,8 @@ var _ready_to_sync := false
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	if preload("res://scripts/debug/DeveloperTools.gd").enabled():
+		return
 	var config: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://configs/online.json"))
 	if config is Dictionary:
 		base_url = str(config.get("api_base_url", "")).trim_suffix("/")

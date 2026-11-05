@@ -66,6 +66,10 @@ func _run() -> void:
 	var game := preload("res://scenes/game/Game.tscn").instantiate()
 	add_child(game)
 	await get_tree().create_timer(2).timeout
+	check(game.get_node_or_null("DeveloperTools") == null,"normal play exposes no developer controls")
+	Engine.set_meta("developer_clock_offset",864000)
+	check(abs(TimeHelper.current_unix_time()-int(Time.get_unix_time_from_system())) <= 1,"normal play ignores developer clock metadata")
+	Engine.remove_meta("developer_clock_offset")
 	game._skip_opening_story()
 	game.get_node("Managers/LevelManager").load_level(435)
 	game._begin_level("signal")

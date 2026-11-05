@@ -27,6 +27,8 @@ var _cover: CanvasLayer
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	if preload("res://scripts/debug/DeveloperTools.gd").enabled():
+		return
 	if OS.has_feature("editor") and OS.is_debug_build() and DisplayServer.get_name() != "headless" and OS.get_name() != "Android" and "--ad-preview" in OS.get_cmdline_user_args():
 		var factory = load("res://addons/admob/internal/mock/mock_admob_factory.gd")
 		for name in ["PoingGodotAdMob", "PoingGodotAdMobInterstitialAd", "PoingGodotAdMobRewardedAd"]:
@@ -40,6 +42,8 @@ func _ready() -> void:
 	# Boot starts consent after the company splash is finished.
 
 func start_session() -> void:
+	if preload("res://scripts/debug/DeveloperTools.gd").enabled():
+		return
 	if OS.get_name() == "Android" and Engine.has_singleton("PoingGodotAdMob") and not _initialized and not _initializing:
 		var settings := ConfigFile.new()
 		if settings.load(AGE_SETTINGS) == OK and settings.get_value("audience", "group", "") in ["under_13", "13_15", "16_17", "adult", "unknown"]:

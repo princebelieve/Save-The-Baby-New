@@ -15,6 +15,9 @@ var _packs_only := false
 const ITEMS := {"life":"life", "lives":"life_refill", "rocket":"rocket_booster", "bomb":"bomb_booster", "thunder":"thunder_booster", "ethan":"ethan_assist", "continue":"continue"}
 
 func open(current_game: Game, focus := "") -> void:
+	if preload("res://scripts/debug/DeveloperTools.gd").enabled():
+		current_game._show_shop_notice("Use DEV TOOLS to refill test lives and boosters. Purchases are disabled in Developer Play.")
+		return
 	if is_instance_valid(_layer):
 		return
 	game = current_game
@@ -85,7 +88,7 @@ func _button(value: String, action: Callable, disabled := false) -> void:
 	button.custom_minimum_size.x = 0
 	button.clip_text = true
 	button.tooltip_text = value
-	button.add_theme_font_size_override("font_size",22)
+	button.add_theme_font_size_override("font_size",32)
 	button.disabled = disabled or _busy
 	button.pressed.connect(action)
 	_content.add_child(button)
@@ -107,7 +110,7 @@ func _refresh() -> void:
 	heading.text = "COIN SHOP"
 	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	heading.add_theme_font_override("font",Game.DISPLAY_FONT)
-	heading.add_theme_font_size_override("font_size",26)
+	heading.add_theme_font_size_override("font_size",34)
 	heading.add_theme_color_override("font_color",Color("#4b3424"))
 	_content.add_child(heading)
 	_text("COINS AVAILABLE: %d\nEarned: %d  |  Purchased: %d\nYou can spend both balances here. Earned coins are used first." % [earned+paid,earned,paid])

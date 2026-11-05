@@ -50,6 +50,8 @@ class AuthReturnExportPlugin extends EditorExportPlugin:
 			output.store_string(source.replace(original, updated))
 
 	func _get_android_manifest_activity_element_contents(_platform: EditorExportPlatform, _debug: bool) -> String:
+		if str(get_option("package/unique_name")) == "com.savethebaby.developer":
+			return ""
 		# The generated release manifest discards children from the template's
 		# activity. Use Godot's activity hook so this filter survives that merge.
 		return """

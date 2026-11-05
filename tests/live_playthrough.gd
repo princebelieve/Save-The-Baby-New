@@ -107,7 +107,7 @@ func _ready() -> void:
 	await dismiss_dialog()
 	game._show_level_result(false)
 	await capture("25_failure")
-	await click_text(game._result_layer, "RETRY LEVEL")
+	await click_text(game._result_layer, "RETRY CASE")
 	if game._story_layer != null and is_instance_valid(game._story_skip_button):
 		await click(game._story_skip_button)
 	if game._briefing_layer != null:
@@ -119,7 +119,7 @@ func _ready() -> void:
 		leftover_special.set_powerup(Constants.PowerupType.ROCKET)
 	await game._show_level_result(true)
 	await capture("26_victory")
-	await click_text(game._result_layer, "CAMPAIGN MAP")
+	await click_text(game._result_layer, "INVESTIGATION MAP")
 	await capture("27_map_progress")
 	# Inspect every authored mechanic introduction and representative late HUD.
 	for level_id in [8, 9, 16, 23, 31, 41, 42, 43, 46, 48, 49, 50]:

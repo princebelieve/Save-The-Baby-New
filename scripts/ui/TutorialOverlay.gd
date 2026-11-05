@@ -131,12 +131,22 @@ func _build_bubble() -> void:
 	var bubble_content := VBoxContainer.new()
 	bubble_content.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	bubble_content.offset_left = 22
-	bubble_content.offset_top = 14
+	bubble_content.offset_top = 106
 	bubble_content.offset_right = -22
 	bubble_content.offset_bottom = -14
 	bubble_content.add_theme_constant_override("separation", 6)
 	bubble_content.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_bubble.add_child(bubble_content)
+	var guide_title := Label.new()
+	guide_title.text = "FIELD GUIDE"
+	guide_title.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	guide_title.offset_left = 22
+	guide_title.offset_right = -110
+	guide_title.offset_top = 22
+	guide_title.offset_bottom = 92
+	guide_title.add_theme_font_size_override("font_size", 32)
+	guide_title.add_theme_color_override("font_color", Color("#4b2d1a"))
+	_bubble.add_child(guide_title)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 12)
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -155,7 +165,7 @@ func _build_bubble() -> void:
 	row.add_child(content)
 	_heading = Label.new()
 	_heading.text = "DAVID"
-	_heading.add_theme_font_size_override("font_size", 19)
+	_heading.add_theme_font_size_override("font_size", 32)
 	_heading.add_theme_color_override("font_color", Color("#995221"))
 	_heading.add_theme_color_override("font_outline_color", Color("#fffaf0"))
 	_heading.add_theme_constant_override("outline_size", 2)
@@ -163,7 +173,7 @@ func _build_bubble() -> void:
 	content.add_child(_heading)
 	_body_label = Label.new()
 	_body_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_body_label.add_theme_font_size_override("font_size", 22)
+	_body_label.add_theme_font_size_override("font_size", 32)
 	_body_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_body_label.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	_body_label.add_theme_color_override("font_color", Color("#4b2d1a"))
@@ -177,9 +187,9 @@ func _build_bubble() -> void:
 	_body_scroll.add_child(_body_label)
 	_acknowledge_button = Button.new()
 	_acknowledge_button.text = "CONTINUE"
-	_acknowledge_button.custom_minimum_size = Vector2(178, 58)
+	_acknowledge_button.custom_minimum_size = Vector2(220, 92)
 	_acknowledge_button.size_flags_horizontal = Control.SIZE_SHRINK_END
-	_acknowledge_button.add_theme_font_size_override("font_size", 22)
+	_acknowledge_button.add_theme_font_size_override("font_size", 32)
 	_acknowledge_button.add_theme_color_override("font_color", Color("#4b2d1a"))
 	var ack_style := StyleBoxFlat.new()
 	ack_style.bg_color = Color("#d8b77b")
@@ -196,8 +206,8 @@ func _build_bubble() -> void:
 	bubble_content.add_child(footer)
 	_previous_button = Button.new()
 	_previous_button.text = "BACK"
-	_previous_button.custom_minimum_size = Vector2(92, 58)
-	_previous_button.add_theme_font_size_override("font_size", 20)
+	_previous_button.custom_minimum_size = Vector2(120, 92)
+	_previous_button.add_theme_font_size_override("font_size", 32)
 	_previous_button.pressed.connect(_previous_page)
 	footer.add_child(_previous_button)
 	var spacer := Control.new()
@@ -206,7 +216,7 @@ func _build_bubble() -> void:
 	footer.add_child(_acknowledge_button)
 	_skip_button = Button.new()
 	_skip_button.text = "X"
-	_skip_button.custom_minimum_size = Vector2(44, 44)
+	_skip_button.custom_minimum_size = Vector2(92, 92)
 	_skip_button.tooltip_text = "Skip coaching"
 	_skip_button.add_theme_color_override("font_color", Color("#4b2d1a"))
 	_skip_button.pressed.connect(func():
@@ -240,13 +250,13 @@ func _layout_tip() -> void:
 	var portrait_width := 104.0 if _speaker_portrait.visible else 0.0
 	var body_width := maxf(120.0, bubble_width - 68.0 - portrait_width)
 	var font := _body_label.get_theme_font("font")
-	var body_height := ceilf(font.get_multiline_string_size(_body_label.text, HORIZONTAL_ALIGNMENT_LEFT, body_width, 22).y) + 24.0
-	var action_height := 64.0 if _acknowledge_button.visible else 0.0
+	var body_height := ceilf(font.get_multiline_string_size(_body_label.text, HORIZONTAL_ALIGNMENT_LEFT, body_width, 32).y) + 24.0
+	var action_height := 100.0 if _acknowledge_button.visible else 0.0
 	var visible_body_height := minf(body_height, viewport.y * 0.55 - 80.0 - action_height)
 	_body_label.custom_minimum_size = Vector2(0, body_height)
 	_body_scroll.custom_minimum_size = Vector2(0, visible_body_height)
 	var row_height := maxf(visible_body_height + 40.0, 112.0 if _speaker_portrait.visible else 0.0)
-	var bubble_height := row_height + action_height + 28.0
+	var bubble_height := row_height + action_height + 120.0
 	_bubble.custom_minimum_size = Vector2(bubble_width, bubble_height)
 	_bubble.size = Vector2(bubble_width, bubble_height)
 	var bubble_x := clampf(hole.get_center().x - bubble_width * 0.5, 18.0, viewport.x - bubble_width - 18.0)
@@ -264,7 +274,7 @@ func _layout_tip() -> void:
 	_top_scroll_roll.size = Vector2(bubble_width - 10, 13)
 	_bottom_scroll_roll.position = Vector2(5, bubble_height - 13)
 	_bottom_scroll_roll.size = Vector2(bubble_width - 10, 13)
-	_skip_button.position = Vector2(bubble_width - 50, 6)
+	_skip_button.position = Vector2(bubble_width - 100, 6)
 	_skip_button.z_index = 3
 
 

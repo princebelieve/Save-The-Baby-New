@@ -3,7 +3,6 @@ class_name CampaignMap
 
 signal level_selected(level_id: int)
 signal back_requested
-signal page_requested(direction: int)
 signal portrait_requested
 signal daily_rewards_requested
 
@@ -27,19 +26,16 @@ func _process(delta: float) -> void:
 	var seconds := (DailyActivities.slot_at(now) + 1) * int(config.slot_hours) * 3600 - now
 	var active := not DailyActivities.active_attempt(_daily_progress, now).is_empty()
 	var ready := DailyActivities.available(_daily_progress, now)
-	_portrait_button.text = "Resume portrait" if active else ("Play portrait: +%d coins" % int(config.portrait_coins) if ready else "Next portrait in %02d:%02d:%02d" % [seconds / 3600, (seconds % 3600) / 60, seconds % 60])
+	_portrait_button.text = "Resume portrait" if active else ("Restore portrait: +%d coins" % int(config.portrait_coins) if ready else "Next portrait in %02d:%02d:%02d" % [seconds / 3600, (seconds % 3600) / 60, seconds % 60])
 	_portrait_button.disabled = not active and not ready
 	var stamped := DailyActivities.day_at(now) == int(_daily_progress.get_value("daily", "last_day", -1))
-	_daily_label.text = "Streak: %d days | %s | Week: %d / %d" % [int(_daily_progress.get_value("daily", "streak", 0)), "Stamped today" if stamped else "Play to earn today's stamp", int(_daily_progress.get_value("daily", "weekly_count", 0)) if int(_daily_progress.get_value("daily", "week", -1)) == int(floor(float(DailyActivities.day_at(now) + 3) / 7)) else 0, int(config.weekly_days)]
+	_daily_label.text = "%d days on the case | %s" % [int(_daily_progress.get_value("daily", "streak", 0)), "Briefing complete" if stamped else "Daily briefing ready"]
 
 const GRASS_PATH := "res://assets/sprites/backgrounds/grass_terrain_texture.jpeg"
 const SIGNPOST_PATH := "res://assets/sprites/props/wooden_signpost_cutout.png"
 const NODE_PATH := "res://assets/sprites/ui/level_node_empty_cutout.png"
 const LEVEL_BADGE_PATH := "res://assets/sprites/ui/level_badge.jpeg"
 const LOCKED_BADGE_PATH := "res://assets/sprites/ui/locked_level_badge_cutout.png"
-const ONE_STAR_BADGE_PATH := "res://assets/sprites/ui/level_node_stars.jpeg"
-const TWO_STAR_BADGE_PATH := "res://assets/sprites/ui/level_select_art.jpeg"
-const THREE_STAR_BADGE_PATH := "res://assets/sprites/ui/level_node_star_frame.jpeg"
 const DAVID_PORTRAIT_PATH := "res://assets/sprites/characters/david_portrait_cutout.png"
 const WHITE_KEY_SHADER := """
 shader_type canvas_item;
@@ -64,6 +60,8 @@ var _map_width := 720.0
 var _chapter_height := 610.0
 var _level_positions: Dictionary = {}
 var _map_scroll: ScrollContainer
+var _map_canvas: Control
+var _visible_chapters: Dictionary = {}
 
 
 func configure(route_name: String, level_records: Array[Dictionary], highest_unlocked_level: int = 1, completed_levels: Dictionary = {}) -> void:
@@ -74,13 +72,13 @@ func configure(route_name: String, level_records: Array[Dictionary], highest_unl
 
 
 func get_level_screen_rect(level_id: int) -> Rect2:
-	var level_button := get_node_or_null("CampaignScroll/CampaignTrail/Level%03d" % level_id) as Control
-	return level_button.get_global_rect() if level_button != null else Rect2()
+	if not _level_positions.has(level_id) or _map_scroll == null: return Rect2()
+	return Rect2(_map_scroll.global_position + _level_positions[level_id] - Vector2(64, 64 + _map_scroll.scroll_vertical), Vector2(128, 128))
 
 
 func _ready() -> void:
 	_map_width = get_viewport_rect().size.x
-	_chapter_height = maxf(570.0, _map_width * 0.86)
+	_chapter_height = maxf(2200.0, _map_width * 3.0)
 	_group_levels_into_chapters()
 	_build_map()
 
@@ -136,14 +134,15 @@ func _build_map() -> void:
 	scroll.name = "CampaignScroll"
 	scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	scroll.offset_top = 118.0
-	scroll.offset_bottom = -225.0
+	scroll.offset_bottom = -460.0
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 	add_child(scroll)
 	var map := Control.new()
 	map.name = "CampaignTrail"
 	map.mouse_filter = Control.MOUSE_FILTER_PASS
-	map.custom_minimum_size = Vector2(_map_width, _chapter_records.size() * _chapter_height)
+	map.custom_minimum_size = Vector2(_map_width, _chapter_records.size() * _chapter_height + 260)
+	_map_canvas = map
 	map.size = map.custom_minimum_size
 	scroll.add_child(map)
 
@@ -151,14 +150,20 @@ func _build_map() -> void:
 	for chapter_index in _chapter_records.size():
 		var chapter: Dictionary = _chapter_records[chapter_index]
 		var chapter_levels := _as_typed_levels(chapter.get("levels", []))
-		var points := _build_chapter_art(map, chapter_index, chapter, chapter_levels)
-		for point in points:
+		for step in chapter_levels.size():
+			var point := _node_position(chapter_index, step, chapter_levels.size())
+			_level_positions[int(chapter_levels[step].level_id)] = point
 			all_points.append(point)
 	_draw_trail(map, all_points)
-	for chapter_index in _chapter_records.size():
-		var chapter: Dictionary = _chapter_records[chapter_index]
-		_add_chapter_nodes(map, chapter_index, chapter, _as_typed_levels(chapter.get("levels", [])))
+	_refresh_visible_chapters()
+	scroll.get_v_scroll_bar().value_changed.connect(func(_value): _refresh_visible_chapters())
+	scroll.resized.connect(_refresh_visible_chapters)
 	_add_david_progress_marker(map)
+	var end := MobileGameUI.card(map, MobileGameUI.PURPLE)
+	end.name = "MoreLevelsAhead"
+	end.position = Vector2(32, _chapter_records.size() * _chapter_height + 20)
+	end.size = Vector2(_map_width - 64, 180)
+	MobileGameUI.label(end, "MORE LEVELS AHEAD\nThe investigation continues...", 38, Color.WHITE)
 
 	var header := ColorRect.new()
 	header.color = Color(0.035, 0.08, 0.075, 0.96)
@@ -170,7 +175,7 @@ func _build_map() -> void:
 	title.position = Vector2(70, 10)
 	title.size = Vector2(_map_width - 140, 40)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_size_override("font_size", 24)
+	title.add_theme_font_size_override("font_size", 32)
 	title.add_theme_color_override("font_color", Color("#fff1ca"))
 	header.add_child(title)
 	var subtitle := Label.new()
@@ -178,63 +183,42 @@ func _build_map() -> void:
 	subtitle.position = Vector2(70, 54)
 	subtitle.size = Vector2(_map_width - 140, 36)
 	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	subtitle.add_theme_font_size_override("font_size", 20)
+	subtitle.add_theme_font_size_override("font_size", 32)
 	subtitle.add_theme_color_override("font_color", Color("#d6e8c8"))
 	header.add_child(subtitle)
-	var back := TextureButton.new()
-	back.texture_normal = ResourceManager.load_texture("res://assets/sprites/ui/buttons/back_normal.png")
-	back.texture_hover = ResourceManager.load_texture("res://assets/sprites/ui/buttons/back_hover.png")
-	back.texture_pressed = ResourceManager.load_texture("res://assets/sprites/ui/buttons/back_pressed.png")
-	back.ignore_texture_size = true
-	back.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
-	back.position = Vector2(12, 20)
-	back.size = Vector2(94, 58)
-	back.pressed.connect(back_requested.emit)
-	header.add_child(back)
+	var back := MobileGameUI.button(header, "<", back_requested.emit, MobileGameUI.PURPLE)
+	back.position = Vector2(12, 12)
+	back.size = Vector2(94, 92)
 
 	var footer_background := ColorRect.new()
 	footer_background.color = Color("#102c2b")
 	footer_background.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
-	footer_background.offset_top = -225
+	footer_background.offset_top = -460
 	add_child(footer_background)
 	var footer := VBoxContainer.new()
 	footer.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
-	footer.offset_top = -220
+	footer.offset_top = -450
 	footer.offset_left = 16
 	footer.offset_right = -16
 	footer.add_theme_constant_override("separation", 5)
 	add_child(footer)
 	var pages := HBoxContainer.new()
 	footer.add_child(pages)
-	var first := int(_level_records.front().level_id) if not _level_records.is_empty() else 1
-	var last := int(_level_records.back().level_id) if not _level_records.is_empty() else 50
-	for direction in [-1, 1]:
-		var page := Button.new()
-		page.text = "Earlier cases" if direction < 0 else "Later cases"
-		page.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		page.custom_minimum_size.y = 42
-		page.disabled = first <= 1 if direction < 0 else last >= int(ConfigLoader.load_config(Constants.ConfigPaths.GAME).get("max_levels", 50))
-		page.pressed.connect(func(): page_requested.emit(direction))
-		pages.add_child(page)
+	pages.add_theme_constant_override("separation", 12)
+	MobileGameUI.button(pages, "My case", scroll_to_level.bind(_highest_unlocked_level))
+	MobileGameUI.button(pages, "Ahead >", scroll_chapters.bind(1))
 	var range_label := Label.new()
-	range_label.text = "Cases %d–%d of %d" % [first, last, int(ConfigLoader.load_config(Constants.ConfigPaths.GAME).get("max_levels", 50))]
+	range_label.text = "THE INVESTIGATION TRAIL"
 	range_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	range_label.add_theme_font_size_override("font_size", 32)
 	footer.add_child(range_label)
-	_portrait_button = Button.new()
-	_portrait_button.custom_minimum_size.y = 48
-	_portrait_button.text = "Roadside portrait puzzle"
-	_portrait_button.pressed.connect(portrait_requested.emit)
-	footer.add_child(_portrait_button)
+	_portrait_button = MobileGameUI.button(footer, "Restore portrait", portrait_requested.emit)
 	_daily_label = Label.new()
 	_daily_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_daily_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_daily_label.add_theme_font_size_override("font_size", 16)
+	_daily_label.add_theme_font_size_override("font_size", 32)
 	footer.add_child(_daily_label)
-	var daily_details := Button.new()
-	daily_details.text = "Daily rewards & portrait album"
-	daily_details.custom_minimum_size.y = 36
-	daily_details.pressed.connect(daily_rewards_requested.emit)
-	footer.add_child(daily_details)
+	MobileGameUI.button(footer, "CASE REWARDS", daily_rewards_requested.emit, MobileGameUI.PURPLE)
 
 
 
@@ -302,7 +286,7 @@ func _build_chapter_art(map: Control, index: int, chapter: Dictionary, levels: A
 	sign_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	sign_title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	sign_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	sign_title.add_theme_font_size_override("font_size", 21)
+	sign_title.add_theme_font_size_override("font_size", 32)
 	sign_title.add_theme_color_override("font_color", Color("#fff3d5"))
 	sign_title.add_theme_color_override("font_shadow_color", Color("#102238"))
 	sign_title.add_theme_constant_override("shadow_offset_x", 1)
@@ -314,7 +298,7 @@ func _build_chapter_art(map: Control, index: int, chapter: Dictionary, levels: A
 	range_label.position = Vector2((_map_width - sign_width) * 0.5, top + 98)
 	range_label.size = Vector2(sign_width, 24)
 	range_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	range_label.add_theme_font_size_override("font_size", 13)
+	range_label.add_theme_font_size_override("font_size", 28)
 	range_label.add_theme_color_override("font_color", Color("#f2ce7c"))
 	range_label.add_theme_color_override("font_shadow_color", Color("#102238"))
 	range_label.add_theme_constant_override("shadow_offset_x", 1)
@@ -326,7 +310,7 @@ func _build_chapter_art(map: Control, index: int, chapter: Dictionary, levels: A
 	for step in count:
 		var progress := 0.0 if count <= 1 else float(step) / float(count - 1)
 		var x := _map_width * (0.50 + 0.31 * sin(progress * TAU + index * 0.72))
-		var y := top + 225 + progress * (_chapter_height - 270)
+		var y := top + 225 + progress * (_chapter_height - 420)
 		points.append(Vector2(x, y))
 	return points
 
@@ -355,7 +339,7 @@ func _add_chapter_nodes(map: Control, index: int, chapter: Dictionary, levels: A
 		var level_id := int(level.get("level_id", 0))
 		var progress := 0.0 if count <= 1 else float(step) / float(count - 1)
 		var x := _map_width * (0.50 + 0.31 * sin(progress * TAU + index * 0.72))
-		var y := top + 225 + progress * (_chapter_height - 270)
+		var y := top + 225 + progress * (_chapter_height - 420)
 		_level_positions[level_id] = Vector2(x, y)
 		var node := TextureButton.new()
 		node.name = "Level%03d" % level_id
@@ -364,12 +348,6 @@ func _add_chapter_nodes(map: Control, index: int, chapter: Dictionary, levels: A
 		var badge_path := NODE_PATH
 		if not is_unlocked:
 			badge_path = LOCKED_BADGE_PATH
-		elif star_count >= 3:
-			badge_path = THREE_STAR_BADGE_PATH
-		elif star_count == 2:
-			badge_path = TWO_STAR_BADGE_PATH
-		elif star_count == 1:
-			badge_path = ONE_STAR_BADGE_PATH
 		elif level_id == _highest_unlocked_level:
 			badge_path = LEVEL_BADGE_PATH
 		node.texture_normal = ResourceManager.load_texture(badge_path)
@@ -377,33 +355,43 @@ func _add_chapter_nodes(map: Control, index: int, chapter: Dictionary, levels: A
 		node.texture_pressed = node.texture_normal
 		node.ignore_texture_size = true
 		node.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
-		node.position = Vector2(x - 49, y - 49)
-		node.size = Vector2(98, 98)
+		node.position = Vector2(x - 64, y - 64)
+		node.size = Vector2(128, 128)
 		node.disabled = not is_unlocked
 		if is_unlocked:
 			node.pressed.connect(level_selected.emit.bind(level_id))
 		if badge_path.ends_with(".jpeg"):
 			node.material = _make_white_key_material()
+		node.z_index = 2
 		map.add_child(node)
 		var number := Label.new()
 		number.text = str(level_id)
 		if not is_unlocked:
-			number.position = node.position + Vector2(0, 67)
-			number.size = Vector2(node.size.x, 23)
+			number.position = node.position + Vector2(0, 85)
+			number.size = Vector2(node.size.x, 48)
 		else:
 			number.position = node.position + Vector2(4, 8)
 			number.size = node.size - Vector2(8, 25)
 		number.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		number.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		number.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		number.add_theme_font_size_override("font_size", 13 if not is_unlocked else 24)
-		number.add_theme_color_override("font_color", Color("#603515"))
-		number.add_theme_color_override("font_outline_color", Color("#fff4d1"))
+		number.add_theme_font_size_override("font_size", 42)
+		number.add_theme_color_override("font_color", Color("#603515") if is_unlocked else Color("#fff4d1"))
+		number.add_theme_color_override("font_outline_color", Color("#fff4d1") if is_unlocked else Color("#13283f"))
 		number.add_theme_constant_override("outline_size", 3)
 		number.add_theme_color_override("font_shadow_color", Color("#22140b"))
 		number.add_theme_constant_override("shadow_offset_x", 1)
 		number.add_theme_constant_override("shadow_offset_y", 2)
+		number.z_index = 3
 		map.add_child(number)
+		if is_unlocked:
+			var stars := MapStars.new()
+			stars.name = "Stars%03d" % level_id
+			stars.z_index = 3
+			stars.earned = clampi(star_count, 0, 3)
+			stars.position = Vector2(x - 78, y + 58)
+			map.add_child(stars)
+
 
 
 func _make_white_key_material() -> ShaderMaterial:
@@ -430,7 +418,7 @@ func _add_david_progress_marker(map: Control) -> void:
 	portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	portrait.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
-	portrait.position = start_position + Vector2(-27.0, -78.0)
+	portrait.position = start_position + Vector2(78.0, -58.0)
 	portrait.size = Vector2(54.0, 64.0)
 	portrait.z_index = 10
 	portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -448,22 +436,20 @@ func _add_david_progress_marker(map: Control) -> void:
 	outline_style.set_corner_radius_all(18)
 	outline.add_theme_stylebox_override("panel", outline_style)
 	map.add_child(outline)
-	var current_node := get_node_or_null("CampaignScroll/CampaignTrail/Level%03d" % current_level) as Control
-	if current_node != null:
-		var focus_y := maxf(0.0, current_position.y - _map_scroll.size.y * 0.48)
-		_map_scroll.set_deferred("scroll_vertical", int(focus_y))
+	call_deferred("scroll_to_level", current_level)
 	if has_arrival:
 		await get_tree().process_frame
 		await get_tree().create_timer(0.18).timeout
 		var move := create_tween()
-		move.tween_property(portrait, "position", current_position + Vector2(-27.0, -78.0), 1.05).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
-		move.parallel().tween_property(outline, "position", current_position + Vector2(-30.0, -81.0), 1.05).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+		move.tween_property(portrait, "position", current_position + Vector2(78.0, -58.0), 1.05).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+		move.parallel().tween_property(outline, "position", current_position + Vector2(75.0, -61.0), 1.05).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
 
 
 func _draw_trail(map: Control, points: PackedVector2Array) -> void:
 	if points.size() < 2:
 		return
 	var shadow := Line2D.new()
+	shadow.z_index = 1
 	shadow.points = points
 	shadow.width = 13
 	shadow.default_color = Color("#50391e")
@@ -472,6 +458,7 @@ func _draw_trail(map: Control, points: PackedVector2Array) -> void:
 	shadow.joint_mode = Line2D.LINE_JOINT_ROUND
 	map.add_child(shadow)
 	var center := Line2D.new()
+	center.z_index = 1
 	center.points = points
 	center.width = 6
 	center.default_color = Color("#f0d88a")
@@ -479,3 +466,42 @@ func _draw_trail(map: Control, points: PackedVector2Array) -> void:
 	center.end_cap_mode = Line2D.LINE_CAP_ROUND
 	center.joint_mode = Line2D.LINE_JOINT_ROUND
 	map.add_child(center)
+
+
+func _node_position(chapter: int, step: int, count: int) -> Vector2:
+	var progress := 0.0 if count <= 1 else float(step) / float(count - 1)
+	return Vector2(_map_width * (0.50 + 0.31 * sin(progress * TAU + chapter * 0.72)), chapter * _chapter_height + 225 + progress * (_chapter_height - 420))
+
+
+func _refresh_visible_chapters() -> void:
+	if _map_canvas == null or _map_scroll == null: return
+	var first := maxi(0, int(_map_scroll.scroll_vertical / _chapter_height) - 1)
+	var last := mini(_chapter_records.size() - 1, int((_map_scroll.scroll_vertical + _map_scroll.size.y) / _chapter_height) + 1)
+	for index in _visible_chapters.keys():
+		if index < first or index > last:
+			var old: Control = _visible_chapters[index]
+			_map_canvas.remove_child(old)
+			old.queue_free()
+			_visible_chapters.erase(index)
+	for index in range(first, last + 1):
+		if _visible_chapters.has(index): continue
+		var chunk := Control.new()
+		chunk.name = "Chapter%d" % index
+		chunk.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_map_canvas.add_child(chunk)
+		_visible_chapters[index] = chunk
+		var chapter: Dictionary = _chapter_records[index]
+		var levels := _as_typed_levels(chapter.get("levels", []))
+		_build_chapter_art(chunk, index, chapter, levels)
+		_add_chapter_nodes(chunk, index, chapter, levels)
+
+
+func scroll_to_level(level_id: int) -> void:
+	if not _level_positions.has(level_id): return
+	_map_scroll.scroll_vertical = maxi(0, int(_level_positions[level_id].y - _map_scroll.size.y * 0.48))
+	_refresh_visible_chapters()
+
+
+func scroll_chapters(direction: int) -> void:
+	_map_scroll.scroll_vertical = maxi(0, _map_scroll.scroll_vertical + int(_chapter_height) * direction)
+	_refresh_visible_chapters()

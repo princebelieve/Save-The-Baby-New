@@ -14,6 +14,8 @@ var _checking_catalog := false
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	if preload("res://scripts/debug/DeveloperTools.gd").enabled():
+		return
 	var saved := ConfigFile.new()
 	if saved.load(PENDING_PATH) == OK:
 		_pending = saved.get_value("purchases","pending",{})

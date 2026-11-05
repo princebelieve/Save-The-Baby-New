@@ -44,7 +44,7 @@ func _run() -> void:
 	check(DailyActivities.start_portrait(progress, now + 1).is_empty(), "Slot cannot restart")
 	check(not DailyActivities.active_attempt(progress, now + 10).is_empty(), "Active attempt resumes")
 	check(DailyActivities.finish_portrait(progress, int(attempt.slot), now + 10).is_empty(), "Unsolved portrait earns nothing")
-	attempt.pieces = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+	attempt.pieces = range(attempt.pieces.size())
 	progress.set_value("daily", "attempt", attempt)
 	var reward := DailyActivities.finish_portrait(progress, int(attempt.slot), now + 20)
 	check(int(reward.coins) == 20, "Portrait and first daily stamp combine")
@@ -59,6 +59,31 @@ func _run() -> void:
 	check(int(attempt.deadline) == now - 100 + 43200, "Attempt ends at slot rollover")
 	for portrait in DailyActivities.settings().portraits:
 		check(ResourceLoader.exists(str(portrait)), "Portrait asset exists: %s" % portrait)
+	var catalog: Array = DailyActivities.settings().portraits
+	var seen: Dictionary = {}
+	var dimensions: Dictionary = {}
+	for slot in catalog.size():
+		var sample_progress := ConfigFile.new()
+		var sample := DailyActivities.start_portrait(sample_progress, slot * 43200 + 100)
+		check(not seen.has(sample.portrait), "Artwork does not repeat within catalog rotation")
+		seen[sample.portrait] = true
+		var size := int(sample.columns) * int(sample.rows)
+		dimensions[size] = true
+		check(sample.pieces.size() == size, "Difficulty matches permutation length")
+		var sorted: Array = sample.pieces.duplicate()
+		sorted.sort()
+		check(sorted == range(size), "Every fragment occurs exactly once")
+		check(sample.pieces != range(size), "Puzzle starts shuffled")
+		check(DailyActivities.finish_portrait(sample_progress, int(sample.slot), slot * 43200 + 101).is_empty(), "Unsolved larger puzzle cannot pay")
+		sample.pieces = range(size)
+		sample_progress.set_value("daily", "attempt", sample)
+		check(not DailyActivities.finish_portrait(sample_progress, int(sample.slot), slot * 43200 + 102).is_empty(), "Every difficulty completes and pays")
+	check(dimensions.has(9) and dimensions.has(16) and dimensions.has(25), "Three difficulty sizes rotate")
+	for tile in JsonLoader.load_file("res://configs/tiles.json").tiles:
+		check(catalog.has(str(tile.icon)), "All tile artwork included: " + str(tile.id))
+	var legacy := ConfigFile.new()
+	legacy.set_value("daily", "attempt", {"slot": DailyActivities.slot_at(now), "portrait": str(catalog[0]), "pieces": range(9), "deadline": now + 120})
+	check(not DailyActivities.finish_portrait(legacy, DailyActivities.slot_at(now), now + 1).is_empty(), "Existing nine-piece saves still complete")
 	var calculator := RewardCalculator.new()
 	add_child(calculator)
 	calculator.initialize()
@@ -140,21 +165,18 @@ func _check_game_integration() -> void:
 	add_child(game)
 	await get_tree().process_frame
 	game._highest_unlocked_level = 1050
-	game._campaign_page_start = -1
 	var records := game._load_campaign_level_records()
-	check(records.size() == 50 and int(records[0].level_id) == 1001 and int(records.back().level_id) == 1050, "Map loads only current 50 cases")
+	check(records.size() == 1050 and int(records[0].level_id) == 1 and int(records.back().level_id) == 1050, "Map exposes the complete trail")
 	game._campaign_coach_shown = true
 	game._show_campaign_map("alone")
 	await get_tree().process_frame
-	check(game._campaign_map.get_node_or_null("CampaignScroll/CampaignTrail/Level1050") != null, "Final map page rendered")
+	check(game._campaign_map.find_child("Level1050", true, false) != null, "Final map page rendered")
 	game._campaign_progress.set_value("generated_levels", "51", {"name": "Stale runtime snapshot"})
-	game._campaign_page_start = 51
 	var file_records := game._load_campaign_level_records()
-	check(str(file_records[0].name) == str(JsonLoader.load_file("res://levels/level051.json").name), "Map reads files rather than stale generated snapshots")
-	game._campaign_page_start = 1001
-	game._change_campaign_page(-1)
+	check(str(file_records[50].name) == str(JsonLoader.load_file("res://levels/level051.json").name), "Map reads files rather than stale generated snapshots")
+	game._campaign_map.scroll_chapters(-1)
 	await get_tree().process_frame
-	check(game._campaign_page_start == 951, "Map navigates backward")
+	check(game._campaign_map._map_scroll.scroll_vertical < int(game._campaign_map._level_positions[1050].y), "Map scrolls backward without replacing the trail")
 	if game._campaign_progress.has_section("daily"):
 		game._campaign_progress.erase_section("daily")
 	var coins := game._economy_manager.get_coins()
@@ -165,7 +187,7 @@ func _check_game_integration() -> void:
 	check(game._portrait_puzzle != null, "Portrait opens from campaign")
 	var puzzle := game._portrait_puzzle
 	# Solve through the actual tap handler and saved swap signals.
-	for index in 9:
+	for index in puzzle._pieces.size():
 		if int(puzzle._pieces[index]) != index:
 			var other := puzzle._pieces.find(index)
 			puzzle._select(index)

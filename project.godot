@@ -51,7 +51,7 @@ window/handheld/orientation=1
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/admob/plugin.cfg", "res://addons/brand_launch/plugin.cfg", "res://addons/GodotGooglePlayBilling/plugin.cfg", "res://addons/auth_return/plugin.cfg", "res://addons/release_diagnostics/plugin.cfg")
+enabled=PackedStringArray("res://addons/admob/plugin.cfg", "res://addons/brand_launch/plugin.cfg", "res://addons/GodotGooglePlayBilling/plugin.cfg", "res://addons/auth_return/plugin.cfg", "res://addons/release_diagnostics/plugin.cfg", "res://addons/portrait_gallery/plugin.cfg")
 
 [gui]
 

@@ -18,7 +18,10 @@ Rules:
 
 static func current_unix_time() -> int:
 	# Returns current system time in seconds (UTC-based Unix timestamp)
-	return Time.get_unix_time_from_system()
+	var offset := 0
+	if preload("res://scripts/debug/DeveloperTools.gd").enabled():
+		offset = int(Engine.get_meta("developer_clock_offset",0))
+	return int(Time.get_unix_time_from_system())+offset
 
 
 static func current_datetime() -> Dictionary:

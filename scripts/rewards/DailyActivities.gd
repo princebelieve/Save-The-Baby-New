@@ -5,7 +5,14 @@ class_name DailyActivities
 const DAY := 86400
 
 static func settings() -> Dictionary:
-	return JsonLoader.load_file("res://configs/daily_activities.json")
+	var config := JsonLoader.load_file("res://configs/daily_activities.json").duplicate(true)
+	var portraits: Array = config.portraits
+	for tile in JsonLoader.load_file("res://configs/tiles.json").get("tiles", []):
+		var path := str(tile.get("icon", ""))
+		if not path.is_empty() and not portraits.has(path): portraits.append(path)
+	for artwork in config.get("puzzle_art", []):
+		if not portraits.has(str(artwork.path)): portraits.append(str(artwork.path))
+	return config
 
 
 static func day_at(now: int) -> int:
@@ -77,22 +84,28 @@ static func start_portrait(progress: ConfigFile, now: int) -> Dictionary:
 		return {}
 	var config := settings()
 	var slot := slot_at(now)
+	var challenge := puzzle_for_slot(slot)
 	var portrait: String = config.portraits[slot % config.portraits.size()]
+	var count := int(challenge.columns) * int(challenge.rows)
 	var pieces: Array[int] = []
-	for index in 9:
+	for index in count:
 		pieces.append(index)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = slot * 7919 + 41
-	for index in range(8, 0, -1):
+	for index in range(count - 1, 0, -1):
 		var other := rng.randi_range(0, index)
 		var temporary := pieces[index]
 		pieces[index] = pieces[other]
 		pieces[other] = temporary
-	if pieces == [0, 1, 2, 3, 4, 5, 6, 7, 8]:
+	var solved := true
+	for index in count:
+		if pieces[index] != index: solved = false
+	if solved:
 		pieces[0] = 1
 		pieces[1] = 0
-	var deadline := mini(now + int(config.portrait_seconds), (slot + 1) * int(config.slot_hours) * 3600)
-	var attempt := {"slot": slot, "portrait": portrait, "pieces": pieces, "deadline": deadline}
+	var deadline := mini(now + int(challenge.seconds), (slot + 1) * int(config.slot_hours) * 3600)
+	var attempt := {"slot": slot, "portrait": portrait, "pieces": pieces, "deadline": deadline,
+		"columns": int(challenge.columns), "rows": int(challenge.rows), "difficulty": str(challenge.name)}
 	progress.set_value("daily", "portrait_slot", slot)
 	progress.set_value("daily", "last_seen", now)
 	progress.set_value("daily", "attempt", attempt)
@@ -110,7 +123,9 @@ static func finish_portrait(progress: ConfigFile, slot: int, now: int) -> Dictio
 	var attempt := active_attempt(progress, now)
 	if attempt.is_empty() or int(attempt.slot) != slot:
 		return {}
-	for index in 9:
+	var count := int(attempt.get("columns", 3)) * int(attempt.get("rows", 3))
+	if attempt.pieces.size() != count: return {}
+	for index in count:
 		if int(attempt.pieces[index]) != index:
 			return {}
 	progress.set_value("daily", "attempt", {})
@@ -120,3 +135,20 @@ static func finish_portrait(progress: ConfigFile, slot: int, now: int) -> Dictio
 	progress.set_value("daily", "portraits", collection)
 	var daily := stamp(progress, now)
 	return {"coins": int(settings().portrait_coins) + int(daily.get("coins", 0)), "streak": int(progress.get_value("daily", "streak", 0))}
+
+
+static func puzzle_for_slot(slot: int) -> Dictionary:
+	var config := settings()
+	var rotation: Array = config.get("difficulty_rotation", [0])
+	var difficulties: Array = config.get("puzzle_difficulties", [{"name":"Standard", "columns":3, "rows":3, "seconds":120}])
+	return difficulties[int(rotation[posmod(slot, rotation.size())])].duplicate()
+
+
+static func artwork_title(path: String) -> String:
+	if path.contains("amara_and_ethan"): return "Amara & Ethan"
+	if path.contains("david"): return "David"
+	for tile in JsonLoader.load_file("res://configs/tiles.json").get("tiles", []):
+		if str(tile.get("icon", "")) == path: return str(tile.name)
+	for artwork in settings().get("puzzle_art", []):
+		if str(artwork.path) == path: return str(artwork.title)
+	return path.get_file().get_basename().replace("_", " ").capitalize()

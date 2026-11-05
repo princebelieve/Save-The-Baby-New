@@ -82,9 +82,9 @@ func initialize(level_data: Dictionary) -> bool:
 	var configured_tile_size := int(board_data.get("tile_size", 64))
 	var columns := maxi(get_width(), 1)
 	var viewport_size := get_viewport_rect().size
-	var board_top := viewport_size.y * 0.205 + 16.0
-	var board_bottom := viewport_size.y * 0.80 - 20.0
-	var horizontal_limit := int(floor(viewport_size.x * 0.92 / columns))
+	var board_top := 244.0
+	var board_bottom := viewport_size.y - 176.0
+	var horizontal_limit := int(floor((viewport_size.x - 32.0) / columns))
 	var vertical_limit := int(floor((board_bottom - board_top) / maxi(get_height(), 1)))
 	# Respect the HUD and booster tray on short phones as well as tall screens.
 	_tile_size = maxi(24, mini(maxi(configured_tile_size, horizontal_limit), mini(horizontal_limit, vertical_limit)))
@@ -101,7 +101,7 @@ func initialize(level_data: Dictionary) -> bool:
 
 	position = Vector2(
 		(viewport_size.x - get_width() * _tile_size) * 0.5,
-		board_top + (board_bottom - board_top - get_height() * _tile_size) * 0.5
+		board_top
 	)
 	_shake_origin = position
 	moves_changed.emit(_remaining_moves)

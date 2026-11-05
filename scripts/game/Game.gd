@@ -6,10 +6,11 @@ const DISPLAY_FONT: FontFile = preload("res://assets/fonts/Baloo2-Variable.ttf")
 const OPENING_STORY_PATH := "res://stories/opening_story.json"
 const CAMPAIGN_PROGRESS_PATH := "user://campaign_progress.cfg"
 
-var _campaign_page_start := -1
 var _daily_rewards_layer: CanvasLayer
 var _portrait_layer: CanvasLayer
 var _portrait_puzzle: PortraitPuzzle
+var _portrait_gallery: Node
+var _completed_portrait_id := ""
 var _progress_transaction := false
 var _last_daily_stamp: Dictionary = {}
 
@@ -145,11 +146,9 @@ func _notification(what: int) -> void:
 
 
 func _handle_back_request() -> void:
-	if _daily_rewards_layer != null and is_instance_valid(_daily_rewards_layer):
-		_close_daily_rewards()
-		return
-	if _portrait_layer != null and is_instance_valid(_portrait_layer):
-		_close_portrait_puzzle()
+	var developer := get_node_or_null("DeveloperTools")
+	if developer != null and developer._panel.visible:
+		developer.close()
 		return
 	var dialogs := find_children("*", "AcceptDialog", true, false)
 	for index in range(dialogs.size() - 1, -1, -1):
@@ -161,6 +160,15 @@ func _handle_back_request() -> void:
 		_close_detail()
 	elif _case_file_layer != null and is_instance_valid(_case_file_layer):
 		_close_case_file()
+	elif _daily_rewards_layer != null and is_instance_valid(_daily_rewards_layer):
+		var hub := _daily_rewards_layer.get_node_or_null("RewardsHub")
+		if hub != null: hub.go_back()
+		else: _close_daily_rewards()
+		return
+	elif _portrait_layer != null and is_instance_valid(_portrait_layer):
+		if is_instance_valid(_portrait_puzzle): _portrait_puzzle.go_back()
+		else: _close_portrait_puzzle()
+		return
 	elif _pause_layer != null:
 		_close_pause_menu()
 	elif _result_layer != null and is_instance_valid(_result_layer):
@@ -188,6 +196,7 @@ func _handle_back_request() -> void:
 
 
 func _ready() -> void:
+	preload("res://scripts/debug/DeveloperTools.gd").restore_clock()
 	_ads = AdManager.new()
 	add_child(_ads)
 	if not SignalBus.board_shuffled.is_connected(_on_board_shuffled):
@@ -244,7 +253,18 @@ func _ready() -> void:
 	_coin_shop = preload("res://scripts/online/ShopPanel.gd").new()
 	_coin_shop.process_mode = Node.PROCESS_MODE_ALWAYS
 	add_child(_coin_shop)
+	_portrait_gallery = preload("res://scripts/rewards/PortraitGallery.gd").new()
+	add_child(_portrait_gallery)
+	_portrait_gallery.status_changed.connect(func(message: String):
+		if is_instance_valid(_portrait_puzzle):
+			_portrait_puzzle.show_gallery_status(message)
+	)
 	get_node("/root/CloudAccount").changed.connect(_refresh_available_coins)
+	if preload("res://scripts/debug/DeveloperTools.gd").enabled():
+		var developer = preload("res://scripts/debug/DeveloperTools.gd").new()
+		developer.name = "DeveloperTools"
+		add_child(developer)
+		developer.initialize(self)
 
 
 func _load_game_art() -> void:
@@ -411,7 +431,7 @@ func _show_launch_screen() -> void:
 	start.size = Vector2(minf(300.0, viewport_size.x * 0.66), 92)
 	start.pressed.connect(_start_opening_story)
 	content.add_child(start)
-	var settings_size := Vector2(minf(154.0, viewport_size.x * 0.30), 64.0)
+	var settings_size := Vector2(minf(184.0, viewport_size.x * 0.30), 92.0)
 	var settings_button := _make_texture_button("settings", settings_size)
 	settings_button.position = Vector2(viewport_size.x - settings_size.x - 18.0, 18.0)
 	settings_button.size = settings_size
@@ -419,8 +439,8 @@ func _show_launch_screen() -> void:
 	content.add_child(settings_button)
 	var account_button := _make_menu_button("ACCOUNT & COINS")
 	account_button.position = Vector2(viewport_size.x * 0.22, viewport_size.y * 0.89)
-	account_button.size = Vector2(viewport_size.x * 0.56, 54)
-	account_button.add_theme_font_size_override("font_size",20)
+	account_button.size = Vector2(viewport_size.x * 0.56, 92)
+	account_button.add_theme_font_size_override("font_size",32)
 	account_button.pressed.connect(func(): _account_panel.show_account())
 	content.add_child(account_button)
 	family.modulate.a = 0.0
@@ -476,14 +496,18 @@ func _build_gameplay_hud() -> void:
 	status_row.name = "StatusRow"
 	status_row.anchor_left = 0.025
 	status_row.anchor_right = 0.975
-	status_row.anchor_top = 0.104
-	status_row.anchor_bottom = 0.216
+	status_row.anchor_top = 0.0
+	status_row.offset_top = 124
+	status_row.anchor_bottom = 0.0
+	status_row.offset_bottom = 224
 	_status_panel = Panel.new()
 	_status_panel.name = "StatusRowBacking"
 	_status_panel.anchor_left = 0.025
 	_status_panel.anchor_right = 0.975
-	_status_panel.anchor_top = 0.101
-	_status_panel.anchor_bottom = 0.219
+	_status_panel.anchor_top = 0.0
+	_status_panel.offset_top = 120
+	_status_panel.anchor_bottom = 0.0
+	_status_panel.offset_bottom = 228
 	_apply_hud_profile_style()
 	hud.add_child(_status_panel)
 	hud.add_child(status_row)
@@ -497,21 +521,21 @@ func _build_gameplay_hud() -> void:
 	_reward_label = _make_compact_hud_panel(status_row, "CoinCounter", "0", Vector2(188, 46) * hud_scale, roundi(26 * hud_scale), Color("#e9bd55"))
 	var lives_panel := _lives_label.get_parent().get_parent() as Control
 	lives_panel.anchor_left = 0.22
-	lives_panel.anchor_right = 0.89
-	lives_panel.anchor_top = 0.035
-	lives_panel.anchor_bottom = 0.49
+	lives_panel.anchor_right = 0.54
+	lives_panel.anchor_top = 0.12
+	lives_panel.anchor_bottom = 0.85
 	lives_panel.custom_minimum_size = Vector2(0, 46 * hud_scale)
 	var coins_panel := _reward_label.get_parent().get_parent() as Control
-	coins_panel.anchor_left = 0.22
-	coins_panel.anchor_right = 0.89
-	coins_panel.anchor_top = 0.51
-	coins_panel.anchor_bottom = 0.965
+	coins_panel.anchor_left = 0.55
+	coins_panel.anchor_right = 0.85
+	coins_panel.anchor_top = 0.12
+	coins_panel.anchor_bottom = 0.85
 	coins_panel.custom_minimum_size = Vector2(0, 46 * hud_scale)
 	_pause_button = TextureButton.new()
 	_pause_button.name = "SettingsButton"
 	_pause_button.ignore_texture_size = true
 	_pause_button.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
-	_pause_button.custom_minimum_size = Vector2(64, 68) * hud_scale
+	_pause_button.custom_minimum_size = Vector2(92, 92) * hud_scale
 	var pause_icon := _load_hud_asset("res://assets/sprites/ui/hud/pause_button.png")
 	_pause_button.texture_normal = pause_icon
 	_pause_button.texture_hover = pause_icon
@@ -521,7 +545,7 @@ func _build_gameplay_hud() -> void:
 	_pause_button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_pause_button.pressed.connect(_play_ui_click)
 	_pause_button.pressed.connect(_show_pause_menu)
-	_pause_button.anchor_left = 0.90
+	_pause_button.anchor_left = 0.86
 	_pause_button.anchor_right = 1.0
 	_pause_button.anchor_top = 0.0
 	_pause_button.anchor_bottom = 1.0
@@ -529,8 +553,10 @@ func _build_gameplay_hud() -> void:
 	_hint_label = _make_label("INVESTIGATION 01 | THE FIRST CLUE", 22)
 	_hint_label.anchor_left = 0.08
 	_hint_label.anchor_right = 0.92
-	_hint_label.anchor_top = 0.219
-	_hint_label.anchor_bottom = 0.249
+	_hint_label.anchor_top = 0.0
+	_hint_label.offset_top = 228
+	_hint_label.anchor_bottom = 0.0
+	_hint_label.offset_bottom = 244
 	_hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_hint_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_hint_label.add_theme_color_override("font_color", Color("#fff3d5"))
@@ -553,8 +579,10 @@ func _build_level_objective_row(parent: CanvasLayer) -> void:
 	panel.name = "MissionHeader"
 	panel.anchor_left = 0.025
 	panel.anchor_right = 0.975
-	panel.anchor_top = 0.014
-	panel.anchor_bottom = 0.099
+	panel.anchor_top = 0.0
+	panel.offset_top = 12
+	panel.anchor_bottom = 0.0
+	panel.offset_bottom = 112
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color(0.025, 0.08, 0.105, 0.94)
 	style.border_color = Color("#d6b66e")
@@ -634,7 +662,7 @@ func _build_level_objective_row(parent: CanvasLayer) -> void:
 	_objective_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	_objective_label.add_theme_color_override("font_color", Color("#f4ce49"))
 	objective_copy.add_child(_objective_label)
-	_case_file_button = _make_story_action_button("CASE FILE", 142)
+	_case_file_button = _make_story_action_button("CASE FILE", 180)
 	_case_file_button.name = "CaseFileButton"
 	_case_file_button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_case_file_button.tooltip_text = "OPEN CASE FILE"
@@ -889,10 +917,10 @@ func _load_hud_asset(path: String) -> Texture2D:
 func _build_booster_dock(parent: CanvasLayer) -> void:
 	var dock := PanelContainer.new()
 	dock.name = "BoosterDock"
-	dock.anchor_left = 0.08
-	dock.anchor_right = 0.92
-	dock.anchor_top = 0.80
-	dock.anchor_bottom = 0.91
+	dock.anchor_left = 0.025
+	dock.anchor_right = 0.975
+	dock.anchor_top = 0.0
+	dock.anchor_bottom = 0.0
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color(0.02, 0.055, 0.08, 0.92)
 	style.border_color = Color("#e3c275")
@@ -935,6 +963,21 @@ func _build_booster_dock(parent: CanvasLayer) -> void:
 		wrapper.add_child(count_label)
 		_booster_buttons[kind] = {"button": button, "count": count_label}
 	dock.show()
+	_layout_play_area()
+	if not get_viewport().size_changed.is_connected(_layout_play_area):
+		get_viewport().size_changed.connect(_layout_play_area)
+
+
+func _layout_play_area() -> void:
+	if _booster_dock == null:
+		return
+	var viewport_size := get_viewport_rect().size
+	var columns := _board.get_width() if _board != null else 8
+	var rows := _board.get_height() if _board != null else 8
+	var cell := floorf(minf((viewport_size.x - 32.0) / maxi(columns, 1), (viewport_size.y - 420.0) / maxi(rows, 1)))
+	var dock_top := 244.0 + rows * maxf(24.0, cell) + 16.0
+	_booster_dock.offset_top = dock_top
+	_booster_dock.offset_bottom = dock_top + 140.0
 
 
 func _make_texture_button(name: String, button_size: Vector2, folder: String = "buttons") -> TextureButton:
@@ -966,7 +1009,6 @@ func _show_pause_menu(force_pause: bool = false) -> void:
 		if _tutorial_overlay != null:
 			_tutorial_overlay.hide_tip()
 	get_tree().paused = true
-	var audio_manager := get_node_or_null("Managers/AudioManager")
 	_pause_layer = CanvasLayer.new()
 	_pause_layer.name = "PauseMenuLayer"
 	_pause_layer.layer = 12
@@ -979,74 +1021,31 @@ func _show_pause_menu(force_pause: bool = false) -> void:
 	var center := CenterContainer.new()
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	veil.add_child(center)
-	var frame := PanelContainer.new()
-	frame.custom_minimum_size = Vector2(minf(580.0, get_viewport_rect().size.x * 0.92), 700 if _tutorial_active else 620)
-	frame.add_theme_stylebox_override("panel", _make_parchment_panel_style(78, 90))
-	center.add_child(frame)
-	var pause_paper := PanelContainer.new()
-	pause_paper.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	pause_paper.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	pause_paper.add_theme_stylebox_override("panel", _make_parchment_sheet_style())
-	frame.add_child(pause_paper)
-	var actions := VBoxContainer.new()
-	actions.add_theme_constant_override("separation", 16)
-	pause_paper.add_child(actions)
-	var heading := _make_label("PAUSED", 34)
-	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	actions.add_child(heading)
+	var frame := MobileGameUI.card(center, Color("#eef4ff"))
+	frame.custom_minimum_size.x = minf(660.0, get_viewport_rect().size.x - 40)
+	var actions := MobileGameUI.column(frame, 16)
+	MobileGameUI.label(actions, "INVESTIGATION PAUSED", 42)
 	if _tutorial_active:
-		var pause_guide := _make_label("RESUME returns to this board. MUSIC and SOUND FX toggle independently. SETTINGS has separate volume sliders. RETURN TO TITLE exits this investigation.", 17)
-		pause_guide.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		pause_guide.custom_minimum_size = Vector2(0, 88)
-		pause_guide.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		actions.add_child(pause_guide)
+		MobileGameUI.label(actions, "Resume the search or review your case file.", 32)
 	var resume := _make_menu_button("RESUME")
 	resume.pressed.connect(_close_pause_menu)
 	actions.add_child(resume)
+	var case_file := _make_menu_button("CASE FILE")
+	case_file.pressed.connect(_show_case_file)
+	actions.add_child(case_file)
 	var settings := _make_menu_button("SETTINGS")
 	settings.pressed.connect(_show_settings_popup)
 	actions.add_child(settings)
-	var music := _make_menu_button("MUSIC: ON")
-	music.pressed.connect(_toggle_audio_bus.bind(music, "music"))
-	actions.add_child(music)
-	var effects := _make_menu_button("SOUND FX: ON")
-	effects.pressed.connect(_toggle_audio_bus.bind(effects, "sfx"))
-	actions.add_child(effects)
+	var map_button := _make_menu_button("INVESTIGATION MAP")
+	map_button.pressed.connect(_return_from_activity_to_map)
+	actions.add_child(map_button)
 	var title := _make_menu_button("RETURN TO TITLE")
 	title.pressed.connect(_return_to_title)
 	actions.add_child(title)
-	_apply_parchment_text(actions)
-	if audio_manager != null:
-		music.text = "MUSIC: OFF" if not audio_manager.is_music_enabled() else "MUSIC: ON"
-		effects.text = "SOUND FX: OFF" if not audio_manager.is_sfx_enabled() else "SOUND FX: ON"
 
 
 func _make_menu_button(caption: String) -> Button:
-	var button := Button.new()
-	button.text = caption
-	button.custom_minimum_size = Vector2(350, 66)
-	button.add_theme_font_size_override("font_size", 22)
-	button.add_theme_font_override("font", DISPLAY_FONT)
-	button.add_theme_color_override("font_color", Color("#4b2d1a"))
-	var normal := StyleBoxFlat.new()
-	normal.bg_color = Color("#d8b77b")
-	normal.border_color = Color("#8b572b")
-	normal.set_border_width_all(2)
-	normal.set_corner_radius_all(16)
-	button.add_theme_stylebox_override("normal", normal)
-	var hover := normal.duplicate() as StyleBoxFlat
-	hover.bg_color = Color("#ead09b")
-	button.add_theme_stylebox_override("hover", hover)
-	var pressed := normal.duplicate() as StyleBoxFlat
-	pressed.bg_color = Color("#c89d5f")
-	button.add_theme_stylebox_override("pressed", pressed)
-	var disabled := normal.duplicate() as StyleBoxFlat
-	disabled.bg_color = Color("#e9dfca")
-	disabled.border_color = Color("#cbb994")
-	button.add_theme_stylebox_override("disabled", disabled)
-	button.add_theme_color_override("font_disabled_color", Color("#75634d"))
-	button.pressed.connect(_play_ui_click)
-	return button
+	return MobileGameUI.button(null, caption, _play_ui_click)
 
 
 func _make_parchment_panel_style(horizontal_margin: float, vertical_margin: float) -> StyleBoxTexture:
@@ -1115,7 +1114,7 @@ func _close_pause_menu() -> void:
 
 
 func _show_case_file() -> void:
-	if _case_file_layer != null or (_tutorial_active and _tutorial_action != "field_guide"):
+	if _case_file_layer != null or (_tutorial_active and _tutorial_action != "field_guide" and not is_instance_valid(_portrait_layer) and not is_instance_valid(_daily_rewards_layer)):
 		return
 	if _idle_hint_timer != null:
 		_idle_hint_timer.stop()
@@ -1174,9 +1173,9 @@ func _show_case_file() -> void:
 	intro_copy.alignment = BoxContainer.ALIGNMENT_CENTER
 	intro_copy.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	intro.add_child(intro_copy)
-	var title := _make_label("AMARA'S CASE FILE", 24)
+	var title := _make_label("AMARA'S CASE FILE", 38)
 	intro_copy.add_child(title)
-	var explanation := _make_label("Your discovered skills and decisions. Open a card to review exactly what you learned.", 17)
+	var explanation := _make_label("Your discovered skills and decisions. Open a card to review exactly what you learned.", 32)
 	explanation.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	intro_copy.add_child(explanation)
 	var canon := JsonLoader.load_file("res://configs/story_canon.json")
@@ -1186,16 +1185,16 @@ func _show_case_file() -> void:
 		_add_case_card(content,str(latest.get("title","The search so far")),"Latest verified lead",str(latest.get("summary","")),"res://assets/sprites/props/evidence_briefcase.jpeg")
 	var discovered := CaseJournal.entries(_campaign_progress)
 	if discovered.is_empty():
-		var empty := _make_label("David's instructions will appear here as you uncover them. Read a lesson or practise a new skill to add it to this file.", 23)
+		var empty := _make_label("David's instructions will appear here as you uncover them. Read a lesson or practise a new skill to add it to this file.", 32)
 		empty.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		content.add_child(empty)
 	else:
-		content.add_child(_make_label("SKILLS YOU HAVE UNCOVERED", 23))
+		content.add_child(_make_label("SKILLS YOU HAVE UNCOVERED", 34))
 		for entry in discovered:
 			var pages: Array = entry["facts"].values()
 			_add_case_card(content, str(entry["title"]), "Discovered in level %d" % int(entry["level"]), "\n".join(pages), str(entry["illustration"]))
 	var decisions: Dictionary = _campaign_progress.get_value("story_choices", "history", {})
-	if not decisions.is_empty(): content.add_child(_make_label("YOUR STORY DECISIONS", 23))
+	if not decisions.is_empty(): content.add_child(_make_label("YOUR STORY DECISIONS", 34))
 	for story_id in decisions:
 		var decision: Dictionary = Serial.resolve_choice(str(story_id),str(decisions[story_id].get("id","alone")))
 		_add_case_card(content, str(decision.get("label", "Decision")), "Story decision | " + str(story_id), str(decision.get("response", "")), "res://assets/sprites/props/evidence_briefcase.jpeg")
@@ -1203,7 +1202,7 @@ func _show_case_file() -> void:
 		case_label.add_theme_color_override("font_color", Color("#4b3424"))
 		case_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0))
 		case_label.add_theme_color_override("font_outline_color", Color("#f3e7ca"))
-	var close := _make_story_action_button("BACK TO SEARCH", 240)
+	var close := _make_story_action_button("BACK TO SEARCH", 400)
 	close.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	close.pressed.connect(_close_case_file)
 	layout.add_child(close)
@@ -1252,14 +1251,14 @@ func _prepare_dialog(dialog: AcceptDialog) -> void:
 	dialog.borderless = true
 	dialog.transparent_bg = true
 	dialog.add_theme_constant_override("buttons_min_width", 200)
-	dialog.add_theme_constant_override("buttons_min_height", 72)
+	dialog.add_theme_constant_override("buttons_min_height", 92)
 	dialog.add_theme_constant_override("buttons_separation", 18)
 	dialog.about_to_popup.connect(func():
 		if not dialog.has_meta("custom_heading"):
 			dialog.dialog_text = dialog.title.to_upper() + ("\n\n" + dialog.dialog_text if not dialog.dialog_text.is_empty() else "")
 	, CONNECT_ONE_SHOT)
 	dialog.add_theme_font_override("title_font", DISPLAY_FONT)
-	dialog.add_theme_font_size_override("title_font_size", 24)
+	dialog.add_theme_font_size_override("title_font_size", 36)
 	dialog.add_theme_constant_override("title_height", 48)
 	dialog.add_theme_color_override("title_color", Color("#80502b"))
 	var border := StyleBoxFlat.new()
@@ -1282,15 +1281,15 @@ func _prepare_dialog(dialog: AcceptDialog) -> void:
 	dialog.add_theme_stylebox_override("panel", panel)
 	var label := dialog.get_label()
 	label.add_theme_font_override("font", DISPLAY_FONT)
-	label.add_theme_font_size_override("font_size", 24)
+	label.add_theme_font_size_override("font_size", 32)
 	label.add_theme_color_override("font_color", Color("#4b3424"))
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	var buttons: Array[Button] = [dialog.get_ok_button()]
 	if dialog is ConfirmationDialog:
 		buttons.append(dialog.get_cancel_button())
 	for button in buttons:
-		button.custom_minimum_size = Vector2(200, 72)
-		button.add_theme_font_size_override("font_size", 24)
+		button.custom_minimum_size = Vector2(200, 92)
+		button.add_theme_font_size_override("font_size", 32)
 		button.add_theme_font_override("font", DISPLAY_FONT)
 		button.add_theme_color_override("font_color", Color("#4b2d1a"))
 		var style := StyleBoxFlat.new()
@@ -1327,9 +1326,9 @@ func _show_audio_settings(parent_layer: Node) -> void:
 	if _tutorial_active and _tutorial_action == "settings" and _tutorial_overlay != null:
 		_tutorial_overlay.hide_tip()
 	var settings := VBoxContainer.new()
-	settings.custom_minimum_size = Vector2(minf(480.0, get_viewport_rect().size.x * 0.78), 400)
+	settings.custom_minimum_size = Vector2(minf(590.0, get_viewport_rect().size.x - 100), 0)
 	settings.add_theme_constant_override("separation", 12)
-	var heading := _make_label("AUDIO SETTINGS", 28)
+	var heading := _make_label("SETTINGS", 40)
 	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	heading.add_theme_color_override("font_color", Color("#80502b"))
 	heading.add_theme_color_override("font_outline_color", Color("#f4e2bd"))
@@ -1337,7 +1336,7 @@ func _show_audio_settings(parent_layer: Node) -> void:
 	for bus_kind in ["music", "sfx"]:
 		var volume_label := Label.new()
 		volume_label.add_theme_font_override("font", DISPLAY_FONT)
-		volume_label.add_theme_font_size_override("font_size", 23)
+		volume_label.add_theme_font_size_override("font_size", 32)
 		volume_label.add_theme_color_override("font_color", Color("#4b3424"))
 		volume_label.text = "Background music" if bus_kind == "music" else "Sound effects"
 		settings.add_child(volume_label)
@@ -1346,33 +1345,34 @@ func _show_audio_settings(parent_layer: Node) -> void:
 		volume.min_value = 0.0
 		volume.max_value = 1.0
 		volume.step = 0.01
-		volume.custom_minimum_size.y = 48
+		volume.custom_minimum_size.y = 92
 		volume.value = audio_manager.get_music_volume() if bus_kind == "music" else audio_manager.get_sfx_volume()
 		volume.value_changed.connect(_set_audio_volume.bind(bus_kind))
 		settings.add_child(volume)
 		var enabled := CheckButton.new()
-		enabled.add_theme_font_size_override("font_size", 23)
+		enabled.custom_minimum_size.y = 92
+		enabled.add_theme_font_size_override("font_size", 32)
 		enabled.add_theme_font_override("font", DISPLAY_FONT)
 		enabled.add_theme_color_override("font_color", Color("#4b3424"))
 		enabled.add_theme_color_override("font_hover_color", Color("#4b3424"))
 		enabled.add_theme_color_override("font_pressed_color", Color("#4b3424"))
 		enabled.add_theme_color_override("font_focus_color", Color("#4b3424"))
 		enabled.name = "MusicEnabled" if bus_kind == "music" else "EffectsEnabled"
-		enabled.custom_minimum_size.y = 52
+		enabled.custom_minimum_size.y = 92
 		enabled.button_pressed = audio_manager.is_music_enabled() if bus_kind == "music" else audio_manager.is_sfx_enabled()
 		enabled.text = "Enabled" if enabled.button_pressed else "Disabled"
 		enabled.toggled.connect(_set_audio_enabled.bind(bus_kind, enabled))
 		settings.add_child(enabled)
-	var legal_links := HBoxContainer.new()
+	var legal_links := VBoxContainer.new()
 	legal_links.add_theme_constant_override("separation", 10)
 	for legal_page in [
 		{"title": "PRIVACY POLICY", "path": "res://legal/privacy_policy.md"},
 		{"title": "TERMS AND CONDITIONS", "path": "res://legal/terms_and_conditions.md"}
 	]:
 		var legal_button := _make_menu_button(str(legal_page["title"]))
-		legal_button.custom_minimum_size = Vector2(0, 62)
+		legal_button.custom_minimum_size = Vector2(0, 92)
 		legal_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		legal_button.add_theme_font_size_override("font_size", 19)
+		legal_button.add_theme_font_size_override("font_size", 32)
 		legal_button.pressed.connect(_show_legal_document.bind(parent_layer, str(legal_page["title"]), str(legal_page["path"])))
 		legal_links.add_child(legal_button)
 	settings.add_child(legal_links)
@@ -1386,12 +1386,17 @@ func _show_audio_settings(parent_layer: Node) -> void:
 		var ad_privacy := _make_menu_button("AD PRIVACY OPTIONS")
 		ad_privacy.pressed.connect(ad_provider.show_privacy_options)
 		settings.add_child(ad_privacy)
-	popup.add_child(settings)
+	var settings_scroll := ScrollContainer.new()
+	settings_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	settings_scroll.custom_minimum_size = Vector2(settings.custom_minimum_size.x, minf(820, get_viewport_rect().size.y - 250))
+	settings.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	settings_scroll.add_child(settings)
+	popup.add_child(settings_scroll)
 	if _tutorial_active and _tutorial_action == "settings":
 		popup.confirmed.connect(_on_tutorial_settings_confirmed, CONNECT_ONE_SHOT)
 	popup.confirmed.connect(popup.queue_free, CONNECT_ONE_SHOT)
 	popup.canceled.connect(popup.queue_free, CONNECT_ONE_SHOT)
-	popup.popup_centered_clamped(Vector2i(mini(580, int(get_viewport_rect().size.x * 0.9)), 520))
+	popup.popup_centered_clamped(Vector2i(mini(680, int(get_viewport_rect().size.x * 0.95)), int(get_viewport_rect().size.y - 80)))
 
 
 func _show_legal_document(parent_layer: Node, title: String, path: String) -> void:
@@ -1639,22 +1644,9 @@ func _show_story_overlay() -> void:
 
 
 func _make_story_action_button(caption: String, width: float) -> Button:
-	var button := Button.new()
-	button.text = caption
-	button.custom_minimum_size = Vector2(width, 64)
-	button.add_theme_font_size_override("font_size", 21)
-	button.add_theme_font_override("font", DISPLAY_FONT)
-	button.add_theme_color_override("font_color", Color("#4b2d1a"))
-	var normal := StyleBoxFlat.new()
-	normal.bg_color = Color("#d8b77b")
-	normal.border_color = Color("#8b572b")
-	normal.set_border_width_all(2)
-	normal.set_corner_radius_all(14)
-	button.add_theme_stylebox_override("normal", normal)
-	var hover := normal.duplicate() as StyleBoxFlat
-	hover.bg_color = Color("#ead09b")
-	button.add_theme_stylebox_override("hover", hover)
-	button.pressed.connect(_play_ui_click)
+	var button := _make_menu_button(caption)
+	button.custom_minimum_size.x = width
+	button.add_theme_font_size_override("font_size", 32)
 	return button
 
 
@@ -1772,11 +1764,11 @@ func _present_route_choices(choices: Array) -> void:
 	for choice in choices:
 		var button := Button.new()
 		button.text = str(choice.get("label", "Choose")).to_upper()
-		button.custom_minimum_size = Vector2(0, 72)
+		button.custom_minimum_size = Vector2(0, 100)
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		button.add_theme_font_size_override("font_size", 21)
+		button.add_theme_font_size_override("font_size", 32)
 		button.add_theme_color_override("font_color", Color("#4b2d1a"))
 		button.add_theme_color_override("font_hover_color", Color("#2d1d12"))
 		button.add_theme_constant_override("h_separation", 12)
@@ -1909,7 +1901,6 @@ func _show_campaign_map(route_id: String) -> void:
 	_campaign_map.configure(_chosen_route_label, _load_campaign_level_records(), _highest_unlocked_level, _completed_levels)
 	_campaign_map.level_selected.connect(_on_campaign_level_selected.bind(route_id))
 	_campaign_map.back_requested.connect(_show_launch_screen)
-	_campaign_map.page_requested.connect(_change_campaign_page)
 	_campaign_map.portrait_requested.connect(_open_portrait_puzzle)
 	_campaign_map.configure_daily(_campaign_progress)
 	_campaign_map.daily_rewards_requested.connect(_show_daily_rewards)
@@ -1946,22 +1937,12 @@ func _show_campaign_map_coach() -> void:
 
 func _load_campaign_level_records() -> Array[Dictionary]:
 	var records: Array[Dictionary] = []
-	var page_size := int(ConfigLoader.load_config(Constants.ConfigPaths.GAME).get("campaign_page_size", 50))
-	if _campaign_page_start < 1:
-		_campaign_page_start = (mini(_highest_unlocked_level, int(ConfigLoader.load_config(Constants.ConfigPaths.GAME).get("max_levels", 50))) - 1) / page_size * page_size + 1
-	for level_id in range(_campaign_page_start, mini(_campaign_page_start + page_size, int(ConfigLoader.load_config(Constants.ConfigPaths.GAME).get("max_levels", 50)) + 1)):
-		var path := "res://levels/level%03d.json" % level_id
-		var record: Dictionary = JsonLoader.load_file(path) if JsonLoader.file_exists(path) else {}
+	var maximum := int(ConfigLoader.load_config(Constants.ConfigPaths.GAME).get("max_levels", 1050))
+	for level_id in range(1, maximum + 1):
+		var record := JsonLoader.load_file("res://levels/level%03d.json" % level_id)
 		if not record.is_empty():
-			records.append(record)
+			records.append({"level_id": level_id, "name": record.get("name", ""), "metadata": record.get("metadata", {})})
 	return records
-
-
-func _change_campaign_page(direction: int) -> void:
-	var page_size := int(ConfigLoader.load_config(Constants.ConfigPaths.GAME).get("campaign_page_size", 50))
-	_campaign_page_start = clampi(_campaign_page_start + direction * page_size, 1, int(ConfigLoader.load_config(Constants.ConfigPaths.GAME).get("max_levels", 50)) - page_size + 1)
-	_show_campaign_map(_current_route_id)
-
 
 
 func _on_campaign_level_selected(level_id: int, route_id: String) -> void:
@@ -1970,7 +1951,6 @@ func _on_campaign_level_selected(level_id: int, route_id: String) -> void:
 	if _economy_manager != null and _economy_manager.get_lives() <= 0:
 		_show_life_shop()
 		return
-	_campaign_page_start = (level_id - 1) / int(ConfigLoader.load_config(Constants.ConfigPaths.GAME).get("campaign_page_size", 50)) * int(ConfigLoader.load_config(Constants.ConfigPaths.GAME).get("campaign_page_size", 50)) + 1
 	SignalBus.play_sfx.emit("door_open")
 	if _tutorial_overlay != null:
 		_tutorial_overlay.hide_tip()
@@ -2203,7 +2183,7 @@ func _show_level_briefing(route_id: String) -> void:
 	play.pressed.connect(_begin_level.bind(route_id), CONNECT_ONE_SHOT)
 	content.add_child(play)
 	if sealed:
-		var back_to_map := _make_menu_button("BACK TO CAMPAIGN MAP")
+		var back_to_map := _make_menu_button("INVESTIGATION MAP")
 		back_to_map.pressed.connect(func():
 			_briefing_layer.queue_free()
 			_briefing_layer = null
@@ -2415,6 +2395,7 @@ func _on_board_created() -> void:
 	_attempt_coins_start = _economy_manager.get_coins() if _economy_manager != null else 0
 	_result_ad_shown = false
 	_board = created_board
+	_layout_play_area()
 	_board.moves_changed.connect(_on_moves_changed)
 	_board.player_interacted.connect(_on_board_player_interacted)
 	_board.match_collected.connect(_on_tiles_matched)
@@ -3276,24 +3257,19 @@ func _show_level_result(won: bool) -> void:
 	var center := CenterContainer.new()
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	veil.add_child(center)
-	var card := PanelContainer.new()
-	card.custom_minimum_size = Vector2(minf(520.0, get_viewport_rect().size.x * 0.90), 430)
-	var card_style := StyleBoxFlat.new()
-	card_style.bg_color = Color("#f4e4bd")
-	card_style.border_color = Color("#8b572b")
-	card_style.set_border_width_all(5)
-	card_style.set_corner_radius_all(12)
-	card_style.set_content_margin_all(24)
-	card.add_theme_stylebox_override("panel", card_style)
-	center.add_child(card)
-	card.scale = Vector2(0.72, 0.72)
+	var card := MobileGameUI.card(center, Color("#eef4ff"))
+	card.custom_minimum_size = Vector2(minf(672.0, get_viewport_rect().size.x - 32), minf(1040.0, get_viewport_rect().size.y - 48))
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	card.add_child(scroll)
 	var content := VBoxContainer.new()
+	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	content.alignment = BoxContainer.ALIGNMENT_CENTER
-	content.add_theme_constant_override("separation", 12)
-	card.add_child(content)
-	var heading := _make_label("CLUE FOUND!" if won else "VICTOR GETS AWAY", 32)
+	content.add_theme_constant_override("separation", 14)
+	scroll.add_child(content)
+	var heading := _make_label("CLUE FOUND!" if won else "VICTOR GETS AWAY", 42)
 	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	heading.add_theme_color_override("font_color", Color("#633718"))
+	heading.add_theme_color_override("font_color", MobileGameUI.INK)
 	content.add_child(heading)
 	if not won:
 		var failure_count := int(_campaign_progress.get_value("campaign","failed_attempts",0))+1
@@ -3345,7 +3321,7 @@ func _show_level_result(won: bool) -> void:
 	var total_points := int(_campaign_progress.get_value("campaign", "total_points", 0))
 	var detail_text: String
 	if not won:
-		detail_text = "The remaining moves ran out. You lost one life. Try again or visit the Life Shop."
+		detail_text = "Out of moves. One life lost.\nRetry the case or continue the search."
 	else:
 		detail_text = "LEVEL POINTS: %d\nTOTAL POINTS: %d\nCOINS: +%d   TOTAL: %d\nSTARS EARNED: %d" % [_current_level_points, total_points, coins_earned, total_coins, _result_stars_earned]
 		detail_text += "\n"+str(result_data.get("story",{}).get("win_outcome","The clue is real, but Victor has moved Ethan. The search continues."))
@@ -3355,28 +3331,28 @@ func _show_level_result(won: bool) -> void:
 			detail_text += "\nCase %03d is now unlocked." % mini(_highest_unlocked_level, _current_level_id + 1)
 		else:
 			detail_text += "\nDavid's search continues as new investigations are added."
-	var detail := _make_label(detail_text, 17)
+	var detail := _make_label(detail_text, 32)
 	detail.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	detail.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	detail.add_theme_color_override("font_color", Color("#4b2d1a"))
+	detail.add_theme_color_override("font_color", MobileGameUI.INK)
 	detail.add_theme_color_override("font_outline_color", Color("#b89564"))
-	detail.add_theme_color_override("font_shadow_color", Color("#c9ad7b"))
+	detail.add_theme_color_override("font_shadow_color", Color.TRANSPARENT)
 	detail.add_theme_constant_override("outline_size", 1)
 	detail.add_theme_constant_override("shadow_offset_x", 1)
 	detail.add_theme_constant_override("shadow_offset_y", 1)
-	detail.add_theme_font_size_override("font_size", 16)
+	detail.add_theme_font_size_override("font_size", 32)
 	content.add_child(detail)
 	if won:
-		var next := _make_menu_button("NEXT CHAPTER" if has_after_story else ("NEXT LEVEL" if has_next_level else "RETURN TO MAP"))
+		var next := _make_menu_button("NEXT CHAPTER" if has_after_story else ("NEXT CASE" if has_next_level else "RETURN TO MAP"))
 		next.pressed.connect(_next_level_after_win)
 		content.add_child(next)
 	else:
 		if _economy_manager == null or _economy_manager.get_lives() > 0:
-			var retry := _make_menu_button("RETRY LEVEL")
+			var retry := _make_menu_button("RETRY CASE")
 			retry.pressed.connect(_retry_current_level)
 			content.add_child(retry)
 		if _can_buy_continue():
-			var play_on := _make_menu_button("PLAY ON: +5 MOVES")
+			var play_on := _make_menu_button("CONTINUE: +5 MOVES")
 			play_on.pressed.connect(_show_continue_shop)
 			content.add_child(play_on)
 		var life_shop := _make_menu_button("LIFE SHOP")
@@ -3388,8 +3364,8 @@ func _show_level_result(won: bool) -> void:
 			_persist_campaign_progress()
 		)
 	elif not won and not _ad_revived:
-		_add_reward_offer(content, "Watch an ad: +5 moves and restore lost life", "continue", _reward_continue)
-	var map_button := _make_menu_button("CAMPAIGN MAP")
+		_add_reward_offer(content, "Watch ad: +5 moves", "continue", _reward_continue)
+	var map_button := _make_menu_button("INVESTIGATION MAP")
 	map_button.pressed.connect(_return_to_campaign_map)
 	content.add_child(map_button)
 	card.modulate.a = 0.0
@@ -3580,7 +3556,6 @@ func _record_level_completion() -> bool:
 	_completed_levels[str(_current_level_id)] = maxi(stars_earned, old_stars)
 	var star_delta := maxi(0, stars_earned - old_stars)
 	_highest_unlocked_level = mini(int(ConfigLoader.load_config(Constants.ConfigPaths.GAME).get("max_levels", 50)), maxi(_highest_unlocked_level, _current_level_id + 1))
-	_campaign_page_start = -1
 	var point_records_value: Variant = _campaign_progress.get_value("campaign", "level_points", {})
 	var point_records: Dictionary = point_records_value if typeof(point_records_value) == TYPE_DICTIONARY else {}
 	point_records[str(_current_level_id)] = maxi(_current_level_points, int(point_records.get(str(_current_level_id), 0)))
@@ -3695,7 +3670,7 @@ func _complete_academy_lesson() -> void:
 
 func _add_case_card(parent: VBoxContainer, title: String, subtitle: String, detail: String, illustration: String = "") -> void:
 	var button := _make_story_action_button(title, 0)
-	button.custom_minimum_size.y = 76
+	button.custom_minimum_size.y = 100
 	button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	button.tooltip_text = subtitle
 	button.pressed.connect(_show_detail.bind(title, detail, Callable(), "", illustration))
@@ -3964,18 +3939,36 @@ func _open_portrait_puzzle() -> void:
 	if not attempt.is_empty():
 		_show_portrait_attempt(attempt)
 		return
-	var dialog := ConfirmationDialog.new()
-	dialog.title = "Roadside evidence puzzle"
-	var collection: Dictionary = _campaign_progress.get_value("daily", "portraits", {})
+	_portrait_layer = CanvasLayer.new()
+	_portrait_layer.layer = 20
+	add_child(_portrait_layer)
+	var screen := Control.new()
+	screen.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_portrait_layer.add_child(screen)
+	MobileGameUI.background(screen)
+	var margin := MarginContainer.new()
+	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	for side in ["left", "right", "top", "bottom"]:
+		margin.add_theme_constant_override("margin_" + side, 24)
+	screen.add_child(margin)
+	var column := MobileGameUI.column(margin, 20)
+	MobileGameUI.label(column, "Restore evidence", 48)
+	MobileGameUI.spacer(column)
 	var config := DailyActivities.settings()
-	dialog.dialog_text = "Restore a portrait in %d seconds for %d coins.\nTwo puzzles daily, at 00:00 and 12:00 UTC.\nStarting uses this slot. The timer continues when you leave.\nThe attempt ends at the next reset if sooner.\nPortrait collection: %d / %d\nComplete a puzzle or campaign level for your daily stamp." % [int(config.portrait_seconds), int(config.portrait_coins), collection.size(), config.portraits.size()]
-	dialog.ok_button_text = "Start timed puzzle"
-	dialog.get_ok_button().disabled = not DailyActivities.available(_campaign_progress, now)
-	dialog.confirmed.connect(_start_portrait_attempt)
-	dialog.confirmed.connect(dialog.queue_free)
-	dialog.canceled.connect(dialog.queue_free)
-	add_child(dialog)
-	dialog.popup_centered(Vector2i(mini(600, int(get_viewport_rect().size.x) - 32), 260))
+	var challenge := DailyActivities.puzzle_for_slot(DailyActivities.slot_at(now))
+	var hero := MobileGameUI.card(column, MobileGameUI.PURPLE)
+	var hero_content := MobileGameUI.column(hero)
+	MobileGameUI.image(hero_content, MobileGameUI.COIN, Vector2(120, 100))
+	MobileGameUI.label(hero_content, "+%d coins" % int(config.portrait_coins), 64, Color.WHITE)
+	MobileGameUI.label(hero_content, "%d pieces | %d minutes" % [int(challenge.columns) * int(challenge.rows), int(challenge.seconds) / 60], 42, Color.WHITE)
+	var ready := DailyActivities.available(_campaign_progress, now)
+	MobileGameUI.label(column, "Swap pieces to restore the picture.\nThe timer keeps running if you leave." if ready else "This puzzle slot is finished.\nNew puzzles at 00:00 and 12:00 UTC.", 36)
+	MobileGameUI.spacer(column)
+	MobileGameUI.button(column, "Start puzzle" if ready else "Come back for the next puzzle", func():
+		_close_portrait_puzzle()
+		_start_portrait_attempt()
+	, MobileGameUI.PINK).disabled = not ready
+	MobileGameUI.button(column, "Return to investigation", _close_portrait_puzzle)
 
 
 func _start_portrait_attempt() -> void:
@@ -3994,8 +3987,12 @@ func _show_portrait_attempt(attempt: Dictionary) -> void:
 	_portrait_puzzle = PortraitPuzzle.new()
 	_portrait_puzzle.configure(attempt)
 	_portrait_puzzle.closed.connect(_close_portrait_puzzle)
+	_portrait_puzzle.map_requested.connect(_return_from_activity_to_map)
+	_portrait_puzzle.settings_requested.connect(_show_activity_settings)
+	_portrait_puzzle.case_file_requested.connect(_show_case_file)
 	_portrait_puzzle.pieces_changed.connect(_save_portrait_pieces)
 	_portrait_puzzle.completed.connect(_complete_portrait_puzzle)
+	_portrait_puzzle.save_requested.connect(func(): _portrait_gallery.request_save(_completed_portrait_id,true))
 	_portrait_layer.add_child(_portrait_puzzle)
 
 
@@ -4011,6 +4008,7 @@ func _save_portrait_pieces(slot: int, pieces: Array) -> void:
 
 
 func _complete_portrait_puzzle(slot: int) -> void:
+	var completed_attempt := DailyActivities.active_attempt(_campaign_progress,TimeHelper.current_unix_time())
 	_progress_transaction = true
 	var result := DailyActivities.finish_portrait(_campaign_progress, slot, TimeHelper.current_unix_time())
 	if not result.is_empty():
@@ -4019,6 +4017,8 @@ func _complete_portrait_puzzle(slot: int) -> void:
 	_persist_campaign_progress()
 	if not result.is_empty() and _portrait_puzzle != null:
 		_portrait_puzzle.show_reward(int(result.coins), int(result.streak))
+	if not result.is_empty() and not completed_attempt.is_empty():
+		_completed_portrait_id = _portrait_gallery.record_completed(str(completed_attempt.portrait),slot)
 
 
 func _close_portrait_puzzle() -> void:
@@ -4038,64 +4038,39 @@ func _record_daily_mission(kind: String, amount: int) -> void:
 
 
 func _show_daily_rewards() -> void:
-	if _daily_rewards_layer != null and is_instance_valid(_daily_rewards_layer):
+	if is_instance_valid(_daily_rewards_layer):
 		return
-	var layer := CanvasLayer.new()
-	_daily_rewards_layer = layer
-	layer.layer = 20
-	var panel := PanelContainer.new()
-	panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	var daily_style := StyleBoxFlat.new()
-	daily_style.bg_color = Color("#102c2b")
-	daily_style.content_margin_left = 20
-	daily_style.content_margin_right = 20
-	daily_style.content_margin_top = 20
-	daily_style.content_margin_bottom = 20
-	panel.add_theme_stylebox_override("panel", daily_style)
-	var scroll := ScrollContainer.new()
-	panel.add_child(scroll)
-	var content := VBoxContainer.new()
-	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	content.add_theme_constant_override("separation", 12)
-	scroll.add_child(content)
-	var close := _make_menu_button("BACK TO TRAIL")
-	close.pressed.connect(_close_daily_rewards)
-	content.add_child(close)
-	var config := DailyActivities.settings()
-	var text := "DAILY REWARDS\nComplete a campaign case or portrait puzzle to earn a stamp.\n"
-	for index in config.streak_coins.size():
-		text += "Day %d: %d coins\n" % [index + 1, int(config.streak_coins[index])]
-	text += "The reward cycle repeats every 7 stamps.\nOne missed day is protected once every %d days.\nEarn %d stamps in a UTC Monday to Sunday week: +%d coins.\nDaily reset: 00:00 UTC. Portrait slots: 00:00 and 12:00 UTC.\n\nTODAY'S GOALS\n" % [int(config.grace_cooldown_days), int(config.weekly_days), int(config.weekly_coins)]
-	var today := DailyActivities.day_at(TimeHelper.current_unix_time())
-	var counts: Dictionary = _campaign_progress.get_value("daily", "missions", {}) if int(_campaign_progress.get_value("daily", "mission_day", -1)) == today else {}
-	for mission in config.missions:
-		text += "%s: %d / %d (+%d coins)\n" % [str(mission.title), mini(int(mission.target), int(counts.get(str(mission.id), 0))), int(mission.target), int(mission.coins)]
-	text += "\nPORTRAIT ALBUM"
-	var label := _make_label(text, 21)
-	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	content.add_child(label)
-	var collection: Dictionary = _campaign_progress.get_value("daily", "portraits", {})
-	for portrait in config.portraits:
-		var count := int(collection.get(str(portrait), 0))
-		var image := TextureRect.new()
-		image.texture = ResourceManager.load_texture(str(portrait))
-		image.custom_minimum_size = Vector2(120, 140)
-		image.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		image.modulate = Color.WHITE if count > 0 else Color(0.15, 0.15, 0.15)
-		content.add_child(image)
-		var caption := _make_label("Restored %d times" % count if count > 0 else "Not restored yet", 18)
-		caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		content.add_child(caption)
-	var back := _make_menu_button("BACK TO TRAIL")
-	back.pressed.connect(_close_daily_rewards)
-	content.add_child(back)
-	layer.add_child(panel)
-	add_child(layer)
+	_daily_rewards_layer = CanvasLayer.new()
+	_daily_rewards_layer.layer = 20
+	var hub := RewardsHub.new()
+	hub.name = "RewardsHub"
+	hub.configure(_campaign_progress, _portrait_gallery)
+	hub.closed.connect(_close_daily_rewards)
+	hub.map_requested.connect(_return_from_activity_to_map)
+	hub.settings_requested.connect(_show_activity_settings)
+	hub.case_file_requested.connect(_show_case_file)
+	hub.play_requested.connect(func():
+		_close_daily_rewards()
+		_open_portrait_puzzle()
+	)
+	_daily_rewards_layer.add_child(hub)
+	add_child(_daily_rewards_layer)
 
 
 func _close_daily_rewards() -> void:
-	if _daily_rewards_layer != null and is_instance_valid(_daily_rewards_layer):
+	if is_instance_valid(_daily_rewards_layer):
 		_daily_rewards_layer.queue_free()
 	_daily_rewards_layer = null
+
+
+func _show_activity_settings() -> void:
+	var layer := _portrait_layer if is_instance_valid(_portrait_layer) else _daily_rewards_layer
+	_show_audio_settings(layer)
+
+
+func _return_from_activity_to_map() -> void:
+	_close_portrait_puzzle()
+	_close_daily_rewards()
+	if is_instance_valid(_pause_layer): _close_pause_menu()
+	if _board != null: _board.lock()
+	_show_campaign_map(_current_route_id)

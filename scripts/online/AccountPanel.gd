@@ -16,6 +16,8 @@ func initialize(current_game: Game) -> void:
 	game = current_game
 	account = get_node("/root/CloudAccount")
 	purchases = get_node("/root/CoinPurchases")
+	if preload("res://scripts/debug/DeveloperTools.gd").enabled():
+		return
 	var owner := ConfigFile.new()
 	if owner.load(OWNER_PATH) == OK:
 		_owner = str(owner.get_value("profile","owner",""))
@@ -47,6 +49,8 @@ func _snapshot() -> Dictionary:
 	return result
 
 func local_changed() -> void:
+	if preload("res://scripts/debug/DeveloperTools.gd").enabled():
+		return
 	if account.signed_in() and _owner == account.user_id:
 		account.queue_save(_snapshot())
 
@@ -54,6 +58,9 @@ func _safe_menu() -> bool:
 	return game._launch_layer != null or game._campaign_layer != null or game._result_layer != null or game._briefing_layer != null
 
 func show_account() -> void:
+	if preload("res://scripts/debug/DeveloperTools.gd").enabled():
+		_notice("Accounts and purchases are disabled in Developer Play. This session uses a separate test save.")
+		return
 	if not _safe_menu():
 		_notice("You can sign in from the title screen, campaign map, or level result. Finish this attempt first; your board stays here.")
 		return
@@ -163,7 +170,7 @@ func show_account() -> void:
 
 func _style_section_label(label: Label) -> void:
 	label.add_theme_font_override("font",Game.DISPLAY_FONT)
-	label.add_theme_font_size_override("font_size",22)
+	label.add_theme_font_size_override("font_size",32)
 	label.add_theme_color_override("font_color",Color("#80502b"))
 
 func _style_account_scrollbar(scrollbar: VScrollBar) -> void:
@@ -231,9 +238,9 @@ func _confirm_purchase(product: String, price: String) -> void:
 
 func _button(parent: Control,title: String,action: Callable,disabled := false,keep_open := false) -> void:
 	var button := game._make_menu_button(title)
-	button.custom_minimum_size = Vector2(0,88)
+	button.custom_minimum_size = Vector2(0,92)
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	button.add_theme_font_size_override("font_size",26)
+	button.add_theme_font_size_override("font_size",34)
 	button.disabled = disabled
 	if keep_open: _login_buttons.append(button)
 	button.pressed.connect(func():

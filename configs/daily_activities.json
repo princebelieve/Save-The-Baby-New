@@ -17,6 +17,7 @@
   "weekly_days": 5,
   "weekly_coins": 50,
   "portraits": [
+    "res://assets/sprites/characters/amara_and_ethan_portrait.jpeg",
     "res://assets/sprites/characters/ethan_portrait_cutout.png",
     "res://assets/sprites/characters/david_portrait_cutout.png",
     "res://assets/sprites/characters/victor_portrait_badge_cutout.png"
@@ -33,6 +34,91 @@
       "title": "Clear 3 blockers",
       "target": 3,
       "coins": 15
+    }
+  ],
+  "puzzle_difficulties": [
+    {
+      "name": "Standard",
+      "columns": 3,
+      "rows": 3,
+      "seconds": 120
+    },
+    {
+      "name": "Challenging",
+      "columns": 4,
+      "rows": 4,
+      "seconds": 180
+    },
+    {
+      "name": "Expert",
+      "columns": 5,
+      "rows": 5,
+      "seconds": 240
+    }
+  ],
+  "difficulty_rotation": [
+    0,
+    1,
+    0,
+    2,
+    1
+  ],
+  "puzzle_art": [
+    {
+      "title": "Amara",
+      "path": "res://assets/sprites/characters/amara_police_portrait_cutout.png"
+    },
+    {
+      "title": "Rocket",
+      "path": "res://assets/sprites/powerups/rocket_powerup_icon.jpeg"
+    },
+    {
+      "title": "Bomb",
+      "path": "res://assets/sprites/powerups/bomb_powerup_icon.jpeg"
+    },
+    {
+      "title": "Thunder",
+      "path": "res://assets/sprites/powerups/thunder_powerup_icon.jpeg"
+    },
+    {
+      "title": "Barricaded Door",
+      "path": "res://assets/sprites/obstacles/barricaded_door.jpeg"
+    },
+    {
+      "title": "Chain",
+      "path": "res://assets/sprites/obstacles/chain_obstacle_icon.jpeg"
+    },
+    {
+      "title": "Electric Trap",
+      "path": "res://assets/sprites/obstacles/electric_trap_obstacle_icon.jpeg"
+    },
+    {
+      "title": "Locked Padlock",
+      "path": "res://assets/sprites/obstacles/locked_padlock_obstacle_icon.jpeg"
+    },
+    {
+      "title": "Missile",
+      "path": "res://assets/sprites/obstacles/missile_obstacle_icon.jpeg"
+    },
+    {
+      "title": "Pincers",
+      "path": "res://assets/sprites/obstacles/pincers_obstacle_icon.jpeg"
+    },
+    {
+      "title": "Pliers",
+      "path": "res://assets/sprites/obstacles/pliers_obstacle_icon.jpeg"
+    },
+    {
+      "title": "Unlocked Padlock",
+      "path": "res://assets/sprites/obstacles/unlocked_padlock_icon.jpeg"
+    },
+    {
+      "title": "Wooden Gate",
+      "path": "res://assets/sprites/obstacles/wooden_gate_board_tile.jpeg"
+    },
+    {
+      "title": "Evidence document",
+      "path": "res://assets/sprites/powerups/tiles/evidence_document_icon.jpeg"
     }
   ]
 }

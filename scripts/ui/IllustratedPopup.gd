@@ -73,14 +73,14 @@ func show_tip(message: String, target_rect: Rect2, speaker_name: String = "DAVID
 	var bubble_width := minf(560.0, get_viewport_rect().size.x - 48.0)
 	var text_width := bubble_width - 64.0 if _modal else bubble_width - 164.0 - (70.0 if not _art_path.is_empty() else 0.0)
 	var font := _body_label.get_theme_font("font")
-	var two_lines := font.get_height(24) * 2.0 + 2.0
+	var two_lines := font.get_height(32) * 2.0 + 2.0
 	# Explicit lesson lines are pages; legacy instruction copy is wrapped into
 	# short pages rather than shrinking the text or hiding it in a scroll area.
 	for paragraph in message.strip_edges().split("\n", false):
 		var page_text := ""
 		for word in paragraph.split(" ", false):
 			var candidate := page_text + (" " if not page_text.is_empty() else "") + word
-			if font.get_multiline_string_size(candidate, HORIZONTAL_ALIGNMENT_LEFT, text_width, 24).y > two_lines and not page_text.is_empty():
+			if font.get_multiline_string_size(candidate, HORIZONTAL_ALIGNMENT_LEFT, text_width, 32).y > two_lines and not page_text.is_empty():
 				_pages.append(page_text)
 				page_text = ""
 			page_text += (" " if not page_text.is_empty() else "") + word
@@ -177,7 +177,7 @@ func _build_bubble() -> void:
 	_body_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_body_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_body_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_body_label.add_theme_font_size_override("font_size", 24)
+	_body_label.add_theme_font_size_override("font_size", 32)
 	_body_label.add_theme_color_override("font_color", Color("#173f40"))
 	_body_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_body_scroll.add_child(_body_label)
@@ -188,7 +188,7 @@ func _build_bubble() -> void:
 	_acknowledge_button.pressed.connect(_next_page)
 	_page_indicator = Label.new()
 	_page_indicator.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_page_indicator.add_theme_font_size_override("font_size", 17)
+	_page_indicator.add_theme_font_size_override("font_size", 32)
 	_page_indicator.add_theme_color_override("font_color", Color("#477f78"))
 	_page_indicator.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_bubble.add_child(_page_indicator)
@@ -205,7 +205,8 @@ func _build_bubble() -> void:
 func _card_button(caption: String, primary: bool) -> Button:
 	var button := Button.new()
 	button.text = caption
-	button.add_theme_font_size_override("font_size", 20)
+	button.custom_minimum_size.y = 92
+	button.add_theme_font_size_override("font_size", 32)
 	button.add_theme_color_override("font_color", Color("#fff9d9") if primary else Color("#12645b"))
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color("#147d70") if primary else Color("#d6f3d9")
@@ -240,7 +241,7 @@ func _layout_tip() -> void:
 		_set_panel(_shade_panels[2], Vector2(hole.end.x,hole.position.y), Vector2(viewport.x-hole.end.x,hole.size.y))
 		_set_panel(_shade_panels[3], Vector2(0,hole.end.y), Vector2(viewport.x,viewport.y-hole.end.y))
 	var width := minf(560, viewport.x - 48)
-	var height := minf(620, viewport.y * 0.73) if _modal else 286.0
+	var height := minf(620, viewport.y * 0.73) if _modal else 350.0
 	var at := (viewport - Vector2(width,height)) * 0.5
 	if not _modal:
 		at.y = hole.position.y - height - 22
@@ -250,8 +251,8 @@ func _layout_tip() -> void:
 	_bubble.position = at
 	_bubble.pivot_offset = _bubble.size * 0.5
 	_heading.position = Vector2(36,22)
-	_heading.size = Vector2(width-72,76 if _modal else 42)
-	_heading.add_theme_font_size_override("font_size", 29 if _modal else 23)
+	_heading.size = Vector2(width-154,76 if _modal else 42)
+	_heading.add_theme_font_size_override("font_size", 34)
 	_decoration.position = Vector2(20,90 if _modal else 48)
 	_decoration.size = Vector2(width-40,280 if _modal else 130)
 	_decoration.visible = _modal
@@ -262,7 +263,7 @@ func _layout_tip() -> void:
 	_hero_art.position = Vector2(width*0.49,135) if _modal else Vector2(width-98,72)
 	_hero_art.size = Vector2(width*0.43,218) if _modal else Vector2(72,90)
 	_hero_art.visible = has_art
-	var text_at := Vector2(32,height-220) if _modal else Vector2(136,64)
+	var text_at := Vector2(32,height-260) if _modal else Vector2(136,64)
 	var text_size := Vector2(width-64,130) if _modal else Vector2(width-164-(70 if has_art else 0),136)
 	# Clear the previous large card's minimum before shrinking to an action tip.
 	_body_label.custom_minimum_size = Vector2.ZERO
@@ -271,14 +272,14 @@ func _layout_tip() -> void:
 	_body_scroll.position = text_at
 	_body_scroll.size = text_size
 	_body_label.custom_minimum_size = Vector2(0, text_size.y)
-	_previous_button.position = Vector2(22,height-72)
-	_previous_button.size = Vector2(54,48)
-	_acknowledge_button.size = Vector2(150 if _page == _pages.size()-1 and _needs_ack else 54,48)
-	_acknowledge_button.position = Vector2(width-_acknowledge_button.size.x-22,height-72)
-	_page_indicator.position = Vector2(width*0.5-44,height-59)
+	_previous_button.position = Vector2(22,height-110)
+	_previous_button.size = Vector2(92,92)
+	_acknowledge_button.size = Vector2(220 if _page == _pages.size()-1 and _needs_ack else 92,92)
+	_acknowledge_button.position = Vector2(width-_acknowledge_button.size.x-22,height-110)
+	_page_indicator.position = Vector2(width*0.5-44,height-82)
 	_page_indicator.size = Vector2(88,30)
-	_skip_button.position = Vector2(width-54,10)
-	_skip_button.size = Vector2(44,44)
+	_skip_button.position = Vector2(width-108,10)
+	_skip_button.size = Vector2(92,92)
 
 
 func _update_page() -> void:
