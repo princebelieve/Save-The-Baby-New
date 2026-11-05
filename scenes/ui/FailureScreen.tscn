@@ -1,0 +1,21 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/FailureScreen.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/sprites/characters/victor_portrait_v2.png" id="2"]
+
+[node name="FailureScreen" type="HBoxContainer"]
+theme_override_constants/separation = 14
+script = ExtResource("1")
+
+[node name="VictorPortrait" type="TextureRect" parent="."]
+custom_minimum_size = Vector2(100, 125)
+texture = ExtResource("2")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="VictorTaunt" type="Label" parent="."]
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.4, 0.15, 0.1, 1)
+theme_override_font_sizes/font_size = 23
+text = "My money or Ethan."
+autowrap_mode = 3

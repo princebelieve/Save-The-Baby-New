@@ -214,7 +214,7 @@ export function createApp({db, client, oauth, play, baseUrl, clientId, commerceE
   const user=await users.findOneAndUpdate({_id:req.user._id,revision},{$set:{save:clean,updated:new Date()},$inc:{revision:1}},{returnDocument:'after'});
   requireThat(user,409,'Another device has a newer save. Download it before uploading again.'); res.json(profile(user));
  });
- app.get('/v1/catalog',auth,(_req,res)=>res.json({packs:PACKS,supplies:SUPPLIES,commerceEnabled}));
+ app.get('/v1/catalog',auth,(_req,res)=>res.json({shopVersion:2,packs:PACKS,supplies:SUPPLIES,commerceEnabled}));
  app.post('/v1/purchases/google',auth,async(req,res)=>{
   requireThat(commerceEnabled,503,'Coin purchases are not enabled yet.');
   const {productId,purchaseToken}=req.body; requireThat(Object.hasOwn(PACKS,productId)&&typeof purchaseToken==='string'&&purchaseToken.length>=10&&purchaseToken.length<=4096,400,'Invalid product or purchase token');
@@ -239,18 +239,24 @@ export function createApp({db, client, oauth, play, baseUrl, clientId, commerceE
   res.json({...profile(await users.findOne({_id:req.user._id})),credited:!purchase.revoked});
  });
  app.post('/v1/wallet/spend',auth,async(req,res)=>{
-  const {kind,revision,requestId}=req.body; requireThat(Object.hasOwn(SUPPLIES,kind)&&Number.isSafeInteger(revision)&&typeof requestId==='string'&&/^[a-f0-9-]{16,80}$/.test(requestId),400,'Invalid supply request');
+  const {kind,revision,requestId,expectedPrice,useEarned=false}=req.body; requireThat(Object.hasOwn(SUPPLIES,kind)&&Number.isSafeInteger(revision)&&typeof requestId==='string'&&/^[a-f0-9-]{16,80}$/.test(requestId)&&typeof useEarned==='boolean',400,'Invalid supply request');
+  requireThat(Number.isSafeInteger(expectedPrice)&&expectedPrice>0,400,'Update the game before using the coin shop.');
   const key=hash(`${req.user._id}:${requestId}`);
   await transaction(async session=>{
    const previous=await db.collection('spends').findOne({_id:key},{session});
-   if(previous) {requireThat(previous.kind===kind,409,'Request was already used');return;}
+   if(previous) {requireThat(previous.kind===kind&&previous.price===expectedPrice&&Boolean(previous.useEarned)===useEarned,409,'Request was already used');return;}
    const user=await users.findOne({_id:req.user._id},{session}); requireThat(user?.save,409,'Save progress before purchasing supplies');
    requireThat(user.revision===revision,409,'Another device has a newer save');
-   const price=SUPPLIES[kind].price; requireThat(user.wallet>=price,409,'Not enough purchased coins');
+   const price=SUPPLIES[kind].price;
+   requireThat(expectedPrice===price,409,'Shop prices changed. Reopen the shop before buying.');
+   const earned=useEarned?Math.min(price,Number(user.save.campaign.coins)||0):0;
+   const paid=price-earned;
+   requireThat(user.wallet>=paid,409,'Not enough coins');
    requireThat(kind!=='ethan'||Number(user.save.campaign.ethan||0)<MAX_ETHAN_ASSISTS,409,'Ethan assists are already full');
-   requireThat(kind!=='lives'||Number(user.save.campaign.lives)<5,409,'Lives are already full');
-   await users.updateOne({_id:user._id,revision},{$inc:{wallet:-price,revision:1},$set:{save:addSupply(user.save,kind),updated:new Date()}},{session});
-   await db.collection('spends').insertOne({_id:key,userId:user._id,kind,price,created:new Date()},{session});
+   requireThat(!['lives','life'].includes(kind)||Number(user.save.campaign.lives)<5,409,'Lives are already full');
+   const save=addSupply(user.save,kind);save.campaign.coins=(Number(save.campaign.coins)||0)-earned;
+   await users.updateOne({_id:user._id,revision},{$inc:{wallet:-paid,revision:1},$set:{save,updated:new Date()}},{session});
+   await db.collection('spends').insertOne({_id:key,userId:user._id,kind,price,earned,paid,useEarned,created:new Date()},{session});
   });
   res.json(profile(await users.findOne({_id:req.user._id})));
  });

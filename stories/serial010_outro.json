@@ -1,0 +1,91 @@
+{
+  "story_id": "serial010_outro",
+  "title": "An Empty Office | The next lead",
+  "background_music": "suspense_opening",
+  "default_background": "res://assets/sprites/backgrounds/river_map_section.jpeg",
+  "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+  "characters": [
+    "david",
+    "amara",
+    "victor",
+    "ethan",
+    "detective_morris"
+  ],
+  "scenes": [
+    {
+      "scene_id": "serial010_outro",
+      "route_dialogues": {
+        "police": [
+          {
+            "speaker": "Detective Morris",
+            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
+            "text": "We will verify the estate office visitor book and keep its source intact. A lead is not a rescue; we cannot assume Victor stayed there.",
+            "routes": [
+              "police"
+            ]
+          }
+        ],
+        "signal": [
+          {
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+            "text": "I will check the technical trail behind the estate office visitor book. Amara, tell me what the records cannot explain."
+          }
+        ],
+        "alone": [
+          {
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+            "text": "I am following the estate office visitor book without police backup. Amara has my location; I am not going to turn this into a contest with Victor."
+          }
+        ]
+      },
+      "dialogues": [
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "Victor used an old visitor pass to collect a sealed packet before fleeing through the back."
+        },
+        {
+          "speaker": "Amara",
+          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+          "text": "We reach the office minutes too late. The packet's receipt leads into the accounts he wants to control."
+        }
+      ],
+      "choices": [
+        {
+          "id": "police",
+          "label": "Coordinate the next lead with the police",
+          "impact": "Bring Morris into the next investigation and preserve the evidence behind the estate office visitor book.",
+          "response": "Morris takes the lead into the formal investigation. David checks the record while Amara explains its personal significance.",
+          "speaker": "Detective Morris"
+        },
+        {
+          "id": "signal",
+          "label": "Decode the next connection with Amara",
+          "impact": "David checks the technical trail from the estate office visitor book; Amara tests it against her own history.",
+          "response": "David saves the original record and checks its connections. Amara refuses to let Victor's version replace what she remembers.",
+          "speaker": "David"
+        },
+        {
+          "id": "alone",
+          "label": "Follow the next trail without police backup",
+          "impact": "David follows the physical lead from the estate office visitor book, keeping Amara informed.",
+          "response": "David sends Amara his location before moving. Finding Ethan matters more than claiming the search as his own achievement.",
+          "speaker": "David"
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "version": 2,
+    "season": 1,
+    "season_title": "The River Between Us",
+    "episode": 10,
+    "episode_id": 10,
+    "campaign_levels": "141-150",
+    "ethan_status": "missing",
+    "season_finale": true,
+    "evidence_summary": "Victor used an old visitor pass to collect a sealed packet before fleeing through the back. We reach the office minutes too late. The packet's receipt leads into the accounts he wants to control."
+  }
+}

@@ -1,0 +1,91 @@
+{
+  "story_id": "serial048_outro",
+  "title": "The Dashboard Tag | The next lead",
+  "background_music": "suspense_opening",
+  "default_background": "res://assets/sprites/backgrounds/level_map_landscape.jpeg",
+  "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+  "characters": [
+    "david",
+    "amara",
+    "victor",
+    "ethan",
+    "detective_morris"
+  ],
+  "scenes": [
+    {
+      "scene_id": "serial048_outro",
+      "route_dialogues": {
+        "police": [
+          {
+            "speaker": "Detective Morris",
+            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
+            "text": "We will verify the vehicle service tag and keep its source intact. A lead is not a rescue; we cannot assume Victor stayed there.",
+            "routes": [
+              "police"
+            ]
+          }
+        ],
+        "signal": [
+          {
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+            "text": "I will check the technical trail behind the vehicle service tag. Amara, tell me what the records cannot explain."
+          }
+        ],
+        "alone": [
+          {
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+            "text": "I am following the vehicle service tag without police backup. Amara has my location; I am not going to turn this into a contest with Victor."
+          }
+        ]
+      },
+      "dialogues": [
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "The workshop replaced a damaged mirror after a hurried departure."
+        },
+        {
+          "speaker": "Amara",
+          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+          "text": "We arrive after pickup. A witness saw the vehicle turn toward an estate storehouse."
+        }
+      ],
+      "choices": [
+        {
+          "id": "police",
+          "label": "Coordinate the next lead with the police",
+          "impact": "Bring Morris into the next investigation and preserve the evidence behind the vehicle service tag.",
+          "response": "Morris takes the lead into the formal investigation. David checks the record while Amara explains its personal significance.",
+          "speaker": "Detective Morris"
+        },
+        {
+          "id": "signal",
+          "label": "Decode the next connection with Amara",
+          "impact": "David checks the technical trail from the vehicle service tag; Amara tests it against her own history.",
+          "response": "David saves the original record and checks its connections. Amara refuses to let Victor's version replace what she remembers.",
+          "speaker": "David"
+        },
+        {
+          "id": "alone",
+          "label": "Follow the next trail without police backup",
+          "impact": "David follows the physical lead from the vehicle service tag, keeping Amara informed.",
+          "response": "David sends Amara his location before moving. Finding Ethan matters more than claiming the search as his own achievement.",
+          "speaker": "David"
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "version": 2,
+    "season": 5,
+    "season_title": "For Her Son",
+    "episode": 8,
+    "episode_id": 48,
+    "campaign_levels": "521-530",
+    "ethan_status": "missing",
+    "season_finale": false,
+    "evidence_summary": "The workshop replaced a damaged mirror after a hurried departure. We arrive after pickup. A witness saw the vehicle turn toward an estate storehouse."
+  }
+}

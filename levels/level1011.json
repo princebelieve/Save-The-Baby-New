@@ -1,122 +1,131 @@
 {
-    "audio": {
-        "game_over": "",
-        "music": "",
-        "victory": ""
-    },
-    "background": {
-        "image": "res://assets/sprites/backgrounds/dirt_board_background.jpeg",
-        "parallax": false
-    },
-    "board": {
-        "blocked_cells": [],
-        "columns": 8,
-        "locked_cells": [],
-        "rows": 7,
-        "spawn_points": [],
-        "tile_size": 64
-    },
-    "description": "Gather phone evidence and clear every blocker on this patrol.",
-    "difficulty": "EASY",
-    "level_id": 1011,
-    "metadata": {
-        "chapter_end_level": 1020,
-        "chapter_id": 103,
-        "chapter_start_level": 1011,
-        "chapter_title": "River Watch",
-        "generator_version": 1,
-        "map_background": "river_map_section_cutout.png",
-        "map_landmark": "wooden_bridge_cutout.png",
-        "map_props": [
-            "wooden_bridge_cutout.png",
-            "police_car_topdown_cutout.png"
-        ],
-        "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
-        "seed": 8748012
-    },
-    "moves": {
-        "total": 32
-    },
-    "name": "Evidence Patrol 1011",
-    "objectives": [
-        {
-            "amount": 18,
-            "target": "PHONE",
-            "type": "COLLECT_ITEMS"
-        }
+  "audio": {
+    "game_over": "",
+    "music": "",
+    "victory": ""
+  },
+  "background": {
+    "image": "res://assets/sprites/backgrounds/dirt_board_background.jpeg",
+    "parallax": false
+  },
+  "board": {
+    "blocked_cells": [],
+    "columns": 8,
+    "locked_cells": [],
+    "rows": 7,
+    "spawn_points": [],
+    "tile_size": 64
+  },
+  "description": "The next lead is the shuttle return schedule. We need its original source before Victor moves again.",
+  "difficulty": "EASY",
+  "level_id": 1011,
+  "metadata": {
+    "chapter_end_level": 1020,
+    "chapter_id": 103,
+    "chapter_start_level": 1011,
+    "chapter_title": "The Return Schedule",
+    "generator_version": 2,
+    "map_background": "river_map_section_cutout.png",
+    "map_landmark": "wooden_bridge_cutout.png",
+    "map_props": [
+      "wooden_bridge_cutout.png",
+      "police_car_topdown_cutout.png"
     ],
-    "obstacles": {
-        "items": [
-            {
-                "health": 1,
-                "type": "lock",
-                "x": 4,
-                "y": 2
-            },
-            {
-                "health": 1,
-                "type": "chain",
-                "x": 4,
-                "y": 4
-            }
-        ]
-    },
-    "powerups": {
-        "available": [
-            "ROCKET",
-            "BOMB",
-            "THUNDER"
-        ],
-        "enabled": true
-    },
-    "rewards": {
-        "coins": 50,
-        "first_try_bonus": 10,
-        "perfect_bonus": 20,
-        "powerups": [],
-        "stars": 3
-    },
-    "settings": {
-        "allow_boosters": true,
-        "allow_shuffle": true,
-        "available_boosters": [
-            "rocket",
-            "bomb",
-            "thunder",
-            "ethan"
-        ],
-        "time_limit": 0
-    },
-    "story": {
-        "after_level": "",
-        "before_level": "",
-        "first_clear": "",
-        "return_to_map": true
-    },
-    "tile_pool": {
-        "tiles": [
-            "key",
-            "phone",
-            "fingerprint",
-            "recorder",
-            "clock",
-            "ethan",
-            "detective",
-            "victor"
-        ],
-        "weights": [
-            16,
-            18,
-            19,
-            18,
-            17,
-            1,
-            1,
-            1
-        ]
-    },
-    "tutorial": {
-        "enabled": false,
-        "steps": []
+    "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
+    "seed": 8748012,
+    "season": 10,
+    "season_title": "One Door Away",
+    "episode_id": 97
+  },
+  "moves": {
+    "total": 28
+  },
+  "name": "The Return Schedule 01",
+  "objectives": [
+    {
+      "amount": 18,
+      "target": "PHONE",
+      "type": "COLLECT_ITEMS"
     }
+  ],
+  "obstacles": {
+    "items": [
+      {
+        "health": 1,
+        "type": "lock",
+        "x": 4,
+        "y": 2
+      },
+      {
+        "health": 1,
+        "type": "chain",
+        "x": 4,
+        "y": 4
+      }
+    ]
+  },
+  "powerups": {
+    "available": [
+      "ROCKET",
+      "BOMB",
+      "THUNDER"
+    ],
+    "enabled": true
+  },
+  "rewards": {
+    "coins": 30,
+    "first_try_bonus": 10,
+    "perfect_bonus": 20,
+    "powerups": [],
+    "stars": 3
+  },
+  "settings": {
+    "allow_boosters": true,
+    "allow_shuffle": true,
+    "available_boosters": [
+      "rocket",
+      "bomb",
+      "thunder",
+      "ethan"
+    ],
+    "time_limit": 0
+  },
+  "story": {
+    "before_level": "serial097_intro",
+    "after_level": "",
+    "first_clear": "",
+    "return_to_map": true,
+    "win_outcome": "You verified the lead behind the shuttle return schedule. Ethan is still missing; the trail continues.",
+    "briefings": {
+      "police": "Morris coordinates the investigation into the shuttle return schedule. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
+      "signal": "David checks the digital trail behind the shuttle return schedule. Amara compares it with what she knows; no police team has joined this approach.",
+      "alone": "David follows the physical trail behind the shuttle return schedule without police backup, keeping Amara informed rather than claiming the search as his own."
+    }
+  },
+  "tile_pool": {
+    "tiles": [
+      "key",
+      "phone",
+      "fingerprint",
+      "recorder",
+      "clock",
+      "ethan",
+      "detective",
+      "victor"
+    ],
+    "weights": [
+      16,
+      18,
+      19,
+      18,
+      17,
+      1,
+      1,
+      1
+    ]
+  },
+  "tutorial": {
+    "enabled": false,
+    "steps": []
+  }
 }

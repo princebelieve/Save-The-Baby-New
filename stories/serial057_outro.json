@@ -1,0 +1,91 @@
+{
+  "story_id": "serial057_outro",
+  "title": "The Refund Trail | The next lead",
+  "background_music": "suspense_opening",
+  "default_background": "res://assets/sprites/backgrounds/factory_cage_art.jpeg",
+  "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+  "characters": [
+    "david",
+    "amara",
+    "victor",
+    "ethan",
+    "detective_morris"
+  ],
+  "scenes": [
+    {
+      "scene_id": "serial057_outro",
+      "route_dialogues": {
+        "police": [
+          {
+            "speaker": "Detective Morris",
+            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
+            "text": "We will verify the room hire refund and keep its source intact. A lead is not a rescue; we cannot assume Victor stayed there.",
+            "routes": [
+              "police"
+            ]
+          }
+        ],
+        "signal": [
+          {
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+            "text": "I will check the technical trail behind the room hire refund. Amara, tell me what the records cannot explain."
+          }
+        ],
+        "alone": [
+          {
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+            "text": "I am following the room hire refund without police backup. Amara has my location; I am not going to turn this into a contest with Victor."
+          }
+        ]
+      },
+      "dialogues": [
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "The agency redirected the refund into a private minibus booking."
+        },
+        {
+          "speaker": "Amara",
+          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+          "text": "The bus has departed. The dispatcher retains an amended stop list."
+        }
+      ],
+      "choices": [
+        {
+          "id": "police",
+          "label": "Coordinate the next lead with the police",
+          "impact": "Bring Morris into the next investigation and preserve the evidence behind the room hire refund.",
+          "response": "Morris takes the lead into the formal investigation. David checks the record while Amara explains its personal significance.",
+          "speaker": "Detective Morris"
+        },
+        {
+          "id": "signal",
+          "label": "Decode the next connection with Amara",
+          "impact": "David checks the technical trail from the room hire refund; Amara tests it against her own history.",
+          "response": "David saves the original record and checks its connections. Amara refuses to let Victor's version replace what she remembers.",
+          "speaker": "David"
+        },
+        {
+          "id": "alone",
+          "label": "Follow the next trail without police backup",
+          "impact": "David follows the physical lead from the room hire refund, keeping Amara informed.",
+          "response": "David sends Amara his location before moving. Finding Ethan matters more than claiming the search as his own achievement.",
+          "speaker": "David"
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "version": 2,
+    "season": 6,
+    "season_title": "An Audience for Victor",
+    "episode": 7,
+    "episode_id": 57,
+    "campaign_levels": "611-620",
+    "ethan_status": "missing",
+    "season_finale": false,
+    "evidence_summary": "The agency redirected the refund into a private minibus booking. The bus has departed. The dispatcher retains an amended stop list."
+  }
+}

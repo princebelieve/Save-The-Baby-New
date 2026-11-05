@@ -177,6 +177,9 @@ func _check_story_flow() -> void:
 	check(game._completed_levels.has("1050"), "Final case completion must persist")
 	await game._next_level_after_win()
 	await get_tree().process_frame
+	check(game._pending_story_id == "serial100_outro", "Last available level must reveal the continuing story before the map")
+	game._story_manager.end_story()
+	await get_tree().process_frame
 	check(game._pending_level_id == 0 and game._campaign_layer != null, "The last available case must return to the continuing campaign map")
 	check(audio._music_player.stream != null and audio._current_music_track == "suspense_opening", "Resuming the campaign must request background music")
 	var music_bus := AudioServer.get_bus_index("Music")

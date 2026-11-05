@@ -1,0 +1,68 @@
+{
+  "story_id": "serial084_intro",
+  "title": "The Visitor Invitation",
+  "background_music": "suspense_opening",
+  "default_background": "res://assets/sprites/backgrounds/factory_map_section.jpeg",
+  "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+  "characters": [
+    "david",
+    "amara",
+    "victor",
+    "ethan",
+    "detective_morris"
+  ],
+  "scenes": [
+    {
+      "scene_id": "serial084_intro",
+      "route_dialogues": {
+        "police": [
+          {
+            "speaker": "Detective Morris",
+            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
+            "text": "We will verify the club visitor invitation and keep its source intact. A lead is not a rescue; we cannot assume Victor stayed there.",
+            "routes": [
+              "police"
+            ]
+          }
+        ],
+        "signal": [
+          {
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+            "text": "I will check the technical trail behind the club visitor invitation. Amara, tell me what the records cannot explain."
+          }
+        ],
+        "alone": [
+          {
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+            "text": "I am following the club visitor invitation without police backup. Amara has my location; I am not going to turn this into a contest with Victor."
+          }
+        ]
+      },
+      "dialogues": [
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "The next lead is the club visitor invitation. We need its original source before Victor moves again."
+        },
+        {
+          "speaker": "Amara",
+          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+          "text": "I will say no in my own voice. It is not an opening for negotiation."
+        }
+      ],
+      "choices": []
+    }
+  ],
+  "metadata": {
+    "version": 2,
+    "season": 9,
+    "season_title": "The Price of Glory",
+    "episode": 4,
+    "episode_id": 84,
+    "campaign_levels": "881-890",
+    "ethan_status": "missing",
+    "season_finale": false
+  }
+}

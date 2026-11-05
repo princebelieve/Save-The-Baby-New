@@ -1,0 +1,68 @@
+{
+  "story_id": "serial075_intro",
+  "title": "The Service Entrance",
+  "background_music": "suspense_opening",
+  "default_background": "res://assets/sprites/backgrounds/iron_gate_map_tile.jpeg",
+  "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+  "characters": [
+    "david",
+    "amara",
+    "victor",
+    "ethan",
+    "detective_morris"
+  ],
+  "scenes": [
+    {
+      "scene_id": "serial075_intro",
+      "route_dialogues": {
+        "police": [
+          {
+            "speaker": "Detective Morris",
+            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
+            "text": "We will verify the property service log and keep its source intact. A lead is not a rescue; we cannot assume Victor stayed there.",
+            "routes": [
+              "police"
+            ]
+          }
+        ],
+        "signal": [
+          {
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+            "text": "I will check the technical trail behind the property service log. Amara, tell me what the records cannot explain."
+          }
+        ],
+        "alone": [
+          {
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+            "text": "I am following the property service log without police backup. Amara has my location; I am not going to turn this into a contest with Victor."
+          }
+        ]
+      },
+      "dialogues": [
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "The next lead is the property service log. We need its original source before Victor moves again."
+        },
+        {
+          "speaker": "Amara",
+          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+          "text": "He turns other people's helpfulness into a story about his own importance."
+        }
+      ],
+      "choices": []
+    }
+  ],
+  "metadata": {
+    "version": 2,
+    "season": 8,
+    "season_title": "Names That Do Not Belong",
+    "episode": 5,
+    "episode_id": 75,
+    "campaign_levels": "791-800",
+    "ethan_status": "missing",
+    "season_finale": false
+  }
+}

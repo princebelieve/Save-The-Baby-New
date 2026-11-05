@@ -1,0 +1,91 @@
+{
+  "story_id": "serial069_outro",
+  "title": "The Document Bag | The next lead",
+  "background_music": "suspense_opening",
+  "default_background": "res://assets/sprites/backgrounds/riverbank_map_section.jpeg",
+  "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+  "characters": [
+    "david",
+    "amara",
+    "victor",
+    "ethan",
+    "detective_morris"
+  ],
+  "scenes": [
+    {
+      "scene_id": "serial069_outro",
+      "route_dialogues": {
+        "police": [
+          {
+            "speaker": "Detective Morris",
+            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
+            "text": "We will verify the courier bag scan and keep its source intact. A lead is not a rescue; we cannot assume Victor stayed there.",
+            "routes": [
+              "police"
+            ]
+          }
+        ],
+        "signal": [
+          {
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+            "text": "I will check the technical trail behind the courier bag scan. Amara, tell me what the records cannot explain."
+          }
+        ],
+        "alone": [
+          {
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+            "text": "I am following the courier bag scan without police backup. Amara has my location; I am not going to turn this into a contest with Victor."
+          }
+        ]
+      },
+      "dialogues": [
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "The scan identifies a documents service used to create new travel permissions."
+        },
+        {
+          "speaker": "Amara",
+          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+          "text": "The bag has moved on. The service keeps a copy of the requestor's identity document."
+        }
+      ],
+      "choices": [
+        {
+          "id": "police",
+          "label": "Coordinate the next lead with the police",
+          "impact": "Bring Morris into the next investigation and preserve the evidence behind the courier bag scan.",
+          "response": "Morris takes the lead into the formal investigation. David checks the record while Amara explains its personal significance.",
+          "speaker": "Detective Morris"
+        },
+        {
+          "id": "signal",
+          "label": "Decode the next connection with Amara",
+          "impact": "David checks the technical trail from the courier bag scan; Amara tests it against her own history.",
+          "response": "David saves the original record and checks its connections. Amara refuses to let Victor's version replace what she remembers.",
+          "speaker": "David"
+        },
+        {
+          "id": "alone",
+          "label": "Follow the next trail without police backup",
+          "impact": "David follows the physical lead from the courier bag scan, keeping Amara informed.",
+          "response": "David sends Amara his location before moving. Finding Ethan matters more than claiming the search as his own achievement.",
+          "speaker": "David"
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "version": 2,
+    "season": 7,
+    "season_title": "The Night Routes",
+    "episode": 9,
+    "episode_id": 69,
+    "campaign_levels": "731-740",
+    "ethan_status": "missing",
+    "season_finale": false,
+    "evidence_summary": "The scan identifies a documents service used to create new travel permissions. The bag has moved on. The service keeps a copy of the requestor's identity document."
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "story_id": "serial001_intro",
+  "title": "The Lift Register",
+  "background_music": "suspense_opening",
+  "default_background": "res://assets/sprites/backgrounds/river_map_section.jpeg",
+  "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+  "characters": [
+    "david",
+    "amara",
+    "victor",
+    "ethan",
+    "detective_morris"
+  ],
+  "scenes": [
+    {
+      "scene_id": "serial001_intro",
+      "route_dialogues": {
+        "police": [
+          {
+            "speaker": "Detective Morris",
+            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
+            "text": "We will verify the depot lift register and keep its source intact. A lead is not a rescue; we cannot assume Victor stayed there.",
+            "routes": [
+              "police"
+            ]
+          }
+        ],
+        "signal": [
+          {
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+            "text": "I will check the technical trail behind the depot lift register. Amara, tell me what the records cannot explain."
+          }
+        ],
+        "alone": [
+          {
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+            "text": "I am following the depot lift register without police backup. Amara has my location; I am not going to turn this into a contest with Victor."
+          }
+        ]
+      },
+      "dialogues": [
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "The next lead is the depot lift register. We need its original source before Victor moves again."
+        },
+        {
+          "speaker": "Amara",
+          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+          "text": "I remember that trolley from the delivery Victor insisted he arranged himself."
+        }
+      ],
+      "choices": []
+    }
+  ],
+  "metadata": {
+    "version": 2,
+    "season": 1,
+    "season_title": "The River Between Us",
+    "episode": 1,
+    "episode_id": 1,
+    "campaign_levels": "051-060",
+    "ethan_status": "missing",
+    "season_finale": false
+  }
+}

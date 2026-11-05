@@ -1,0 +1,68 @@
+{
+  "story_id": "serial022_intro",
+  "title": "The Shared Workstation",
+  "background_music": "suspense_opening",
+  "default_background": "res://assets/sprites/backgrounds/factory_map_section.jpeg",
+  "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+  "characters": [
+    "david",
+    "amara",
+    "victor",
+    "ethan",
+    "detective_morris"
+  ],
+  "scenes": [
+    {
+      "scene_id": "serial022_intro",
+      "route_dialogues": {
+        "police": [
+          {
+            "speaker": "Detective Morris",
+            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
+            "text": "We will verify the workstation session record and keep its source intact. A lead is not a rescue; we cannot assume Victor stayed there.",
+            "routes": [
+              "police"
+            ]
+          }
+        ],
+        "signal": [
+          {
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+            "text": "I will check the technical trail behind the workstation session record. Amara, tell me what the records cannot explain."
+          }
+        ],
+        "alone": [
+          {
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+            "text": "I am following the workstation session record without police backup. Amara has my location; I am not going to turn this into a contest with Victor."
+          }
+        ]
+      },
+      "dialogues": [
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "The next lead is the workstation session record. We need its original source before Victor moves again."
+        },
+        {
+          "speaker": "Amara",
+          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+          "text": "People can be used without knowing it. Do not accuse the owner just to move faster."
+        }
+      ],
+      "choices": []
+    }
+  ],
+  "metadata": {
+    "version": 2,
+    "season": 3,
+    "season_title": "A Web of Mirrors",
+    "episode": 2,
+    "episode_id": 22,
+    "campaign_levels": "261-270",
+    "ethan_status": "missing",
+    "season_finale": false
+  }
+}

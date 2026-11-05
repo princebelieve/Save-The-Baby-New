@@ -1,0 +1,68 @@
+{
+  "story_id": "serial025_intro",
+  "title": "The Wrong Door",
+  "background_music": "suspense_opening",
+  "default_background": "res://assets/sprites/backgrounds/factory_map_section.jpeg",
+  "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+  "characters": [
+    "david",
+    "amara",
+    "victor",
+    "ethan",
+    "detective_morris"
+  ],
+  "scenes": [
+    {
+      "scene_id": "serial025_intro",
+      "route_dialogues": {
+        "police": [
+          {
+            "speaker": "Detective Morris",
+            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
+            "text": "We will verify the maintenance door log and keep its source intact. A lead is not a rescue; we cannot assume Victor stayed there.",
+            "routes": [
+              "police"
+            ]
+          }
+        ],
+        "signal": [
+          {
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+            "text": "I will check the technical trail behind the maintenance door log. Amara, tell me what the records cannot explain."
+          }
+        ],
+        "alone": [
+          {
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+            "text": "I am following the maintenance door log without police backup. Amara has my location; I am not going to turn this into a contest with Victor."
+          }
+        ]
+      },
+      "dialogues": [
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "The next lead is the maintenance door log. We need its original source before Victor moves again."
+        },
+        {
+          "speaker": "Amara",
+          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+          "text": "Being wrong is not the end, David. Pretending you cannot be wrong would help Victor."
+        }
+      ],
+      "choices": []
+    }
+  ],
+  "metadata": {
+    "version": 2,
+    "season": 3,
+    "season_title": "A Web of Mirrors",
+    "episode": 5,
+    "episode_id": 25,
+    "campaign_levels": "291-300",
+    "ethan_status": "missing",
+    "season_finale": false
+  }
+}

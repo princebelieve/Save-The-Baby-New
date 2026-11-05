@@ -1,0 +1,91 @@
+{
+  "story_id": "serial085_outro",
+  "title": "The Cloakroom Parcel | The next lead",
+  "background_music": "suspense_opening",
+  "default_background": "res://assets/sprites/backgrounds/factory_map_section.jpeg",
+  "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+  "characters": [
+    "david",
+    "amara",
+    "victor",
+    "ethan",
+    "detective_morris"
+  ],
+  "scenes": [
+    {
+      "scene_id": "serial085_outro",
+      "route_dialogues": {
+        "police": [
+          {
+            "speaker": "Detective Morris",
+            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
+            "text": "We will verify the parcel collection signature and keep its source intact. A lead is not a rescue; we cannot assume Victor stayed there.",
+            "routes": [
+              "police"
+            ]
+          }
+        ],
+        "signal": [
+          {
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+            "text": "I will check the technical trail behind the parcel collection signature. Amara, tell me what the records cannot explain."
+          }
+        ],
+        "alone": [
+          {
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+            "text": "I am following the parcel collection signature without police backup. Amara has my location; I am not going to turn this into a contest with Victor."
+          }
+        ]
+      },
+      "dialogues": [
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "The parcel contains printed demands, sent onward to a message courier."
+        },
+        {
+          "speaker": "Amara",
+          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+          "text": "The courier has delivered the demands. The return envelope points to a small business centre."
+        }
+      ],
+      "choices": [
+        {
+          "id": "police",
+          "label": "Coordinate the next lead with the police",
+          "impact": "Bring Morris into the next investigation and preserve the evidence behind the parcel collection signature.",
+          "response": "Morris takes the lead into the formal investigation. David checks the record while Amara explains its personal significance.",
+          "speaker": "Detective Morris"
+        },
+        {
+          "id": "signal",
+          "label": "Decode the next connection with Amara",
+          "impact": "David checks the technical trail from the parcel collection signature; Amara tests it against her own history.",
+          "response": "David saves the original record and checks its connections. Amara refuses to let Victor's version replace what she remembers.",
+          "speaker": "David"
+        },
+        {
+          "id": "alone",
+          "label": "Follow the next trail without police backup",
+          "impact": "David follows the physical lead from the parcel collection signature, keeping Amara informed.",
+          "response": "David sends Amara his location before moving. Finding Ethan matters more than claiming the search as his own achievement.",
+          "speaker": "David"
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "version": 2,
+    "season": 9,
+    "season_title": "The Price of Glory",
+    "episode": 5,
+    "episode_id": 85,
+    "campaign_levels": "891-900",
+    "ethan_status": "missing",
+    "season_finale": false,
+    "evidence_summary": "The parcel contains printed demands, sent onward to a message courier. The courier has delivered the demands. The return envelope points to a small business centre."
+  }
+}

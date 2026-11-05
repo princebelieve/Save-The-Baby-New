@@ -3,6 +3,7 @@ extends Node
 var game: Game
 var account: Node
 var purchases: Node
+var _supplies: Dictionary = {}
 var _owner := ""
 var _pending_login: Dictionary = {}
 var _login_dialog: AcceptDialog
@@ -50,11 +51,11 @@ func local_changed() -> void:
 		account.queue_save(_snapshot())
 
 func _safe_menu() -> bool:
-	return game._launch_layer != null or game._campaign_layer != null
+	return game._launch_layer != null or game._campaign_layer != null or game._result_layer != null or game._briefing_layer != null
 
 func show_account() -> void:
 	if not _safe_menu():
-		_notice("Open Account & Coins from the title screen or campaign map after finishing your case.")
+		_notice("You can sign in from the title screen, campaign map, or level result. Finish this attempt first; your board stays here.")
 		return
 	if not _pending_login.is_empty():
 		var pending := _pending_login
@@ -64,6 +65,9 @@ func show_account() -> void:
 	if purchases.busy or account.busy:
 		_notice("A purchase or sync is still running. Try again when it finishes.")
 		return
+	if account.signed_in():
+		var catalog: Dictionary = await account.api("/v1/catalog")
+		_supplies = catalog.get("supplies",{}) if int(catalog.get("shopVersion",0)) >= 2 else {}
 	var dialog := AcceptDialog.new()
 	_login_dialog = dialog
 	_login_buttons.clear()
@@ -135,10 +139,12 @@ func show_account() -> void:
 		supply_label.text = "USE PURCHASED COINS"
 		_style_section_label(supply_label)
 		content.add_child(supply_label)
-		for supply in [["rocket",35],["bomb",50],["thunder",70],["ethan",90],["lives",100]]:
-			var kind := str(supply[0])
-			var ethan_full := kind == "ethan" and game._economy_manager.get_ethan_count() >= EthanInventory.MAX_ASSISTS
-			_button(content,"%s - %d coins" % ["5 lives" if kind == "lives" else "+1 " + kind.capitalize(),supply[1]],_spend.bind(kind),account.wallet<int(supply[1]) or account.conflict or ethan_full)
+		for kind in _supplies:
+			if kind == "continue":
+				continue
+			var supply: Dictionary = _supplies[kind]
+			var ethan_full: bool = kind == "ethan" and game._economy_manager.get_ethan_count() >= EthanInventory.MAX_ASSISTS
+			_button(content,"%s - %d purchased coins" % ["Refill to 5 lives" if kind == "lives" else "+1 " + kind.capitalize(),int(supply.price)],_spend.bind(kind),account.wallet<int(supply.price) or account.conflict or ethan_full or (kind in ["life","lives"] and game._economy_manager.get_lives() >= 5))
 		_button(content,"CHECK PENDING PURCHASES",func(): purchases.restore())
 		_button(content,"SIGN OUT",func(): account.sign_out())
 		_button(content,"DELETE ONLINE ACCOUNT",_confirm_delete)
@@ -217,7 +223,10 @@ func _confirm_purchase(product: String, price: String) -> void:
 	confirm.confirmed.connect(func(): purchases.buy(product))
 	confirm.confirmed.connect(confirm.queue_free)
 	confirm.canceled.connect(confirm.queue_free)
-	game.add_child(confirm)
+	if is_instance_valid(game._coin_shop) and is_instance_valid(game._coin_shop._dialog) and game._coin_shop._dialog.visible:
+		game._coin_shop._dialog.add_child(confirm)
+	else:
+		game.add_child(confirm)
 	confirm.popup_centered_clamped(Vector2i(520,340))
 
 func _button(parent: Control,title: String,action: Callable,disabled := false,keep_open := false) -> void:
@@ -239,7 +248,7 @@ func _button(parent: Control,title: String,action: Callable,disabled := false,ke
 	parent.add_child(button)
 
 func _notice(text: String) -> void:
-	if is_instance_valid(game) and _safe_menu():
+	if is_instance_valid(game):
 		game._show_shop_notice(text)
 
 func _archive_current() -> void:
@@ -324,23 +333,58 @@ func _apply(profile: Dictionary) -> void:
 	get_tree().reload_current_scene()
 
 func _spend(kind: String) -> void:
+	await spend_supply(kind,int(_supplies.get(kind,{}).get("price",-1)),false)
+
+func spend_supply(kind: String, expected_price: int, use_earned: bool) -> bool:
+	if purchases.busy or account.busy:
+		_notice("A purchase or sync is still running. Try again when it finishes.")
+		return false
 	if _owner != account.user_id or account.conflict:
 		_notice("Load your account's cloud save before using purchased coins.")
-		return
+		return false
 	var uploaded: Dictionary = await account.upload(_snapshot())
 	if uploaded.has("error"):
-		return
+		return false
 	account.busy = true
 	var request_id := Crypto.new().generate_random_bytes(16).hex_encode()
-	var result: Dictionary = await account.api("/v1/wallet/spend",HTTPClient.METHOD_POST,{"kind":kind,"revision":account.revision,"requestId":request_id})
+	var result: Dictionary = {}
+	# Reuse the request ID after a lost response: the server may have committed
+	# the debit already. Retrying must never purchase the same supply twice.
+	var request := {"kind":kind,"revision":account.revision,"requestId":request_id,"expectedPrice":expected_price,"useEarned":use_earned}
+	for _attempt in 3:
+		result = await account.api("/v1/wallet/spend",HTTPClient.METHOD_POST,request,true,12.0)
+		if not result.has("error") or int(result.get("status",0)) not in [0,408,425,429,500,502,503,504]:
+			break
 	account.busy = false
 	if result.has("error"):
 		# A lost response may hide a successful debit. Stop uploads until a download reconciles it.
 		account.conflict = true
 		account._save_session()
 		_notice(str(result.error) + " Load cloud progress before trying again.")
-	else:
-		_apply(result)
+		return false
+	# Persist the authoritative snapshot before acknowledging it. Keep the active
+	# board intact: buying a supply must not restart a level or throw away moves.
+	var save := ConfigFile.new()
+	for section in result.save:
+		for key in result.save[section]:
+			save.set_value(section,key,result.save[section][key])
+	if CampaignProgressStore.write(save,Game.CAMPAIGN_PROGRESS_PATH) != OK:
+		account.conflict = true
+		account._save_session()
+		_notice("Purchase confirmed online. Load cloud progress to recover your supply.")
+		return false
+	game._progress_transaction = true
+	game._campaign_progress = save
+	var campaign: Dictionary = result.save.campaign
+	game._economy_manager.set_coins(int(campaign.get("coins",0)))
+	game._economy_manager.set_lives(int(campaign.get("lives",0)))
+	game._economy_manager.set_ethan_count(int(campaign.get("ethan",0)))
+	for booster in ["rocket","bomb","thunder"]:
+		game._economy_manager.set_booster_count(booster,int(campaign.get("boosters",{}).get(booster,0)))
+	game._progress_transaction = false
+	account.applied_download(result)
+	game._save_inventory_progress()
+	return true
 
 func _on_logout() -> void:
 	_archive_current()

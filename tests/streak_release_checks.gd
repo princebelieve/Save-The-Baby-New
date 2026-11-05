@@ -41,7 +41,7 @@ func _check_calendar() -> void:
 		var reward := DailyActivities.stamp(progress, now)
 		var expected := int(DailyActivities.settings().streak_coins[day % 7])
 		if day % 7 == 4:
-			expected += 75
+			expected += 50
 		check(int(reward.get("streak", -1)) == day + 1, "Consecutive day %d retains streak" % day)
 		check(int(reward.get("coins", -1)) == expected, "Exact cycle and weekly reward for day %d" % day)
 		check(DailyActivities.stamp(progress, now + 20).is_empty(), "No second stamp on day %d" % day)
@@ -52,7 +52,7 @@ func _check_calendar() -> void:
 		check(CampaignProgressStore.read(restored, "user://calendar_roundtrip.cfg") == OK, "Calendar save reloads")
 		progress = restored
 		check(DailyActivities.stamp(progress, now + 30).is_empty(), "Restart cannot repeat daily claim")
-	check(total == 1375, "35 consecutive days pay exactly five cycles and five weekly bonuses")
+	check(total == 975, "35 consecutive days pay exactly five cycles and five weekly bonuses")
 	check(DailyActivities.stamp(progress, MONDAY - 1).is_empty(), "Rollback cannot earn rewards")
 	var boundary := ConfigFile.new()
 	check(int(DailyActivities.stamp(boundary, MONDAY + 86399).streak) == 1, "Stamp just before UTC midnight")
@@ -88,12 +88,12 @@ func _check_slots() -> void:
 	check(not first.is_empty(), "Morning portrait available")
 	check(int(first.deadline) == morning + 120, "Full portrait timer is 120 seconds")
 	check(DailyActivities.start_portrait(progress, morning + 1).is_empty(), "Cannot restart slot to reset time")
-	check(int(_solve(progress, first, morning + 30).coins) == 40, "First portrait grants 30 coins and first stamp")
+	check(int(_solve(progress, first, morning + 30).coins) == 20, "First portrait grants 15 coins and first stamp")
 	check(DailyActivities.finish_portrait(progress, int(first.slot), morning + 31).is_empty(), "Double completion rejected")
 	check(not DailyActivities.available(progress, MONDAY + 43199), "Still locked one second before second slot")
 	check(DailyActivities.available(progress, MONDAY + 43200), "Second slot opens exactly at noon UTC")
 	var second := DailyActivities.start_portrait(progress, MONDAY + 43200)
-	check(int(_solve(progress, second, MONDAY + 43220).coins) == 30, "Second portrait gives only portrait reward, no duplicate stamp")
+	check(int(_solve(progress, second, MONDAY + 43220).coins) == 15, "Second portrait gives only portrait reward, no duplicate stamp")
 	check(int(progress.get_value("daily", "streak", 0)) == 1, "Two portraits count as one daily stamp")
 	check(not DailyActivities.available(progress, MONDAY + 86399), "No third rewarded slot in a UTC day")
 	check(DailyActivities.available(progress, MONDAY + 86400), "Next day's portrait unlocks at midnight")
@@ -111,11 +111,11 @@ func _check_missions() -> void:
 	var progress := ConfigFile.new()
 	var now := MONDAY + 3600
 	check(DailyActivities.record_mission(progress, "specials", 1, now) == 0, "Partial special goal")
-	check(DailyActivities.record_mission(progress, "specials", 1, now + 1) == 20, "Special goal exact reward")
+	check(DailyActivities.record_mission(progress, "specials", 1, now + 1) == 10, "Special goal exact reward")
 	check(DailyActivities.record_mission(progress, "specials", 100, now + 2) == 0, "Special goal pays only once")
-	check(DailyActivities.record_mission(progress, "blockers", 3, now + 3) == 25, "Blocker goal exact reward")
+	check(DailyActivities.record_mission(progress, "blockers", 3, now + 3) == 15, "Blocker goal exact reward")
 	check(DailyActivities.record_mission(progress, "blockers", 3, now - 1) == 0, "Clock rollback cannot pay mission")
-	check(DailyActivities.record_mission(progress, "blockers", 3, now + 86400) == 25, "Goals reset next day")
+	check(DailyActivities.record_mission(progress, "blockers", 3, now + 86400) == 15, "Goals reset next day")
 	check(int(progress.get_value("daily", "streak", 0)) == 0, "Goals alone cannot inflate streak")
 
 
@@ -143,7 +143,7 @@ func _check_process_restart() -> void:
 	check(int(attempt.deadline) == int(progress.get_value("test", "deadline", 0)), "Restart does not extend deadline")
 	check(attempt.pieces == progress.get_value("test", "pieces", []), "Restart preserves exact piece arrangement")
 	check(DailyActivities.stamp(progress, now + 21).is_empty(), "Restart cannot duplicate previously claimed stamp")
-	check(int(_solve(progress, attempt, now + 30).coins) == 30, "Resumed portrait pays once without duplicate stamp")
+	check(int(_solve(progress, attempt, now + 30).coins) == 15, "Resumed portrait pays once without duplicate stamp")
 	check(CampaignProgressStore.write(progress, FIXTURE) == OK, "Claim is persisted")
 	var restored := ConfigFile.new()
 	check(CampaignProgressStore.read(restored, FIXTURE) == OK, "Claimed activity reloads")

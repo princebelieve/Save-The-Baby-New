@@ -10,6 +10,7 @@ var _generated_grid: Dictionary = {}
 var _tile_size: int = 64
 var _seeded_rng: RandomNumberGenerator
 var _unmatchable: Dictionary = {}
+var _lucky_refill_chance := 0.0
 
 
 func initialize(tile_factory: TileFactory, tile_database: TileDatabase) -> void:
@@ -18,6 +19,7 @@ func initialize(tile_factory: TileFactory, tile_database: TileDatabase) -> void:
 
 
 func generate(level_data: Dictionary) -> Dictionary:
+	_lucky_refill_chance = clampf(float(level_data.get("settings",{}).get("lucky_refill_chance",0.0)),0.0,0.25)
 	_seeded_rng = null
 	if level_data.get("metadata", {}).has("seed"):
 		_seeded_rng = RandomNumberGenerator.new()
@@ -96,6 +98,8 @@ func generate_tile(position: Vector2i) -> Tile:
 
 func generate_refill_tile(position: Vector2i, board) -> Tile:
 	if _tile_factory == null or _level_tile_definitions.is_empty() or board == null:
+		return generate_tile(position)
+	if _lucky_refill_chance > 0 and RandomGenerator.random_float(0,1) < _lucky_refill_chance:
 		return generate_tile(position)
 	# Keep the configured spawn weights while avoiding a match created solely by
 	# a lucky refill. Matches made by falling tiles still cascade as usual.

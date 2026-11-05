@@ -24,9 +24,9 @@
         ],
         "signal": [
           {
-            "speaker": "Amara",
-            "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-            "text": "Amara narrows the source to the old flood channel beneath the dam."
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+            "text": "David narrows the radio source to the old flood channel. Amara remembers the approach beneath the dam."
           }
         ],
         "alone": [
@@ -41,7 +41,7 @@
         {
           "speaker": "David",
           "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "At the rail spur, Amara tunes the radio through bursts of static. A child's voice says, \"Dad, the water is loud here.\""
+          "text": "At the rail spur, I filter the radio recording without overwriting it. A child's voice reaches Amara through the static: 'Mum.' Water crashes somewhere nearby."
         },
         {
           "speaker": "Amara",
@@ -64,10 +64,10 @@
         },
         {
           "id": "signal",
-          "label": "Use the signal to locate the river source",
-          "impact": "Amara can map the water source, but the channel may flood before she finishes.",
-          "response": "Amara: I will mark the flood channel and send you the safest way through.",
-          "speaker": "Amara"
+          "label": "Decode the next lead with Amara",
+          "impact": "David checks the technical evidence. Amara connects it to the people and history behind the records, without police assistance.",
+          "response": "David preserves the original record and tests the next connection while Amara checks its meaning against what she remembers.",
+          "speaker": "David"
         },
         {
           "id": "alone",
@@ -80,7 +80,7 @@
     }
   ],
   "metadata": {
-    "version": 1,
+    "version": 2,
     "chapter": 8,
     "season": 2,
     "campaign_levels": "036-040",

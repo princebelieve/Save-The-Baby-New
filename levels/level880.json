@@ -1,155 +1,164 @@
 {
-    "audio": {
-        "game_over": "",
-        "music": "",
-        "victory": ""
-    },
-    "background": {
-        "image": "res://assets/sprites/backgrounds/dirt_board_background.jpeg",
-        "parallax": false
-    },
-    "board": {
-        "blocked_cells": [
-            [
-                0,
-                7
-            ],
-            [
-                7,
-                7
-            ]
-        ],
-        "columns": 8,
-        "locked_cells": [],
-        "rows": 8,
-        "spawn_points": [],
-        "tile_size": 64
-    },
-    "description": "Gather phone evidence and clear every blocker on this patrol.",
-    "difficulty": "HARD",
-    "level_id": 880,
-    "metadata": {
-        "chapter_end_level": 880,
-        "chapter_id": 89,
-        "chapter_start_level": 871,
-        "chapter_title": "River Watch",
-        "generator_version": 1,
-        "map_background": "river_map_section_cutout.png",
-        "map_landmark": "wooden_bridge_cutout.png",
-        "map_props": [
-            "wooden_bridge_cutout.png",
-            "police_car_topdown_cutout.png"
-        ],
-        "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
-        "seed": 7710623
-    },
-    "moves": {
-        "total": 28
-    },
-    "name": "Evidence Patrol 880",
-    "objectives": [
-        {
-            "amount": 30,
-            "target": "PHONE",
-            "type": "COLLECT_ITEMS"
-        }
+  "audio": {
+    "game_over": "",
+    "music": "",
+    "victory": ""
+  },
+  "background": {
+    "image": "res://assets/sprites/backgrounds/dirt_board_background.jpeg",
+    "parallax": false
+  },
+  "board": {
+    "blocked_cells": [
+      [
+        0,
+        7
+      ],
+      [
+        7,
+        7
+      ]
     ],
-    "obstacles": {
-        "items": [
-            {
-                "health": 1,
-                "type": "chain",
-                "x": 2,
-                "y": 3
-            },
-            {
-                "health": 1,
-                "type": "tape",
-                "x": 5,
-                "y": 5
-            },
-            {
-                "health": 1,
-                "type": "lock",
-                "x": 2,
-                "y": 5
-            },
-            {
-                "health": 1,
-                "type": "chain",
-                "x": 1,
-                "y": 1
-            },
-            {
-                "health": 1,
-                "type": "tape",
-                "x": 5,
-                "y": 1
-            },
-            {
-                "health": 1,
-                "type": "lock",
-                "x": 4,
-                "y": 5
-            }
-        ]
-    },
-    "powerups": {
-        "available": [
-            "ROCKET",
-            "BOMB",
-            "THUNDER"
-        ],
-        "enabled": true
-    },
-    "rewards": {
-        "coins": 50,
-        "first_try_bonus": 10,
-        "perfect_bonus": 20,
-        "powerups": [],
-        "stars": 3
-    },
-    "settings": {
-        "allow_boosters": true,
-        "allow_shuffle": true,
-        "available_boosters": [
-            "rocket",
-            "bomb",
-            "thunder",
-            "ethan"
-        ],
-        "time_limit": 0
-    },
-    "story": {
-        "after_level": "",
-        "before_level": "",
-        "first_clear": "",
-        "return_to_map": true
-    },
-    "tile_pool": {
-        "tiles": [
-            "key",
-            "phone",
-            "fingerprint",
-            "recorder",
-            "clock",
-            "ethan",
-            "detective",
-            "victor"
-        ],
-        "weights": [
-            20,
-            16,
-            19,
-            17,
-            17,
-            1,
-            1,
-            1
-        ]
-    },
-    "tutorial": {
-        "enabled": false,
-        "steps": []
+    "columns": 8,
+    "locked_cells": [],
+    "rows": 8,
+    "spawn_points": [],
+    "tile_size": 64
+  },
+  "description": "Close this investigation and hear what the roadside fuel transaction changes for the family.",
+  "difficulty": "HARD",
+  "level_id": 880,
+  "metadata": {
+    "chapter_end_level": 880,
+    "chapter_id": 89,
+    "chapter_start_level": 871,
+    "chapter_title": "The Fuel Card",
+    "generator_version": 2,
+    "map_background": "river_map_section_cutout.png",
+    "map_landmark": "wooden_bridge_cutout.png",
+    "map_props": [
+      "wooden_bridge_cutout.png",
+      "police_car_topdown_cutout.png"
+    ],
+    "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
+    "seed": 7710623,
+    "season": 9,
+    "season_title": "The Price of Glory",
+    "episode_id": 83
+  },
+  "moves": {
+    "total": 24
+  },
+  "name": "The Fuel Card 10",
+  "objectives": [
+    {
+      "amount": 30,
+      "target": "PHONE",
+      "type": "COLLECT_ITEMS"
     }
+  ],
+  "obstacles": {
+    "items": [
+      {
+        "health": 1,
+        "type": "chain",
+        "x": 2,
+        "y": 3
+      },
+      {
+        "health": 1,
+        "type": "tape",
+        "x": 5,
+        "y": 5
+      },
+      {
+        "health": 1,
+        "type": "lock",
+        "x": 2,
+        "y": 5
+      },
+      {
+        "health": 1,
+        "type": "chain",
+        "x": 1,
+        "y": 1
+      },
+      {
+        "health": 1,
+        "type": "tape",
+        "x": 5,
+        "y": 1
+      },
+      {
+        "health": 1,
+        "type": "lock",
+        "x": 4,
+        "y": 5
+      }
+    ]
+  },
+  "powerups": {
+    "available": [
+      "ROCKET",
+      "BOMB",
+      "THUNDER"
+    ],
+    "enabled": true
+  },
+  "rewards": {
+    "coins": 60,
+    "first_try_bonus": 10,
+    "perfect_bonus": 20,
+    "powerups": [],
+    "stars": 3
+  },
+  "settings": {
+    "allow_boosters": true,
+    "allow_shuffle": true,
+    "available_boosters": [
+      "rocket",
+      "bomb",
+      "thunder",
+      "ethan"
+    ],
+    "time_limit": 0
+  },
+  "story": {
+    "before_level": "",
+    "after_level": "serial083_outro",
+    "first_clear": "",
+    "return_to_map": true,
+    "win_outcome": "You verified the lead behind the roadside fuel transaction. Ethan is still missing; the trail continues.",
+    "briefings": {
+      "police": "Morris coordinates the investigation into the roadside fuel transaction. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
+      "signal": "David checks the digital trail behind the roadside fuel transaction. Amara compares it with what she knows; no police team has joined this approach.",
+      "alone": "David follows the physical trail behind the roadside fuel transaction without police backup, keeping Amara informed rather than claiming the search as his own."
+    }
+  },
+  "tile_pool": {
+    "tiles": [
+      "key",
+      "phone",
+      "fingerprint",
+      "recorder",
+      "clock",
+      "ethan",
+      "detective",
+      "victor"
+    ],
+    "weights": [
+      20,
+      16,
+      19,
+      17,
+      17,
+      1,
+      1,
+      1
+    ]
+  },
+  "tutorial": {
+    "enabled": false,
+    "steps": []
+  }
 }

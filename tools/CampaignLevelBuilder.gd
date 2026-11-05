@@ -43,7 +43,14 @@ static func generate(level_id: int) -> Dictionary:
 		data.tile_pool.weights[index] = 16 + weight_code % 5
 		weight_code = weight_code / 5
 	data.moves.total = int(band.moves)
+	if level_id <= int(config.get("onboarding_last_level", 0)):
+		data.moves.total += int(config.get("onboarding_extra_moves", 0))
 	data.objectives = [{"type": "COLLECT_ITEMS", "target": target, "amount": int(band.amount)}]
+	var override: Dictionary = config.get("case_overrides", {}).get(str(level_id), {})
+	if override.has("moves"):
+		data.moves.total = int(override.moves)
+	if override.has("amount"):
+		data.objectives[0].amount = int(override.amount)
 	var cells: Array[Vector2i] = []
 	for y in range(1, height - 1):
 		for x in range(1, width - 1):
@@ -55,9 +62,16 @@ static func generate(level_id: int) -> Dictionary:
 		cells.remove_at(chosen)
 		obstacles.append({"x": cell.x, "y": cell.y, "type": config.obstacles[(index + offset) % config.obstacles.size()], "health": 1})
 	data.obstacles.items = obstacles
+	var challenge: Dictionary = JsonLoader.load_file("res://configs/difficulty_policy.json").get("booster_challenges",{})
+	if level_id >= int(challenge.get("first_level",100)) and (level_id-int(challenge.get("first_level",100))) % int(challenge.get("interval",50)) == 0 and not obstacles.is_empty():
+		obstacles[0]["inventory_only"] = true
+		obstacles[0]["type"] = "lock"
+		obstacles[0]["health"] = 1
+		data.description = "Critical Case: gather the evidence and break through a reinforced investigation. Plan your supplies before following the trail."
+		data.difficulty = "CRITICAL_CASE"
 	data.story = {"before_level": "", "after_level": "", "first_clear": "", "return_to_map": true}
 	data.tutorial = {"enabled": false, "steps": []}
-	data.rewards.coins = int(config.coins)
+	data.rewards.coins = int(config.get("coins_by_difficulty", {}).get(data.difficulty, config.coins))
 	data.metadata = {
 		"chapter_id": chapter, "chapter_title": theme.title,
 		"chapter_start_level": level_id - offset % length,
@@ -67,4 +81,8 @@ static func generate(level_id: int) -> Dictionary:
 		"generator_version": int(config.version), "seed": stable_seed,
 		"notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges."
 	}
-	return data
+	if data.difficulty == "CRITICAL_CASE":
+		var case_index := (level_id-int(challenge.get("first_level",100)))/int(challenge.get("interval",50))
+		data.metadata["recommended_booster"] = ["rocket","bomb","thunder"][case_index % 3]
+		data.metadata["scout_supply"] = case_index % 4 == 0
+	return preload("res://scripts/story/StoryCampaign.gd").apply_to_level(data)

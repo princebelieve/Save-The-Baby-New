@@ -24,8 +24,8 @@
         ],
         "signal": [
           {
-            "speaker": "Amara",
-            "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
             "text": "The depot mark matches an old shipping code Amara saw on Victor's phone."
           }
         ],
@@ -64,10 +64,10 @@
         },
         {
           "id": "signal",
-          "label": "Have Amara decode the depot mark",
-          "impact": "Amara can match the mark to a freight route before the rain erases the tracks.",
-          "response": "Amara: I will compare the stamp with Victor's old shipping records and mark the route.",
-          "speaker": "Amara"
+          "label": "Decode the next lead with Amara",
+          "impact": "David checks the technical evidence. Amara connects it to the people and history behind the records, without police assistance.",
+          "response": "David preserves the original record and tests the next connection while Amara checks its meaning against what she remembers.",
+          "speaker": "David"
         },
         {
           "id": "alone",
@@ -80,7 +80,7 @@
     }
   ],
   "metadata": {
-    "version": 1,
+    "version": 2,
     "chapter": 1,
     "season": 1,
     "campaign_levels": "001-005",

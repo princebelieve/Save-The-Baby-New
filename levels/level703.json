@@ -1,143 +1,152 @@
 {
-    "audio": {
-        "game_over": "",
-        "music": "",
-        "victory": ""
-    },
-    "background": {
-        "image": "res://assets/sprites/backgrounds/dirt_board_background.jpeg",
-        "parallax": false
-    },
-    "board": {
-        "blocked_cells": [
-            [
-                0,
-                7
-            ],
-            [
-                6,
-                7
-            ]
-        ],
-        "columns": 7,
-        "locked_cells": [],
-        "rows": 8,
-        "spawn_points": [],
-        "tile_size": 64
-    },
-    "description": "Gather recorder evidence and clear every blocker on this patrol.",
-    "difficulty": "MEDIUM",
-    "level_id": 703,
-    "metadata": {
-        "chapter_end_level": 710,
-        "chapter_id": 72,
-        "chapter_start_level": 701,
-        "chapter_title": "Factory Patrol",
-        "generator_version": 1,
-        "map_background": "factory_map_section_cutout.png",
-        "map_landmark": "police_car_topdown_cutout.png",
-        "map_props": [
-            "wooden_bridge_cutout.png",
-            "police_car_topdown_cutout.png"
-        ],
-        "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
-        "seed": 6308960
-    },
-    "moves": {
-        "total": 30
-    },
-    "name": "Evidence Patrol 703",
-    "objectives": [
-        {
-            "amount": 24,
-            "target": "RECORDER",
-            "type": "COLLECT_ITEMS"
-        }
+  "audio": {
+    "game_over": "",
+    "music": "",
+    "victory": ""
+  },
+  "background": {
+    "image": "res://assets/sprites/backgrounds/dirt_board_background.jpeg",
+    "parallax": false
+  },
+  "board": {
+    "blocked_cells": [
+      [
+        0,
+        7
+      ],
+      [
+        6,
+        7
+      ]
     ],
-    "obstacles": {
-        "items": [
-            {
-                "health": 1,
-                "type": "chain",
-                "x": 1,
-                "y": 2
-            },
-            {
-                "health": 1,
-                "type": "tape",
-                "x": 3,
-                "y": 1
-            },
-            {
-                "health": 1,
-                "type": "lock",
-                "x": 2,
-                "y": 6
-            },
-            {
-                "health": 1,
-                "type": "chain",
-                "x": 1,
-                "y": 6
-            }
-        ]
-    },
-    "powerups": {
-        "available": [
-            "ROCKET",
-            "BOMB",
-            "THUNDER"
-        ],
-        "enabled": true
-    },
-    "rewards": {
-        "coins": 50,
-        "first_try_bonus": 10,
-        "perfect_bonus": 20,
-        "powerups": [],
-        "stars": 3
-    },
-    "settings": {
-        "allow_boosters": true,
-        "allow_shuffle": true,
-        "available_boosters": [
-            "rocket",
-            "bomb",
-            "thunder",
-            "ethan"
-        ],
-        "time_limit": 0
-    },
-    "story": {
-        "after_level": "",
-        "before_level": "",
-        "first_clear": "",
-        "return_to_map": true
-    },
-    "tile_pool": {
-        "tiles": [
-            "key",
-            "phone",
-            "fingerprint",
-            "recorder",
-            "clock",
-            "ethan",
-            "detective",
-            "victor"
-        ],
-        "weights": [
-            18,
-            16,
-            17,
-            16,
-            17,
-            1,
-            1,
-            1
-        ]
-    },
-    "tutorial": {
-        "enabled": false,
-        "steps": []
+    "columns": 7,
+    "locked_cells": [],
+    "rows": 8,
+    "spawn_points": [],
+    "tile_size": 64
+  },
+  "description": "Trace the source of the ride-share pickup record before trusting Victor's account.",
+  "difficulty": "MEDIUM",
+  "level_id": 703,
+  "metadata": {
+    "chapter_end_level": 710,
+    "chapter_id": 72,
+    "chapter_start_level": 701,
+    "chapter_title": "The Collected Passenger",
+    "generator_version": 2,
+    "map_background": "factory_map_section_cutout.png",
+    "map_landmark": "police_car_topdown_cutout.png",
+    "map_props": [
+      "wooden_bridge_cutout.png",
+      "police_car_topdown_cutout.png"
+    ],
+    "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
+    "seed": 6308960,
+    "season": 7,
+    "season_title": "The Night Routes",
+    "episode_id": 66
+  },
+  "moves": {
+    "total": 26
+  },
+  "name": "The Collected Passenger 03",
+  "objectives": [
+    {
+      "amount": 24,
+      "target": "RECORDER",
+      "type": "COLLECT_ITEMS"
     }
+  ],
+  "obstacles": {
+    "items": [
+      {
+        "health": 1,
+        "type": "chain",
+        "x": 1,
+        "y": 2
+      },
+      {
+        "health": 1,
+        "type": "tape",
+        "x": 3,
+        "y": 1
+      },
+      {
+        "health": 1,
+        "type": "lock",
+        "x": 2,
+        "y": 6
+      },
+      {
+        "health": 1,
+        "type": "chain",
+        "x": 1,
+        "y": 6
+      }
+    ]
+  },
+  "powerups": {
+    "available": [
+      "ROCKET",
+      "BOMB",
+      "THUNDER"
+    ],
+    "enabled": true
+  },
+  "rewards": {
+    "coins": 40,
+    "first_try_bonus": 10,
+    "perfect_bonus": 20,
+    "powerups": [],
+    "stars": 3
+  },
+  "settings": {
+    "allow_boosters": true,
+    "allow_shuffle": true,
+    "available_boosters": [
+      "rocket",
+      "bomb",
+      "thunder",
+      "ethan"
+    ],
+    "time_limit": 0
+  },
+  "story": {
+    "before_level": "",
+    "after_level": "",
+    "first_clear": "",
+    "return_to_map": true,
+    "win_outcome": "You verified the lead behind the ride-share pickup record. Ethan is still missing; the trail continues.",
+    "briefings": {
+      "police": "Morris coordinates the investigation into the ride-share pickup record. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
+      "signal": "David checks the digital trail behind the ride-share pickup record. Amara compares it with what she knows; no police team has joined this approach.",
+      "alone": "David follows the physical trail behind the ride-share pickup record without police backup, keeping Amara informed rather than claiming the search as his own."
+    }
+  },
+  "tile_pool": {
+    "tiles": [
+      "key",
+      "phone",
+      "fingerprint",
+      "recorder",
+      "clock",
+      "ethan",
+      "detective",
+      "victor"
+    ],
+    "weights": [
+      18,
+      16,
+      17,
+      16,
+      17,
+      1,
+      1,
+      1
+    ]
+  },
+  "tutorial": {
+    "enabled": false,
+    "steps": []
+  }
 }

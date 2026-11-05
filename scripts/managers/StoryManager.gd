@@ -58,10 +58,19 @@ func load_story(id: String) -> bool:
 	# A chapter remembers the latest decision, then offers a fresh one.
 	for scene in _current_story.get("scenes", []):
 		var branches: Dictionary = scene.get("route_dialogues", {})
+		var combined: Array = []
 		if branches.has(_approach):
-			var branch: Array = branches[_approach].duplicate(true)
-			branch.append_array(scene.get("dialogues", []))
-			scene["dialogues"] = branch
+			combined.append_array(branches[_approach].duplicate(true))
+		combined.append_array(scene.get("dialogues", []))
+		var visible: Array = []
+		for dialogue in combined:
+			var routes: Array = dialogue.get("routes",[])
+			if not routes.is_empty() and _approach not in routes:
+				continue
+			if str(dialogue.get("speaker","")).to_lower().contains("morris") and _approach != "police":
+				continue
+			visible.append(dialogue)
+		scene["dialogues"] = visible
 	_current_scene = -1
 	_current_dialogue = -1
 

@@ -24,8 +24,8 @@
         ],
         "signal": [
           {
-            "speaker": "Amara",
-            "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
             "text": "The bell rhythm points to an abandoned rail spur hidden beyond the trees."
           }
         ],
@@ -46,7 +46,7 @@
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "Amara finds a small shoe lace tied around a branch. Ethan used that knot to mark the way home."
+          "text": "That knot is mine. I tied Ethan's blanket that way before we left home. Someone pulled this strip from it beside the forest path."
         },
         {
           "speaker": "Victor",
@@ -64,10 +64,10 @@
         },
         {
           "id": "signal",
-          "label": "Use the train bell to choose the lower path",
-          "impact": "Amara can use the crossing bell to pick a route, but the signal is fading.",
-          "response": "Amara: I will count the bell rhythm and guide you toward the rail spur.",
-          "speaker": "Amara"
+          "label": "Decode the next lead with Amara",
+          "impact": "David checks the technical evidence. Amara connects it to the people and history behind the records, without police assistance.",
+          "response": "David preserves the original record and tests the next connection while Amara checks its meaning against what she remembers.",
+          "speaker": "David"
         },
         {
           "id": "alone",
@@ -80,7 +80,7 @@
     }
   ],
   "metadata": {
-    "version": 1,
+    "version": 2,
     "chapter": 6,
     "season": 2,
     "campaign_levels": "026-030",

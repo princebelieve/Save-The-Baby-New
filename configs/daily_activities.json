@@ -3,19 +3,19 @@
   "reset_timezone": "UTC",
   "slot_hours": 12,
   "portrait_seconds": 120,
-  "portrait_coins": 30,
+  "portrait_coins": 15,
   "streak_coins": [
+    5,
     10,
     15,
     20,
     25,
     30,
-    40,
-    60
+    40
   ],
   "grace_cooldown_days": 7,
   "weekly_days": 5,
-  "weekly_coins": 75,
+  "weekly_coins": 50,
   "portraits": [
     "res://assets/sprites/characters/ethan_portrait_cutout.png",
     "res://assets/sprites/characters/david_portrait_cutout.png",
@@ -26,13 +26,13 @@
       "id": "specials",
       "title": "Create 2 special pieces",
       "target": 2,
-      "coins": 20
+      "coins": 10
     },
     {
       "id": "blockers",
       "title": "Clear 3 blockers",
       "target": 3,
-      "coins": 25
+      "coins": 15
     }
   ]
 }

@@ -1,143 +1,152 @@
 {
-    "audio": {
-        "game_over": "",
-        "music": "",
-        "victory": ""
-    },
-    "background": {
-        "image": "res://assets/sprites/backgrounds/dirt_board_background.jpeg",
-        "parallax": false
-    },
-    "board": {
-        "blocked_cells": [
-            [
-                0,
-                7
-            ],
-            [
-                7,
-                7
-            ]
-        ],
-        "columns": 8,
-        "locked_cells": [],
-        "rows": 8,
-        "spawn_points": [],
-        "tile_size": 64
-    },
-    "description": "Gather fingerprint evidence and clear every blocker on this patrol.",
-    "difficulty": "MEDIUM",
-    "level_id": 604,
-    "metadata": {
-        "chapter_end_level": 610,
-        "chapter_id": 62,
-        "chapter_start_level": 601,
-        "chapter_title": "Factory Patrol",
-        "generator_version": 1,
-        "map_background": "factory_map_section_cutout.png",
-        "map_landmark": "police_car_topdown_cutout.png",
-        "map_props": [
-            "wooden_bridge_cutout.png",
-            "police_car_topdown_cutout.png"
-        ],
-        "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
-        "seed": 5524979
-    },
-    "moves": {
-        "total": 30
-    },
-    "name": "Evidence Patrol 604",
-    "objectives": [
-        {
-            "amount": 24,
-            "target": "FINGERPRINT",
-            "type": "COLLECT_ITEMS"
-        }
+  "audio": {
+    "game_over": "",
+    "music": "",
+    "victory": ""
+  },
+  "background": {
+    "image": "res://assets/sprites/backgrounds/dirt_board_background.jpeg",
+    "parallax": false
+  },
+  "board": {
+    "blocked_cells": [
+      [
+        0,
+        7
+      ],
+      [
+        7,
+        7
+      ]
     ],
-    "obstacles": {
-        "items": [
-            {
-                "health": 1,
-                "type": "chain",
-                "x": 4,
-                "y": 6
-            },
-            {
-                "health": 1,
-                "type": "tape",
-                "x": 1,
-                "y": 5
-            },
-            {
-                "health": 1,
-                "type": "lock",
-                "x": 6,
-                "y": 6
-            },
-            {
-                "health": 1,
-                "type": "chain",
-                "x": 4,
-                "y": 1
-            }
-        ]
-    },
-    "powerups": {
-        "available": [
-            "ROCKET",
-            "BOMB",
-            "THUNDER"
-        ],
-        "enabled": true
-    },
-    "rewards": {
-        "coins": 50,
-        "first_try_bonus": 10,
-        "perfect_bonus": 20,
-        "powerups": [],
-        "stars": 3
-    },
-    "settings": {
-        "allow_boosters": true,
-        "allow_shuffle": true,
-        "available_boosters": [
-            "rocket",
-            "bomb",
-            "thunder",
-            "ethan"
-        ],
-        "time_limit": 0
-    },
-    "story": {
-        "after_level": "",
-        "before_level": "",
-        "first_clear": "",
-        "return_to_map": true
-    },
-    "tile_pool": {
-        "tiles": [
-            "key",
-            "phone",
-            "fingerprint",
-            "recorder",
-            "clock",
-            "ethan",
-            "detective",
-            "victor"
-        ],
-        "weights": [
-            19,
-            16,
-            18,
-            20,
-            16,
-            1,
-            1,
-            1
-        ]
-    },
-    "tutorial": {
-        "enabled": false,
-        "steps": []
+    "columns": 8,
+    "locked_cells": [],
+    "rows": 8,
+    "spawn_points": [],
+    "tile_size": 64
+  },
+  "description": "He can lose an audience. Ethan cannot lose another chance because we chase applause.",
+  "difficulty": "MEDIUM",
+  "level_id": 604,
+  "metadata": {
+    "chapter_end_level": 610,
+    "chapter_id": 62,
+    "chapter_start_level": 601,
+    "chapter_title": "The Empty Interview",
+    "generator_version": 2,
+    "map_background": "factory_map_section_cutout.png",
+    "map_landmark": "police_car_topdown_cutout.png",
+    "map_props": [
+      "wooden_bridge_cutout.png",
+      "police_car_topdown_cutout.png"
+    ],
+    "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
+    "seed": 5524979,
+    "season": 6,
+    "season_title": "An Audience for Victor",
+    "episode_id": 56
+  },
+  "moves": {
+    "total": 26
+  },
+  "name": "The Empty Interview 04",
+  "objectives": [
+    {
+      "amount": 24,
+      "target": "FINGERPRINT",
+      "type": "COLLECT_ITEMS"
     }
+  ],
+  "obstacles": {
+    "items": [
+      {
+        "health": 1,
+        "type": "chain",
+        "x": 4,
+        "y": 6
+      },
+      {
+        "health": 1,
+        "type": "tape",
+        "x": 1,
+        "y": 5
+      },
+      {
+        "health": 1,
+        "type": "lock",
+        "x": 6,
+        "y": 6
+      },
+      {
+        "health": 1,
+        "type": "chain",
+        "x": 4,
+        "y": 1
+      }
+    ]
+  },
+  "powerups": {
+    "available": [
+      "ROCKET",
+      "BOMB",
+      "THUNDER"
+    ],
+    "enabled": true
+  },
+  "rewards": {
+    "coins": 40,
+    "first_try_bonus": 10,
+    "perfect_bonus": 20,
+    "powerups": [],
+    "stars": 3
+  },
+  "settings": {
+    "allow_boosters": true,
+    "allow_shuffle": true,
+    "available_boosters": [
+      "rocket",
+      "bomb",
+      "thunder",
+      "ethan"
+    ],
+    "time_limit": 0
+  },
+  "story": {
+    "before_level": "",
+    "after_level": "",
+    "first_clear": "",
+    "return_to_map": true,
+    "win_outcome": "You verified the lead behind the interview room reservation. Ethan is still missing; the trail continues.",
+    "briefings": {
+      "police": "Morris coordinates the investigation into the interview room reservation. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
+      "signal": "David checks the digital trail behind the interview room reservation. Amara compares it with what she knows; no police team has joined this approach.",
+      "alone": "David follows the physical trail behind the interview room reservation without police backup, keeping Amara informed rather than claiming the search as his own."
+    }
+  },
+  "tile_pool": {
+    "tiles": [
+      "key",
+      "phone",
+      "fingerprint",
+      "recorder",
+      "clock",
+      "ethan",
+      "detective",
+      "victor"
+    ],
+    "weights": [
+      19,
+      16,
+      18,
+      20,
+      16,
+      1,
+      1,
+      1
+    ]
+  },
+  "tutorial": {
+    "enabled": false,
+    "steps": []
+  }
 }

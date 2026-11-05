@@ -1,90 +1,90 @@
 {
-    "story_id": "chapter02",
-    "title": "Across the Village Road",
-    "background_music": "suspense_opening",
-    "default_background": "res://assets/sprites/backgrounds/level_map_landscape.jpeg",
-    "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-    "characters": [
-        "david",
-        "amara",
-        "ethan",
-        "victor"
-    ],
-    "scenes": [
+  "story_id": "chapter02",
+  "title": "Across the Village Road",
+  "background_music": "suspense_opening",
+  "default_background": "res://assets/sprites/backgrounds/level_map_landscape.jpeg",
+  "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+  "characters": [
+    "david",
+    "amara",
+    "ethan",
+    "victor"
+  ],
+  "scenes": [
+    {
+      "scene_id": "chapter_02_intro",
+      "choices": [
         {
-            "scene_id": "chapter_02_intro",
-            "choices": [
-                {
-                    "id": "police",
-                    "label": "Request a bridge lookout",
-                    "impact": "Morris watches the crossing while David examines the riverbank. Morris can watch for danger, but he needs you to share each clue before he can act.",
-                    "response": "Morris watches the crossing while David examines the riverbank. Ethan must come home alive.",
-                    "speaker": "Detective Morris"
-                },
-                {
-                    "id": "signal",
-                    "label": "Check the van call records",
-                    "impact": "Amara follows a call record toward the workshop. Amara stays involved, but the signal could be a decoy. David will still need physical evidence.",
-                    "response": "Amara follows a call record toward the workshop. Ethan must come home alive.",
-                    "speaker": "Amara"
-                },
-                {
-                    "id": "alone",
-                    "label": "Inspect the riverbank myself",
-                    "impact": "David follows fresh tire marks, keeping his location on Amara's phone. You can investigate quietly, but no one will be close enough to help immediately if Victor is waiting.",
-                    "response": "David follows fresh tire marks, keeping his location on Amara's phone. Ethan must come home alive.",
-                    "speaker": "David"
-                }
-            ],
-            "dialogues": [
-                {
-                    "speaker": "David",
-                    "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-                    "text": "The tire tracks cross the old bridge. They are fresh, but the rain is already washing them away.",
-                    "animation": "fade"
-                },
-                {
-                    "speaker": "Amara",
-                    "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-                    "text": "A neighbor saw a van stop by the river. He heard a phone ring, then the driver turned toward the workshop road.",
-                    "animation": "fade"
-                },
-                {
-                    "speaker": "David",
-                    "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-                    "text": "Victor wants us chasing scraps. We keep gathering evidence, and we do not let the trail split us apart.",
-                    "animation": "fade"
-                }
-            ],
-            "route_dialogues": {
-                "police": [
-                    {
-                        "speaker": "David",
-                        "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-                        "text": "Morris stops a delivery driver at the bridge. The driver remembers a van turning toward the workshop."
-                    }
-                ],
-                "signal": [
-                    {
-                        "speaker": "David",
-                        "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-                        "text": "Amara matches the van call to a riverside tower. The signal paused near the old bridge."
-                    }
-                ],
-                "alone": [
-                    {
-                        "speaker": "David",
-                        "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-                        "text": "I find a broken tail light at the riverbank. Its tracks turn toward the workshop road."
-                    }
-                ]
-            }
+          "id": "police",
+          "label": "Request a bridge lookout",
+          "impact": "Morris watches the crossing while David examines the riverbank. Morris can watch for danger, but he needs you to share each clue before he can act.",
+          "response": "Morris watches the crossing while David examines the riverbank. Ethan must come home alive.",
+          "speaker": "Detective Morris"
+        },
+        {
+          "id": "signal",
+          "label": "Decode the next lead with Amara",
+          "impact": "David checks the technical evidence. Amara connects it to the people and history behind the records, without police assistance.",
+          "response": "David preserves the original record and tests the next connection while Amara checks its meaning against what she remembers.",
+          "speaker": "David"
+        },
+        {
+          "id": "alone",
+          "label": "Inspect the riverbank myself",
+          "impact": "David follows fresh tire marks, keeping his location on Amara's phone. You can investigate quietly, but no one will be close enough to help immediately if Victor is waiting.",
+          "response": "David follows fresh tire marks, keeping his location on Amara's phone. Ethan must come home alive.",
+          "speaker": "David"
         }
-    ],
-    "metadata": {
-        "version": 1,
-        "chapter": 2,
-        "campaign_levels": "009-015",
-        "tutorial_chapter": true
+      ],
+      "dialogues": [
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "The tire tracks cross the old bridge. They are fresh, but the rain is already washing them away.",
+          "animation": "fade"
+        },
+        {
+          "speaker": "Amara",
+          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+          "text": "A neighbor saw a van stop by the river. He heard a phone ring, then the driver turned toward the workshop road.",
+          "animation": "fade"
+        },
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "Victor wants us chasing scraps. We keep gathering evidence, and we do not let the trail split us apart.",
+          "animation": "fade"
+        }
+      ],
+      "route_dialogues": {
+        "police": [
+          {
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+            "text": "Morris stops a delivery driver at the bridge. The driver remembers a van turning toward the workshop."
+          }
+        ],
+        "signal": [
+          {
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+            "text": "David maps the van call to a riverside tower. Amara recognises the old bridge where the signal paused."
+          }
+        ],
+        "alone": [
+          {
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+            "text": "I find a broken tail light at the riverbank. Its tracks turn toward the workshop road."
+          }
+        ]
+      }
     }
+  ],
+  "metadata": {
+    "version": 2,
+    "chapter": 2,
+    "campaign_levels": "009-015",
+    "tutorial_chapter": true
+  }
 }

@@ -24,9 +24,9 @@
         ],
         "signal": [
           {
-            "speaker": "Amara",
-            "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-            "text": "Amara isolates a second signal, moving beneath the village rather than across it."
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+            "text": "David isolates a second signal moving beneath the village. Amara knows the old routes below those streets."
           }
         ],
         "alone": [
@@ -41,7 +41,7 @@
         {
           "speaker": "David",
           "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "Amara traces the signal to a shuttered relay station. Three phones there repeat the same call, each with a different timestamp."
+          "text": "I trace the message to a shuttered relay station. Three phones repeat the call with different timestamps. Amara recognizes the background sound; I check which recording came first."
         },
         {
           "speaker": "Amara",
@@ -64,10 +64,10 @@
         },
         {
           "id": "signal",
-          "label": "Triangulate the original recording",
-          "impact": "Amara can isolate the signal beneath the village, but it may disappear if Victor changes phones.",
-          "response": "Amara: I will trace the second signal now and keep the line open.",
-          "speaker": "Amara"
+          "label": "Decode the next lead with Amara",
+          "impact": "David checks the technical evidence. Amara connects it to the people and history behind the records, without police assistance.",
+          "response": "David preserves the original record and tests the next connection while Amara checks its meaning against what she remembers.",
+          "speaker": "David"
         },
         {
           "id": "alone",
@@ -80,7 +80,7 @@
     }
   ],
   "metadata": {
-    "version": 1,
+    "version": 2,
     "chapter": 2,
     "season": 1,
     "campaign_levels": "006-010",

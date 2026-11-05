@@ -18,6 +18,14 @@ var _ad_attempt := 0
 var _ad_revived := false
 var _result_ad_shown := false
 
+var _coin_shop: Node
+var _paid_revived := false
+var _assist_tiles := 0
+var _attempt_coins_start := 0
+var _last_recorded_coins := -1
+var _attempt_failure_recorded := false
+const Recovery = preload("res://scripts/game/LevelRecovery.gd")
+const Serial = preload("res://scripts/story/StoryCampaign.gd")
 var _account_panel: Node
 
 var _board_manager: Node
@@ -118,6 +126,7 @@ func _notification(what: int) -> void:
 	if not is_node_ready():
 		return
 	if what == NOTIFICATION_APPLICATION_PAUSED or what == NOTIFICATION_WM_WINDOW_FOCUS_OUT:
+		Recovery.touch(_campaign_progress,TimeHelper.current_unix_time())
 		# A screen switch can cancel a touch while a board tween is still active.
 		# Always clear that gesture and persist, even when a full-screen ad owns
 		# the foreground; only the ad provider should manage its own pause UI.
@@ -127,6 +136,8 @@ func _notification(what: int) -> void:
 		if (_ads == null or not _ads.busy) and not CloudAccount.login_in_progress() and _board != null and _launch_layer == null and _story_layer == null and _campaign_layer == null and _result_layer == null:
 			_show_pause_menu(true)
 	elif what == NOTIFICATION_APPLICATION_RESUMED:
+		Recovery.begin_session(_campaign_progress,TimeHelper.current_unix_time())
+		_persist_campaign_progress()
 		if _board != null:
 			_board.cancel_pointer_gesture()
 	elif what == NOTIFICATION_WM_GO_BACK_REQUEST:
@@ -185,6 +196,8 @@ func _ready() -> void:
 	if provider != null:
 		_ads.configure(provider)
 	_load_campaign_progress()
+	Serial.compact_history(_campaign_progress)
+	Recovery.begin_session(_campaign_progress,TimeHelper.current_unix_time())
 	_campaign_coach_shown = bool(_campaign_progress.get_value("tutorials", "campaign_map_intro", false))
 	_special_moves_created = int(_campaign_progress.get_value("campaign", "special_moves_created", 0))
 	_economy_manager = get_node_or_null("Managers/EconomyManager") as EconomyManager
@@ -228,6 +241,10 @@ func _ready() -> void:
 	_account_panel = preload("res://scripts/online/AccountPanel.gd").new()
 	add_child(_account_panel)
 	_account_panel.initialize(self)
+	_coin_shop = preload("res://scripts/online/ShopPanel.gd").new()
+	_coin_shop.process_mode = Node.PROCESS_MODE_ALWAYS
+	add_child(_coin_shop)
+	get_node("/root/CloudAccount").changed.connect(_refresh_available_coins)
 
 
 func _load_game_art() -> void:
@@ -769,12 +786,12 @@ func _make_compact_hud_panel(parent: Control, panel_name: String, text: String, 
 	content.add_child(label)
 	if panel_name == "CoinCounter":
 		var shop_hitbox := Button.new()
-		shop_hitbox.name = "OpenLifeShop"
+		shop_hitbox.name = "OpenCoinShop"
 		shop_hitbox.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		shop_hitbox.flat = true
-		shop_hitbox.tooltip_text = "Spend Ethan Coins on lives"
+		shop_hitbox.tooltip_text = "Coin shop: lives, boosters and Google Play coin packs"
 		shop_hitbox.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-		shop_hitbox.pressed.connect(_show_life_shop)
+		shop_hitbox.pressed.connect(_open_coin_shop)
 		content.add_child(shop_hitbox)
 	return label
 
@@ -1151,7 +1168,7 @@ func _show_case_file() -> void:
 	amara.custom_minimum_size = Vector2(128, 144)
 	amara.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	amara.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	amara.texture = ResourceManager.load_portrait("res://assets/sprites/characters/amara_police_portrait_cutout.png")
+	amara.texture = ResourceManager.load_portrait("res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png")
 	intro.add_child(amara)
 	var intro_copy := VBoxContainer.new()
 	intro_copy.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -1162,6 +1179,11 @@ func _show_case_file() -> void:
 	var explanation := _make_label("Your discovered skills and decisions. Open a card to review exactly what you learned.", 17)
 	explanation.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	intro_copy.add_child(explanation)
+	var canon := JsonLoader.load_file("res://configs/story_canon.json")
+	_add_case_card(content,"AMARA, ETHAN AND DAVID","The family behind the search",str(canon.get("summary","")),"res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png")
+	var latest: Dictionary = _campaign_progress.get_value("story_progress","latest",{})
+	if not latest.is_empty():
+		_add_case_card(content,str(latest.get("title","The search so far")),"Latest verified lead",str(latest.get("summary","")),"res://assets/sprites/props/evidence_briefcase.jpeg")
 	var discovered := CaseJournal.entries(_campaign_progress)
 	if discovered.is_empty():
 		var empty := _make_label("David's instructions will appear here as you uncover them. Read a lesson or practise a new skill to add it to this file.", 23)
@@ -1175,7 +1197,7 @@ func _show_case_file() -> void:
 	var decisions: Dictionary = _campaign_progress.get_value("story_choices", "history", {})
 	if not decisions.is_empty(): content.add_child(_make_label("YOUR STORY DECISIONS", 23))
 	for story_id in decisions:
-		var decision: Dictionary = decisions[story_id]
+		var decision: Dictionary = Serial.resolve_choice(str(story_id),str(decisions[story_id].get("id","alone")))
 		_add_case_card(content, str(decision.get("label", "Decision")), "Story decision | " + str(story_id), str(decision.get("response", "")), "res://assets/sprites/props/evidence_briefcase.jpeg")
 	for case_label in content.find_children("*", "Label", true, false):
 		case_label.add_theme_color_override("font_color", Color("#4b3424"))
@@ -1225,6 +1247,7 @@ func _show_gameplay_audio_settings() -> void:
 
 
 func _prepare_dialog(dialog: AcceptDialog) -> void:
+	dialog.process_mode = Node.PROCESS_MODE_ALWAYS
 	dialog.dialog_autowrap = true
 	dialog.borderless = true
 	dialog.transparent_bg = true
@@ -1807,14 +1830,14 @@ func _on_route_selected(choice: Dictionary) -> void:
 	if route_id == "police":
 		_story_portrait.texture = ResourceManager.load_portrait("res://assets/sprites/characters/detective_portrait_cutout.png")
 	elif route_id == "signal":
-		_story_portrait.texture = ResourceManager.load_portrait("res://assets/sprites/characters/amara_police_portrait_cutout.png")
+		_story_portrait.texture = ResourceManager.load_portrait("res://assets/sprites/characters/david_portrait_v2.png")
 	else:
 		_story_portrait.texture = ResourceManager.load_portrait("res://assets/sprites/characters/david_portrait_v2.png")
 	_speaker_label.text = str(choice.get("speaker", choice.get("label", ""))).to_upper()
 	_begin_story_typing(str(choice.get("response", "The search begins.")))
 	var story_id := str(_story_manager.get_story_data().get("story_id", "opening_story"))
 	var history: Dictionary = _campaign_progress.get_value("story_choices", "history", {})
-	history[story_id] = choice.duplicate(true)
+	history[story_id] = {"id":route_id}
 	_campaign_progress.set_value("story_choices", "history", history)
 	_chosen_route_label = str(choice.get("label", "Continue the search"))
 	_current_route_id = route_id
@@ -1954,7 +1977,9 @@ func _on_campaign_level_selected(level_id: int, route_id: String) -> void:
 	if _tutorial_action == "campaign_map_intro":
 		_tutorial_action = ""
 	var level_manager := get_node_or_null("Managers/LevelManager")
-	if level_manager == null or not level_manager.load_level(level_id):
+	var authored := JsonLoader.load_file("res://levels/level%03d.json" % level_id)
+	var attempt_variant := Recovery.preview(_campaign_progress,authored,TimeHelper.current_unix_time())
+	if level_manager == null or not level_manager.load_level(level_id,attempt_variant):
 		DebugLogger.error("Game: Could not load selected level %03d." % level_id)
 		return
 	if _campaign_layer != null and is_instance_valid(_campaign_layer):
@@ -1964,7 +1989,7 @@ func _on_campaign_level_selected(level_id: int, route_id: String) -> void:
 	var level_data: Dictionary = level_manager.get_level_data()
 	var story_data: Dictionary = level_data.get("story", {})
 	var story_id := str(story_data.get("before_level", ""))
-	if not story_id.is_empty() and JsonLoader.file_exists("res://stories/" + story_id + ".json"):
+	if not story_id.is_empty() and not bool(_campaign_progress.get_value("story_seen",story_id,false)) and JsonLoader.file_exists("res://stories/" + story_id + ".json"):
 		_pending_level_id = level_id
 		_pending_route_id = route_id
 		_pending_story_id = story_id
@@ -1993,6 +2018,17 @@ func _start_campaign_story(story_id: String) -> void:
 
 
 func _on_story_finished(story_id: String) -> void:
+	if not story_id.is_empty():
+		_campaign_progress.set_value("story_seen",story_id,true)
+		var path := "res://stories/"+story_id+".json"
+		if FileAccess.file_exists(path):
+			var data := JsonLoader.load_file(path)
+			var metadata: Dictionary = data.get("metadata",{})
+			if metadata.has("evidence_summary"):
+				_campaign_progress.set_value("story_progress","latest",{"title":str(data.get("title","")),"summary":str(metadata.evidence_summary)})
+			if bool(metadata.get("season_finale",false)):
+				CaseJournal.discover(_campaign_progress,"serial_season_%02d" % int(metadata.get("season",0)),str(metadata.get("season_title","The continuing search")),"verified_lead",str(metadata.get("evidence_summary","")),"res://assets/sprites/props/evidence_briefcase.jpeg",_current_level_id)
+		_persist_campaign_progress()
 	if _pending_level_id == -1 and story_id == _pending_story_id:
 		_pending_level_id = 0
 		_pending_story_id = ""
@@ -2075,7 +2111,7 @@ func _show_level_briefing(route_id: String) -> void:
 	portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	var portrait_paths := {
 		"police": "res://assets/sprites/characters/detective_portrait_cutout.png",
-		"signal": "res://assets/sprites/characters/amara_police_portrait_cutout.png",
+		"signal": "res://assets/sprites/characters/david_portrait_v2.png",
 		"alone": "res://assets/sprites/characters/david_portrait_v2.png"
 	}
 	portrait.texture = ResourceManager.load_portrait(str(portrait_paths.get(route_id, portrait_paths["alone"])))
@@ -2089,16 +2125,17 @@ func _show_level_briefing(route_id: String) -> void:
 	description.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	content.add_child(description)
 	var route_briefings := {
-		"police": "Detective Morris is securing the house while you gather evidence for his team.",
-		"signal": "Amara is tracing Victor's phone. The clues you collect will narrow her search.",
-		"alone": "David is following the trail alone. Every clue must point him toward Ethan."
+		"police": "Detective Morris coordinates the investigation. David checks the records, and Amara supplies the history behind them.",
+		"signal": "David traces the technical evidence while Amara checks its meaning against what she knows.",
+		"alone": "David follows the physical trail without police backup, keeping Amara informed."
 	}
+	route_briefings = level_data.get("story",{}).get("briefings",route_briefings)
 	var route_detail := _make_label(str(route_briefings.get(route_id, route_briefings["alone"])), 20)
 	route_detail.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	route_detail.custom_minimum_size.x = 0
 	route_detail.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	content.add_child(route_detail)
-	route_detail.hide()
+	route_detail.visible = level_data.get("story",{}).has("briefings")
 
 	var objective := _get_primary_objective(level_data)
 	var objective_panel := PanelContainer.new()
@@ -2137,6 +2174,27 @@ func _show_level_briefing(route_id: String) -> void:
 	var moves := _make_label("MATCH THE GOAL | %d MOVES" % moves_total, 21)
 	moves.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	content.add_child(moves)
+	if bool(level_data.get("settings",{}).get("return_assistance",false)):
+		var welcome := _make_label("WELCOME BACK | +4 moves and a refreshed evidence mix for this attempt.",20)
+		welcome.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		content.add_child(welcome)
+	var sealed := _has_inventory_seal(level_data)
+	if sealed:
+		var recommended := str(level_data.get("metadata",{}).get("recommended_booster","rocket"))
+		var suggestion := _make_label("RECOMMENDED SUPPLY | " + recommended.to_upper(),20)
+		suggestion.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		content.add_child(suggestion)
+		var supplies := _make_menu_button("VIEW " + recommended.to_upper() + " OFFER")
+		supplies.pressed.connect(_open_booster_shop.bind(recommended))
+		content.add_child(supplies)
+		if bool(level_data.get("metadata",{}).get("scout_supply",false)) and not bool(_campaign_progress.get_value("scout_supplies",str(level_id),false)):
+			var gift := _make_menu_button("SCOUT SUPPLY | CLAIM 1 " + recommended.to_upper())
+			gift.pressed.connect(func():
+				if _claim_scout_supply(level_data):
+					gift.text = "SCOUT SUPPLY COLLECTED"
+					gift.disabled = true)
+			content.add_child(gift)
+
 	_apply_parchment_text(content)
 	var play := _make_menu_button("PLAY")
 	play.custom_minimum_size = Vector2(350, 82)
@@ -2144,6 +2202,35 @@ func _show_level_briefing(route_id: String) -> void:
 	play.pressed.connect(_play_ui_confirm)
 	play.pressed.connect(_begin_level.bind(route_id), CONNECT_ONE_SHOT)
 	content.add_child(play)
+	if sealed:
+		var back_to_map := _make_menu_button("BACK TO CAMPAIGN MAP")
+		back_to_map.pressed.connect(func():
+			_briefing_layer.queue_free()
+			_briefing_layer = null
+			_show_campaign_map(route_id))
+		content.add_child(back_to_map)
+
+
+func _has_inventory_seal(data: Dictionary) -> bool:
+	for obstacle in data.get("obstacles",{}).get("items",[]):
+		if bool(obstacle.get("inventory_only",false)):
+			return true
+	return false
+
+
+func _claim_scout_supply(data: Dictionary) -> bool:
+	var id := str(int(data.get("level_id",0)))
+	if not bool(data.get("metadata",{}).get("scout_supply",false)) or bool(_campaign_progress.get_value("scout_supplies",id,false)):
+		return false
+	var kind := str(data.metadata.get("recommended_booster","rocket"))
+	if kind not in ["rocket","bomb","thunder"]:
+		return false
+	_progress_transaction = true
+	_campaign_progress.set_value("scout_supplies",id,true)
+	_economy_manager.add_booster(kind,1)
+	_progress_transaction = false
+	_save_inventory_progress()
+	return true
 
 
 func _get_primary_objective(level_data: Dictionary) -> Dictionary:
@@ -2230,6 +2317,11 @@ func _objective_icon_path(target: String) -> String:
 
 
 func _begin_level(_route_id: String) -> void:
+	var selected_manager := get_node_or_null("Managers/LevelManager")
+	var selected_data: Dictionary = selected_manager.get_level_data() if selected_manager != null else {}
+
+	Recovery.start_attempt(_campaign_progress,selected_data,TimeHelper.current_unix_time())
+	_persist_campaign_progress()
 	_waiting_for_collection = false
 	_turn_praise_rank = 0
 	if is_instance_valid(_gameplay_effects): _gameplay_effects.clear()
@@ -2317,6 +2409,10 @@ func _on_board_created() -> void:
 	_current_level_points = 0
 	_clear_bonus_coins = 0
 	_ad_revived = false
+	_paid_revived = false
+	_attempt_failure_recorded = false
+	_assist_tiles = 0
+	_attempt_coins_start = _economy_manager.get_coins() if _economy_manager != null else 0
 	_result_ad_shown = false
 	_board = created_board
 	_board.moves_changed.connect(_on_moves_changed)
@@ -2343,6 +2439,7 @@ func _on_moves_changed(remaining: int) -> void:
 
 
 func _on_board_player_interacted() -> void:
+	Recovery.touch(_campaign_progress,TimeHelper.current_unix_time())
 	_reset_idle_hint_timer()
 	if _hint_label != null and _hint_label.text.begins_with("TRY THIS SWAP"):
 		_hint_label.text = "MATCH %s | PLAN YOUR NEXT MOVE" % _objective_target.replace("_", " ")
@@ -2403,14 +2500,30 @@ func _on_board_shuffled() -> void:
 
 
 func _on_coins_changed(coins: int) -> void:
+	if _last_recorded_coins >= 0 and coins != _last_recorded_coins:
+		preload("res://scripts/economy/BalanceMetrics.gd").record({"event":"earned_coin_change","level":_current_level_id,"before":_last_recorded_coins,"after":coins,"delta":coins-_last_recorded_coins})
+	_last_recorded_coins = coins
 	if _reward_label != null:
 		var from := _displayed_coins
 		if _coin_count_tween != null and _coin_count_tween.is_running():
 			_coin_count_tween.kill()
 		_coin_count_tween = create_tween()
-		_coin_count_tween.tween_method(_set_displayed_coin_count, from, coins, 0.55)
+		var paid := _available_purchased_coins()
+		_coin_count_tween.tween_method(_set_displayed_coin_count, from, coins + paid, 0.55)
 	_campaign_progress.set_value("campaign", "coins", coins)
 	_persist_campaign_progress()
+
+
+func _available_purchased_coins() -> int:
+	var account := get_node_or_null("/root/CloudAccount")
+	return int(account.wallet) if account != null and account.signed_in() and not account.conflict and is_instance_valid(_account_panel) and _account_panel._owner == account.user_id else 0
+
+
+func _refresh_available_coins() -> void:
+	if _economy_manager != null:
+		if _coin_count_tween != null and _coin_count_tween.is_running():
+			_coin_count_tween.kill()
+		_set_displayed_coin_count(_economy_manager.get_coins() + _available_purchased_coins())
 
 
 func _set_displayed_coin_count(value: int) -> void:
@@ -2467,65 +2580,8 @@ func _save_inventory_progress() -> void:
 
 
 func _open_booster_shop(kind: String) -> void:
-	if _economy_manager == null:
-		return
-	if kind == "ethan" and _economy_manager.get_ethan_count() >= EthanInventory.MAX_ASSISTS:
-		_show_shop_notice("Ethan assists are full. Use one before collecting another.")
-		return
-	var item_id := "ethan_assist" if kind == "ethan" else "%s_booster" % kind
-	var item: Dictionary = _economy_manager.get_shop_item(item_id)
-	if item.is_empty():
-		return
-	var amount := int(item.get("amount", 1))
-	var cost := int(item.get("price", 0))
-	var dialog := ConfirmationDialog.new()
-	dialog.title = "FIELD SUPPLIES"
-	_prepare_dialog(dialog)
-	dialog.dialog_text = "Buy %s for %d Ethan Coins? You have %d." % [str(item.get("name", kind.capitalize())), cost, _economy_manager.get_coins()]
-	dialog.ok_button_text = "BUY"
-	var layer := CanvasLayer.new()
-	layer.layer = 24
-	layer.process_mode = Node.PROCESS_MODE_ALWAYS
-	add_child(layer)
-	layer.add_child(dialog)
-	dialog.confirmed.connect(func():
-		var purchase := Purchase.new()
-		purchase.initialize()
-		purchase.set_item(item_id)
-		purchase.set_currency(str(item.get("currency", "coins")))
-		purchase.set_price(cost)
-		if _economy_manager.purchase(purchase):
-			if kind == "ethan":
-				_economy_manager.add_ethan(amount)
-			else:
-				_economy_manager.add_booster(kind, amount)
-				_booster_inventory[kind] = _economy_manager.get_booster_count(kind)
-				var entry: Dictionary = _booster_buttons.get(kind, {})
-				if not entry.is_empty():
-					(entry["count"] as Label).text = str(int(_booster_inventory[kind]))
-			_save_inventory_progress()
-		else:
-			_show_shop_notice("You need %d Ethan Coins for this supply." % cost)
-		purchase.free()
-	)
-	var supplies_ad := dialog.add_button("Watch ad: +1 %s" % kind.capitalize(), false, "reward")
-	if kind == "ethan" and _economy_manager.get_ethan_count() >= EthanInventory.MAX_ASSISTS:
-		supplies_ad.disabled = true
-	_bind_ad_button(supplies_ad, "supply_" + kind)
-	dialog.custom_action.connect(func(action: String):
-		if action == "reward":
-			layer.queue_free()
-			_request_reward("supply_" + kind, func():
-				if kind == "ethan":
-					_economy_manager.add_ethan(1)
-				else:
-					_economy_manager.add_booster(kind, 1)
-				_save_inventory_progress()
-			)
-	)
-	dialog.confirmed.connect(layer.queue_free, CONNECT_ONE_SHOT)
-	dialog.canceled.connect(layer.queue_free, CONNECT_ONE_SHOT)
-	dialog.popup_centered_clamped(Vector2i(mini(560, int(get_viewport_rect().size.x * 0.9)), 300))
+	if is_instance_valid(_coin_shop):
+		_coin_shop.open(self, kind)
 
 
 func _update_objective_hud() -> void:
@@ -2571,7 +2627,7 @@ func _animate_matched_tiles(tile_types: Array, cells: Array) -> void:
 		if kind == int(Constants.TileType.VICTOR):
 			target = _reward_label
 			texture_path = "res://assets/sprites/ui/icons/coins_icon.png"
-			value = 10
+			value = int(ConfigLoader.load_config(Constants.ConfigPaths.ECONOMY).get("character_rewards",{}).get("victor_coins_per_tile",2))
 		elif kind in [int(Constants.TileType.ETHAN),int(Constants.TileType.DETECTIVE)]:
 			target = _booster_buttons["ethan"]["button"]
 			texture_path = "res://assets/sprites/characters/%s" % ("ethan_portrait_cutout.png" if kind == int(Constants.TileType.ETHAN) else "detective_portrait_cutout.png")
@@ -2644,18 +2700,22 @@ func _on_tiles_matched(tile_types: Array) -> void:
 	var shake_board := false
 	var character_rewards := {"ethan": 0, "detective": 0, "victor": 0}
 	var target_enum := int(Constants.TileType.get(_objective_target, -1))
+	var character_config: Dictionary = ConfigLoader.load_config(Constants.ConfigPaths.ECONOMY).get("character_rewards", {})
 	for tile_type in tile_types:
 		if _objective_type == "COLLECT_ITEMS" and int(tile_type) == target_enum:
 			_evidence_count += 1
 		if not _suppress_character_rewards_this_turn and _economy_manager != null:
 			if int(tile_type) in [int(Constants.TileType.ETHAN), int(Constants.TileType.DETECTIVE)]:
+				_assist_tiles += 1
+				if _assist_tiles % maxi(1,int(character_config.get("assist_tiles_per_reward",3))) != 0:
+					continue
 				var assists_before := _economy_manager.get_ethan_count()
 				_economy_manager.add_ethan(1)
 				if _economy_manager.get_ethan_count() > assists_before:
 					var character_id := "ethan" if int(tile_type) == int(Constants.TileType.ETHAN) else "detective"
 					character_rewards[character_id] = int(character_rewards[character_id]) + 1
 			elif int(tile_type) == int(Constants.TileType.VICTOR):
-				_economy_manager.add_coins(10)
+				_economy_manager.add_coins(int(character_config.get("victor_coins_per_tile",2)))
 				character_rewards["victor"] = int(character_rewards["victor"]) + 1
 	var reward_notices: Array[String] = []
 	var ethan_matches := int(character_rewards["ethan"])
@@ -2673,7 +2733,7 @@ func _on_tiles_matched(tile_types: Array) -> void:
 	if detective_matches > 0:
 		reward_notices.append("DETECTIVE +%d RESCUE ASSIST%s" % [detective_matches, "" if detective_matches == 1 else "S"])
 	if victor_matches > 0:
-		reward_notices.append("VICTOR +%d ETHAN COINS" % (victor_matches * 10))
+		reward_notices.append("VICTOR +%d ETHAN COINS" % (victor_matches * int(character_config.get("victor_coins_per_tile",2))))
 	var special_reward_text := " | ".join(reward_notices)
 	SignalBus.play_sfx.emit("tile_match")
 	var rank := 0
@@ -2760,7 +2820,7 @@ func _on_special_created(kind: String) -> void:
 		reward_note = " | AMARA SUPPLY: +1 %s" % kind.to_upper()
 	elif milestone > 0:
 		reward_note = " | SUPPLY %d / %d" % [supply_progress, milestone]
-	_hint_label.text = "SPECIAL MOVE | +%d COINS%s" % [coin_reward, reward_note]
+	_hint_label.text = "SPECIAL PIECE CREATED%s%s" % [(" | +%d COINS" % coin_reward) if coin_reward > 0 else "", reward_note]
 	_hint_label.add_theme_color_override("font_color", Color("#8df4ff"))
 	_hint_label.scale = Vector2(0.75, 0.75)
 	var pop := create_tween()
@@ -2867,7 +2927,7 @@ func _show_tutorial_special_result() -> void:
 	_tutorial_action = "explain_special_result"
 	if _board != null:
 		_board.lock()
-	_show_tutorial_tip("The rocket cleared its row and column in one move. Creating special pieces also earns Ethan Coins; Amara sends a matching booster after the configured milestone. Use specials to clear a blocked path or reach mission evidence.", _objective_label.get_global_rect(), "DAVID", "res://assets/sprites/characters/david_portrait_v2.png", true)
+	_show_tutorial_tip("The rocket cleared its row and column in one move. Amara sends a matching booster after 15 special pieces. Use specials to clear a blocked path or reach mission evidence.", _objective_label.get_global_rect(), "DAVID", "res://assets/sprites/characters/david_portrait_v2.png", true)
 
 
 func _show_tutorial_booster_result() -> void:
@@ -3183,6 +3243,17 @@ func _show_level_result(won: bool) -> void:
 	if _result_in_progress or _result_layer != null:
 		return
 	_result_in_progress = true
+	if won or not _attempt_failure_recorded:
+		Recovery.record_result(_campaign_progress,_current_level_id,won,TimeHelper.current_unix_time())
+		_attempt_failure_recorded = not won
+		_persist_campaign_progress()
+	preload("res://scripts/economy/BalanceMetrics.gd").record({
+		"event":"attempt_result", "level":_current_level_id, "won":won,
+		"moves_remaining":_moves_remaining, "evidence_collected":_evidence_count,
+		"evidence_goal":_evidence_goal, "blockers_remaining":maxi(0,_obstacles_goal-_obstacles_cleared),
+		"coins_before_attempt":_attempt_coins_start, "coins_at_result":_economy_manager.get_coins(),
+		"lives":_economy_manager.get_lives(), "boosters":_booster_inventory.duplicate(),
+		"ad_continue_used":_ad_revived, "coin_continue_used":_paid_revived})
 	if _board != null:
 		_board.lock()
 	_tutorial_active = false
@@ -3220,14 +3291,22 @@ func _show_level_result(won: bool) -> void:
 	content.alignment = BoxContainer.ALIGNMENT_CENTER
 	content.add_theme_constant_override("separation", 12)
 	card.add_child(content)
-	var heading := _make_label("CASE WON!" if won else "THE TRAIL WENT COLD", 32)
+	var heading := _make_label("CLUE FOUND!" if won else "VICTOR GETS AWAY", 32)
 	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	heading.add_theme_color_override("font_color", Color("#633718"))
 	content.add_child(heading)
+	if not won:
+		var failure_count := int(_campaign_progress.get_value("campaign","failed_attempts",0))+1
+		_campaign_progress.set_value("campaign","failed_attempts",failure_count)
+		_persist_campaign_progress()
+		var taunts: Array = JsonLoader.load_file("res://configs/story_canon.json").get("failure_taunts",[])
+		var failure = preload("res://scenes/ui/FailureScreen.tscn").instantiate()
+		content.add_child(failure)
+		failure.configure(str(taunts[(failure_count-1)%taunts.size()]) if not taunts.is_empty() else "My money or Ethan.",DISPLAY_FONT)
 	var result_manager := get_node_or_null("Managers/LevelManager")
 	var result_data: Dictionary = result_manager.get_level_data() if result_manager != null else {}
 	if won and _is_story_final_level(result_data):
-		var story_complete := _make_label("STORY OBJECTIVE COMPLETE!", 22)
+		var story_complete := _make_label("LEAD VERIFIED", 22)
 		story_complete.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		story_complete.add_theme_color_override("font_color", Color("#8b572b"))
 		content.add_child(story_complete)
@@ -3269,6 +3348,7 @@ func _show_level_result(won: bool) -> void:
 		detail_text = "The remaining moves ran out. You lost one life. Try again or visit the Life Shop."
 	else:
 		detail_text = "LEVEL POINTS: %d\nTOTAL POINTS: %d\nCOINS: +%d   TOTAL: %d\nSTARS EARNED: %d" % [_current_level_points, total_points, coins_earned, total_coins, _result_stars_earned]
+		detail_text += "\n"+str(result_data.get("story",{}).get("win_outcome","The clue is real, but Victor has moved Ethan. The search continues."))
 		if not _last_daily_stamp.is_empty():
 			detail_text += "\nDAILY STAMP: +%d coins | Streak: %d" % [int(_last_daily_stamp.coins), int(_last_daily_stamp.streak)]
 		if has_next_level:
@@ -3295,6 +3375,10 @@ func _show_level_result(won: bool) -> void:
 			var retry := _make_menu_button("RETRY LEVEL")
 			retry.pressed.connect(_retry_current_level)
 			content.add_child(retry)
+		if _can_buy_continue():
+			var play_on := _make_menu_button("PLAY ON: +5 MOVES")
+			play_on.pressed.connect(_show_continue_shop)
+			content.add_child(play_on)
 		var life_shop := _make_menu_button("LIFE SHOP")
 		life_shop.pressed.connect(_show_life_shop)
 		content.add_child(life_shop)
@@ -3347,7 +3431,7 @@ func _play_board_clear_celebration() -> void:
 		if is_instance_valid(tile) and tile.has_powerup():
 			remaining_specials.append(tile)
 	_current_level_points += remaining_specials.size() * 250
-	_clear_bonus_coins = remaining_specials.size() * 5
+	_clear_bonus_coins = mini(25, remaining_specials.size() * 5)
 	for special in remaining_specials:
 		SignalBus.play_sfx.emit("powerup_activate")
 		var blast := create_tween()
@@ -3371,65 +3455,43 @@ func _play_story_objective_sound_after_mission() -> void:
 		SignalBus.play_sfx.emit("objective_achieved")
 
 
+func _open_coin_shop() -> void:
+	if is_instance_valid(_coin_shop):
+		_coin_shop.open(self)
+
+
 func _show_life_shop() -> void:
-	if _economy_manager == null:
+	if is_instance_valid(_coin_shop):
+		_coin_shop.open(self, "lives")
+
+
+func _can_buy_continue() -> bool:
+	return _result_layer != null and _board != null and not _paid_revived and _board.get_remaining_moves() == 0
+
+
+func _show_continue_shop() -> void:
+	if _can_buy_continue():
+		_coin_shop.open(self, "continue")
+
+
+func _use_coin_continue() -> void:
+	var credits := int(_campaign_progress.get_value("campaign", "continue_credits", 0))
+	if not _can_buy_continue() or credits < 1:
 		return
-	var item: Dictionary = _economy_manager.get_shop_item("life_refill")
-	var price := int(item.get("price", 300))
-	var amount := int(item.get("amount", 5))
-	var game_config: Dictionary = ConfigLoader.load_config(Constants.ConfigPaths.GAME)
-	var maximum_lives := int(game_config.get("max_lives", 5))
-	if _economy_manager.get_lives() >= maximum_lives:
-		_show_shop_notice("Your life meter is already full.")
-		return
-	var purchase_dialog := ConfirmationDialog.new()
-	_prepare_dialog(purchase_dialog)
-	purchase_dialog.title = "LIFE SHOP"
-	purchase_dialog.dialog_text = "Refill %d lives for %d Ethan Coins? You have %d." % [amount, price, _economy_manager.get_coins()]
-	var seconds := _economy_manager.seconds_until_next_life()
-	purchase_dialog.dialog_text += "\n\nA free life returns in %02d:%02d." % [seconds / 60, seconds % 60]
-	purchase_dialog.ok_button_text = "BUY LIVES"
-	var shop_layer := CanvasLayer.new()
-	shop_layer.layer = 24
-	shop_layer.process_mode = Node.PROCESS_MODE_ALWAYS
-	add_child(shop_layer)
-	shop_layer.add_child(purchase_dialog)
-	purchase_dialog.confirmed.connect(func():
-		var purchase := Purchase.new()
-		purchase.initialize()
-		purchase.set_item("life_refill")
-		purchase.set_currency(str(item.get("currency", "coins")))
-		purchase.set_price(price)
-		if _economy_manager.purchase(purchase):
-			_economy_manager.add_life(amount)
-			var result_was_open := _result_layer != null
-			if result_was_open:
-				_dismiss_level_result()
-				get_tree().paused = false
-				_show_campaign_map(_current_route_id)
-				_show_shop_notice("Lives restored. Choose a case from the campaign map.")
-		else:
-			_show_shop_notice("You need %d Ethan Coins for this refill." % price)
-		purchase.free()
-	)
-	var life_ad := purchase_dialog.add_button("Watch ad: +1 life", false, "reward")
-	_bind_ad_button(life_ad, "life")
-	purchase_dialog.custom_action.connect(func(action: String):
-		if action == "reward":
-			shop_layer.queue_free()
-			_request_reward("life", func():
-				_economy_manager.add_life(1)
-				_persist_campaign_progress()
-				if _result_layer != null:
-					_return_to_campaign_map()
-			)
-	)
-	purchase_dialog.confirmed.connect(shop_layer.queue_free, CONNECT_ONE_SHOT)
-	purchase_dialog.canceled.connect(shop_layer.queue_free, CONNECT_ONE_SHOT)
-	purchase_dialog.popup_centered_clamped(Vector2i(mini(560, int(get_viewport_rect().size.x * 0.9)), 350))
+	_campaign_progress.set_value("campaign", "continue_credits", credits - 1)
+	_paid_revived = true
+	_economy_manager.add_life(1)
+	_board.add_reward_moves(5)
+	_dismiss_level_result()
+	get_tree().paused = false
+	_board.unlock()
+	_persist_campaign_progress()
 
 
 func _show_shop_notice(message: String) -> void:
+	if is_instance_valid(_coin_shop) and is_instance_valid(_coin_shop._layer) and not _coin_shop._layer.is_queued_for_deletion():
+		_coin_shop.show_message(message)
+		return
 	var notice := AcceptDialog.new()
 	_prepare_dialog(notice)
 	notice.title = "ETHAN COINS"
@@ -3466,7 +3528,7 @@ func _next_level_after_win() -> void:
 	var next_id := _current_level_id + 1
 	_dismiss_level_result()
 	get_tree().paused = false
-	if not after_story.is_empty():
+	if not after_story.is_empty() and not bool(_campaign_progress.get_value("story_seen",after_story,false)):
 		_pending_level_id = -1
 		_pending_story_id = after_story
 		_start_campaign_story(after_story)
@@ -3837,6 +3899,7 @@ func _request_reward(placement: String, reward: Callable) -> void:
 		ad_board.lock()
 	# Connect before show: a provider may report failure synchronously.
 	var receive := func(earned: bool):
+		preload("res://scripts/economy/BalanceMetrics.gd").record({"event":"rewarded_ad_result","placement":placement,"earned":earned,"level":_current_level_id})
 		if is_instance_valid(ad_board) and not was_locked:
 			ad_board.unlock()
 		if earned:

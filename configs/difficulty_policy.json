@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "booster_challenges": {"first_level": 100, "interval": 50},
+  "return_assistance": {
+    "first_level": 51,
+    "minimum_failures": 3,
+    "absence_seconds": 21600,
+    "claim_window_seconds": 1800,
+    "cooldown_seconds": 86400,
+    "extra_moves": 4,
+    "target_weight_multiplier": 1.6,
+    "lucky_refill_chance": 0.20
+  }
+}

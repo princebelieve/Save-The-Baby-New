@@ -1,143 +1,152 @@
 {
-    "audio": {
-        "game_over": "",
-        "music": "",
-        "victory": ""
-    },
-    "background": {
-        "image": "res://assets/sprites/backgrounds/dirt_board_background.jpeg",
-        "parallax": false
-    },
-    "board": {
-        "blocked_cells": [
-            [
-                0,
-                7
-            ],
-            [
-                6,
-                7
-            ]
-        ],
-        "columns": 7,
-        "locked_cells": [],
-        "rows": 8,
-        "spawn_points": [],
-        "tile_size": 64
-    },
-    "description": "Gather fingerprint evidence and clear every blocker on this patrol.",
-    "difficulty": "MEDIUM",
-    "level_id": 487,
-    "metadata": {
-        "chapter_end_level": 490,
-        "chapter_id": 50,
-        "chapter_start_level": 481,
-        "chapter_title": "Factory Patrol",
-        "generator_version": 1,
-        "map_background": "factory_map_section_cutout.png",
-        "map_landmark": "police_car_topdown_cutout.png",
-        "map_props": [
-            "wooden_bridge_cutout.png",
-            "police_car_topdown_cutout.png"
-        ],
-        "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
-        "seed": 4598456
-    },
-    "moves": {
-        "total": 30
-    },
-    "name": "Evidence Patrol 487",
-    "objectives": [
-        {
-            "amount": 24,
-            "target": "FINGERPRINT",
-            "type": "COLLECT_ITEMS"
-        }
+  "audio": {
+    "game_over": "",
+    "music": "",
+    "victory": ""
+  },
+  "background": {
+    "image": "res://assets/sprites/backgrounds/dirt_board_background.jpeg",
+    "parallax": false
+  },
+  "board": {
+    "blocked_cells": [
+      [
+        0,
+        7
+      ],
+      [
+        6,
+        7
+      ]
     ],
-    "obstacles": {
-        "items": [
-            {
-                "health": 1,
-                "type": "chain",
-                "x": 4,
-                "y": 3
-            },
-            {
-                "health": 1,
-                "type": "tape",
-                "x": 3,
-                "y": 5
-            },
-            {
-                "health": 1,
-                "type": "lock",
-                "x": 2,
-                "y": 6
-            },
-            {
-                "health": 1,
-                "type": "chain",
-                "x": 4,
-                "y": 2
-            }
-        ]
-    },
-    "powerups": {
-        "available": [
-            "ROCKET",
-            "BOMB",
-            "THUNDER"
-        ],
-        "enabled": true
-    },
-    "rewards": {
-        "coins": 50,
-        "first_try_bonus": 10,
-        "perfect_bonus": 20,
-        "powerups": [],
-        "stars": 3
-    },
-    "settings": {
-        "allow_boosters": true,
-        "allow_shuffle": true,
-        "available_boosters": [
-            "rocket",
-            "bomb",
-            "thunder",
-            "ethan"
-        ],
-        "time_limit": 0
-    },
-    "story": {
-        "after_level": "",
-        "before_level": "",
-        "first_clear": "",
-        "return_to_map": true
-    },
-    "tile_pool": {
-        "tiles": [
-            "key",
-            "phone",
-            "fingerprint",
-            "recorder",
-            "clock",
-            "ethan",
-            "detective",
-            "victor"
-        ],
-        "weights": [
-            17,
-            18,
-            18,
-            19,
-            16,
-            1,
-            1,
-            1
-        ]
-    },
-    "tutorial": {
-        "enabled": false,
-        "steps": []
+    "columns": 7,
+    "locked_cells": [],
+    "rows": 8,
+    "spawn_points": [],
+    "tile_size": 64
+  },
+  "description": "Check the mailbox rental form against an independent record.",
+  "difficulty": "MEDIUM",
+  "level_id": 487,
+  "metadata": {
+    "chapter_end_level": 490,
+    "chapter_id": 50,
+    "chapter_start_level": 481,
+    "chapter_title": "The Private Mailbox",
+    "generator_version": 2,
+    "map_background": "factory_map_section_cutout.png",
+    "map_landmark": "police_car_topdown_cutout.png",
+    "map_props": [
+      "wooden_bridge_cutout.png",
+      "police_car_topdown_cutout.png"
+    ],
+    "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
+    "seed": 4598456,
+    "season": 5,
+    "season_title": "For Her Son",
+    "episode_id": 44
+  },
+  "moves": {
+    "total": 26
+  },
+  "name": "The Private Mailbox 07",
+  "objectives": [
+    {
+      "amount": 24,
+      "target": "FINGERPRINT",
+      "type": "COLLECT_ITEMS"
     }
+  ],
+  "obstacles": {
+    "items": [
+      {
+        "health": 1,
+        "type": "chain",
+        "x": 4,
+        "y": 3
+      },
+      {
+        "health": 1,
+        "type": "tape",
+        "x": 3,
+        "y": 5
+      },
+      {
+        "health": 1,
+        "type": "lock",
+        "x": 2,
+        "y": 6
+      },
+      {
+        "health": 1,
+        "type": "chain",
+        "x": 4,
+        "y": 2
+      }
+    ]
+  },
+  "powerups": {
+    "available": [
+      "ROCKET",
+      "BOMB",
+      "THUNDER"
+    ],
+    "enabled": true
+  },
+  "rewards": {
+    "coins": 40,
+    "first_try_bonus": 10,
+    "perfect_bonus": 20,
+    "powerups": [],
+    "stars": 3
+  },
+  "settings": {
+    "allow_boosters": true,
+    "allow_shuffle": true,
+    "available_boosters": [
+      "rocket",
+      "bomb",
+      "thunder",
+      "ethan"
+    ],
+    "time_limit": 0
+  },
+  "story": {
+    "before_level": "",
+    "after_level": "",
+    "first_clear": "",
+    "return_to_map": true,
+    "win_outcome": "You verified the lead behind the mailbox rental form. Ethan is still missing; the trail continues.",
+    "briefings": {
+      "police": "Morris coordinates the investigation into the mailbox rental form. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
+      "signal": "David checks the digital trail behind the mailbox rental form. Amara compares it with what she knows; no police team has joined this approach.",
+      "alone": "David follows the physical trail behind the mailbox rental form without police backup, keeping Amara informed rather than claiming the search as his own."
+    }
+  },
+  "tile_pool": {
+    "tiles": [
+      "key",
+      "phone",
+      "fingerprint",
+      "recorder",
+      "clock",
+      "ethan",
+      "detective",
+      "victor"
+    ],
+    "weights": [
+      17,
+      18,
+      18,
+      19,
+      16,
+      1,
+      1,
+      1
+    ]
+  },
+  "tutorial": {
+    "enabled": false,
+    "steps": []
+  }
 }

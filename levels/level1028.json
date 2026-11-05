@@ -1,146 +1,155 @@
 {
-    "audio": {
-        "game_over": "",
-        "music": "",
-        "victory": ""
-    },
-    "background": {
-        "image": "res://assets/sprites/backgrounds/dirt_board_background.jpeg",
-        "parallax": false
-    },
-    "board": {
-        "blocked_cells": [],
-        "columns": 8,
-        "locked_cells": [],
-        "rows": 8,
-        "spawn_points": [],
-        "tile_size": 64
-    },
-    "description": "Gather recorder evidence and clear every blocker on this patrol.",
-    "difficulty": "HARD",
-    "level_id": 1028,
-    "metadata": {
-        "chapter_end_level": 1030,
-        "chapter_id": 104,
-        "chapter_start_level": 1021,
-        "chapter_title": "Factory Patrol",
-        "generator_version": 1,
-        "map_background": "factory_map_section_cutout.png",
-        "map_landmark": "police_car_topdown_cutout.png",
-        "map_props": [
-            "wooden_bridge_cutout.png",
-            "police_car_topdown_cutout.png"
-        ],
-        "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
-        "seed": 8882635
-    },
-    "moves": {
-        "total": 28
-    },
-    "name": "Evidence Patrol 1028",
-    "objectives": [
-        {
-            "amount": 30,
-            "target": "RECORDER",
-            "type": "COLLECT_ITEMS"
-        }
+  "audio": {
+    "game_over": "",
+    "music": "",
+    "victory": ""
+  },
+  "background": {
+    "image": "res://assets/sprites/backgrounds/dirt_board_background.jpeg",
+    "parallax": false
+  },
+  "board": {
+    "blocked_cells": [],
+    "columns": 8,
+    "locked_cells": [],
+    "rows": 8,
+    "spawn_points": [],
+    "tile_size": 64
+  },
+  "description": "Reconstruct the missing step around the barrier camera original.",
+  "difficulty": "HARD",
+  "level_id": 1028,
+  "metadata": {
+    "chapter_end_level": 1030,
+    "chapter_id": 104,
+    "chapter_start_level": 1021,
+    "chapter_title": "Beyond the Barrier",
+    "generator_version": 2,
+    "map_background": "factory_map_section_cutout.png",
+    "map_landmark": "police_car_topdown_cutout.png",
+    "map_props": [
+      "wooden_bridge_cutout.png",
+      "police_car_topdown_cutout.png"
     ],
-    "obstacles": {
-        "items": [
-            {
-                "health": 1,
-                "type": "tape",
-                "x": 1,
-                "y": 2
-            },
-            {
-                "health": 1,
-                "type": "lock",
-                "x": 2,
-                "y": 4
-            },
-            {
-                "health": 1,
-                "type": "chain",
-                "x": 4,
-                "y": 3
-            },
-            {
-                "health": 1,
-                "type": "tape",
-                "x": 4,
-                "y": 6
-            },
-            {
-                "health": 1,
-                "type": "lock",
-                "x": 6,
-                "y": 3
-            },
-            {
-                "health": 1,
-                "type": "chain",
-                "x": 3,
-                "y": 1
-            }
-        ]
-    },
-    "powerups": {
-        "available": [
-            "ROCKET",
-            "BOMB",
-            "THUNDER"
-        ],
-        "enabled": true
-    },
-    "rewards": {
-        "coins": 50,
-        "first_try_bonus": 10,
-        "perfect_bonus": 20,
-        "powerups": [],
-        "stars": 3
-    },
-    "settings": {
-        "allow_boosters": true,
-        "allow_shuffle": true,
-        "available_boosters": [
-            "rocket",
-            "bomb",
-            "thunder",
-            "ethan"
-        ],
-        "time_limit": 0
-    },
-    "story": {
-        "after_level": "",
-        "before_level": "",
-        "first_clear": "",
-        "return_to_map": true
-    },
-    "tile_pool": {
-        "tiles": [
-            "key",
-            "phone",
-            "fingerprint",
-            "recorder",
-            "clock",
-            "ethan",
-            "detective",
-            "victor"
-        ],
-        "weights": [
-            18,
-            16,
-            20,
-            18,
-            17,
-            1,
-            1,
-            1
-        ]
-    },
-    "tutorial": {
-        "enabled": false,
-        "steps": []
+    "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
+    "seed": 8882635,
+    "season": 10,
+    "season_title": "One Door Away",
+    "episode_id": 98
+  },
+  "moves": {
+    "total": 24
+  },
+  "name": "Beyond the Barrier 08",
+  "objectives": [
+    {
+      "amount": 30,
+      "target": "RECORDER",
+      "type": "COLLECT_ITEMS"
     }
+  ],
+  "obstacles": {
+    "items": [
+      {
+        "health": 1,
+        "type": "tape",
+        "x": 1,
+        "y": 2
+      },
+      {
+        "health": 1,
+        "type": "lock",
+        "x": 2,
+        "y": 4
+      },
+      {
+        "health": 1,
+        "type": "chain",
+        "x": 4,
+        "y": 3
+      },
+      {
+        "health": 1,
+        "type": "tape",
+        "x": 4,
+        "y": 6
+      },
+      {
+        "health": 1,
+        "type": "lock",
+        "x": 6,
+        "y": 3
+      },
+      {
+        "health": 1,
+        "type": "chain",
+        "x": 3,
+        "y": 1
+      }
+    ]
+  },
+  "powerups": {
+    "available": [
+      "ROCKET",
+      "BOMB",
+      "THUNDER"
+    ],
+    "enabled": true
+  },
+  "rewards": {
+    "coins": 60,
+    "first_try_bonus": 10,
+    "perfect_bonus": 20,
+    "powerups": [],
+    "stars": 3
+  },
+  "settings": {
+    "allow_boosters": true,
+    "allow_shuffle": true,
+    "available_boosters": [
+      "rocket",
+      "bomb",
+      "thunder",
+      "ethan"
+    ],
+    "time_limit": 0
+  },
+  "story": {
+    "before_level": "",
+    "after_level": "",
+    "first_clear": "",
+    "return_to_map": true,
+    "win_outcome": "You verified the lead behind the barrier camera original. Ethan is still missing; the trail continues.",
+    "briefings": {
+      "police": "Morris coordinates the investigation into the barrier camera original. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
+      "signal": "David checks the digital trail behind the barrier camera original. Amara compares it with what she knows; no police team has joined this approach.",
+      "alone": "David follows the physical trail behind the barrier camera original without police backup, keeping Amara informed rather than claiming the search as his own."
+    }
+  },
+  "tile_pool": {
+    "tiles": [
+      "key",
+      "phone",
+      "fingerprint",
+      "recorder",
+      "clock",
+      "ethan",
+      "detective",
+      "victor"
+    ],
+    "weights": [
+      18,
+      16,
+      20,
+      18,
+      17,
+      1,
+      1,
+      1
+    ]
+  },
+  "tutorial": {
+    "enabled": false,
+    "steps": []
+  }
 }

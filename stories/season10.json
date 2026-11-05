@@ -24,9 +24,9 @@
         ],
         "signal": [
           {
-            "speaker": "Amara",
-            "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-            "text": "Amara maps the knock to a moving service lift beneath the dam."
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+            "text": "David compares the knocking with the lift schedule. Amara recognises the rhythm; the service lift is moving beneath the dam."
           }
         ],
         "alone": [
@@ -64,10 +64,10 @@
         },
         {
           "id": "signal",
-          "label": "Trace the knock through the adjoining channel",
-          "impact": "Amara can trace the knock, but the service lift is moving and may not return.",
-          "response": "Amara: I will follow the knock through the channel and call when the lift stops.",
-          "speaker": "Amara"
+          "label": "Decode the next lead with Amara",
+          "impact": "David checks the technical evidence. Amara connects it to the people and history behind the records, without police assistance.",
+          "response": "David preserves the original record and tests the next connection while Amara checks its meaning against what she remembers.",
+          "speaker": "David"
         },
         {
           "id": "alone",
@@ -80,7 +80,7 @@
     }
   ],
   "metadata": {
-    "version": 1,
+    "version": 2,
     "chapter": 10,
     "season": 2,
     "campaign_levels": "046-050",

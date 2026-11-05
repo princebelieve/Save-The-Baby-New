@@ -24,9 +24,9 @@
         ],
         "signal": [
           {
-            "speaker": "Amara",
-            "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-            "text": "Amara maps a dry pocket behind the eastern retaining wall."
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+            "text": "David compares the signal with the service map. Amara points out a dry pocket behind the eastern retaining wall."
           }
         ],
         "alone": [
@@ -49,9 +49,9 @@
           "text": "A toy boat floats past with a new message: \"Not the room. The wall.\""
         },
         {
-          "speaker": "Victor",
-          "portrait": "res://assets/sprites/characters/victor_portrait_v2.png",
-          "text": "The panel opens. From the other side, Ethan whispers: \"Dad\" Don't come in yet."
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "The panel opens. Ethan's voice comes from the other side: 'Mum.' Amara moves toward it, but the echo is wrong. I ask her to wait while we check the room."
         }
       ],
       "choices": [
@@ -64,10 +64,10 @@
         },
         {
           "id": "signal",
-          "label": "Ask Amara to map the channel flow",
-          "impact": "Amara can find the dry pocket, but rising water may close the route behind David.",
-          "response": "Amara: I will map the current and tell you when the water changes.",
-          "speaker": "Amara"
+          "label": "Decode the next lead with Amara",
+          "impact": "David checks the technical evidence. Amara connects it to the people and history behind the records, without police assistance.",
+          "response": "David preserves the original record and tests the next connection while Amara checks its meaning against what she remembers.",
+          "speaker": "David"
         },
         {
           "id": "alone",
@@ -80,7 +80,7 @@
     }
   ],
   "metadata": {
-    "version": 1,
+    "version": 2,
     "chapter": 9,
     "season": 2,
     "campaign_levels": "041-045",

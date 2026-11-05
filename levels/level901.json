@@ -1,131 +1,140 @@
 {
-    "audio": {
-        "game_over": "",
-        "music": "",
-        "victory": ""
-    },
-    "background": {
-        "image": "res://assets/sprites/backgrounds/dirt_board_background.jpeg",
-        "parallax": false
-    },
-    "board": {
-        "blocked_cells": [
-            [
-                0,
-                6
-            ],
-            [
-                7,
-                6
-            ]
-        ],
-        "columns": 8,
-        "locked_cells": [],
-        "rows": 7,
-        "spawn_points": [],
-        "tile_size": 64
-    },
-    "description": "Gather key evidence and clear every blocker on this patrol.",
-    "difficulty": "EASY",
-    "level_id": 901,
-    "metadata": {
-        "chapter_end_level": 910,
-        "chapter_id": 92,
-        "chapter_start_level": 901,
-        "chapter_title": "Factory Patrol",
-        "generator_version": 1,
-        "map_background": "factory_map_section_cutout.png",
-        "map_landmark": "police_car_topdown_cutout.png",
-        "map_props": [
-            "wooden_bridge_cutout.png",
-            "police_car_topdown_cutout.png"
-        ],
-        "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
-        "seed": 7876922
-    },
-    "moves": {
-        "total": 32
-    },
-    "name": "Evidence Patrol 901",
-    "objectives": [
-        {
-            "amount": 18,
-            "target": "KEY",
-            "type": "COLLECT_ITEMS"
-        }
+  "audio": {
+    "game_over": "",
+    "music": "",
+    "victory": ""
+  },
+  "background": {
+    "image": "res://assets/sprites/backgrounds/dirt_board_background.jpeg",
+    "parallax": false
+  },
+  "board": {
+    "blocked_cells": [
+      [
+        0,
+        6
+      ],
+      [
+        7,
+        6
+      ]
     ],
-    "obstacles": {
-        "items": [
-            {
-                "health": 1,
-                "type": "chain",
-                "x": 6,
-                "y": 2
-            },
-            {
-                "health": 1,
-                "type": "tape",
-                "x": 1,
-                "y": 1
-            }
-        ]
-    },
-    "powerups": {
-        "available": [
-            "ROCKET",
-            "BOMB",
-            "THUNDER"
-        ],
-        "enabled": true
-    },
-    "rewards": {
-        "coins": 50,
-        "first_try_bonus": 10,
-        "perfect_bonus": 20,
-        "powerups": [],
-        "stars": 3
-    },
-    "settings": {
-        "allow_boosters": true,
-        "allow_shuffle": true,
-        "available_boosters": [
-            "rocket",
-            "bomb",
-            "thunder",
-            "ethan"
-        ],
-        "time_limit": 0
-    },
-    "story": {
-        "after_level": "",
-        "before_level": "",
-        "first_clear": "",
-        "return_to_map": true
-    },
-    "tile_pool": {
-        "tiles": [
-            "key",
-            "phone",
-            "fingerprint",
-            "recorder",
-            "clock",
-            "ethan",
-            "detective",
-            "victor"
-        ],
-        "weights": [
-            16,
-            16,
-            20,
-            17,
-            17,
-            1,
-            1,
-            1
-        ]
-    },
-    "tutorial": {
-        "enabled": false,
-        "steps": []
+    "columns": 8,
+    "locked_cells": [],
+    "rows": 7,
+    "spawn_points": [],
+    "tile_size": 64
+  },
+  "description": "The next lead is the business centre dispatch log. We need its original source before Victor moves again.",
+  "difficulty": "EASY",
+  "level_id": 901,
+  "metadata": {
+    "chapter_end_level": 910,
+    "chapter_id": 92,
+    "chapter_start_level": 901,
+    "chapter_title": "The Message Desk",
+    "generator_version": 2,
+    "map_background": "factory_map_section_cutout.png",
+    "map_landmark": "police_car_topdown_cutout.png",
+    "map_props": [
+      "wooden_bridge_cutout.png",
+      "police_car_topdown_cutout.png"
+    ],
+    "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
+    "seed": 7876922,
+    "season": 9,
+    "season_title": "The Price of Glory",
+    "episode_id": 86
+  },
+  "moves": {
+    "total": 28
+  },
+  "name": "The Message Desk 01",
+  "objectives": [
+    {
+      "amount": 18,
+      "target": "KEY",
+      "type": "COLLECT_ITEMS"
     }
+  ],
+  "obstacles": {
+    "items": [
+      {
+        "health": 1,
+        "type": "chain",
+        "x": 6,
+        "y": 2
+      },
+      {
+        "health": 1,
+        "type": "tape",
+        "x": 1,
+        "y": 1
+      }
+    ]
+  },
+  "powerups": {
+    "available": [
+      "ROCKET",
+      "BOMB",
+      "THUNDER"
+    ],
+    "enabled": true
+  },
+  "rewards": {
+    "coins": 30,
+    "first_try_bonus": 10,
+    "perfect_bonus": 20,
+    "powerups": [],
+    "stars": 3
+  },
+  "settings": {
+    "allow_boosters": true,
+    "allow_shuffle": true,
+    "available_boosters": [
+      "rocket",
+      "bomb",
+      "thunder",
+      "ethan"
+    ],
+    "time_limit": 0
+  },
+  "story": {
+    "before_level": "serial086_intro",
+    "after_level": "",
+    "first_clear": "",
+    "return_to_map": true,
+    "win_outcome": "You verified the lead behind the business centre dispatch log. Ethan is still missing; the trail continues.",
+    "briefings": {
+      "police": "Morris coordinates the investigation into the business centre dispatch log. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
+      "signal": "David checks the digital trail behind the business centre dispatch log. Amara compares it with what she knows; no police team has joined this approach.",
+      "alone": "David follows the physical trail behind the business centre dispatch log without police backup, keeping Amara informed rather than claiming the search as his own."
+    }
+  },
+  "tile_pool": {
+    "tiles": [
+      "key",
+      "phone",
+      "fingerprint",
+      "recorder",
+      "clock",
+      "ethan",
+      "detective",
+      "victor"
+    ],
+    "weights": [
+      16,
+      16,
+      20,
+      17,
+      17,
+      1,
+      1,
+      1
+    ]
+  },
+  "tutorial": {
+    "enabled": false,
+    "steps": []
+  }
 }

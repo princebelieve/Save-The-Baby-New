@@ -1,155 +1,164 @@
 {
-    "audio": {
-        "game_over": "",
-        "music": "",
-        "victory": ""
-    },
-    "background": {
-        "image": "res://assets/sprites/backgrounds/dirt_board_background.jpeg",
-        "parallax": false
-    },
-    "board": {
-        "blocked_cells": [
-            [
-                0,
-                6
-            ],
-            [
-                7,
-                6
-            ]
-        ],
-        "columns": 8,
-        "locked_cells": [],
-        "rows": 7,
-        "spawn_points": [],
-        "tile_size": 64
-    },
-    "description": "Gather key evidence and clear every blocker on this patrol.",
-    "difficulty": "HARD",
-    "level_id": 415,
-    "metadata": {
-        "chapter_end_level": 420,
-        "chapter_id": 43,
-        "chapter_start_level": 411,
-        "chapter_title": "River Watch",
-        "generator_version": 1,
-        "map_background": "river_map_section_cutout.png",
-        "map_landmark": "wooden_bridge_cutout.png",
-        "map_props": [
-            "wooden_bridge_cutout.png",
-            "police_car_topdown_cutout.png"
-        ],
-        "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
-        "seed": 4028288
-    },
-    "moves": {
-        "total": 28
-    },
-    "name": "Evidence Patrol 415",
-    "objectives": [
-        {
-            "amount": 30,
-            "target": "KEY",
-            "type": "COLLECT_ITEMS"
-        }
+  "audio": {
+    "game_over": "",
+    "music": "",
+    "victory": ""
+  },
+  "background": {
+    "image": "res://assets/sprites/backgrounds/dirt_board_background.jpeg",
+    "parallax": false
+  },
+  "board": {
+    "blocked_cells": [
+      [
+        0,
+        6
+      ],
+      [
+        7,
+        6
+      ]
     ],
-    "obstacles": {
-        "items": [
-            {
-                "health": 1,
-                "type": "chain",
-                "x": 6,
-                "y": 4
-            },
-            {
-                "health": 1,
-                "type": "tape",
-                "x": 3,
-                "y": 5
-            },
-            {
-                "health": 1,
-                "type": "lock",
-                "x": 5,
-                "y": 4
-            },
-            {
-                "health": 1,
-                "type": "chain",
-                "x": 6,
-                "y": 2
-            },
-            {
-                "health": 1,
-                "type": "tape",
-                "x": 6,
-                "y": 3
-            },
-            {
-                "health": 1,
-                "type": "lock",
-                "x": 2,
-                "y": 3
-            }
-        ]
-    },
-    "powerups": {
-        "available": [
-            "ROCKET",
-            "BOMB",
-            "THUNDER"
-        ],
-        "enabled": true
-    },
-    "rewards": {
-        "coins": 50,
-        "first_try_bonus": 10,
-        "perfect_bonus": 20,
-        "powerups": [],
-        "stars": 3
-    },
-    "settings": {
-        "allow_boosters": true,
-        "allow_shuffle": true,
-        "available_boosters": [
-            "rocket",
-            "bomb",
-            "thunder",
-            "ethan"
-        ],
-        "time_limit": 0
-    },
-    "story": {
-        "after_level": "",
-        "before_level": "",
-        "first_clear": "",
-        "return_to_map": true
-    },
-    "tile_pool": {
-        "tiles": [
-            "key",
-            "phone",
-            "fingerprint",
-            "recorder",
-            "clock",
-            "ethan",
-            "detective",
-            "victor"
-        ],
-        "weights": [
-            20,
-            18,
-            20,
-            18,
-            16,
-            1,
-            1,
-            1
-        ]
-    },
-    "tutorial": {
-        "enabled": false,
-        "steps": []
+    "columns": 8,
+    "locked_cells": [],
+    "rows": 7,
+    "spawn_points": [],
+    "tile_size": 64
+  },
+  "description": "Compare the depot receiving signature with what the witnesses actually remember.",
+  "difficulty": "HARD",
+  "level_id": 415,
+  "metadata": {
+    "chapter_end_level": 420,
+    "chapter_id": 43,
+    "chapter_start_level": 411,
+    "chapter_title": "Someone Else's Name",
+    "generator_version": 2,
+    "map_background": "river_map_section_cutout.png",
+    "map_landmark": "wooden_bridge_cutout.png",
+    "map_props": [
+      "wooden_bridge_cutout.png",
+      "police_car_topdown_cutout.png"
+    ],
+    "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
+    "seed": 4028288,
+    "season": 4,
+    "season_title": "What He Calls Love",
+    "episode_id": 37
+  },
+  "moves": {
+    "total": 24
+  },
+  "name": "Someone Else's Name 05",
+  "objectives": [
+    {
+      "amount": 30,
+      "target": "KEY",
+      "type": "COLLECT_ITEMS"
     }
+  ],
+  "obstacles": {
+    "items": [
+      {
+        "health": 1,
+        "type": "chain",
+        "x": 6,
+        "y": 4
+      },
+      {
+        "health": 1,
+        "type": "tape",
+        "x": 3,
+        "y": 5
+      },
+      {
+        "health": 1,
+        "type": "lock",
+        "x": 5,
+        "y": 4
+      },
+      {
+        "health": 1,
+        "type": "chain",
+        "x": 6,
+        "y": 2
+      },
+      {
+        "health": 1,
+        "type": "tape",
+        "x": 6,
+        "y": 3
+      },
+      {
+        "health": 1,
+        "type": "lock",
+        "x": 2,
+        "y": 3
+      }
+    ]
+  },
+  "powerups": {
+    "available": [
+      "ROCKET",
+      "BOMB",
+      "THUNDER"
+    ],
+    "enabled": true
+  },
+  "rewards": {
+    "coins": 60,
+    "first_try_bonus": 10,
+    "perfect_bonus": 20,
+    "powerups": [],
+    "stars": 3
+  },
+  "settings": {
+    "allow_boosters": true,
+    "allow_shuffle": true,
+    "available_boosters": [
+      "rocket",
+      "bomb",
+      "thunder",
+      "ethan"
+    ],
+    "time_limit": 0
+  },
+  "story": {
+    "before_level": "",
+    "after_level": "",
+    "first_clear": "",
+    "return_to_map": true,
+    "win_outcome": "You verified the lead behind the depot receiving signature. Ethan is still missing; the trail continues.",
+    "briefings": {
+      "police": "Morris coordinates the investigation into the depot receiving signature. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
+      "signal": "David checks the digital trail behind the depot receiving signature. Amara compares it with what she knows; no police team has joined this approach.",
+      "alone": "David follows the physical trail behind the depot receiving signature without police backup, keeping Amara informed rather than claiming the search as his own."
+    }
+  },
+  "tile_pool": {
+    "tiles": [
+      "key",
+      "phone",
+      "fingerprint",
+      "recorder",
+      "clock",
+      "ethan",
+      "detective",
+      "victor"
+    ],
+    "weights": [
+      20,
+      18,
+      20,
+      18,
+      16,
+      1,
+      1,
+      1
+    ]
+  },
+  "tutorial": {
+    "enabled": false,
+    "steps": []
+  }
 }

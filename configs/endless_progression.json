@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "first_level": 51,
   "last_level": 1050,
   "chapter_length": 10,
@@ -27,17 +27,17 @@
   ],
   "bands": {
     "EASY": {
-      "moves": 32,
+      "moves": 28,
       "amount": 18,
       "obstacles": 2
     },
     "MEDIUM": {
-      "moves": 30,
+      "moves": 26,
       "amount": 24,
       "obstacles": 4
     },
     "HARD": {
-      "moves": 28,
+      "moves": 24,
       "amount": 30,
       "obstacles": 6
     }
@@ -73,5 +73,25 @@
     "chain",
     "tape"
   ],
-  "coins": 50
+  "coins": 50,
+  "coins_by_difficulty": {
+    "EASY": 30,
+    "MEDIUM": 40,
+    "HARD": 60,
+    "CRITICAL_CASE": 80
+  },
+  "onboarding_last_level": 100,
+  "onboarding_extra_moves": 2,
+  "case_overrides": {
+    "105": {
+      "moves": 26
+    },
+    "783": {
+      "moves": 28,
+      "amount": 20
+    },
+    "1050": {
+      "moves": 26
+    }
+  }
 }

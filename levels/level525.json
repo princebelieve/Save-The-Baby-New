@@ -1,146 +1,155 @@
 {
-    "audio": {
-        "game_over": "",
-        "music": "",
-        "victory": ""
-    },
-    "background": {
-        "image": "res://assets/sprites/backgrounds/dirt_board_background.jpeg",
-        "parallax": false
-    },
-    "board": {
-        "blocked_cells": [],
-        "columns": 8,
-        "locked_cells": [],
-        "rows": 7,
-        "spawn_points": [],
-        "tile_size": 64
-    },
-    "description": "Gather phone evidence and clear every blocker on this patrol.",
-    "difficulty": "HARD",
-    "level_id": 525,
-    "metadata": {
-        "chapter_end_level": 530,
-        "chapter_id": 54,
-        "chapter_start_level": 521,
-        "chapter_title": "Factory Patrol",
-        "generator_version": 1,
-        "map_background": "factory_map_section_cutout.png",
-        "map_landmark": "police_car_topdown_cutout.png",
-        "map_props": [
-            "wooden_bridge_cutout.png",
-            "police_car_topdown_cutout.png"
-        ],
-        "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
-        "seed": 4899378
-    },
-    "moves": {
-        "total": 28
-    },
-    "name": "Evidence Patrol 525",
-    "objectives": [
-        {
-            "amount": 30,
-            "target": "PHONE",
-            "type": "COLLECT_ITEMS"
-        }
+  "audio": {
+    "game_over": "",
+    "music": "",
+    "victory": ""
+  },
+  "background": {
+    "image": "res://assets/sprites/backgrounds/dirt_board_background.jpeg",
+    "parallax": false
+  },
+  "board": {
+    "blocked_cells": [],
+    "columns": 8,
+    "locked_cells": [],
+    "rows": 7,
+    "spawn_points": [],
+    "tile_size": 64
+  },
+  "description": "Compare the vehicle service tag with what the witnesses actually remember.",
+  "difficulty": "HARD",
+  "level_id": 525,
+  "metadata": {
+    "chapter_end_level": 530,
+    "chapter_id": 54,
+    "chapter_start_level": 521,
+    "chapter_title": "The Dashboard Tag",
+    "generator_version": 2,
+    "map_background": "factory_map_section_cutout.png",
+    "map_landmark": "police_car_topdown_cutout.png",
+    "map_props": [
+      "wooden_bridge_cutout.png",
+      "police_car_topdown_cutout.png"
     ],
-    "obstacles": {
-        "items": [
-            {
-                "health": 1,
-                "type": "lock",
-                "x": 1,
-                "y": 3
-            },
-            {
-                "health": 1,
-                "type": "chain",
-                "x": 4,
-                "y": 4
-            },
-            {
-                "health": 1,
-                "type": "tape",
-                "x": 5,
-                "y": 3
-            },
-            {
-                "health": 1,
-                "type": "lock",
-                "x": 6,
-                "y": 3
-            },
-            {
-                "health": 1,
-                "type": "chain",
-                "x": 4,
-                "y": 3
-            },
-            {
-                "health": 1,
-                "type": "tape",
-                "x": 5,
-                "y": 1
-            }
-        ]
-    },
-    "powerups": {
-        "available": [
-            "ROCKET",
-            "BOMB",
-            "THUNDER"
-        ],
-        "enabled": true
-    },
-    "rewards": {
-        "coins": 50,
-        "first_try_bonus": 10,
-        "perfect_bonus": 20,
-        "powerups": [],
-        "stars": 3
-    },
-    "settings": {
-        "allow_boosters": true,
-        "allow_shuffle": true,
-        "available_boosters": [
-            "rocket",
-            "bomb",
-            "thunder",
-            "ethan"
-        ],
-        "time_limit": 0
-    },
-    "story": {
-        "after_level": "",
-        "before_level": "",
-        "first_clear": "",
-        "return_to_map": true
-    },
-    "tile_pool": {
-        "tiles": [
-            "key",
-            "phone",
-            "fingerprint",
-            "recorder",
-            "clock",
-            "ethan",
-            "detective",
-            "victor"
-        ],
-        "weights": [
-            20,
-            20,
-            19,
-            19,
-            16,
-            1,
-            1,
-            1
-        ]
-    },
-    "tutorial": {
-        "enabled": false,
-        "steps": []
+    "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
+    "seed": 4899378,
+    "season": 5,
+    "season_title": "For Her Son",
+    "episode_id": 48
+  },
+  "moves": {
+    "total": 24
+  },
+  "name": "The Dashboard Tag 05",
+  "objectives": [
+    {
+      "amount": 30,
+      "target": "PHONE",
+      "type": "COLLECT_ITEMS"
     }
+  ],
+  "obstacles": {
+    "items": [
+      {
+        "health": 1,
+        "type": "lock",
+        "x": 1,
+        "y": 3
+      },
+      {
+        "health": 1,
+        "type": "chain",
+        "x": 4,
+        "y": 4
+      },
+      {
+        "health": 1,
+        "type": "tape",
+        "x": 5,
+        "y": 3
+      },
+      {
+        "health": 1,
+        "type": "lock",
+        "x": 6,
+        "y": 3
+      },
+      {
+        "health": 1,
+        "type": "chain",
+        "x": 4,
+        "y": 3
+      },
+      {
+        "health": 1,
+        "type": "tape",
+        "x": 5,
+        "y": 1
+      }
+    ]
+  },
+  "powerups": {
+    "available": [
+      "ROCKET",
+      "BOMB",
+      "THUNDER"
+    ],
+    "enabled": true
+  },
+  "rewards": {
+    "coins": 60,
+    "first_try_bonus": 10,
+    "perfect_bonus": 20,
+    "powerups": [],
+    "stars": 3
+  },
+  "settings": {
+    "allow_boosters": true,
+    "allow_shuffle": true,
+    "available_boosters": [
+      "rocket",
+      "bomb",
+      "thunder",
+      "ethan"
+    ],
+    "time_limit": 0
+  },
+  "story": {
+    "before_level": "",
+    "after_level": "",
+    "first_clear": "",
+    "return_to_map": true,
+    "win_outcome": "You verified the lead behind the vehicle service tag. Ethan is still missing; the trail continues.",
+    "briefings": {
+      "police": "Morris coordinates the investigation into the vehicle service tag. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
+      "signal": "David checks the digital trail behind the vehicle service tag. Amara compares it with what she knows; no police team has joined this approach.",
+      "alone": "David follows the physical trail behind the vehicle service tag without police backup, keeping Amara informed rather than claiming the search as his own."
+    }
+  },
+  "tile_pool": {
+    "tiles": [
+      "key",
+      "phone",
+      "fingerprint",
+      "recorder",
+      "clock",
+      "ethan",
+      "detective",
+      "victor"
+    ],
+    "weights": [
+      20,
+      20,
+      19,
+      19,
+      16,
+      1,
+      1,
+      1
+    ]
+  },
+  "tutorial": {
+    "enabled": false,
+    "steps": []
+  }
 }

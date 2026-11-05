@@ -24,8 +24,8 @@
         ],
         "signal": [
           {
-            "speaker": "Amara",
-            "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
             "text": "The hidden ink says: \"The river remembers what the road forgets.\""
           }
         ],
@@ -64,10 +64,10 @@
         },
         {
           "id": "signal",
-          "label": "Check the note for hidden ink",
-          "impact": "Amara can reveal the hidden ink, but the message may be a trap written for her.",
-          "response": "Amara: I will check the note under the lamp and tell you what it says before you move.",
-          "speaker": "Amara"
+          "label": "Decode the next lead with Amara",
+          "impact": "David checks the technical evidence. Amara connects it to the people and history behind the records, without police assistance.",
+          "response": "David preserves the original record and tests the next connection while Amara checks its meaning against what she remembers.",
+          "speaker": "David"
         },
         {
           "id": "alone",
@@ -80,7 +80,7 @@
     }
   ],
   "metadata": {
-    "version": 1,
+    "version": 2,
     "chapter": 7,
     "season": 2,
     "campaign_levels": "031-035",

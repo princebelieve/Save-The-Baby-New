@@ -18,7 +18,7 @@ func initialize() -> void:
 	_level_data.clear()
 
 
-func load_level(level_id: int) -> bool:
+func load_level(level_id: int, attempt_variant: Dictionary = {}) -> bool:
 	level_loading.emit(level_id)
 	SignalBus.level_loading.emit(level_id)
 
@@ -29,6 +29,8 @@ func load_level(level_id: int) -> bool:
 		return false
 
 	var data := JsonLoader.load_file(path)
+	if not attempt_variant.is_empty() and int(attempt_variant.get("level_id",0)) == level_id:
+		data = attempt_variant.duplicate(true)
 
 	if not _validate_level(data):
 		DebugLogger.error("LevelManager: Invalid level file -> %s" % path)

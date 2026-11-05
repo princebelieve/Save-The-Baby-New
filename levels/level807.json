@@ -1,134 +1,143 @@
 {
-    "audio": {
-        "game_over": "",
-        "music": "",
-        "victory": ""
-    },
-    "background": {
-        "image": "res://assets/sprites/backgrounds/dirt_board_background.jpeg",
-        "parallax": false
-    },
-    "board": {
-        "blocked_cells": [],
-        "columns": 8,
-        "locked_cells": [],
-        "rows": 8,
-        "spawn_points": [],
-        "tile_size": 64
-    },
-    "description": "Gather phone evidence and clear every blocker on this patrol.",
-    "difficulty": "MEDIUM",
-    "level_id": 807,
-    "metadata": {
-        "chapter_end_level": 810,
-        "chapter_id": 82,
-        "chapter_start_level": 801,
-        "chapter_title": "Factory Patrol",
-        "generator_version": 1,
-        "map_background": "factory_map_section_cutout.png",
-        "map_landmark": "police_car_topdown_cutout.png",
-        "map_props": [
-            "wooden_bridge_cutout.png",
-            "police_car_topdown_cutout.png"
-        ],
-        "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
-        "seed": 7132536
-    },
-    "moves": {
-        "total": 30
-    },
-    "name": "Evidence Patrol 807",
-    "objectives": [
-        {
-            "amount": 24,
-            "target": "PHONE",
-            "type": "COLLECT_ITEMS"
-        }
+  "audio": {
+    "game_over": "",
+    "music": "",
+    "victory": ""
+  },
+  "background": {
+    "image": "res://assets/sprites/backgrounds/dirt_board_background.jpeg",
+    "parallax": false
+  },
+  "board": {
+    "blocked_cells": [],
+    "columns": 8,
+    "locked_cells": [],
+    "rows": 8,
+    "spawn_points": [],
+    "tile_size": 64
+  },
+  "description": "Check the vehicle hire sticker against an independent record.",
+  "difficulty": "MEDIUM",
+  "level_id": 807,
+  "metadata": {
+    "chapter_end_level": 810,
+    "chapter_id": 82,
+    "chapter_start_level": 801,
+    "chapter_title": "The Sticker",
+    "generator_version": 2,
+    "map_background": "factory_map_section_cutout.png",
+    "map_landmark": "police_car_topdown_cutout.png",
+    "map_props": [
+      "wooden_bridge_cutout.png",
+      "police_car_topdown_cutout.png"
     ],
-    "obstacles": {
-        "items": [
-            {
-                "health": 1,
-                "type": "lock",
-                "x": 4,
-                "y": 6
-            },
-            {
-                "health": 1,
-                "type": "chain",
-                "x": 1,
-                "y": 6
-            },
-            {
-                "health": 1,
-                "type": "tape",
-                "x": 6,
-                "y": 3
-            },
-            {
-                "health": 1,
-                "type": "lock",
-                "x": 2,
-                "y": 3
-            }
-        ]
-    },
-    "powerups": {
-        "available": [
-            "ROCKET",
-            "BOMB",
-            "THUNDER"
-        ],
-        "enabled": true
-    },
-    "rewards": {
-        "coins": 50,
-        "first_try_bonus": 10,
-        "perfect_bonus": 20,
-        "powerups": [],
-        "stars": 3
-    },
-    "settings": {
-        "allow_boosters": true,
-        "allow_shuffle": true,
-        "available_boosters": [
-            "rocket",
-            "bomb",
-            "thunder",
-            "ethan"
-        ],
-        "time_limit": 0
-    },
-    "story": {
-        "after_level": "",
-        "before_level": "",
-        "first_clear": "",
-        "return_to_map": true
-    },
-    "tile_pool": {
-        "tiles": [
-            "key",
-            "phone",
-            "fingerprint",
-            "recorder",
-            "clock",
-            "ethan",
-            "detective",
-            "victor"
-        ],
-        "weights": [
-            17,
-            17,
-            16,
-            17,
-            17,
-            1,
-            1,
-            1
-        ]
-    },
-    "tutorial": {
-        "enabled": false,
-        "steps": []
+    "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
+    "seed": 7132536,
+    "season": 8,
+    "season_title": "Names That Do Not Belong",
+    "episode_id": 76
+  },
+  "moves": {
+    "total": 26
+  },
+  "name": "The Sticker 07",
+  "objectives": [
+    {
+      "amount": 24,
+      "target": "PHONE",
+      "type": "COLLECT_ITEMS"
     }
+  ],
+  "obstacles": {
+    "items": [
+      {
+        "health": 1,
+        "type": "lock",
+        "x": 4,
+        "y": 6
+      },
+      {
+        "health": 1,
+        "type": "chain",
+        "x": 1,
+        "y": 6
+      },
+      {
+        "health": 1,
+        "type": "tape",
+        "x": 6,
+        "y": 3
+      },
+      {
+        "health": 1,
+        "type": "lock",
+        "x": 2,
+        "y": 3
+      }
+    ]
+  },
+  "powerups": {
+    "available": [
+      "ROCKET",
+      "BOMB",
+      "THUNDER"
+    ],
+    "enabled": true
+  },
+  "rewards": {
+    "coins": 40,
+    "first_try_bonus": 10,
+    "perfect_bonus": 20,
+    "powerups": [],
+    "stars": 3
+  },
+  "settings": {
+    "allow_boosters": true,
+    "allow_shuffle": true,
+    "available_boosters": [
+      "rocket",
+      "bomb",
+      "thunder",
+      "ethan"
+    ],
+    "time_limit": 0
+  },
+  "story": {
+    "before_level": "",
+    "after_level": "",
+    "first_clear": "",
+    "return_to_map": true,
+    "win_outcome": "You verified the lead behind the vehicle hire sticker. Ethan is still missing; the trail continues.",
+    "briefings": {
+      "police": "Morris coordinates the investigation into the vehicle hire sticker. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
+      "signal": "David checks the digital trail behind the vehicle hire sticker. Amara compares it with what she knows; no police team has joined this approach.",
+      "alone": "David follows the physical trail behind the vehicle hire sticker without police backup, keeping Amara informed rather than claiming the search as his own."
+    }
+  },
+  "tile_pool": {
+    "tiles": [
+      "key",
+      "phone",
+      "fingerprint",
+      "recorder",
+      "clock",
+      "ethan",
+      "detective",
+      "victor"
+    ],
+    "weights": [
+      17,
+      17,
+      16,
+      17,
+      17,
+      1,
+      1,
+      1
+    ]
+  },
+  "tutorial": {
+    "enabled": false,
+    "steps": []
+  }
 }

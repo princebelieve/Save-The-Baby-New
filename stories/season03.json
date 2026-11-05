@@ -24,9 +24,9 @@
         ],
         "signal": [
           {
-            "speaker": "Amara",
-            "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-            "text": "Amara matches the witness's phrase to a dispatch call logged inside the station."
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+            "text": "David matches the witness's phrase to a dispatch recording. Amara recognises the caller's manner of speaking."
           }
         ],
         "alone": [
@@ -46,7 +46,7 @@
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "Morris recognizes the route from an old case file, then notices that the page listing the destination has been torn out."
+          "text": "The witness kept a duplicate of the old destination list. Someone tore the matching page from the public archive. Victor is borrowing other people's work again."
         },
         {
           "speaker": "Victor",
@@ -64,10 +64,10 @@
         },
         {
           "id": "signal",
-          "label": "Ask Amara to compare the voice recording",
-          "impact": "Amara can compare the witness voice to dispatch, but that could expose her access to the files.",
-          "response": "Amara: I will compare the phrase with the dispatch recording and leave the original untouched.",
-          "speaker": "Amara"
+          "label": "Decode the next lead with Amara",
+          "impact": "David checks the technical evidence. Amara connects it to the people and history behind the records, without police assistance.",
+          "response": "David preserves the original record and tests the next connection while Amara checks its meaning against what she remembers.",
+          "speaker": "David"
         },
         {
           "id": "alone",
@@ -80,7 +80,7 @@
     }
   ],
   "metadata": {
-    "version": 1,
+    "version": 2,
     "chapter": 3,
     "season": 1,
     "campaign_levels": "011-015",

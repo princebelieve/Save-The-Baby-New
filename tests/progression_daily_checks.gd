@@ -20,7 +20,7 @@ func _run() -> void:
 	var progress := ConfigFile.new()
 	var now := 20000 * DailyActivities.DAY + 100
 	var first := DailyActivities.stamp(progress, now)
-	check(int(first.coins) == 10 and int(first.streak) == 1, "First daily stamp")
+	check(int(first.coins) == 5 and int(first.streak) == 1, "First daily stamp")
 	check(DailyActivities.stamp(progress, now + 1).is_empty(), "No repeated daily claim")
 	check(DailyActivities.stamp(progress, now - 1).is_empty(), "Clock rollback rejected")
 	check(int(DailyActivities.stamp(progress, now + 86400).streak) == 2, "Consecutive day")
@@ -32,12 +32,12 @@ func _run() -> void:
 	for day in 5:
 		var reward := DailyActivities.stamp(weekly, monday + day * 86400)
 		if day == 4:
-			check(int(reward.coins) == 105, "Fifth weekly stamp includes chest coins")
+			check(int(reward.coins) == 75, "Fifth weekly stamp includes chest coins")
 	var missions := ConfigFile.new()
 	check(DailyActivities.record_mission(missions, "specials", 1, now) == 0, "Partial daily goal")
-	check(DailyActivities.record_mission(missions, "specials", 1, now + 1) == 20, "Daily goal payout")
+	check(DailyActivities.record_mission(missions, "specials", 1, now + 1) == 10, "Daily goal payout")
 	check(DailyActivities.record_mission(missions, "specials", 2, now + 2) == 0, "Daily goal pays only once")
-	check(DailyActivities.record_mission(missions, "specials", 2, now + 86400) == 20, "Daily goals reset tomorrow")
+	check(DailyActivities.record_mission(missions, "specials", 2, now + 86400) == 10, "Daily goals reset tomorrow")
 	progress = ConfigFile.new()
 	var attempt := DailyActivities.start_portrait(progress, now)
 	check(not attempt.is_empty(), "Portrait slot opens")
@@ -47,7 +47,7 @@ func _run() -> void:
 	attempt.pieces = [0, 1, 2, 3, 4, 5, 6, 7, 8]
 	progress.set_value("daily", "attempt", attempt)
 	var reward := DailyActivities.finish_portrait(progress, int(attempt.slot), now + 20)
-	check(int(reward.coins) == 40, "Portrait and first daily stamp combine")
+	check(int(reward.coins) == 20, "Portrait and first daily stamp combine")
 	check(DailyActivities.finish_portrait(progress, int(attempt.slot), now + 21).is_empty(), "Portrait pays only once")
 	check(not DailyActivities.available(progress, now + 60), "Completed slot remains consumed")
 	check(DailyActivities.available(progress, now + 43200), "Second daily slot available")
@@ -80,7 +80,10 @@ func _run() -> void:
 		check(not definition.is_empty(), "Level JSON parses: %s" % path)
 		check(manager._validate_level(definition), "Full schema %d" % level_id)
 		check(int(definition.level_id) == level_id, "Correct level identity")
-		check(definition.story.before_level == "" and definition.story.after_level == "", "Patrol does not replay story endings")
+		var episode := (level_id-51)/10+1
+		var step := (level_id-51)%10
+		check(definition.story.before_level == ("serial%03d_intro" % episode if step == 0 else ""), "Episode intro hook %d" % level_id)
+		check(definition.story.after_level == ("serial%03d_outro" % episode if step == 9 else ""), "Episode discovery hook %d" % level_id)
 		var generator := BoardGenerator.new()
 		generator._tile_database = database
 		generator._load_level_tile_pool(definition.tile_pool)
@@ -167,22 +170,22 @@ func _check_game_integration() -> void:
 			var other := puzzle._pieces.find(index)
 			puzzle._select(index)
 			puzzle._select(other)
-	check(game._economy_manager.get_coins() == coins + 40, "Actual portrait grants coins and daily stamp")
+	check(game._economy_manager.get_coins() == coins + 20, "Actual portrait grants coins and daily stamp")
 	check(game._economy_manager.get_lives() == lives, "Portrait does not consume campaign lives")
 	game._complete_portrait_puzzle(int(attempt.slot))
-	check(game._economy_manager.get_coins() == coins + 40, "Duplicate UI completion cannot pay twice")
+	check(game._economy_manager.get_coins() == coins + 20, "Duplicate UI completion cannot pay twice")
 	var saved := ConfigFile.new()
 	check(CampaignProgressStore.read(saved, Game.CAMPAIGN_PROGRESS_PATH) == OK, "Activity save readable")
-	check(int(saved.get_value("campaign", "coins", -1)) == coins + 40 and int(saved.get_value("daily", "streak", 0)) == 1, "Claim marker and economy persist together")
+	check(int(saved.get_value("campaign", "coins", -1)) == coins + 20 and int(saved.get_value("daily", "streak", 0)) == 1, "Claim marker and economy persist together")
 	game.get_node("Managers/LevelManager").load_level(51)
 	game._current_level_id = 51
 	game._completed_levels.erase("51")
 	game._result_stars_earned = 3
 	game._clear_bonus_coins = 0
 	check(game._record_level_completion(), "File-backed campaign first clear")
-	check(game._economy_manager.get_coins() == coins + 90, "File-backed level grants configured rewards without a second daily stamp")
+	check(game._economy_manager.get_coins() == coins + 50, "File-backed level grants configured rewards without a second daily stamp")
 	game._record_level_completion()
-	check(game._economy_manager.get_coins() == coins + 90, "Campaign replay cannot repeat first-clear rewards")
+	check(game._economy_manager.get_coins() == coins + 50, "Campaign replay cannot repeat first-clear rewards")
 	game._close_portrait_puzzle()
 	game._show_daily_rewards()
 	check(game._daily_rewards_layer != null, "Daily rewards and album opens")

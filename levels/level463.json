@@ -1,143 +1,152 @@
 {
-    "audio": {
-        "game_over": "",
-        "music": "",
-        "victory": ""
-    },
-    "background": {
-        "image": "res://assets/sprites/backgrounds/dirt_board_background.jpeg",
-        "parallax": false
-    },
-    "board": {
-        "blocked_cells": [
-            [
-                0,
-                7
-            ],
-            [
-                6,
-                7
-            ]
-        ],
-        "columns": 7,
-        "locked_cells": [],
-        "rows": 8,
-        "spawn_points": [],
-        "tile_size": 64
-    },
-    "description": "Gather recorder evidence and clear every blocker on this patrol.",
-    "difficulty": "MEDIUM",
-    "level_id": 463,
-    "metadata": {
-        "chapter_end_level": 470,
-        "chapter_id": 48,
-        "chapter_start_level": 461,
-        "chapter_title": "Factory Patrol",
-        "generator_version": 1,
-        "map_background": "factory_map_section_cutout.png",
-        "map_landmark": "police_car_topdown_cutout.png",
-        "map_props": [
-            "wooden_bridge_cutout.png",
-            "police_car_topdown_cutout.png"
-        ],
-        "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
-        "seed": 4408400
-    },
-    "moves": {
-        "total": 30
-    },
-    "name": "Evidence Patrol 463",
-    "objectives": [
-        {
-            "amount": 24,
-            "target": "RECORDER",
-            "type": "COLLECT_ITEMS"
-        }
+  "audio": {
+    "game_over": "",
+    "music": "",
+    "victory": ""
+  },
+  "background": {
+    "image": "res://assets/sprites/backgrounds/dirt_board_background.jpeg",
+    "parallax": false
+  },
+  "board": {
+    "blocked_cells": [
+      [
+        0,
+        7
+      ],
+      [
+        6,
+        7
+      ]
     ],
-    "obstacles": {
-        "items": [
-            {
-                "health": 1,
-                "type": "chain",
-                "x": 5,
-                "y": 6
-            },
-            {
-                "health": 1,
-                "type": "tape",
-                "x": 2,
-                "y": 1
-            },
-            {
-                "health": 1,
-                "type": "lock",
-                "x": 3,
-                "y": 6
-            },
-            {
-                "health": 1,
-                "type": "chain",
-                "x": 5,
-                "y": 3
-            }
-        ]
-    },
-    "powerups": {
-        "available": [
-            "ROCKET",
-            "BOMB",
-            "THUNDER"
-        ],
-        "enabled": true
-    },
-    "rewards": {
-        "coins": 50,
-        "first_try_bonus": 10,
-        "perfect_bonus": 20,
-        "powerups": [],
-        "stars": 3
-    },
-    "settings": {
-        "allow_boosters": true,
-        "allow_shuffle": true,
-        "available_boosters": [
-            "rocket",
-            "bomb",
-            "thunder",
-            "ethan"
-        ],
-        "time_limit": 0
-    },
-    "story": {
-        "after_level": "",
-        "before_level": "",
-        "first_clear": "",
-        "return_to_map": true
-    },
-    "tile_pool": {
-        "tiles": [
-            "key",
-            "phone",
-            "fingerprint",
-            "recorder",
-            "clock",
-            "ethan",
-            "detective",
-            "victor"
-        ],
-        "weights": [
-            18,
-            18,
-            17,
-            19,
-            16,
-            1,
-            1,
-            1
-        ]
-    },
-    "tutorial": {
-        "enabled": false,
-        "steps": []
+    "columns": 7,
+    "locked_cells": [],
+    "rows": 8,
+    "spawn_points": [],
+    "tile_size": 64
+  },
+  "description": "Trace the source of the duplicate archive index before trusting Victor's account.",
+  "difficulty": "MEDIUM",
+  "level_id": 463,
+  "metadata": {
+    "chapter_end_level": 470,
+    "chapter_id": 48,
+    "chapter_start_level": 461,
+    "chapter_title": "The Duplicate Index",
+    "generator_version": 2,
+    "map_background": "factory_map_section_cutout.png",
+    "map_landmark": "police_car_topdown_cutout.png",
+    "map_props": [
+      "wooden_bridge_cutout.png",
+      "police_car_topdown_cutout.png"
+    ],
+    "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
+    "seed": 4408400,
+    "season": 5,
+    "season_title": "For Her Son",
+    "episode_id": 42
+  },
+  "moves": {
+    "total": 26
+  },
+  "name": "The Duplicate Index 03",
+  "objectives": [
+    {
+      "amount": 24,
+      "target": "RECORDER",
+      "type": "COLLECT_ITEMS"
     }
+  ],
+  "obstacles": {
+    "items": [
+      {
+        "health": 1,
+        "type": "chain",
+        "x": 5,
+        "y": 6
+      },
+      {
+        "health": 1,
+        "type": "tape",
+        "x": 2,
+        "y": 1
+      },
+      {
+        "health": 1,
+        "type": "lock",
+        "x": 3,
+        "y": 6
+      },
+      {
+        "health": 1,
+        "type": "chain",
+        "x": 5,
+        "y": 3
+      }
+    ]
+  },
+  "powerups": {
+    "available": [
+      "ROCKET",
+      "BOMB",
+      "THUNDER"
+    ],
+    "enabled": true
+  },
+  "rewards": {
+    "coins": 40,
+    "first_try_bonus": 10,
+    "perfect_bonus": 20,
+    "powerups": [],
+    "stars": 3
+  },
+  "settings": {
+    "allow_boosters": true,
+    "allow_shuffle": true,
+    "available_boosters": [
+      "rocket",
+      "bomb",
+      "thunder",
+      "ethan"
+    ],
+    "time_limit": 0
+  },
+  "story": {
+    "before_level": "",
+    "after_level": "",
+    "first_clear": "",
+    "return_to_map": true,
+    "win_outcome": "You verified the lead behind the duplicate archive index. Ethan is still missing; the trail continues.",
+    "briefings": {
+      "police": "Morris coordinates the investigation into the duplicate archive index. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
+      "signal": "David checks the digital trail behind the duplicate archive index. Amara compares it with what she knows; no police team has joined this approach.",
+      "alone": "David follows the physical trail behind the duplicate archive index without police backup, keeping Amara informed rather than claiming the search as his own."
+    }
+  },
+  "tile_pool": {
+    "tiles": [
+      "key",
+      "phone",
+      "fingerprint",
+      "recorder",
+      "clock",
+      "ethan",
+      "detective",
+      "victor"
+    ],
+    "weights": [
+      18,
+      18,
+      17,
+      19,
+      16,
+      1,
+      1,
+      1
+    ]
+  },
+  "tutorial": {
+    "enabled": false,
+    "steps": []
+  }
 }

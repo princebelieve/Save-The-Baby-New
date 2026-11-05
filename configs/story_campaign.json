@@ -1,0 +1,867 @@
+{
+  "version": 1,
+  "first_level": 51,
+  "episode_length": 10,
+  "seasons": [
+    {
+      "title": "The River Between Us",
+      "background": "river_map_section.jpeg",
+      "episodes": [
+        {
+          "title": "The Lift Register",
+          "clue": "the depot lift register",
+          "setup": "The next lead is the depot lift register. We need its original source before Victor moves again.",
+          "reveal": "The lift carried a covered passenger trolley to the river exit, not the roof.",
+          "amara": "I remember that trolley from the delivery Victor insisted he arranged himself.",
+          "hook": "The lift is empty. Its wheels have left a wet track toward the quay."
+        },
+        {
+          "title": "Wet Wheels",
+          "clue": "the trolley wheel marks",
+          "setup": "The next lead is the trolley wheel marks. We need its original source before Victor moves again.",
+          "reveal": "The tracks end at a hired launch; its owner was paid to leave before our arrival.",
+          "amara": "Victor always called a hired service a favour people owed him.",
+          "hook": "The launch has gone. The hire receipt names a fuel stop upstream."
+        },
+        {
+          "title": "The Fuel Receipt",
+          "clue": "the launch fuel receipt",
+          "setup": "The next lead is the launch fuel receipt. We need its original source before Victor moves again.",
+          "reveal": "The receipt includes fuel for a second boat that never appeared on the public schedule.",
+          "amara": "He wants us admiring the first trail while he chooses another.",
+          "hook": "We reach the stop after the second boat leaves. A blue mooring cord remains."
+        },
+        {
+          "title": "Blue Cord",
+          "clue": "the cut mooring cord",
+          "setup": "The next lead is the cut mooring cord. We need its original source before Victor moves again.",
+          "reveal": "The cord matches a repair batch sold to a riverside workshop.",
+          "amara": "That workshop repaired Ethan's pushchair once. I can identify the owner, not the person in that boat.",
+          "hook": "The owner confirms a hurried repair, but points to an already deserted landing."
+        },
+        {
+          "title": "The Quiet Landing",
+          "clue": "the landing maintenance notice",
+          "setup": "The next lead is the landing maintenance notice. We need its original source before Victor moves again.",
+          "reveal": "Someone reserved the landing under a company Victor used during our relationship.",
+          "amara": "He called it his company; other people did the work and signed the bills.",
+          "hook": "A caretaker has just watched a van leave. The reservation has a forwarding number."
+        },
+        {
+          "title": "Forwarded Calls",
+          "clue": "the landing forwarding number",
+          "setup": "The next lead is the landing forwarding number. We need its original source before Victor moves again.",
+          "reveal": "The number forwards to a switchboard rather than Victor's handset.",
+          "amara": "A voice on a phone is not proof that Ethan is in the building.",
+          "hook": "The switchboard room is empty. Its call sheet records a laundry collection."
+        },
+        {
+          "title": "Folded Linen",
+          "clue": "the laundry collection tag",
+          "setup": "The next lead is the laundry collection tag. We need its original source before Victor moves again.",
+          "reveal": "The collection carried bedding to a guesthouse with a private rear stair.",
+          "amara": "I packed that patterned cover for Ethan. Keep the original tag; a photograph alone could be planted.",
+          "hook": "The room is warm but vacant. The cover is gone and a stair camera has a gap."
+        },
+        {
+          "title": "Nine Missing Minutes",
+          "clue": "the stair camera gap",
+          "setup": "The next lead is the stair camera gap. We need its original source before Victor moves again.",
+          "reveal": "A local recorder preserves the minutes missing from the shared camera feed.",
+          "amara": "David, decoding a copy does not mean you have seen the whole truth.",
+          "hook": "The recording shows a covered carrier entering a taxi. We miss it at the next stop."
+        },
+        {
+          "title": "The Taxi Queue",
+          "clue": "the taxi dispatch slip",
+          "setup": "The next lead is the taxi dispatch slip. We need its original source before Victor moves again.",
+          "reveal": "The taxi was exchanged for a car paid through an estate-services account.",
+          "amara": "That account was created to maintain our home after Ethan's father died.",
+          "hook": "The driver has gone off shift. The payment points to a familiar office."
+        },
+        {
+          "title": "An Empty Office",
+          "clue": "the estate office visitor book",
+          "setup": "The next lead is the estate office visitor book. We need its original source before Victor moves again.",
+          "reveal": "Victor used an old visitor pass to collect a sealed packet before fleeing through the back.",
+          "amara": "My child's father provided for us. Victor does not get to rewrite that as his gift.",
+          "hook": "We reach the office minutes too late. The packet's receipt leads into the accounts he wants to control."
+        }
+      ]
+    },
+    {
+      "title": "The Borrowed Fortune",
+      "background": "iron_gate_map_tile.jpeg",
+      "episodes": [
+        {
+          "title": "The Original Signature",
+          "clue": "the provision agreement signature",
+          "setup": "The next lead is the provision agreement signature. We need its original source before Victor moves again.",
+          "reveal": "An original agreement confirms the provision came from Ethan's father, not Victor.",
+          "amara": "I chose what to do with my life. Receiving support never made me Victor's property.",
+          "hook": "Victor has left the records room. A fresh access request bears his old alias."
+        },
+        {
+          "title": "The Old Alias",
+          "clue": "the account access request",
+          "setup": "The next lead is the account access request. We need its original source before Victor moves again.",
+          "reveal": "The alias requested a change of contact details immediately before the abduction.",
+          "amara": "He used to call every boundary I set an insult.",
+          "hook": "The request has been refused, but its delivery runner has already left for a notary."
+        },
+        {
+          "title": "The Notary's Copy",
+          "clue": "the notarised contact form",
+          "setup": "The next lead is the notarised contact form. We need its original source before Victor moves again.",
+          "reveal": "The notary retained a copy showing a substituted telephone number.",
+          "amara": "That is not my number. I can challenge the substitution myself.",
+          "hook": "The caller has vanished. The substituted number shares a billing address with a storage unit."
+        },
+        {
+          "title": "Paid Storage",
+          "clue": "the storage billing address",
+          "setup": "The next lead is the storage billing address. We need its original source before Victor moves again.",
+          "reveal": "The unit held household papers, but fresh tyre marks show the boxes were moved.",
+          "amara": "He wants the papers to look like ownership of me and my son.",
+          "hook": "The unit is empty. One torn inventory label names the next courier."
+        },
+        {
+          "title": "The Torn Label",
+          "clue": "the courier inventory label",
+          "setup": "The next lead is the courier inventory label. We need its original source before Victor moves again.",
+          "reveal": "A courier scanned the boxes onto a vehicle heading for a private reception hall.",
+          "amara": "Victor used that hall to tell people he made my success possible.",
+          "hook": "The vehicle has unloaded and gone. The hall's cloakroom holds its numbered token."
+        },
+        {
+          "title": "Numbered Coats",
+          "clue": "the cloakroom token",
+          "setup": "The next lead is the cloakroom token. We need its original source before Victor moves again.",
+          "reveal": "The token links the visitor to an envelope collected by a hall employee.",
+          "amara": "Please protect that employee. Victor uses people's need for work against them.",
+          "hook": "We arrive after the envelope changes hands. A wage note names the payment desk."
+        },
+        {
+          "title": "The Wage Note",
+          "clue": "the employee payment note",
+          "setup": "The next lead is the employee payment note. We need its original source before Victor moves again.",
+          "reveal": "The note proves the employee was hired for a delivery, not told about Ethan.",
+          "amara": "We need witnesses who feel safe enough to tell the truth.",
+          "hook": "The employee is safe, but the recipient has left. The envelope carried a copy-shop stamp."
+        },
+        {
+          "title": "Carbon Copies",
+          "clue": "the copy-shop stamp",
+          "setup": "The next lead is the copy-shop stamp. We need its original source before Victor moves again.",
+          "reveal": "Victor copied a financial statement and removed the page identifying the source of the funds.",
+          "amara": "Keep the missing page with the rest. He cannot have the credit by cutting out a name.",
+          "hook": "The copier log survives; Victor does not. His next print job was a hotel booking."
+        },
+        {
+          "title": "The Unused Booking",
+          "clue": "the prepaid hotel booking",
+          "setup": "The next lead is the prepaid hotel booking. We need its original source before Victor moves again.",
+          "reveal": "The booking was bait; a porter remembers a car waiting at the service door.",
+          "amara": "A room in our names does not mean either of us agreed to stay there.",
+          "hook": "We miss the service car. Its payment came from the account Victor tried to seize."
+        },
+        {
+          "title": "Control Refused",
+          "clue": "the rejected account mandate",
+          "setup": "The next lead is the rejected account mandate. We need its original source before Victor moves again.",
+          "reveal": "The mandate is blocked, preserving Amara's control of the provision, but Victor has moved again.",
+          "amara": "The money is not his. I will not sign away Ethan's future to validate his story.",
+          "hook": "A message arrives from a page David once built. Victor has found another way to boast."
+        }
+      ]
+    },
+    {
+      "title": "A Web of Mirrors",
+      "background": "factory_map_section.jpeg",
+      "episodes": [
+        {
+          "title": "David's Old Page",
+          "clue": "the cloned portfolio page",
+          "setup": "The next lead is the cloned portfolio page. We need its original source before Victor moves again.",
+          "reveal": "The threatening page is a clone of David's work, hosted somewhere else.",
+          "amara": "You did not send it. Now show me how we distinguish its source from your name on it.",
+          "hook": "The host is empty of live connections. Its invoice refers to a shared workstation."
+        },
+        {
+          "title": "The Shared Workstation",
+          "clue": "the workstation session record",
+          "setup": "The next lead is the workstation session record. We need its original source before Victor moves again.",
+          "reveal": "A session token was reused after its owner logged out.",
+          "amara": "People can be used without knowing it. Do not accuse the owner just to move faster.",
+          "hook": "We reach the workstation after the visitor leaves. A printer spool retains a route slip."
+        },
+        {
+          "title": "The Route Slip",
+          "clue": "the printer spool entry",
+          "setup": "The next lead is the printer spool entry. We need its original source before Victor moves again.",
+          "reveal": "The slip gives a meeting place, but its creation time predates Victor's message.",
+          "amara": "He is making yesterday look like now. We cannot let urgency choose for us.",
+          "hook": "The meeting place is deserted. A newer correction sits in the print queue."
+        },
+        {
+          "title": "The Correction",
+          "clue": "the revised route file",
+          "setup": "The next lead is the revised route file. We need its original source before Victor moves again.",
+          "reveal": "The correction was uploaded through a compromised maintenance account.",
+          "amara": "Whoever maintains the building may know which door that account opens.",
+          "hook": "The maintainer has changed the password. The old login points to an industrial block."
+        },
+        {
+          "title": "The Wrong Door",
+          "clue": "the maintenance door log",
+          "setup": "The next lead is the maintenance door log. We need its original source before Victor moves again.",
+          "reveal": "David's first decoding follows a decoy door; the genuine log lists a different entrance.",
+          "amara": "Being wrong is not the end, David. Pretending you cannot be wrong would help Victor.",
+          "hook": "The genuine entrance is open, but the passenger lift has already descended."
+        },
+        {
+          "title": "Below the Signal",
+          "clue": "the basement repeater label",
+          "setup": "The next lead is the basement repeater label. We need its original source before Victor moves again.",
+          "reveal": "A repeater made Victor's phone appear upstairs while he used a basement exit.",
+          "amara": "You can decode a signal without knowing where my son is. Keep checking both.",
+          "hook": "The basement exit is vacant. Its repeater was rented under a delivery contract."
+        },
+        {
+          "title": "The Rental Contract",
+          "clue": "the repeater rental contract",
+          "setup": "The next lead is the repeater rental contract. We need its original source before Victor moves again.",
+          "reveal": "The rental company recorded a return to a parcel locker.",
+          "amara": "Victor expects us to chase his equipment while he travels light.",
+          "hook": "The locker is empty. Its access receipt identifies a second compartment."
+        },
+        {
+          "title": "The Second Compartment",
+          "clue": "the locker access receipt",
+          "setup": "The next lead is the locker access receipt. We need its original source before Victor moves again.",
+          "reveal": "The second compartment contains a memory card with a recent recording, but no reliable location.",
+          "amara": "I recognise Ethan's little blanket. I will not mistake that for knowing he is safe.",
+          "hook": "We have a trace of him, not him. The card's packaging names a recording studio."
+        },
+        {
+          "title": "Recorded Applause",
+          "clue": "the studio booking sheet",
+          "setup": "The next lead is the studio booking sheet. We need its original source before Victor moves again.",
+          "reveal": "Victor recorded a speech claiming he alone could protect Amara.",
+          "amara": "He wants an audience for a role nobody gave him.",
+          "hook": "The studio has just closed. A hired car appears on its exit camera."
+        },
+        {
+          "title": "An Unbroken Original",
+          "clue": "the original studio recording",
+          "setup": "The next lead is the original studio recording. We need its original source before Victor moves again.",
+          "reveal": "The unedited recording exposes Victor's false account and includes an audible station announcement.",
+          "amara": "Keep the whole recording. My history is not his speech to edit.",
+          "hook": "The car leaves the station before we arrive. The announcement points toward an old part of my life."
+        }
+      ]
+    },
+    {
+      "title": "What He Calls Love",
+      "background": "garden_map_tile.jpeg",
+      "episodes": [
+        {
+          "title": "The Old Station",
+          "clue": "the station parcel register",
+          "setup": "The next lead is the station parcel register. We need its original source before Victor moves again.",
+          "reveal": "A parcel was collected using a nickname Victor used during the relationship.",
+          "amara": "I know that nickname. Knowing him once does not make me responsible for what he does now.",
+          "hook": "The collector has left. A forwarding card names a former neighbour."
+        },
+        {
+          "title": "A Neighbour's Door",
+          "clue": "the neighbour's forwarding card",
+          "setup": "The next lead is the neighbour's forwarding card. We need its original source before Victor moves again.",
+          "reveal": "The neighbour refused to hide Victor and kept the address he tried to use.",
+          "amara": "She helped me when we separated. Victor told everyone it was his kindness.",
+          "hook": "The neighbour is safe. Victor left before we came, dropping a reunion invitation."
+        },
+        {
+          "title": "The Reunion Invitation",
+          "clue": "the reunion invitation",
+          "setup": "The next lead is the reunion invitation. We need its original source before Victor moves again.",
+          "reveal": "Victor arranged a reunion under Amara's name without her permission.",
+          "amara": "I never agreed to see him. The invitation is another claim over my choices.",
+          "hook": "The hired room is empty. A caterer has a new delivery address."
+        },
+        {
+          "title": "An Unset Table",
+          "clue": "the catering delivery note",
+          "setup": "The next lead is the catering delivery note. We need its original source before Victor moves again.",
+          "reveal": "The food was diverted to a caretaker's flat that Victor borrowed.",
+          "amara": "He likes a borrowed room to look like a home he built.",
+          "hook": "The flat has just been cleared. A caretaker kept a duplicate key receipt."
+        },
+        {
+          "title": "The Duplicate Key",
+          "clue": "the duplicate key receipt",
+          "setup": "The next lead is the duplicate key receipt. We need its original source before Victor moves again.",
+          "reveal": "The key opened a side gate at the place Amara once shared with Victor.",
+          "amara": "Leaving that relationship was my decision. He cannot turn a key into consent.",
+          "hook": "The gate swings open on an empty yard. A removed notice leaves a fresh outline."
+        },
+        {
+          "title": "The Missing Notice",
+          "clue": "the yard notice photograph",
+          "setup": "The next lead is the yard notice photograph. We need its original source before Victor moves again.",
+          "reveal": "A neighbour photographed the notice before Victor tore it down: a vehicle collection slot.",
+          "amara": "Someone noticed what he thought nobody would remember.",
+          "hook": "We miss the collection by minutes. The vehicle depot records the receiving signature."
+        },
+        {
+          "title": "Someone Else's Name",
+          "clue": "the depot receiving signature",
+          "setup": "The next lead is the depot receiving signature. We need its original source before Victor moves again.",
+          "reveal": "Victor signed with the name of a former colleague whose work he used to claim.",
+          "amara": "Ask the colleague what they made, not what Victor said he made.",
+          "hook": "The colleague identifies the forgery. Victor's hired van has already left the depot."
+        },
+        {
+          "title": "Credit Taken",
+          "clue": "the colleague's original project file",
+          "setup": "The next lead is the colleague's original project file. We need its original source before Victor moves again.",
+          "reveal": "The file disproves one of Victor's favourite success stories and contains his old delivery contact.",
+          "amara": "He did that to me too: made my effort sound like proof of his greatness.",
+          "hook": "The contact has missed him. A fresh voice message mentions a shuttered shop."
+        },
+        {
+          "title": "Behind the Shutters",
+          "clue": "the shop utility reading",
+          "setup": "The next lead is the shop utility reading. We need its original source before Victor moves again.",
+          "reveal": "The shop was occupied recently, although Victor told the owner it stood empty.",
+          "amara": "I can recognise the bag in the owner's photograph. I cannot tell who carried it.",
+          "hook": "The shutters rise on nobody. A utility top-up points to another property agent."
+        },
+        {
+          "title": "The Story She Keeps",
+          "clue": "the property agent message",
+          "setup": "The next lead is the property agent message. We need its original source before Victor moves again.",
+          "reveal": "The agent retained Victor's instruction to describe Amara as returning voluntarily.",
+          "amara": "I did not return. I am looking for my child, and I will say it in my own words.",
+          "hook": "The agent stops helping him, but he slips away. His next demand concerns Ethan's father's provision."
+        }
+      ]
+    },
+    {
+      "title": "For Her Son",
+      "background": "level_map_landscape.jpeg",
+      "episodes": [
+        {
+          "title": "The Provision File",
+          "clue": "the original provision file",
+          "setup": "The next lead is the original provision file. We need its original source before Victor moves again.",
+          "reveal": "The file records that Ethan's father provided for Amara and Ethan after her separation from Victor.",
+          "amara": "His father is dead. His name and the circumstances are not for Victor to invent for leverage.",
+          "hook": "Victor has left the archive, taking a duplicate index card rather than the original file."
+        },
+        {
+          "title": "The Duplicate Index",
+          "clue": "the duplicate archive index",
+          "setup": "The next lead is the duplicate archive index. We need its original source before Victor moves again.",
+          "reveal": "The index points to a family-services office, not to cash Victor can claim.",
+          "amara": "Money set aside for Ethan is not a reward for the man who threatens him.",
+          "hook": "The office closes just before we arrive. A late visitor left a collection authorisation."
+        },
+        {
+          "title": "Permission Denied",
+          "clue": "the collection authorisation",
+          "setup": "The next lead is the collection authorisation. We need its original source before Victor moves again.",
+          "reveal": "The authorisation used a copied signature; Amara can revoke it directly.",
+          "amara": "That signature is mine from another document. This permission was never mine.",
+          "hook": "The forgery is stopped, but its messenger has already gone to a private mailbox."
+        },
+        {
+          "title": "The Private Mailbox",
+          "clue": "the mailbox rental form",
+          "setup": "The next lead is the mailbox rental form. We need its original source before Victor moves again.",
+          "reveal": "The rental was paid by an intermediary who thought they were handling household correspondence.",
+          "amara": "Tell them what happened. Let them choose whether to help us rather than order them about.",
+          "hook": "The intermediary cooperates. The box is empty except for a dispatch wrapper."
+        },
+        {
+          "title": "Wrapped in Paper",
+          "clue": "the dispatch wrapper",
+          "setup": "The next lead is the dispatch wrapper. We need its original source before Victor moves again.",
+          "reveal": "The wrapper carried a keepsake inventory photographed before removal.",
+          "amara": "I remember choosing those things for Ethan. Victor was not there.",
+          "hook": "The carrier has moved them on. A photograph reveals a reflection of a ferry sign."
+        },
+        {
+          "title": "The Reflected Sign",
+          "clue": "the reflected ferry sign",
+          "setup": "The next lead is the reflected ferry sign. We need its original source before Victor moves again.",
+          "reveal": "The sign identifies a waiting shelter, but the photographed sailing has already departed.",
+          "amara": "I want to run toward it too. Check the date before we lose another hour.",
+          "hook": "We miss that crossing. Its passenger clerk remembers a private road transfer instead."
+        },
+        {
+          "title": "No Public Ticket",
+          "clue": "the road transfer docket",
+          "setup": "The next lead is the road transfer docket. We need its original source before Victor moves again.",
+          "reveal": "The transfer bypassed the public passenger list using a contractor's vehicle.",
+          "amara": "Not appearing on a list does not mean my child was never there.",
+          "hook": "The contractor's yard is empty. A dashboard service tag gives the next workshop."
+        },
+        {
+          "title": "The Dashboard Tag",
+          "clue": "the vehicle service tag",
+          "setup": "The next lead is the vehicle service tag. We need its original source before Victor moves again.",
+          "reveal": "The workshop replaced a damaged mirror after a hurried departure.",
+          "amara": "Keep the broken mirror. Something discarded can still tell us where he went.",
+          "hook": "We arrive after pickup. A witness saw the vehicle turn toward an estate storehouse."
+        },
+        {
+          "title": "The Storehouse Lock",
+          "clue": "the storehouse access list",
+          "setup": "The next lead is the storehouse access list. We need its original source before Victor moves again.",
+          "reveal": "The lock was opened using an expired estate pass that should have been cancelled.",
+          "amara": "I will cancel every old permission I can. Victor does not inherit access to us.",
+          "hook": "The pass is revoked. The room is empty, with an event badge left on a shelf."
+        },
+        {
+          "title": "What Cannot Be Signed Away",
+          "clue": "the revoked access record",
+          "setup": "The next lead is the revoked access record. We need its original source before Victor moves again.",
+          "reveal": "The estate confirms Amara's authority and closes Victor's old access routes.",
+          "amara": "I have protected part of Ethan's future. I still need him here to live it.",
+          "hook": "Victor escapes another doorway. The badge belongs to an event where he plans to call himself our saviour."
+        }
+      ]
+    },
+    {
+      "title": "An Audience for Victor",
+      "background": "factory_cage_art.jpeg",
+      "episodes": [
+        {
+          "title": "The Saviour's Badge",
+          "clue": "the event staff badge",
+          "setup": "The next lead is the event staff badge. We need its original source before Victor moves again.",
+          "reveal": "The badge grants service access to a hall where Victor booked a private speech.",
+          "amara": "He wants people watching him help, even while he is the reason we need help.",
+          "hook": "The dressing room is empty. A cue sheet shows an unscheduled video call."
+        },
+        {
+          "title": "The Cue Sheet",
+          "clue": "the altered stage cue sheet",
+          "setup": "The next lead is the altered stage cue sheet. We need its original source before Victor moves again.",
+          "reveal": "The call was pre-recorded and played as if live.",
+          "amara": "A recording of Ethan is not Ethan within reach. I will keep asking when it was made.",
+          "hook": "The playback room has been cleared. Its operator saved the delivery filename."
+        },
+        {
+          "title": "Before the Applause",
+          "clue": "the delivered video filename",
+          "setup": "The next lead is the delivered video filename. We need its original source before Victor moves again.",
+          "reveal": "The filename links the recording to a hired edit suite across town.",
+          "amara": "Do not let him cut my voice out of my own story again.",
+          "hook": "The editor has just handed back the drive. A taxi receipt remains on the desk."
+        },
+        {
+          "title": "The Editor's Receipt",
+          "clue": "the edit-suite taxi receipt",
+          "setup": "The next lead is the edit-suite taxi receipt. We need its original source before Victor moves again.",
+          "reveal": "The taxi carried the drive to a promotional office, not to Victor's location.",
+          "amara": "He sends his image one way and takes my child another.",
+          "hook": "The office is deserted. A staff rota identifies who accepted the drive."
+        },
+        {
+          "title": "The Unwilling Witness",
+          "clue": "the office staff rota",
+          "setup": "The next lead is the office staff rota. We need its original source before Victor moves again.",
+          "reveal": "A worker explains the collection route and asks to keep their home address private.",
+          "amara": "We can protect a witness without making them disappear from the truth.",
+          "hook": "The worker is safe. The collector has left for a pop-up interview room."
+        },
+        {
+          "title": "The Empty Interview",
+          "clue": "the interview room reservation",
+          "setup": "The next lead is the interview room reservation. We need its original source before Victor moves again.",
+          "reveal": "The interview was cancelled after Victor learned someone kept an unedited copy.",
+          "amara": "He can lose an audience. Ethan cannot lose another chance because we chase applause.",
+          "hook": "We arrive after the cancellation. The room hire was refunded to a travel agency."
+        },
+        {
+          "title": "The Refund Trail",
+          "clue": "the room hire refund",
+          "setup": "The next lead is the room hire refund. We need its original source before Victor moves again.",
+          "reveal": "The agency redirected the refund into a private minibus booking.",
+          "amara": "That was provision for a journey, not proof that everyone on it knew what he was doing.",
+          "hook": "The bus has departed. The dispatcher retains an amended stop list."
+        },
+        {
+          "title": "The Removed Stop",
+          "clue": "the amended minibus stop list",
+          "setup": "The next lead is the amended minibus stop list. We need its original source before Victor moves again.",
+          "reveal": "A public stop was replaced with a loading bay behind the hall.",
+          "amara": "Victor thinks a hidden entrance makes him cleverer than the people he uses.",
+          "hook": "The loading bay is empty. A steward remembers a missing equipment crate."
+        },
+        {
+          "title": "The Equipment Crate",
+          "clue": "the crate delivery record",
+          "setup": "The next lead is the crate delivery record. We need its original source before Victor moves again.",
+          "reveal": "The crate was cover for moving belongings into a courier van.",
+          "amara": "Keep checking for Ethan himself. His things matter because they can lead us to him.",
+          "hook": "The van slips out before we arrive. Its dispatch record names a night market."
+        },
+        {
+          "title": "No Standing Ovation",
+          "clue": "the unedited event feed",
+          "setup": "The next lead is the unedited event feed. We need its original source before Victor moves again.",
+          "reveal": "The preserved feed contradicts Victor's public story; his planned applause dies away.",
+          "amara": "Let people hear what I actually said. I am not his grateful ending.",
+          "hook": "Victor abandons the hall before capture. At the night market someone has seen the courier's crate."
+        }
+      ]
+    },
+    {
+      "title": "The Night Routes",
+      "background": "riverbank_map_section.jpeg",
+      "episodes": [
+        {
+          "title": "After Closing",
+          "clue": "the market courier token",
+          "setup": "The next lead is the market courier token. We need its original source before Victor moves again.",
+          "reveal": "A night porter saw the crate handed to a different driver.",
+          "amara": "Ask what the porter saw, not whether the porter agrees with our theory.",
+          "hook": "The new driver is gone. A numbered token identifies a food stall collection point."
+        },
+        {
+          "title": "The Last Stall",
+          "clue": "the stall collection token",
+          "setup": "The next lead is the stall collection token. We need its original source before Victor moves again.",
+          "reveal": "The stall owner kept a payment envelope with a warehouse mark.",
+          "amara": "Victor once took credit for helping this owner. They remember who really paid.",
+          "hook": "The envelope's collector has just left. The mark leads to a cold-storage lane."
+        },
+        {
+          "title": "The Cold Lane",
+          "clue": "the warehouse shift board",
+          "setup": "The next lead is the warehouse shift board. We need its original source before Victor moves again.",
+          "reveal": "The night shift let a van through under a food delivery booking.",
+          "amara": "A routine can hide someone for a moment. It cannot erase every person who saw it.",
+          "hook": "The van leaves through a second gate. A broken seal gives us its freight number."
+        },
+        {
+          "title": "A Broken Seal",
+          "clue": "the discarded freight seal",
+          "setup": "The next lead is the discarded freight seal. We need its original source before Victor moves again.",
+          "reveal": "The seal matches a container opened at a roadside repair shelter.",
+          "amara": "I recognise Ethan's cover in the shelter photograph. Please verify who took it and when.",
+          "hook": "The shelter is empty. A mechanic recorded a replaced battery serial number."
+        },
+        {
+          "title": "The Battery Number",
+          "clue": "the replacement battery receipt",
+          "setup": "The next lead is the replacement battery receipt. We need its original source before Victor moves again.",
+          "reveal": "The receipt identifies a hired vehicle returned to a late-night depot.",
+          "amara": "Returning the vehicle is another way to shed a name, not to become innocent.",
+          "hook": "We miss the return driver. The depot camera shows a ride-share collection."
+        },
+        {
+          "title": "The Collected Passenger",
+          "clue": "the ride-share pickup record",
+          "setup": "The next lead is the ride-share pickup record. We need its original source before Victor moves again.",
+          "reveal": "A passenger transferred to a small guest court rather than the booked destination.",
+          "amara": "Follow what happened, David. Your first prediction does not have to be the answer.",
+          "hook": "The court room is empty. Fresh bedding tags point to a mobile laundry."
+        },
+        {
+          "title": "The Moving Laundry",
+          "clue": "the mobile laundry route",
+          "setup": "The next lead is the mobile laundry route. We need its original source before Victor moves again.",
+          "reveal": "The laundry driver delivered to a safehouse without knowing who occupied it.",
+          "amara": "Tell the driver the truth. Another frightened person is not another Victor.",
+          "hook": "The driver guides us there, but the house has just been cleared. A cupboard holds a keycard sleeve."
+        },
+        {
+          "title": "The Sleeve",
+          "clue": "the discarded keycard sleeve",
+          "setup": "The next lead is the discarded keycard sleeve. We need its original source before Victor moves again.",
+          "reveal": "The sleeve belongs to a clinic annex rented for private accommodation.",
+          "amara": "A place that looks respectable can still have a door nobody checked.",
+          "hook": "The annex has no occupants left. A staff member remembers a courier collecting documents."
+        },
+        {
+          "title": "The Document Bag",
+          "clue": "the courier bag scan",
+          "setup": "The next lead is the courier bag scan. We need its original source before Victor moves again.",
+          "reveal": "The scan identifies a documents service used to create new travel permissions.",
+          "amara": "He cannot make permission real by printing my name on it.",
+          "hook": "The bag has moved on. The service keeps a copy of the requestor's identity document."
+        },
+        {
+          "title": "Dawn Without Him",
+          "clue": "the identity service request",
+          "setup": "The next lead is the identity service request. We need its original source before Victor moves again.",
+          "reveal": "The request exposes a false identity, closing one route out of the district.",
+          "amara": "The people who helped us are safe. We have stopped one route, not found my son.",
+          "hook": "Dawn reaches an empty departure room. Victor has another name waiting in the records."
+        }
+      ]
+    },
+    {
+      "title": "Names That Do Not Belong",
+      "background": "iron_gate_map_tile.jpeg",
+      "episodes": [
+        {
+          "title": "A Borrowed Identity",
+          "clue": "the false identity copy",
+          "setup": "The next lead is the false identity copy. We need its original source before Victor moves again.",
+          "reveal": "The copy combines details from two people who never authorised its use.",
+          "amara": "Those people deserve their names back too.",
+          "hook": "The document office is empty. A courier receipt points to a registrar's assistant."
+        },
+        {
+          "title": "The Assistant's Ledger",
+          "clue": "the assistant payment ledger",
+          "setup": "The next lead is the assistant payment ledger. We need its original source before Victor moves again.",
+          "reveal": "The assistant logged a suspicious delivery and refused to certify it.",
+          "amara": "Refusing him mattered. Let the assistant know the record helps us.",
+          "hook": "The delivery runner has fled. A watermark identifies the paper supplier."
+        },
+        {
+          "title": "Watermarked Lies",
+          "clue": "the paper supplier invoice",
+          "setup": "The next lead is the paper supplier invoice. We need its original source before Victor moves again.",
+          "reveal": "Victor bought official-looking stationery from a legitimate supplier using a false purpose.",
+          "amara": "The paper is real. The consent he prints on it is not.",
+          "hook": "The order has been collected. Its pickup code also opened a hired cabinet."
+        },
+        {
+          "title": "The Hired Cabinet",
+          "clue": "the cabinet access code",
+          "setup": "The next lead is the cabinet access code. We need its original source before Victor moves again.",
+          "reveal": "The cabinet held forged letters for a property manager.",
+          "amara": "I will speak to the manager myself. Nobody needs to interpret my permission for me.",
+          "hook": "The manager refuses the letters, but Victor has already used a different entrance."
+        },
+        {
+          "title": "The Service Entrance",
+          "clue": "the property service log",
+          "setup": "The next lead is the property service log. We need its original source before Victor moves again.",
+          "reveal": "The service log records access under an emergency maintenance pretext.",
+          "amara": "He turns other people's helpfulness into a story about his own importance.",
+          "hook": "The maintenance room is vacant. A tool case carries a vehicle hire sticker."
+        },
+        {
+          "title": "The Sticker",
+          "clue": "the vehicle hire sticker",
+          "setup": "The next lead is the vehicle hire sticker. We need its original source before Victor moves again.",
+          "reveal": "The hire company finds a changed return address on the contract.",
+          "amara": "Keep both versions. He relies on the changed page becoming the only page.",
+          "hook": "The vehicle is gone from the new address. Its original return yard has a witness."
+        },
+        {
+          "title": "The First Address",
+          "clue": "the original hire contract",
+          "setup": "The next lead is the original hire contract. We need its original source before Victor moves again.",
+          "reveal": "The witness saw a handover between vehicles and recorded the second registration.",
+          "amara": "Someone stopping to remember one detail can keep this search alive.",
+          "hook": "We reach the second vehicle after it is abandoned. Its glovebox contains a gate receipt."
+        },
+        {
+          "title": "The Gate Receipt",
+          "clue": "the private gate receipt",
+          "setup": "The next lead is the private gate receipt. We need its original source before Victor moves again.",
+          "reveal": "The receipt names an overnight lodging block booked with forged authority.",
+          "amara": "That is my signature copied again. I will challenge it wherever he uses it.",
+          "hook": "The booking is cancelled. The room has just emptied through a connecting passage."
+        },
+        {
+          "title": "Connecting Rooms",
+          "clue": "the lodging floor plan",
+          "setup": "The next lead is the lodging floor plan. We need its original source before Victor moves again.",
+          "reveal": "The connecting passage leads to a courtyard invisible from the reception desk.",
+          "amara": "David, a map is useful only if we notice the door somebody actually used.",
+          "hook": "The courtyard gate closes after the getaway car. A passenger dropped a printed speech."
+        },
+        {
+          "title": "The Name He Wants",
+          "clue": "the discarded victory speech",
+          "setup": "The next lead is the discarded victory speech. We need its original source before Victor moves again.",
+          "reveal": "Victor's speech demands praise and control; it contains the address of his next intended audience.",
+          "amara": "He can keep saying he made me. The records and my voice say otherwise.",
+          "hook": "We reach another empty platform. His next audience may be the people still financing his escapes."
+        }
+      ]
+    },
+    {
+      "title": "The Price of Glory",
+      "background": "factory_map_section.jpeg",
+      "episodes": [
+        {
+          "title": "The Patron List",
+          "clue": "the speech sponsor list",
+          "setup": "The next lead is the speech sponsor list. We need its original source before Victor moves again.",
+          "reveal": "Several sponsors paid for transport believing Victor was organising a family reunion.",
+          "amara": "Tell them there is no reunion I agreed to. Let them see the original messages.",
+          "hook": "The organiser has left the meeting room. A sponsor retains the transport invoice."
+        },
+        {
+          "title": "An Unpaid Invoice",
+          "clue": "the transport invoice",
+          "setup": "The next lead is the transport invoice. We need its original source before Victor moves again.",
+          "reveal": "The driver refuses further work after learning what the journey concealed.",
+          "amara": "We do not need another person trapped by what they were told.",
+          "hook": "The last paid journey is over. Its fuel card records a roadside stop."
+        },
+        {
+          "title": "The Fuel Card",
+          "clue": "the roadside fuel transaction",
+          "setup": "The next lead is the roadside fuel transaction. We need its original source before Victor moves again.",
+          "reveal": "The transaction belongs to a car travelling toward a private social club.",
+          "amara": "Victor used to tell that club every good thing in my life was his doing.",
+          "hook": "The car leaves before we arrive. A member kept the visitor invitation."
+        },
+        {
+          "title": "The Visitor Invitation",
+          "clue": "the club visitor invitation",
+          "setup": "The next lead is the club visitor invitation. We need its original source before Victor moves again.",
+          "reveal": "The invitation promises a reconciliation Amara never accepted.",
+          "amara": "I will say no in my own voice. It is not an opening for negotiation.",
+          "hook": "The club cancels access. Victor has already collected a package from its cloakroom."
+        },
+        {
+          "title": "The Cloakroom Parcel",
+          "clue": "the parcel collection signature",
+          "setup": "The next lead is the parcel collection signature. We need its original source before Victor moves again.",
+          "reveal": "The parcel contains printed demands, sent onward to a message courier.",
+          "amara": "My money or Ethan is his threat, not a debt I owe.",
+          "hook": "The courier has delivered the demands. The return envelope points to a small business centre."
+        },
+        {
+          "title": "The Message Desk",
+          "clue": "the business centre dispatch log",
+          "setup": "The next lead is the business centre dispatch log. We need its original source before Victor moves again.",
+          "reveal": "The centre recorded the sender's visit and a subsequent call for a car.",
+          "amara": "Keep the threat intact. Do not let his wording become our account of what is true.",
+          "hook": "The desk is deserted. A concierge remembers the car's unusual roof rack."
+        },
+        {
+          "title": "The Roof Rack",
+          "clue": "the concierge vehicle photograph",
+          "setup": "The next lead is the concierge vehicle photograph. We need its original source before Victor moves again.",
+          "reveal": "The photograph identifies a rented estate car carrying a folded cot.",
+          "amara": "I recognise the cot. We are closer to something he touched, not entitled to assume the rest.",
+          "hook": "We reach the rental yard after the cot has been moved into a delivery truck."
+        },
+        {
+          "title": "The Transfer Truck",
+          "clue": "the delivery truck route sheet",
+          "setup": "The next lead is the delivery truck route sheet. We need its original source before Victor moves again.",
+          "reveal": "The route was shortened to include an unscheduled service tunnel.",
+          "amara": "He keeps changing plans because people stop accepting his version.",
+          "hook": "The truck exits before we reach the tunnel. Its access pass records the next compound."
+        },
+        {
+          "title": "The Last Sponsor",
+          "clue": "the compound access sponsorship",
+          "setup": "The next lead is the compound access sponsorship. We need its original source before Victor moves again.",
+          "reveal": "The remaining sponsor revokes Victor's pass after Amara shows the unedited evidence.",
+          "amara": "They can withdraw their help. They cannot hand me back the hours Ethan has lost.",
+          "hook": "The compound is emptied before the revocation reaches the gate. A caretaker finds a service-route diagram."
+        },
+        {
+          "title": "Credit Withdrawn",
+          "clue": "the sponsors' original correspondence",
+          "setup": "The next lead is the sponsors' original correspondence. We need its original source before Victor moves again.",
+          "reveal": "The correspondence preserves how Victor misled his helpers and cuts off this funding network.",
+          "amara": "He is losing the audience he demanded. I am still a mother waiting for my child.",
+          "hook": "The caretaker opens a door onto an empty room. The diagram points to a smaller, older network of exits."
+        }
+      ]
+    },
+    {
+      "title": "One Door Away",
+      "background": "river_waterfall_map_tile.jpeg",
+      "episodes": [
+        {
+          "title": "The Service Diagram",
+          "clue": "the compound service diagram",
+          "setup": "The next lead is the compound service diagram. We need its original source before Victor moves again.",
+          "reveal": "The diagram links the compound to a shuttered pumping station.",
+          "amara": "We follow the exit people can use, not the grand entrance Victor wants us watching.",
+          "hook": "The station is empty. Recent footprints lead to a maintenance lift."
+        },
+        {
+          "title": "The Maintenance Lift",
+          "clue": "the lift inspection strip",
+          "setup": "The next lead is the lift inspection strip. We need its original source before Victor moves again.",
+          "reveal": "The strip records an unscheduled descent shortly before our arrival.",
+          "amara": "A few minutes are still enough for him to move. Check where the lift actually stops.",
+          "hook": "The lift returns without passengers. Its lower gate has a fresh delivery chalk mark."
+        },
+        {
+          "title": "The Chalk Mark",
+          "clue": "the lower gate chalk mark",
+          "setup": "The next lead is the lower gate chalk mark. We need its original source before Victor moves again.",
+          "reveal": "The mark belongs to a supplies route that crosses the river under a bridge.",
+          "amara": "I know the blanket in that witness's description. Ask when they last saw it.",
+          "hook": "The bridge shelter has just been cleared. A portable radio still carries a local channel setting."
+        },
+        {
+          "title": "The Local Channel",
+          "clue": "the portable radio setting",
+          "setup": "The next lead is the portable radio setting. We need its original source before Victor moves again.",
+          "reveal": "The channel relays a message from a yard farther downriver.",
+          "amara": "A voice can be relayed. We must follow the person, not only the sound.",
+          "hook": "The yard is empty by the time we arrive. A new recording includes Ethan calling for Mum."
+        },
+        {
+          "title": "The Voice She Knows",
+          "clue": "the original yard recording",
+          "setup": "The next lead is the original yard recording. We need its original source before Victor moves again.",
+          "reveal": "Amara recognises Ethan's voice; an independent time marker places the recording recently.",
+          "amara": "That is my son. Keep me with the evidence, David; do not turn hope into a certainty we have not earned.",
+          "hook": "The recording gives us a direction, not a rescue. A gate bell in the background identifies another landing."
+        },
+        {
+          "title": "The Gate Bell",
+          "clue": "the landing bell recording",
+          "setup": "The next lead is the landing bell recording. We need its original source before Victor moves again.",
+          "reveal": "The bell matches a sheltered landing used by a private river shuttle.",
+          "amara": "Tell me what you can verify. I need hope that can survive the next door opening.",
+          "hook": "The shuttle leaves just before we reach it. Its return schedule names a service pier."
+        },
+        {
+          "title": "The Return Schedule",
+          "clue": "the shuttle return schedule",
+          "setup": "The next lead is the shuttle return schedule. We need its original source before Victor moves again.",
+          "reveal": "The service pier has a road exit absent from the passenger map.",
+          "amara": "He counts on us arriving where the ticket says, instead of where he goes.",
+          "hook": "The pier is vacant. A road barrier keeps a photograph of the departing vehicle."
+        },
+        {
+          "title": "Beyond the Barrier",
+          "clue": "the barrier camera original",
+          "setup": "The next lead is the barrier camera original. We need its original source before Victor moves again.",
+          "reveal": "The photograph shows a vehicle heading toward an old distribution court.",
+          "amara": "Keep the original. Even now he will try to say the whole search was his design.",
+          "hook": "The court gate opens on a recently vacated room. A phone begins ringing on the table."
+        },
+        {
+          "title": "The Ringing Phone",
+          "clue": "the abandoned phone call record",
+          "setup": "The next lead is the abandoned phone call record. We need its original source before Victor moves again.",
+          "reveal": "Victor calls the abandoned handset to boast while a background signal identifies a transfer point.",
+          "amara": "You have not won, Victor. I am still here, and Ethan is still my son.",
+          "hook": "The transfer point is empty when we arrive. One overlooked dispatch label survives the cleared floor."
+        },
+        {
+          "title": "Another Door Opens",
+          "clue": "the overlooked dispatch label",
+          "setup": "The next lead is the overlooked dispatch label. We need its original source before Victor moves again.",
+          "reveal": "The label links the getaway to a previously unknown relay address; the trail has not ended.",
+          "amara": "We missed him here. We keep the evidence, protect the people who helped, and go after the next lead.",
+          "hook": "There is no rescue behind this door. A fresh address waits in the case file, and Ethan is still out there."
+        }
+      ]
+    }
+  ]
+}

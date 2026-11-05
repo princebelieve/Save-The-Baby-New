@@ -24,9 +24,9 @@
         ],
         "signal": [
           {
-            "speaker": "Amara",
-            "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-            "text": "Amara removes the noise and hears a train crossing bell beneath Ethan's signal."
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+            "text": "David removes noise from a copy of the recording. Amara identifies the train crossing bell beneath Ethan's signal."
           }
         ],
         "alone": [
@@ -64,10 +64,10 @@
         },
         {
           "id": "signal",
-          "label": "Clean the audio with Amara's equipment",
-          "impact": "Amara can clean the audio here, but Victor may notice the old phone reconnecting.",
-          "response": "Amara: I will filter the recording and listen for the sound beneath Ethan's signal.",
-          "speaker": "Amara"
+          "label": "Decode the next lead with Amara",
+          "impact": "David checks the technical evidence. Amara connects it to the people and history behind the records, without police assistance.",
+          "response": "David preserves the original record and tests the next connection while Amara checks its meaning against what she remembers.",
+          "speaker": "David"
         },
         {
           "id": "alone",
@@ -80,7 +80,7 @@
     }
   ],
   "metadata": {
-    "version": 1,
+    "version": 2,
     "chapter": 5,
     "season": 1,
     "campaign_levels": "021-025",

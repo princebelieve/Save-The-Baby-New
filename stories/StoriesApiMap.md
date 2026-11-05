@@ -3,6 +3,10 @@ Story JSON API Map (Version 1.0 Freeze)
 
 These files contain all story content. The story engine reads them, but never hardcodes dialogue.
 
+Campaign extension: `serial001_intro.json` through `serial100_outro.json` are physical episode resources for levels 51–1050. The authored outline is `configs/story_campaign.json`; canon is `configs/story_canon.json`. See `docs/design/Continuing_Story.md` for the no-rescue rule and authoring workflow. Legacy `season01.json`–`season10.json` remain prologue reveal identifiers for levels 1–50.
+
+Scenes may contain `route_dialogues` keyed by `police`, `signal`, and `alone`. A dialogue may additionally declare `routes: ["police"]`. StoryManager filters these on a copied resource, so repeated loads cannot accumulate branch dialogue. Morris dialogue is restricted to the police approach. Choice IDs set the next approach; they do not permanently lock a playthrough.
+
 Each story file follows the same structure so StoryManager, DialoguePlayer, PortraitManager, and ChoiceManager can load any story without special handling.
 
 Folder

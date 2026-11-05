@@ -388,7 +388,7 @@ func _cell_center(grid_position: Vector2i) -> Vector2:
 	return Vector2((grid_position.x + 0.5) * _tile_size, (grid_position.y + 0.5) * _tile_size)
 
 
-func notify_match_tiles(tiles: Array) -> void:
+func notify_match_tiles(tiles: Array, inventory_hit: bool = false) -> void:
 	var tile_types: Array = []
 	var cells: Array = []
 	for tile in tiles:
@@ -398,7 +398,7 @@ func notify_match_tiles(tiles: Array) -> void:
 	match_collected.emit(tile_types)
 	tiles_matched_with_cells.emit(tile_types, cells)
 	SignalBus.matches_found.emit(tiles)
-	_damage_nearby_obstacles(tiles)
+	_damage_nearby_obstacles(tiles,inventory_hit)
 
 
 func find_valid_swap() -> Array[Vector2i]:
@@ -670,6 +670,16 @@ func _load_obstacles() -> void:
 		obstacle_state.set_health(int(definition.get("health", _obstacle_database.get_health(obstacle_type))))
 		obstacle.position = _cell_center(cell)
 		add_child(obstacle)
+		if bool(definition.get("inventory_only",false)):
+			obstacle.set_meta("inventory_only",true)
+			var seal_label := Label.new()
+			seal_label.text = "SEAL"
+			seal_label.position = Vector2(-62,-24)
+			seal_label.add_theme_font_size_override("font_size",44)
+			seal_label.add_theme_color_override("font_color",Color("#fff4ad"))
+			seal_label.add_theme_color_override("font_outline_color",Color("#281b30"))
+			seal_label.add_theme_constant_override("outline_size",10)
+			obstacle.add_child(seal_label)
 		var texture := obstacle.get_texture()
 		if texture != null:
 			var max_dimension := maxf(texture.get_width(), texture.get_height())
@@ -677,7 +687,7 @@ func _load_obstacles() -> void:
 		_obstacles[cell] = obstacle
 
 
-func _damage_nearby_obstacles(tiles: Array) -> void:
+func _damage_nearby_obstacles(tiles: Array, inventory_hit: bool = false) -> void:
 	if _obstacles.is_empty():
 		return
 	var hit_cells: Dictionary = {}
@@ -691,6 +701,8 @@ func _damage_nearby_obstacles(tiles: Array) -> void:
 		var obstacle: Obstacle = _obstacles.get(cell)
 		if not is_instance_valid(obstacle):
 			_obstacles.erase(cell)
+			continue
+		if bool(obstacle.get_meta("inventory_only",false)) and not inventory_hit:
 			continue
 		obstacle.damage(1)
 		var destroyed := obstacle.is_destroyed()
@@ -752,7 +764,7 @@ func use_booster_at(kind: String, position: Vector2i) -> bool:
 	booster_used.emit(kind)
 	powerup_blast.emit(kind, position)
 	_spend_move()
-	_resolve_external_clear(targets, kind)
+	_resolve_external_clear(targets, kind, true, [], kind in ["rocket","bomb","thunder"])
 	return true
 
 
@@ -857,7 +869,7 @@ func play_celebration_shake(intensity: float = 1.0) -> void:
 	_shake_tween.finished.connect(func(): position = _shake_origin)
 
 
-func _resolve_external_clear(tiles: Array, effect: String, finish_turn: bool = true, combo_origins: Array = []) -> void:
+func _resolve_external_clear(tiles: Array, effect: String, finish_turn: bool = true, combo_origins: Array = [], inventory_hit: bool = false) -> void:
 	var unique_tiles := expand_special_targets(tiles)
 	if unique_tiles.is_empty():
 		if finish_turn:
@@ -875,7 +887,7 @@ func _resolve_external_clear(tiles: Array, effect: String, finish_turn: bool = t
 		SignalBus.play_sfx.emit("thunder_roll")
 	elif effect != "rocket_combo":
 		SignalBus.play_sfx.emit("powerup_" + effect)
-	notify_match_tiles(unique_tiles)
+	notify_match_tiles(unique_tiles,inventory_hit)
 	var burst := create_tween().set_parallel(true)
 	for tile in unique_tiles:
 		burst.tween_property(tile, "scale", Vector2.ONE * 1.22, 0.08)

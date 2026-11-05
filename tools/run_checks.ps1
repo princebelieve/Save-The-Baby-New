@@ -1,10 +1,11 @@
 param(
     [string]$Godot = "C:\Users\ASUS\My Tools\Godot\4.6.3\Godot_v4.6.3-stable_win64.exe",
-    [ValidateSet("release_checks", "progression_daily_checks", "random_release_checks", "streak_release_checks")]
+    [ValidateSet("release_checks", "progression_daily_checks", "random_release_checks", "streak_release_checks", "economy_checks", "difficulty_checks", "story_checks")]
     [string]$Suite = "release_checks",
     [switch]$Resume,
     [ValidateRange(1, 3600)]
-    [int]$TimeoutSeconds = 900
+    [int]$TimeoutSeconds = 900,
+    [string[]]$TestArguments = @()
 )
 
 $ErrorActionPreference = "Stop"
@@ -18,11 +19,13 @@ try {
     }
     $runnerArguments = @("--headless", "--path", "`"$projectRoot`"", "res://tests/$Suite.tscn")
     if ($Resume) { $runnerArguments += @("--", "--resume") }
+    if ($TestArguments.Count) { $runnerArguments += @("--") + $TestArguments }
     $outputLog = Join-Path $env:APPDATA "runner-output.log"
     $errorLog = Join-Path $env:APPDATA "runner-error.log"
     # The Windows GUI executable can return immediately with '&'. Wait for its
     # actual process exit so a failed suite cannot be reported as successful.
     $runner = Start-Process -FilePath $Godot -ArgumentList $runnerArguments -WindowStyle Hidden -PassThru -RedirectStandardOutput $outputLog -RedirectStandardError $errorLog
+    $runner.Id | Set-Content (Join-Path $env:APPDATA "runner.pid")
     if (-not $runner.WaitForExit($TimeoutSeconds * 1000)) {
         $runner.Kill()
         $runner.WaitForExit()

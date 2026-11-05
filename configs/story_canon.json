@@ -1,0 +1,31 @@
+{
+  "version": 2,
+  "title": "Amara, Ethan and the people around them",
+  "summary": "Ethan is Amara's child. After her long relationship with Victor ended, she had Ethan with a wealthy man who provided for their future. Ethan's father has since died. Amara later fell in love with David, a web developer with hacking skills who believes every system has something he can decode. Victor cannot accept her choice: he takes credit for what other people built and treats Amara's independence as a betrayal. David is trying to bring Amara's child home; he is not Ethan's biological father.",
+  "father_name": "",
+  "father_death_cause": "unspecified",
+  "ethan_status": "missing",
+  "continuing_story_rule": "Wins uncover evidence and narrowly missed opportunities. Losses remain on the same level and show Victor's threats. Ethan is never rescued in the continuing campaign; a rescue would end this story.",
+  "failure_taunts": [
+    "My money or Ethan.",
+    "I told you, David. You won't return alive.",
+    "You decoded a clue. I have already left.",
+    "Another empty room, David. Did you expect applause?",
+    "Amara will remember who holds the next move.",
+    "All those clever answers, and you are still behind me.",
+    "You want to be the hero? Come and find me.",
+    "I made the plan. You are only following it.",
+    "Tell Amara whose name she should be thanking.",
+    "One door too late, David. Again.",
+    "You cannot decode your way out of every mistake.",
+    "Keep chasing. I will choose where we meet."
+  ],
+  "opening_choices": {"police":"Call the police","signal":"Trace Victor's signal","alone":"Go after Victor alone"},
+  "roles": {
+    "amara":"Ethan's mother. She knows her own history and makes her own decisions.",
+    "ethan":"Amara's child with his deceased wealthy father.",
+    "david":"Amara's partner, a web developer and hacker. His confidence in decoding systems is both useful and a source of mistakes.",
+    "victor":"Amara's former long-term partner. He claims other people's achievements, resents her independence and wants the credit and control he believes he deserves.",
+    "detective_morris":"The investigator brought into the active story when the player chooses police assistance."
+  }
+}

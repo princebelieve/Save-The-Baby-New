@@ -1,90 +1,90 @@
 {
-    "story_id": "chapter01",
-    "title": "Amara’s Garden",
-    "background_music": "suspense_opening",
-    "default_background": "res://assets/sprites/backgrounds/garden_map_tile.jpeg",
-    "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-    "characters": [
-        "david",
-        "amara",
-        "ethan",
-        "victor"
-    ],
-    "scenes": [
+  "story_id": "chapter01",
+  "title": "Amara’s Garden",
+  "background_music": "suspense_opening",
+  "default_background": "res://assets/sprites/backgrounds/garden_map_tile.jpeg",
+  "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+  "characters": [
+    "david",
+    "amara",
+    "ethan",
+    "victor"
+  ],
+  "scenes": [
+    {
+      "scene_id": "chapter_01_intro",
+      "choices": [
         {
-            "scene_id": "chapter_01_intro",
-            "choices": [
-                {
-                    "id": "police",
-                    "label": "Ask Morris to secure the gate",
-                    "impact": "Morris keeps Amara safe at the house while David follows the trail. Morris can watch for danger, but he needs you to share each clue before he can act.",
-                    "response": "Morris keeps Amara safe at the house while David follows the trail. Ethan must come home alive.",
-                    "speaker": "Detective Morris"
-                },
-                {
-                    "id": "signal",
-                    "label": "Ask Amara to trace the call",
-                    "impact": "Amara stays on the line and checks the location data. Amara stays involved, but the signal could be a decoy. David will still need physical evidence.",
-                    "response": "Amara stays on the line and checks the location data. Ethan must come home alive.",
-                    "speaker": "Amara"
-                },
-                {
-                    "id": "alone",
-                    "label": "Follow the footprints quietly",
-                    "impact": "David approaches quietly while Amara waits for his next call. You can investigate quietly, but no one will be close enough to help immediately if Victor is waiting.",
-                    "response": "David approaches quietly while Amara waits for his next call. Ethan must come home alive.",
-                    "speaker": "David"
-                }
-            ],
-            "dialogues": [
-                {
-                    "speaker": "Amara",
-                    "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-                    "text": "The mud ends here, David. Victor knew I would follow, but he missed one thing: I heard the gate slam before the car reached the road.",
-                    "animation": "fade"
-                },
-                {
-                    "speaker": "David",
-                    "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-                    "text": "Then the gate is our first clue. We will search every footprint until we know which way he took Ethan.",
-                    "animation": "fade"
-                },
-                {
-                    "speaker": "Amara",
-                    "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-                    "text": "I found a key near the fence. If it belongs to Victor, it may tell us what he opened before he left.",
-                    "animation": "fade"
-                }
-            ],
-            "route_dialogues": {
-                "police": [
-                    {
-                        "speaker": "David",
-                        "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-                        "text": "Morris has secured the garden gate. He asks me to photograph the first clue before I move it."
-                    }
-                ],
-                "signal": [
-                    {
-                        "speaker": "David",
-                        "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-                        "text": "Amara has isolated the number that called her. We search the garden for something that matches its location."
-                    }
-                ],
-                "alone": [
-                    {
-                        "speaker": "David",
-                        "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-                        "text": "The footprints end by the garden fence. I send Amara a photograph before I follow them."
-                    }
-                ]
-            }
+          "id": "police",
+          "label": "Ask Morris to secure the gate",
+          "impact": "Morris keeps Amara safe at the house while David follows the trail. Morris can watch for danger, but he needs you to share each clue before he can act.",
+          "response": "Morris keeps Amara safe at the house while David follows the trail. Ethan must come home alive.",
+          "speaker": "Detective Morris"
+        },
+        {
+          "id": "signal",
+          "label": "Decode the next lead with Amara",
+          "impact": "David checks the technical evidence. Amara connects it to the people and history behind the records, without police assistance.",
+          "response": "David preserves the original record and tests the next connection while Amara checks its meaning against what she remembers.",
+          "speaker": "David"
+        },
+        {
+          "id": "alone",
+          "label": "Follow the footprints quietly",
+          "impact": "David approaches quietly while Amara waits for his next call. You can investigate quietly, but no one will be close enough to help immediately if Victor is waiting.",
+          "response": "David approaches quietly while Amara waits for his next call. Ethan must come home alive.",
+          "speaker": "David"
         }
-    ],
-    "metadata": {
-        "version": 1,
-        "chapter": 1,
-        "campaign_levels": "001-008",
-        "tutorial_chapter": true
+      ],
+      "dialogues": [
+        {
+          "speaker": "Amara",
+          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+          "text": "The mud ends here, David. Victor knew I would follow, but he missed one thing: I heard the gate slam before the car reached the road.",
+          "animation": "fade"
+        },
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "Then the gate is our first clue. We will search every footprint until we know which way he took Ethan.",
+          "animation": "fade"
+        },
+        {
+          "speaker": "Amara",
+          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+          "text": "I found a key near the fence. If it belongs to Victor, it may tell us what he opened before he left.",
+          "animation": "fade"
+        }
+      ],
+      "route_dialogues": {
+        "police": [
+          {
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+            "text": "Morris has secured the garden gate. He asks me to photograph the first clue before I move it."
+          }
+        ],
+        "signal": [
+          {
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+            "text": "I have isolated the number that called her. We search the garden for something that matches its location."
+          }
+        ],
+        "alone": [
+          {
+            "speaker": "David",
+            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+            "text": "The footprints end by the garden fence. I send Amara a photograph before I follow them."
+          }
+        ]
+      }
     }
+  ],
+  "metadata": {
+    "version": 2,
+    "chapter": 1,
+    "campaign_levels": "001-008",
+    "tutorial_chapter": true
+  }
 }
