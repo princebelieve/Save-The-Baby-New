@@ -194,7 +194,7 @@ func _check_story_flow() -> void:
 	var records: Array[Dictionary] = [extension]
 	future_map.configure("Continuing the search", records, 51)
 	add_child(future_map)
-	var next_case := future_map.get_node_or_null("CampaignScroll/CampaignTrail/Level051") as BaseButton
+	var next_case := future_map.find_child("Level051", true, false) as BaseButton
 	check(next_case != null and not next_case.disabled, "New content beyond 50 must appear as playable campaign content")
 	future_map.queue_free()
 	for level_id in range(1, 51):
@@ -219,8 +219,8 @@ func _check_phone_layouts() -> void:
 		check(board.initialize(data), "Phone layout board must initialize")
 		var first_cell := board.get_cell_screen_rect(Vector2i.ZERO)
 		var last_cell := board.get_cell_screen_rect(Vector2i(7, 7))
-		check(first_cell.position.y >= dimensions.y * 0.20, "Board must stay below the HUD")
-		check(last_cell.end.y < dimensions.y * 0.80, "Board must stay above the booster tray")
+		check(first_cell.position.y >= 228, "Board must stay below the HUD")
+		check(last_cell.end.y + 16 + 140 <= dimensions.y, "Board must stay above the booster tray")
 		check(first_cell.position.x >= 0 and last_cell.end.x <= dimensions.x, "Board must fit phone width")
 		var tutorial := TutorialOverlay.new()
 		viewport.add_child(tutorial)

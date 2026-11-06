@@ -17,6 +17,7 @@ signal tile_burst(cell: Vector2i)
 signal player_interacted
 
 var _grid: Dictionary = {}
+var _last_rejection_reason := "no_match"
 var _locked: bool = false
 var _level_data: Dictionary = {}
 var _tile_size: int = 64
@@ -322,7 +323,7 @@ func swap_tiles(position_a: Vector2i, position_b: Vector2i) -> bool:
 	if _locked or _move_validator == null or not is_inside(position_a) or not is_inside(position_b):
 		return false
 	if is_swap_blocked(position_a) or is_swap_blocked(position_b):
-		move_rejected.emit()
+		_reject_move("blocked")
 		return false
 	clear_suggested_move_hint()
 	var tile_a: Tile = get_tile(position_a)
@@ -330,14 +331,14 @@ func swap_tiles(position_a: Vector2i, position_b: Vector2i) -> bool:
 	if tile_a == null or tile_b == null:
 		return false
 	if not _move_validator.is_adjacent(tile_a, tile_b):
-		move_rejected.emit()
+		_reject_move("not_adjacent")
 		return false
 	if not _required_swap.is_empty() and not _is_required_swap(position_a, position_b):
-		move_rejected.emit()
+		_reject_move("tutorial")
 		return false
 	var special_tile: Tile = tile_a if tile_a.has_powerup() else (tile_b if tile_b.has_powerup() else null)
 	if special_tile == null and not _move_validator.is_valid_swipe(tile_a, tile_b):
-		move_rejected.emit()
+		_reject_move("no_match")
 		_animate_invalid_move(tile_a, tile_b)
 		return false
 	_locked = true
@@ -668,6 +669,7 @@ func _load_obstacles() -> void:
 			continue
 		var obstacle_state := obstacle.get_obstacle_state()
 		obstacle_state.set_health(int(definition.get("health", _obstacle_database.get_health(obstacle_type))))
+		obstacle.z_index = 5
 		obstacle.position = _cell_center(cell)
 		add_child(obstacle)
 		if bool(definition.get("inventory_only",false)):
@@ -1125,26 +1127,29 @@ func _tile_at_screen_position(screen_position: Vector2) -> Tile:
 func _finish_swipe(target: Tile, drag_delta: Vector2) -> void:
 	var start := _drag_start
 	_drag_start = null
-	if start == null:
-		return
-	if target != null and start != target:
-		start.reset_tile_modulate()
-		if _tap_selection != null and is_instance_valid(_tap_selection):
-			_tap_selection.reset_tile_modulate()
-		_tap_selection = null
-		swap_tiles(start.get_grid_position(), target.get_grid_position())
-		return
+	if not is_instance_valid(start): return
+	# A swipe selects a direction, not an arbitrary distant destination.
 	if drag_delta.length() >= 18.0:
 		var offset: Vector2i
 		if absf(drag_delta.x) > absf(drag_delta.y):
 			offset = Vector2i.RIGHT if drag_delta.x > 0 else Vector2i.LEFT
 		else:
 			offset = Vector2i.DOWN if drag_delta.y > 0 else Vector2i.UP
-		var destination := start.get_grid_position() + offset
-		if is_inside(destination):
-			start.reset_tile_modulate()
-			_tap_selection = null
-			swap_tiles(start.get_grid_position(), destination)
+		target = get_tile(start.get_grid_position() + offset)
+	if target != null and start != target:
+		start.reset_tile_modulate()
+		if is_instance_valid(_tap_selection): _tap_selection.reset_tile_modulate()
+		_tap_selection = null
+		swap_tiles(start.get_grid_position(), target.get_grid_position())
+
+
+func _reject_move(reason: String) -> void:
+	_last_rejection_reason = reason
+	move_rejected.emit()
+
+
+func get_move_rejection_reason() -> String:
+	return _last_rejection_reason
 
 
 func _finish_pointer_gesture(screen_position: Vector2) -> void:
@@ -1158,7 +1163,7 @@ func _finish_pointer_gesture(screen_position: Vector2) -> void:
 			return
 		var selected_kind := _booster_mode
 		if release_tile != null and _required_booster_target != Vector2i(-1, -1) and release_tile.get_grid_position() != _required_booster_target:
-			move_rejected.emit()
+			_reject_move("booster_target")
 			_drag_start = null
 			_tap_selection = null
 			return

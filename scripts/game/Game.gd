@@ -2448,7 +2448,7 @@ func _show_idle_move_hint() -> void:
 		return
 	_board.show_suggested_move_hint(suggested)
 	_hint_label.text = "TRY THIS SWAP | MATCH %s" % _objective_target.replace("_", " ")
-	_hint_label.show()
+	_hint_label.hide()
 	_idle_hint_timer.start()
 
 
@@ -2756,7 +2756,11 @@ func _on_tiles_matched(tile_types: Array) -> void:
 
 func _on_move_rejected() -> void:
 	SignalBus.play_sfx.emit("invalid_move")
-	_hint_label.text = "NO MATCH | Swap neighboring pieces to make a set of 3."
+	var reason := _board.get_move_rejection_reason() if _board != null else "no_match"
+	var caption: String = {"blocked":"Clear the blocker first", "not_adjacent":"Swap neighboring tiles", "tutorial":"Follow the highlighted move", "booster_target":"Use the highlighted tile"}.get(reason, "No match - try another swap")
+	_hint_label.text = caption
+	_hint_label.hide()
+	_effects().notice(caption, DISPLAY_FONT)
 
 
 func _show_match_feedback(caption: String, sound_id: String, shake_board: bool) -> void:

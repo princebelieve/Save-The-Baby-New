@@ -3,6 +3,25 @@ class_name GameplayEffects
 
 signal collections_finished
 
+func notice(caption: String, font: Font) -> void:
+	if is_instance_valid(_feedback): _feedback.queue_free()
+	var panel := PanelContainer.new()
+	_feedback = panel
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var viewport_size := get_viewport().get_visible_rect().size
+	var width := minf(620, viewport_size.x - 40)
+	panel.custom_minimum_size = Vector2(width, 92)
+	panel.position = Vector2((viewport_size.x - width) * 0.5, viewport_size.y * 0.46)
+	panel.add_theme_stylebox_override("panel", MobileGameUI.style(Color("#26394f")))
+	add_child(panel)
+	var label := MobileGameUI.label(panel, caption, 34, Color.WHITE)
+	label.add_theme_font_override("font", font)
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var tween := _effect_tween().bind_node(panel)
+	tween.tween_interval(1.25)
+	tween.tween_property(panel, "modulate:a", 0.0, 0.25)
+	tween.tween_callback(panel.queue_free)
+
 var pending_collections := 0
 var _pulse_tweens: Dictionary = {}
 var _feedback: Control

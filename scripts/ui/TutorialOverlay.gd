@@ -255,7 +255,7 @@ func _layout_tip() -> void:
 	var visible_body_height := minf(body_height, viewport.y * 0.55 - 80.0 - action_height)
 	_body_label.custom_minimum_size = Vector2(0, body_height)
 	_body_scroll.custom_minimum_size = Vector2(0, visible_body_height)
-	var row_height := maxf(visible_body_height + 40.0, 112.0 if _speaker_portrait.visible else 0.0)
+	var row_height := maxf(visible_body_height + 80.0, 112.0 if _speaker_portrait.visible else 0.0)
 	var bubble_height := row_height + action_height + 120.0
 	_bubble.custom_minimum_size = Vector2(bubble_width, bubble_height)
 	_bubble.size = Vector2(bubble_width, bubble_height)
