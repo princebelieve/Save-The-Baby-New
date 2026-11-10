@@ -22,7 +22,7 @@ func _run() -> void:
 	_check_recovery()
 	for id in range(100,1051,50):
 		var data := JsonLoader.load_file("res://levels/level%03d.json" % id)
-		check(bool(data.obstacles.items[0].get("inventory_only",false)),"Authored challenge %d requires an inventory booster" % id)
+		check(not bool(data.obstacles.items[0].get("inventory_only",false)),"Milestone %d can be completed without inventory boosters" % id)
 		check(str(data.difficulty) == "CRITICAL_CASE","Challenge uses the investigation's own Critical Case label")
 	for kind in ["rocket","bomb","thunder"]:
 		await _check_seal(kind)
@@ -80,6 +80,8 @@ func _check_recovery() -> void:
 
 func _check_seal(kind: String) -> void:
 	var data := JsonLoader.load_file("res://levels/level100.json")
+	# Retain coverage of the optional seal mechanic without requiring it in campaign levels.
+	data.obstacles.items[0]["inventory_only"] = true
 	var seal: Dictionary = data.obstacles.items[0]
 	var cell := Vector2i(int(seal.x),int(seal.y))
 	var board := Board.new()

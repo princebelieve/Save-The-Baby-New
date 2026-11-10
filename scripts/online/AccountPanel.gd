@@ -10,6 +10,7 @@ var _login_dialog: AcceptDialog
 var _login_spinner: ProgressBar
 var _login_status: Label
 var _login_buttons: Array[Button] = []
+var _background_status := ""
 const OWNER_PATH := "user://progress_owner.cfg"
 
 func initialize(current_game: Game) -> void:
@@ -29,6 +30,8 @@ func initialize(current_game: Game) -> void:
 	account.logged_out.connect(_on_logout)
 	account.message.connect(_notice)
 	purchases.message.connect(_notice)
+	account.background_message.connect(_background_notice)
+	purchases.background_message.connect(_background_notice)
 	if account.signed_in() and _owner == account.user_id:
 		account.resume_sync()
 	elif account.signed_in():
@@ -97,6 +100,8 @@ func show_account() -> void:
 	status.add_theme_font_size_override("font_size",23)
 	status.add_theme_color_override("font_color",Color("#4b3424"))
 	status.text = ("%s · %d purchased coins" % [account.player_name,account.wallet]) if account.signed_in() else "Sign in with your existing Google account to sync progress, or continue playing as a guest."
+	if not _background_status.is_empty():
+		status.text += "\n" + _background_status
 	content.add_child(status)
 	if not account.configured():
 		status.text = "Google account sign-in is unavailable right now. You can continue playing as a guest."
@@ -256,7 +261,12 @@ func _button(parent: Control,title: String,action: Callable,disabled := false,ke
 
 func _notice(text: String) -> void:
 	if is_instance_valid(game):
-		game._show_shop_notice(text)
+		game._show_shop_notice(text, "ACCOUNT & COINS")
+
+func _background_notice(text: String) -> void:
+	_background_status = text
+	if is_instance_valid(game) and is_instance_valid(game._coin_shop) and is_instance_valid(game._coin_shop._layer) and not game._coin_shop._layer.is_queued_for_deletion():
+		game._coin_shop.show_message(text)
 
 func _archive_current() -> void:
 	DirAccess.make_dir_recursive_absolute("user://profiles")

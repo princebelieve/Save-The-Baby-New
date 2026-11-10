@@ -95,43 +95,43 @@
                 "x": 6,
                 "y": 3,
                 "type": "electric_trap",
-                "health": 2
+                "health": 1
             },
             {
                 "x": 2,
                 "y": 2,
                 "type": "chain",
-                "health": 2
+                "health": 1
             },
             {
                 "x": 5,
                 "y": 5,
                 "type": "lock",
-                "health": 2
+                "health": 1
             },
             {
                 "x": 2,
                 "y": 5,
                 "type": "missile",
-                "health": 2
+                "health": 1
             },
             {
                 "x": 5,
                 "y": 2,
                 "type": "electric_trap",
-                "health": 2
+                "health": 1
             },
             {
                 "x": 3,
                 "y": 3,
                 "type": "chain",
-                "health": 2
+                "health": 1
             },
             {
                 "x": 4,
                 "y": 4,
                 "type": "lock",
-                "health": 2
+                "health": 1
             }
         ]
     },
@@ -140,7 +140,7 @@
         "image": "res://assets/sprites/backgrounds/dirt_board_background.jpeg"
     },
     "moves": {
-        "total": 24
+        "total": 32
     },
     "rewards": {
         "powerups": [],

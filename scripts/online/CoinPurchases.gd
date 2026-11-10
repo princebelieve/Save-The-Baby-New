@@ -2,6 +2,7 @@ extends Node
 
 signal changed
 signal message(text: String)
+signal background_message(text: String)
 const PRODUCTS := {"coins_500":500,"coins_1500":1500,"coins_3500":3500}
 const PENDING_PATH := "user://pending_purchases.cfg"
 var products: Dictionary = {}
@@ -25,8 +26,9 @@ func _ready() -> void:
 	add_child(_billing)
 	_billing.connected.connect(_on_connected)
 	_billing.connect_error.connect(func(_code: int,_debug: String):
+		var initiated_purchase := busy
 		busy = false
-		message.emit("Google Play billing is unavailable. Please try again later.")
+		_report("Google Play billing is unavailable. Please try again later.", initiated_purchase)
 	)
 	_billing.disconnected.connect(func(): changed.emit())
 	_billing.query_product_details_response.connect(_on_products)
@@ -106,14 +108,15 @@ func restore() -> void:
 	_verify_pending()
 
 func _on_purchases(response: Dictionary) -> void:
+	var initiated_purchase := busy
 	busy = false
 	if int(response.get("response_code",-1)) != BillingClient.BillingResponseCode.OK:
-		message.emit("Purchase canceled or unavailable. No coins were added.")
+		_report("Purchase canceled or unavailable. No coins were added.", initiated_purchase)
 		changed.emit()
 		return
 	for purchase in response.get("purchases",[]):
 		if int(purchase.get("purchase_state",0)) == BillingClient.PurchaseState.PENDING:
-			message.emit("Payment pending. Coins will arrive after Google confirms payment.")
+			_report("Payment pending. Coins will arrive after Google confirms payment.", initiated_purchase)
 			continue
 		if int(purchase.get("purchase_state",0)) != BillingClient.PurchaseState.PURCHASED:
 			continue
@@ -140,11 +143,17 @@ func _verify_pending() -> void:
 			account.wallet = int(response.wallet)
 			account._save_session()
 			account.changed.emit()
-			message.emit("Purchased coin balance updated.")
+			background_message.emit("Purchased coin balance updated.")
 		else:
-			message.emit(str(response.error))
+			background_message.emit(str(response.error))
 	_verifying = false
 	changed.emit()
+
+func _report(text: String, user_initiated: bool) -> void:
+	if user_initiated:
+		message.emit(text)
+	else:
+		background_message.emit(text)
 
 func _save_pending() -> void:
 	var saved := ConfigFile.new()

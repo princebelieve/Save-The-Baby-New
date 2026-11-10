@@ -8,6 +8,7 @@ signal login_start_failed(text: String)
 signal login_status_changed(text: String)
 signal logged_out
 signal message(text: String)
+signal background_message(text: String)
 
 const LOGIN_PATH := "user://pending_google_login.cfg"
 const LOGIN_LIFETIME := 900
@@ -260,13 +261,13 @@ func _upload_pending() -> void:
 		return
 	var snapshot := _pending_save.duplicate(true)
 	_pending_save = {}
-	var response := await upload(snapshot)
+	var response := await upload(snapshot, false)
 	if response.has("error") and _pending_save.is_empty():
 		_pending_save = snapshot
 	if not _pending_save.is_empty() and not conflict:
 		_sync_timer.start()
 
-func upload(snapshot: Dictionary) -> Dictionary:
+func upload(snapshot: Dictionary, user_initiated := true) -> Dictionary:
 	if busy or conflict:
 		return {"error":"Resolve the cloud save conflict before uploading.","status":409}
 	busy = true
@@ -276,7 +277,10 @@ func upload(snapshot: Dictionary) -> Dictionary:
 		if int(response.get("status",0)) == 409:
 			conflict = true
 			_save_session()
-		message.emit(str(response.error))
+		if user_initiated:
+			message.emit(str(response.error))
+		else:
+			background_message.emit("Cloud sync delayed. Your local progress is safe. " + str(response.error))
 	else:
 		accept_profile(response)
 		_ready_to_sync = true

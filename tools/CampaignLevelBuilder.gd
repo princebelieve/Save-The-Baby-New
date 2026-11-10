@@ -64,7 +64,8 @@ static func generate(level_id: int) -> Dictionary:
 	data.obstacles.items = obstacles
 	var challenge: Dictionary = JsonLoader.load_file("res://configs/difficulty_policy.json").get("booster_challenges",{})
 	if level_id >= int(challenge.get("first_level",100)) and (level_id-int(challenge.get("first_level",100))) % int(challenge.get("interval",50)) == 0 and not obstacles.is_empty():
-		obstacles[0]["inventory_only"] = true
+		# Milestone cases remain completable with matches and earned specials.
+		obstacles[0]["inventory_only"] = false
 		obstacles[0]["type"] = "lock"
 		obstacles[0]["health"] = 1
 		data.description = "Critical Case: gather the evidence and break through a reinforced investigation. Plan your supplies before following the trail."

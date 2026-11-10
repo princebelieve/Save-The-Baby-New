@@ -1,6 +1,13 @@
 extends RefCounted
 class_name CampaignProgressStore
 
+## Browsing the full map never grants access. Only consecutive wins do.
+static func unlocked_level(completed: Dictionary, max_levels: int) -> int:
+	var next_level := 1
+	while next_level < maxi(1, max_levels) and int(completed.get(str(next_level), 0)) > 0:
+		next_level += 1
+	return next_level
+
 ## Keep the last successful save intact until its replacement is on disk.
 static func write(config: ConfigFile, path: String) -> Error:
 	var temporary := path + ".tmp"

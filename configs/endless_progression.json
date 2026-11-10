@@ -27,17 +27,17 @@
   ],
   "bands": {
     "EASY": {
-      "moves": 28,
+      "moves": 34,
       "amount": 18,
       "obstacles": 2
     },
     "MEDIUM": {
-      "moves": 26,
+      "moves": 32,
       "amount": 24,
       "obstacles": 4
     },
     "HARD": {
-      "moves": 24,
+      "moves": 30,
       "amount": 30,
       "obstacles": 6
     }
@@ -84,14 +84,14 @@
   "onboarding_extra_moves": 2,
   "case_overrides": {
     "105": {
-      "moves": 26
+      "moves": 32
     },
     "783": {
-      "moves": 28,
+      "moves": 34,
       "amount": 20
     },
     "1050": {
-      "moves": 26
+      "moves": 32
     }
   }
 }

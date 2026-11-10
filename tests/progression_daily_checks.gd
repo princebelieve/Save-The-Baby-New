@@ -164,6 +164,44 @@ func _check_game_integration() -> void:
 	var game := preload("res://scenes/game/Game.tscn").instantiate() as Game
 	add_child(game)
 	await get_tree().process_frame
+	check(CampaignProgressStore.unlocked_level({}, 1050) == 1, "Fresh players only unlock level 1")
+	check(CampaignProgressStore.unlocked_level({"1": 2}, 1050) == 2, "Winning level 1 unlocks only level 2")
+	check(CampaignProgressStore.unlocked_level({"1": 2, "3": 3, "21": 3}, 1050) == 2, "Out-of-order wins cannot unlock unreached levels")
+	check(CampaignProgressStore.unlocked_level({"1": 0}, 1050) == 1, "Failed levels do not unlock the next node")
+	var real_completed: Dictionary = game._completed_levels.duplicate(true)
+	var saved_progress: String = game._campaign_progress.encode_to_text()
+	game._campaign_progress.set_value("campaign", "completed_levels", {})
+	game._campaign_progress.set_value("campaign", "highest_unlocked_level", 21)
+	check(CampaignProgressStore.write(game._campaign_progress, Game.CAMPAIGN_PROGRESS_PATH) == OK, "Inflated unlock fixture saves in isolated test profile")
+	game._load_campaign_progress()
+	check(game._highest_unlocked_level == 1, "Loading an inflated unlock value repairs access from actual wins")
+	game._campaign_progress.clear()
+	game._campaign_progress.parse(saved_progress)
+	CampaignProgressStore.write(game._campaign_progress, Game.CAMPAIGN_PROGRESS_PATH)
+	game._completed_levels = {}
+	game._highest_unlocked_level = 1
+	game._campaign_coach_shown = true
+	game._show_campaign_map("alone")
+	for frame in 8: await get_tree().process_frame
+	var fresh_map: CampaignMap = game._campaign_map
+	var first: TextureButton = fresh_map.find_child("Level001", true, false)
+	var second: TextureButton = fresh_map.find_child("Level002", true, false)
+	check(first != null and not first.disabled, "Fresh map allows level 1")
+	check(second != null and second.disabled, "Fresh map locks level 2")
+	fresh_map.scroll_to_level(21)
+	for frame in 8: await get_tree().process_frame
+	var twenty_one: TextureButton = fresh_map.find_child("Level021", true, false)
+	check(twenty_one != null and twenty_one.disabled, "Level 21 is visible when scrolled to but locked")
+	fresh_map.scroll_to_level(1050)
+	for frame in 8: await get_tree().process_frame
+	var final_node: TextureButton = fresh_map.find_child("Level1050", true, false)
+	check(final_node != null and final_node.disabled, "Fresh players can scroll to the locked final level")
+	check(game._highest_unlocked_level == 1 and fresh_map._highest_unlocked_level == 1, "Scrolling never unlocks levels")
+	var manager: Node = game.get_node("Managers/LevelManager")
+	var before_selection: int = manager.current_level()
+	game._on_campaign_level_selected(21, "alone")
+	check(manager.current_level() == before_selection, "Direct selection also rejects an unreached level")
+	game._completed_levels = real_completed
 	game._highest_unlocked_level = 1050
 	var records := game._load_campaign_level_records()
 	check(records.size() == 1050 and int(records[0].level_id) == 1 and int(records.back().level_id) == 1050, "Map exposes the complete trail")

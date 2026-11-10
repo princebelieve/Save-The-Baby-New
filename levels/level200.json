@@ -40,7 +40,7 @@
     "episode_id": 15
   },
   "moves": {
-    "total": 24
+    "total": 30
   },
   "name": "The Torn Label 10",
   "objectives": [
@@ -57,7 +57,7 @@
         "type": "lock",
         "x": 5,
         "y": 1,
-        "inventory_only": true
+        "inventory_only": false
       },
       {
         "health": 1,

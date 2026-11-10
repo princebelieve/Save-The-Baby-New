@@ -148,7 +148,7 @@
         "image": "res://assets/sprites/backgrounds/dirt_board_background.jpeg"
     },
     "moves": {
-        "total": 25
+        "total": 33
     },
     "rewards": {
         "powerups": [],

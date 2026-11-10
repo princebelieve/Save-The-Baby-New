@@ -653,12 +653,19 @@ func _build_level_objective_row(parent: CanvasLayer) -> void:
 	row.add_child(objective_copy)
 	_objective_description_label = _make_label("COLLECT THE CLUES", roundi(26 * hud_scale))
 	_objective_description_label.clip_text = false
-	_objective_description_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_objective_description_label.custom_minimum_size.y = 34
+	_objective_description_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+	_objective_description_label.clip_text = true
+	_objective_description_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	_objective_description_label.custom_minimum_size.y = 24
+	_objective_description_label.add_theme_font_override("font", ThemeDB.fallback_font)
+	_objective_description_label.add_theme_font_size_override("font_size", roundi(18 * hud_scale))
 	_objective_description_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	_objective_description_label.add_theme_color_override("font_color", Color("#fff5dc"))
 	objective_copy.add_child(_objective_description_label)
 	_objective_label = _make_label("0 / 0", roundi(29 * hud_scale))
+	_objective_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+	_objective_label.add_theme_font_size_override("font_size", roundi(25 * hud_scale))
+	_objective_label.add_theme_font_override("font", ThemeDB.fallback_font)
 	_objective_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	_objective_label.add_theme_color_override("font_color", Color("#f4ce49"))
 	objective_copy.add_child(_objective_label)
@@ -2049,9 +2056,13 @@ func _show_level_briefing(route_id: String) -> void:
 
 	var panel := PanelContainer.new()
 	panel.name = "MissionCard"
-	panel.custom_minimum_size = Vector2(minf(610.0, get_viewport_rect().size.x * 0.92), minf(1020.0, get_viewport_rect().size.y * 0.94))
+	# Bound the card independently of its contents so long briefings scroll.
+	var card_bounds := Control.new()
+	card_bounds.custom_minimum_size = Vector2(minf(610.0, get_viewport_rect().size.x * 0.92), minf(1020.0, get_viewport_rect().size.y * 0.94))
+	center.add_child(card_bounds)
+	panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	panel.add_theme_stylebox_override("panel", _make_parchment_panel_style(82, 100))
-	center.add_child(panel)
+	card_bounds.add_child(panel)
 	panel.modulate.a = 0.0
 	panel.scale = Vector2(0.94, 0.94)
 	var entrance := create_tween().set_parallel(true)
@@ -2181,14 +2192,14 @@ func _show_level_briefing(route_id: String) -> void:
 	play.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	play.pressed.connect(_play_ui_confirm)
 	play.pressed.connect(_begin_level.bind(route_id), CONNECT_ONE_SHOT)
-	content.add_child(play)
+	layout.add_child(play)
 	if sealed:
 		var back_to_map := _make_menu_button("INVESTIGATION MAP")
 		back_to_map.pressed.connect(func():
 			_briefing_layer.queue_free()
 			_briefing_layer = null
 			_show_campaign_map(route_id))
-		content.add_child(back_to_map)
+		layout.add_child(back_to_map)
 
 
 func _has_inventory_seal(data: Dictionary) -> bool:
@@ -2570,7 +2581,7 @@ func _update_objective_hud() -> void:
 		return
 	var progress_text := "%d / %d" % [mini(_evidence_count, _evidence_goal), _evidence_goal]
 	if _obstacles_goal > 0:
-		progress_text += "  %s  %d / %d BLOCKERS" % [String.chr(0x2022), _obstacles_cleared, _obstacles_goal]
+		progress_text += "\n%d / %d BLOCKERS" % [_obstacles_cleared, _obstacles_goal]
 	_objective_label.text = progress_text
 	if _blocker_label != null:
 		_blocker_label.text = ""
@@ -3468,13 +3479,13 @@ func _use_coin_continue() -> void:
 	_persist_campaign_progress()
 
 
-func _show_shop_notice(message: String) -> void:
+func _show_shop_notice(message: String, title := "GAME NOTICE") -> void:
 	if is_instance_valid(_coin_shop) and is_instance_valid(_coin_shop._layer) and not _coin_shop._layer.is_queued_for_deletion():
 		_coin_shop.show_message(message)
 		return
 	var notice := AcceptDialog.new()
 	_prepare_dialog(notice)
-	notice.title = "ETHAN COINS"
+	notice.title = title
 	notice.dialog_text = message
 	var notice_layer := CanvasLayer.new()
 	notice_layer.layer = 25
@@ -3547,6 +3558,8 @@ func _load_campaign_progress() -> void:
 	_highest_unlocked_level = maxi(1, int(_campaign_progress.get_value("campaign", "highest_unlocked_level", 1)))
 	var completed: Variant = _campaign_progress.get_value("campaign", "completed_levels", {})
 	_completed_levels = completed if typeof(completed) == TYPE_DICTIONARY else {}
+	if not preload("res://scripts/debug/DeveloperTools.gd").enabled():
+		_highest_unlocked_level = CampaignProgressStore.unlocked_level(_completed_levels, int(ConfigLoader.load_config(Constants.ConfigPaths.GAME).get("max_levels", 50)))
 
 
 func _record_level_completion() -> bool:
@@ -3560,6 +3573,8 @@ func _record_level_completion() -> bool:
 	_completed_levels[str(_current_level_id)] = maxi(stars_earned, old_stars)
 	var star_delta := maxi(0, stars_earned - old_stars)
 	_highest_unlocked_level = mini(int(ConfigLoader.load_config(Constants.ConfigPaths.GAME).get("max_levels", 50)), maxi(_highest_unlocked_level, _current_level_id + 1))
+	if not preload("res://scripts/debug/DeveloperTools.gd").enabled():
+		_highest_unlocked_level = CampaignProgressStore.unlocked_level(_completed_levels, int(ConfigLoader.load_config(Constants.ConfigPaths.GAME).get("max_levels", 50)))
 	var point_records_value: Variant = _campaign_progress.get_value("campaign", "level_points", {})
 	var point_records: Dictionary = point_records_value if typeof(point_records_value) == TYPE_DICTIONARY else {}
 	point_records[str(_current_level_id)] = maxi(_current_level_points, int(point_records.get(str(_current_level_id), 0)))

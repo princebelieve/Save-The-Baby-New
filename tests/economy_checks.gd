@@ -2,6 +2,11 @@ extends Node
 
 var failures: Array[String] = []
 
+class OfflineAccount extends "res://scripts/online/CloudAccount.gd":
+	func api(_path: String, _method: HTTPClient.Method = HTTPClient.METHOD_GET, _data: Dictionary = {}, _authenticated := true, _timeout_seconds := 25.0) -> Dictionary:
+		return {"error": "Could not connect.", "status": 0}
+	func _save_session() -> void: pass
+
 class FakeAds extends RefCounted:
 	var ready := true
 	var earned: Callable
@@ -34,6 +39,7 @@ func _run() -> void:
 	var account := get_node("/root/CloudAccount")
 	account.token = ""
 	account.user_id = ""
+	await _check_background_notices(game)
 	economy.set_coins(1000)
 	economy.set_lives(0)
 	shop.open(game,"lives")
@@ -96,6 +102,38 @@ func _run() -> void:
 	print("ECONOMY_CHECKS: %d failures" % failures.size())
 	get_tree().quit(0 if failures.is_empty() else 1)
 
+
+func _check_background_notices(game: Game) -> void:
+	var billing := preload("res://scripts/online/CoinPurchases.gd").new()
+	var modal := [0]
+	var background := [0]
+	billing.message.connect(func(_text): modal[0] += 1)
+	billing.background_message.connect(func(_text): background[0] += 1)
+	for attempt in 3:
+		billing._on_purchases({"response_code": -1})
+	check(modal[0] == 0 and background[0] == 3, "Repeated background billing failures never request popups")
+	billing.busy = true
+	billing._on_purchases({"response_code": -1})
+	check(modal[0] == 1, "An initiated purchase still reports its failure")
+	billing.free()
+	var cloud := OfflineAccount.new()
+	modal[0] = 0
+	background[0] = 0
+	cloud.message.connect(func(_text): modal[0] += 1)
+	cloud.background_message.connect(func(_text): background[0] += 1)
+	for attempt in 3: await cloud.upload({"campaign": {}}, false)
+	check(modal[0] == 0 and background[0] == 3, "Background cloud failures never request popups")
+	await cloud.upload({"campaign": {}})
+	check(modal[0] == 1, "Manual cloud save still reports its failure")
+	cloud.free()
+	var dialogs_before := game.find_children("*", "AcceptDialog", true, false).size()
+	game._account_panel._background_notice("Offline. Local progress is safe.")
+	check(game.find_children("*", "AcceptDialog", true, false).size() == dialogs_before, "Background status never creates a game dialog")
+	game._coin_shop.open(game)
+	game._account_panel._background_notice("Purchase verification will retry.")
+	check(game._coin_shop._status == "Purchase verification will retry.", "Background status is readable in an open shop")
+	game._coin_shop._close()
+	await get_tree().process_frame
 
 func _check_ads(economy: EconomyManager) -> void:
 	var ads := AdManager.new()

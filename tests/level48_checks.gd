@@ -122,6 +122,28 @@ func _hud_counts() -> void:
 	game.get_node("Managers/LevelManager").load_level(48)
 	game._begin_level("alone")
 	game._finish_tutorial()
+	for id in range(40, 51):
+		game.get_node("Managers/LevelManager").load_level(id)
+		game._begin_level("alone")
+		game._finish_tutorial()
+		for frame in 8: await get_tree().process_frame
+		check(game._mission_panel.get_global_rect().encloses(game._objective_label.get_global_rect()), "level %d objective counts fit header: %s within %s" % [id, game._objective_label.get_global_rect(), game._mission_panel.get_global_rect()])
+	for id in [51, 100, 511, 1050]:
+		game.get_node("Managers/LevelManager").load_level(id)
+		game._show_level_briefing("alone")
+		for frame in 8: await get_tree().process_frame
+		var play: Button
+		for button in game._briefing_layer.find_children("*", "Button", true, false):
+			if button.text == "PLAY": play = button
+		check(play != null, "level %d has Play" % id)
+		if play != null:
+			check(game.get_viewport_rect().encloses(play.get_global_rect()), "level %d Play fits viewport" % id)
+			check(not play.get_parent() is ScrollContainer and play.get_parent().get_parent().name == "MissionCard", "Play stays outside briefing scroll")
+		game._briefing_layer.queue_free()
+		game._briefing_layer = null
+	game.get_node("Managers/LevelManager").load_level(48)
+	game._begin_level("alone")
+	game._finish_tutorial()
 	for clock_count in [8, 1]:
 		var board: Board = game._board
 		board.clear()

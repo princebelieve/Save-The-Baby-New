@@ -145,7 +145,7 @@
         "image": "res://assets/sprites/backgrounds/grass_board_background.jpeg"
     },
     "moves": {
-        "total": 18
+        "total": 23
     },
     "rewards": {
         "powerups": [],
