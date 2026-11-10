@@ -77,7 +77,7 @@ test('API login, save conflicts, payment replay, atomic spending and logout',asy
  assert.equal(callback.status,200);
  const callbackPage=await callback.text();
  assert.doesNotMatch(callbackPage,/http-equiv="refresh"/);
- assert.match(callbackPage,/Return to game/);
+ assert.match(callbackPage,/Return to Save the Baby Game/);
  assert.match(callbackPage,/href="savethebaby:\/\/auth\/complete"/);
  const login=await request('/auth/poll','POST',{flow,verifier},'');assert.equal(login.status,200);assert.ok(login.body.token);
  const owner=await db.collection('users').findOne({_id:login.body.userId});

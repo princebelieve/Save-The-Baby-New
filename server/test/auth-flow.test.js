@@ -38,8 +38,10 @@ test('existing Google sign-in keeps progress and exposes a persistent Android re
  const state=await f.start();
  const response=await f.callback(state);assert.equal(response.status,200);
  const html=await response.text();
+ assert.equal(response.headers.get('cache-control'),'no-store');
+ assert.equal(response.headers.get('x-auth-return-version'),'2');
  assert.match(html,/id="return-to-game"/);
- assert.match(html,/>Return to game<\/a>/);
+ assert.match(html,/>Return to Save the Baby Game<\/a>/);
  assert.match(html,/intent:\/\/auth\/complete#Intent;scheme=savethebaby;package=com\.savethebaby\.game;/);
  assert.doesNotMatch(html,/http-equiv="refresh"/);
  assert.ok(!html.includes(state.verifier));
@@ -47,7 +49,23 @@ test('existing Google sign-in keeps progress and exposes a persistent Android re
  const login=await (await f.poll(state)).json();
  assert.equal(login.userId,userId);assert.equal(login.wallet,500);assert.equal(login.revision,7);assert.deepEqual(login.save,save);
  const fallback=await fetch(f.base+'/auth/return',{headers:{'User-Agent':'Chrome Android'}});
- assert.equal(fallback.status,200);assert.match(await fallback.text(),/Return to game/);
+ assert.equal(fallback.status,200);assert.match(await fallback.text(),/Return to Save the Baby Game/);
+});
+
+test('first-time Google registration retains the return button after the game redeems login',async t=>{
+ const f=await fixture(t),state=await f.start();
+ const response=await f.callback(state);
+ assert.equal(response.status,200);
+ const html=await response.text();
+ assert.match(html,/data-sign-in-state="complete"/);
+ assert.match(html,/>Return to Save the Baby Game<\/a>/);
+ assert.doesNotMatch(html,/http-equiv="refresh"/);
+ const profile=await (await f.poll(state)).json();
+ assert.equal(profile.save,null);
+ assert.equal(profile.wallet,0);
+ const fallback=await fetch(f.base+'/auth/return');
+ assert.equal(fallback.status,200);
+ assert.match(await fallback.text(),/href="savethebaby:\/\/auth\/complete"/);
 });
 
 test('lost and concurrent poll responses recover the same session, never a false expired login',async t=>{
@@ -66,7 +84,7 @@ test('lost and concurrent poll responses recover the same session, never a false
 test('Google cancellation reaches the game as a terminal failure with a visible return button',async t=>{
  const f=await fixture(t),state=await f.start();
  const canceled=await fetch(f.base+`/auth/google/callback?state=${state.flow}&error=access_denied`,{headers:{Cookie:state.cookie,'User-Agent':'Chrome Android'}});
- assert.equal(canceled.status,400);const page=await canceled.text();assert.match(page,/Return to game/);assert.doesNotMatch(page,/http-equiv="refresh"/);
+ assert.equal(canceled.status,400);const page=await canceled.text();assert.match(page,/Return to Save the Baby Game/);assert.doesNotMatch(page,/http-equiv="refresh"/);
  const poll=await f.poll(state);assert.equal(poll.status,400);assert.match((await poll.json()).error,/canceled/);
 });
 
