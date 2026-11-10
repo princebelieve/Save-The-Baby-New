@@ -66,94 +66,35 @@ func has_matches(board) -> bool:
 
 func _scan_rows(board) -> Array:
 	var matches: Array = []
-
 	for y in range(board.get_height()):
-
-		var current_tiles: Array = []
-		var current_type = null
-
-		for x in range(board.get_width()):
-
-			var tile = board.get_tile(Vector2i(x, y))
-
-			if tile == null:
-				_collect_match(current_tiles, matches)
-				current_tiles.clear()
-				current_type = null
-				continue
-
-			var tile_type = tile.get_tile_type()
-
-			if current_tiles.is_empty():
-				current_tiles.append(tile)
-				current_type = tile_type
-
-			elif tile_type == current_type:
-				current_tiles.append(tile)
-
-			else:
-				_collect_match(current_tiles, matches)
-
-				current_tiles.clear()
-				current_tiles.append(tile)
-
-				current_type = tile_type
-
-		_collect_match(current_tiles, matches)
-
+		_scan_line(board.get_row(y), matches)
 	return matches
 
 
 func _scan_columns(board) -> Array:
 	var matches: Array = []
-
 	for x in range(board.get_width()):
-
-		var current_tiles: Array = []
-		var current_type = null
-
-		for y in range(board.get_height()):
-
-			var tile = board.get_tile(Vector2i(x, y))
-
-			if tile == null:
-				_collect_match(current_tiles, matches)
-				current_tiles.clear()
-				current_type = null
-				continue
-
-			var tile_type = tile.get_tile_type()
-
-			if current_tiles.is_empty():
-				current_tiles.append(tile)
-				current_type = tile_type
-
-			elif tile_type == current_type:
-				current_tiles.append(tile)
-
-			else:
-				_collect_match(current_tiles, matches)
-
-				current_tiles.clear()
-				current_tiles.append(tile)
-
-				current_type = tile_type
-
-		_collect_match(current_tiles, matches)
-
+		_scan_line(board.get_column(x), matches)
 	return matches
 
 
-func _collect_match(tile_list: Array, matches: Array) -> void:
-	if tile_list.size() < 3:
-		return
-
-	var found_match := Match.new()
-
-	found_match.initialize()
-
-	for tile in tile_list:
-		found_match.add_tile(tile)
-
-	if found_match.is_valid():
-		matches.append(found_match)
+func _scan_line(line: Array, matches: Array) -> void:
+	var types: Dictionary = {}
+	for tile in line:
+		if tile != null and int(tile.get_tile_type()) not in [Constants.TileType.ETHAN, Constants.TileType.VICTOR]:
+			types[int(tile.get_tile_type())] = true
+	for kind in types:
+		var run: Array = []
+		for tile in line + [null]:
+			if tile != null and int(tile.get_tile_type()) in [kind, Constants.TileType.ETHAN]:
+				run.append(tile)
+			else:
+				var ordinary := 0
+				for piece in run:
+					if int(piece.get_tile_type()) == kind: ordinary += 1
+				if run.size() >= 3 and ordinary >= 2:
+					var found := Match.new()
+					found.initialize()
+					for piece in run: found.add_tile(piece)
+					matches.append(found)
+				run = []

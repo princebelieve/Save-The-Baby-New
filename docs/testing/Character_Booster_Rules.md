@@ -1,0 +1,11 @@
+# Booster counting and character rules
+
+Booster swaps resolve the union of their blast and the ordinary matches made by the swap before gravity runs. Each cleared tile contributes at most once in that wave. A piece retained as a new special has already contributed its original collection credit and cannot contribute that credit again when fired. Five in a straight line creates Thunder when that powerup is available, including when a booster swap also makes the five-match. Its creation has visible feedback.
+
+Ethan and Victor are excluded from all random board-generation and refill pools. Their rules start at level 24, where the character tutorial appears. A turn with at least three ordinary match waves earns one Ethan wildcard. Ethan joins at least two ordinary pieces of the same type to form a horizontal or vertical match. A match completed on arrival resolves immediately. A wildcard contributes one collection credit; at intersections, the level's primary collection target takes priority. The existing tray rescue assist remains a separate consumable.
+
+Victor appears once per attempt after at least 75% of the configured move budget is spent, provided a move remains. He can be swapped with an adjacent unblocked piece even without a match. This costs one move and replaces all tiles with a playable board using a refreshed seed. Blocker positions and durability remain unchanged. The replacement grants no collection credit, score, character rewards, or inventory specials. Victor does not return after being used or cleared.
+
+Run `powershell -ExecutionPolicy Bypass -File tools/run_checks.ps1 -Suite character_booster_checks` for deterministic regression checks. The fixtures use the production swap, match finder, gravity, collection and refill code with presentation delays disabled. The cascade fixture controls refill pieces to produce a reproducible three-wave chain. Coverage includes reverse-direction rocket swaps, immediate matches outside the blast column, overlapping five-matches, retained-special credit, wildcard matching and validation, random-pool exclusion, real cascade rewards, Victor's threshold, one-use limit, move cost, tile replacement and blocker preservation.
+
+Also run the release, level48 and progression_daily suites. These automated checks do not replace device playtesting or certify the new difficulty balance.

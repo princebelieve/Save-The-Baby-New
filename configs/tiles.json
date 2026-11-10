@@ -80,7 +80,7 @@
       "score": 100,
       "spawn_weight": 1,
       "matchable": true,
-      "spawnable": true,
+      "spawnable": false,
       "hidden": false,
       "special": true
     },
@@ -108,7 +108,7 @@
       "score": 100,
       "spawn_weight": 1,
       "matchable": true,
-      "spawnable": true,
+      "spawnable": false,
       "hidden": false,
       "special": true
     }

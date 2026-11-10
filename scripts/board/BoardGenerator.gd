@@ -118,6 +118,8 @@ func _load_level_tile_pool(tile_pool) -> void:
 	var ids: Array = tile_pool.get("tiles", [])
 	var weights: Array = tile_pool.get("weights", [])
 	for index in range(ids.size()):
+		if str(ids[index]).to_lower() in ["ethan", "victor"]:
+			continue # These characters are earned/events, never random filler.
 		var definition: Dictionary = _tile_database.get_tile(str(ids[index]))
 		if definition.is_empty() or not definition.get("spawnable", false):
 			continue
@@ -131,6 +133,8 @@ func _load_level_tile_pool(tile_pool) -> void:
 		return
 
 	for definition in _tile_database.get_spawnable_tiles():
+		if str(definition.get("id", "")).to_lower() in ["ethan", "victor"]:
+			continue
 		_level_tile_definitions.append(definition)
 		_level_tile_weights.append(maxf(0.0, float(definition.get("spawn_weight", 1.0))))
 

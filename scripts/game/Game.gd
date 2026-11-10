@@ -111,6 +111,7 @@ var _campaign_coach_shown := false
 var _idle_hint_timer: Timer
 var _campaign_progress := ConfigFile.new()
 var _highest_unlocked_level := 1
+var _turn_reward_notices: Array[String] = []
 var _completed_levels: Dictionary = {}
 var _gameplay_effects: GameplayEffects
 var _turn_praise_rank := 0
@@ -1340,6 +1341,20 @@ func _show_audio_settings(parent_layer: Node) -> void:
 	heading.add_theme_color_override("font_color", Color("#80502b"))
 	heading.add_theme_color_override("font_outline_color", Color("#f4e2bd"))
 	settings.add_child(heading)
+	for preference in ["hints", "tutorials"]:
+		var toggle := CheckButton.new()
+		toggle.name = "HintsEnabled" if preference == "hints" else "TutorialsEnabled"
+		toggle.custom_minimum_size.y = 92
+		toggle.add_theme_font_size_override("font_size", 30)
+		toggle.add_theme_color_override("font_color", Color("#4b3424"))
+		toggle.button_pressed = _guidance_enabled(preference)
+		toggle.text = ("MOVE HINTS: " if preference == "hints" else "TUTORIALS: ") + ("ON" if toggle.button_pressed else "OFF")
+		toggle.toggled.connect(_set_guidance_enabled.bind(preference, toggle))
+		settings.add_child(toggle)
+	var help_note := _make_label("Choose the help you want. You can turn either option back on here at any time.", 22)
+	help_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	help_note.add_theme_color_override("font_color", Color("#4b3424"))
+	settings.add_child(help_note)
 	for bus_kind in ["music", "sfx"]:
 		var volume_label := Label.new()
 		volume_label.add_theme_font_override("font", DISPLAY_FONT)
@@ -1404,6 +1419,30 @@ func _show_audio_settings(parent_layer: Node) -> void:
 	popup.confirmed.connect(popup.queue_free, CONNECT_ONE_SHOT)
 	popup.canceled.connect(popup.queue_free, CONNECT_ONE_SHOT)
 	popup.popup_centered_clamped(Vector2i(mini(680, int(get_viewport_rect().size.x * 0.95)), int(get_viewport_rect().size.y - 80)))
+
+
+func _guidance_enabled(preference: String) -> bool:
+	return bool(_campaign_progress.get_value("preferences", preference, true))
+
+
+func _set_guidance_enabled(enabled: bool, preference: String, toggle: CheckButton) -> void:
+	_campaign_progress.set_value("preferences", preference, enabled)
+	toggle.text = ("MOVE HINTS: " if preference == "hints" else "TUTORIALS: ") + ("ON" if enabled else "OFF")
+	_persist_campaign_progress()
+	if preference == "hints":
+		_reset_idle_hint_timer()
+	elif not enabled:
+		_academy_pending_level = {}
+		_academy_lesson_id = ""
+		if _tutorial_overlay != null: _tutorial_overlay.hide_tip()
+		if _board != null and _board.is_locked() and ["guided_swap", "activate_special", "booster_resolving"].has(_tutorial_action):
+			_tutorial_skip_pending = true
+		else:
+			_finish_tutorial()
+
+
+func _show_help_settings() -> void:
+	_show_audio_settings(get_node_or_null("HUD"))
 
 
 func _show_legal_document(parent_layer: Node, title: String, path: String) -> void:
@@ -1921,6 +1960,7 @@ func _show_campaign_map(route_id: String) -> void:
 
 
 func _show_campaign_map_coach() -> void:
+	if not _guidance_enabled("tutorials"): return
 	if _campaign_coach_shown and bool(_campaign_progress.get_value("tutorials", "campaign_map_intro", false)):
 		return
 	if _campaign_map == null or not is_instance_valid(_campaign_map):
@@ -1934,7 +1974,7 @@ func _show_campaign_map_coach() -> void:
 	_persist_campaign_progress()
 	_tutorial_action = "campaign_map_intro"
 	_show_tutorial_tip(
-		"This is the campaign trail. Each marker opens an investigation; chapters show where the search moves next. Start with the glowing first case.",
+		"This is the campaign trail. Each marker opens an investigation; chapters show where the search moves next. Start with the glowing first case.\nPrefer less guidance? HELP SETTINGS lets you turn hints and tutorials off separately. You can turn them back on in Settings.",
 		target_rect,
 		"DAVID",
 		"res://assets/sprites/characters/david_portrait_v2.png",
@@ -2308,6 +2348,7 @@ func _objective_icon_path(target: String) -> String:
 
 
 func _begin_level(_route_id: String) -> void:
+	_turn_reward_notices.clear()
 	var selected_manager := get_node_or_null("Managers/LevelManager")
 	var selected_data: Dictionary = selected_manager.get_level_data() if selected_manager != null else {}
 
@@ -2413,6 +2454,7 @@ func _on_board_created() -> void:
 	_board.move_rejected.connect(_on_move_rejected)
 	_board.turn_resolved.connect(_on_board_turn_resolved)
 	_board.special_created.connect(_on_special_created)
+	_board.character_arrived.connect(_on_character_arrived)
 	_board.special_activated.connect(_on_special_activated)
 	_board.powerup_blast.connect(_on_powerup_blast)
 	_board.rocket_combo.connect(_on_rocket_combo)
@@ -2443,12 +2485,14 @@ func _reset_idle_hint_timer() -> void:
 	_idle_hint_timer.stop()
 	if _board != null:
 		_board.clear_suggested_move_hint()
+	if not _guidance_enabled("hints"): return
 	if _tutorial_active or _board == null or _board.is_locked() or _result_layer != null or _case_file_layer != null or _pause_layer != null or _story_layer != null or _briefing_layer != null or _launch_layer != null or (_ads != null and _ads.busy):
 		return
 	_idle_hint_timer.start()
 
 
 func _show_idle_move_hint() -> void:
+	if not _guidance_enabled("hints"): return
 	if _board == null or _board.is_locked() or _tutorial_active or _result_layer != null or _case_file_layer != null or _pause_layer != null or (_ads != null and _ads.busy):
 		return
 	var target_type := int(Constants.TileType.get(_objective_target, -1)) if _objective_type == "COLLECT_ITEMS" else -1
@@ -2706,9 +2750,6 @@ func _on_tiles_matched(tile_types: Array) -> void:
 				if _economy_manager.get_ethan_count() > assists_before:
 					var character_id := "ethan" if int(tile_type) == int(Constants.TileType.ETHAN) else "detective"
 					character_rewards[character_id] = int(character_rewards[character_id]) + 1
-			elif int(tile_type) == int(Constants.TileType.VICTOR):
-				_economy_manager.add_coins(int(character_config.get("victor_coins_per_tile",2)))
-				character_rewards["victor"] = int(character_rewards["victor"]) + 1
 	var reward_notices: Array[String] = []
 	var ethan_matches := int(character_rewards["ethan"])
 	var detective_matches := int(character_rewards["detective"])
@@ -2784,7 +2825,15 @@ func _show_match_feedback(caption: String, sound_id: String, shake_board: bool) 
 		_board.play_celebration_shake(intensity)
 
 
+func _on_character_arrived(kind: String) -> void:
+	_discover_journal_fact("characters", 0)
+	_turn_reward_notices.append("ETHAN EARNED | Wildcard: Ethan + two matching tiles" if kind == "ethan" else "VICTOR ARRIVED | Swap him to replace the board; blockers remain")
+
+
 func _on_special_created(kind: String) -> void:
+	if kind == "thunder":
+		if not _turn_reward_notices.has("FIVE IN A ROW | THUNDER CREATED"):
+			_turn_reward_notices.append("FIVE IN A ROW | THUNDER CREATED")
 	_record_daily_mission("specials", 1)
 	_discover_journal_fact(kind, 0)
 	SignalBus.play_sfx.emit("special_created")
@@ -2828,6 +2877,8 @@ func _on_special_activated(kind: String) -> void:
 
 
 func _on_board_turn_resolved() -> void:
+	var earned_notices := _turn_reward_notices.duplicate()
+	_turn_reward_notices.clear()
 	_turn_praise_rank = 0
 	_suppress_character_rewards_this_turn = false
 	_discover_journal_fact("first_moves", 1)
@@ -2842,6 +2893,8 @@ func _on_board_turn_resolved() -> void:
 	if (_mission_objectives_complete() or _moves_remaining <= 0) and not tutorial_result_pending:
 		_evaluate_level_end()
 		return
+	if not _tutorial_active and not earned_notices.is_empty():
+		_effects().notice("\n".join(earned_notices), DISPLAY_FONT)
 	if _tutorial_active:
 		if _tutorial_action == "guided_swap":
 			if _tutorial_mechanic == "create_rocket":
@@ -2984,7 +3037,7 @@ func _show_tutorial_booster_selection() -> void:
 
 func _finish_tutorial() -> void:
 	_tutorial_skip_pending = false
-	if _tutorial_active and _current_level_id > 0:
+	if _tutorial_active and _current_level_id > 0 and _guidance_enabled("tutorials"):
 		_campaign_progress.set_value("tutorials", str(_current_level_id), true)
 		_persist_campaign_progress()
 	_tutorial_active = false
@@ -3077,7 +3130,7 @@ func _show_booster_confirmation(kind: String) -> void:
 	_booster_confirm.acknowledged.connect(_confirm_booster_use.bind(kind), CONNECT_ONE_SHOT)
 	_booster_confirm.skipped.connect(_cancel_booster_dialog, CONNECT_ONE_SHOT)
 	_booster_confirm.show_tip(
-		"%s\n\nUsing a booster spends one move. Choose USE BOOSTER, then tap a board tile. Tap X to cancel without spending it." % descriptions.get(kind, "Choose a board tile to use this booster."),
+		"%s\n\nTray boosters preserve your moves. Choose USE BOOSTER, then tap a board tile. Tap X to cancel without spending the booster." % descriptions.get(kind, "Choose a board tile to use this booster."),
 		Rect2(), "DAVID", "res://assets/sprites/characters/david_portrait_v2.png", true
 	)
 
@@ -3144,6 +3197,7 @@ func _show_tutorial_tip(message: String, target_rect: Rect2, speaker: String = "
 		_tutorial_overlay = TutorialOverlay.new()
 		_tutorial_overlay.acknowledged.connect(_on_tutorial_acknowledged)
 		_tutorial_overlay.skipped.connect(_skip_tutorial)
+		_tutorial_overlay.help_settings_requested.connect(_show_help_settings)
 		_tutorial_overlay.page_presented.connect(_on_tutorial_page_presented)
 		layer.add_child(_tutorial_overlay)
 	var board_action := ["guided_swap", "activate_special", "booster_target"].has(_tutorial_action)
@@ -3615,6 +3669,7 @@ func _academy_lessons() -> Array:
 
 
 func _start_academy_lesson(level_data: Dictionary) -> void:
+	if not _guidance_enabled("tutorials"): return
 	_academy_pending_level = {}
 	_academy_lesson_id = ""
 	for lesson in _academy_lessons():
@@ -3725,6 +3780,7 @@ func _close_detail() -> void:
 
 
 func _start_practice_tutorial(level_data: Dictionary) -> void:
+	if not _guidance_enabled("tutorials"): return
 	var obstacle_items: Array = level_data.get("obstacles", {}).get("items", [])
 	var tutorial: Dictionary = level_data.get("tutorial", {})
 	var raw_steps: Variant = tutorial.get("steps", [])
@@ -3760,7 +3816,7 @@ func _start_practice_tutorial(level_data: Dictionary) -> void:
 			_tutorial_action = "explain_character_tiles"
 			if _board != null:
 				_board.lock()
-			_hint_label.text = "NEW MATCH PIECES | CHARACTER REWARDS"
+			_hint_label.text = "ETHAN WILDCARDS | VICTOR DISASTERS"
 			_refresh_tutorial_controls()
 			_show_tutorial_tip(
 				str(tutorial_steps[0].get("message", "Match character portraits for their rewards.")),

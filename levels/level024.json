@@ -115,7 +115,7 @@
         "steps": [
             {
                 "mechanic": "character_tiles",
-                "message": "Character portraits are rare. Match Ethan or Detective for one rescue assist; Victor gives ten coins. The Ethan tray spends an assist to clear a three by three area."
+                "message": "A three-wave cascade earns an Ethan wildcard: Ethan plus two matching pieces clears automatically. Victor arrives once after 75% of your moves are used. Swap him to replace all tiles without collecting clues or clearing blockers. Detective matches still earn the separate rescue assists used by the Ethan tray."
             }
         ]
     },

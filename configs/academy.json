@@ -305,27 +305,27 @@
             "id": "characters",
             "title": "Portraits and rescue assists",
             "pages": [
-                "Character portraits are match pieces, not the missing baby himself.",
-                "Ethan and Detective portraits are rare. Matching one during a regular move earns a rescue assist; blasts do not create extra assists.",
-                "Each matched Victor piece earns ten coins. Keep watching the goal.",
+                "Ethan is an earned wildcard, not a random board piece.",
+                "A three-wave cascade earns one Ethan wildcard. Ethan plus two matching pieces completes a match automatically. Detective matches still earn tray assists.",
+                "Victor arrives once after 75% of your moves are spent. Swap him to replace every tile. This costs one move, leaves blockers intact, and grants no collection credit.",
                 "You can hold two assists. Spend one in the Ethan tray to clear a chosen three by three area."
             ],
             "journal_pages": [
                 {
                     "id": "character_rewards",
-                    "title": "Character tile rewards",
+                    "title": "Ethan wildcards and Victor disasters",
                     "fact": "portraits",
                     "illustration": "res://assets/sprites/characters/ethan_portrait_cutout.png"
                 },
                 {
                     "id": "character_rewards",
-                    "title": "Character tile rewards",
+                    "title": "Ethan wildcards and Victor disasters",
                     "fact": "assists",
                     "illustration": "res://assets/sprites/characters/ethan_portrait_cutout.png"
                 },
                 {
                     "id": "character_rewards",
-                    "title": "Character tile rewards",
+                    "title": "Ethan wildcards and Victor disasters",
                     "fact": "coins",
                     "illustration": "res://assets/sprites/characters/ethan_portrait_cutout.png"
                 },

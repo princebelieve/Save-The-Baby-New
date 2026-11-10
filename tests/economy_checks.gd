@@ -39,6 +39,7 @@ func _run() -> void:
 	var account := get_node("/root/CloudAccount")
 	account.token = ""
 	account.user_id = ""
+	await _check_help_preferences(game)
 	await _check_background_notices(game)
 	economy.set_coins(1000)
 	economy.set_lives(0)
@@ -102,6 +103,42 @@ func _run() -> void:
 	print("ECONOMY_CHECKS: %d failures" % failures.size())
 	get_tree().quit(0 if failures.is_empty() else 1)
 
+
+func _check_help_preferences(game: Game) -> void:
+	game._campaign_progress.set_value("preferences", "hints", true)
+	game._campaign_progress.set_value("preferences", "tutorials", true)
+	game._tutorial_active = true
+	game._tutorial_action = "guided_swap"
+	game._show_tutorial_tip("You can control coaching in Help Settings.", Rect2(20,100,200,80), "DAVID", "", true)
+	for frame in 8: await get_tree().process_frame
+	var help_settings: Button = game._tutorial_overlay.find_child("HelpSettings", true, false)
+	check(help_settings != null and game._tutorial_overlay._bubble.get_global_rect().encloses(help_settings.get_global_rect()), "Coaching includes a visible Help Settings shortcut")
+	if help_settings != null: help_settings.pressed.emit()
+	await get_tree().process_frame
+	var hints: CheckButton = game.find_child("HintsEnabled", true, false)
+	var tutorials: CheckButton = game.find_child("TutorialsEnabled", true, false)
+	check(hints != null and tutorials != null, "Settings exposes separate hints and tutorial controls")
+	if hints == null or tutorials == null: return
+	game._board.unlock()
+	game._board.set_required_swap([Vector2i(0,0), Vector2i(1,0)])
+	var tutorial_record: Variant = game._campaign_progress.get_value("tutorials", str(game._current_level_id), false)
+	hints.button_pressed = false
+	check(not game._guidance_enabled("hints") and game._guidance_enabled("tutorials"), "Disabling hints leaves tutorials enabled")
+	game._show_idle_move_hint()
+	check(game._idle_hint_timer.is_stopped() and game._board._suggested_move_tiles.is_empty(), "Disabled hints stop the timer and do not draw a suggestion")
+	tutorials.button_pressed = false
+	check(not game._tutorial_active and not game._board.is_locked() and game._board._required_swap.is_empty(), "Disabling tutorials releases forced input")
+	check(game._campaign_progress.get_value("tutorials", str(game._current_level_id), false) == tutorial_record, "Disabling tutorials does not complete an unseen lesson")
+	var reloaded := ConfigFile.new()
+	check(CampaignProgressStore.read(reloaded, Game.CAMPAIGN_PROGRESS_PATH) == OK and not reloaded.get_value("preferences", "hints", true) and not reloaded.get_value("preferences", "tutorials", true), "Both preferences persist on disk")
+	game._start_academy_lesson(game.get_node("Managers/LevelManager").get_level_data())
+	check(not game._tutorial_active, "Disabled tutorials do not start another academy lesson")
+	tutorials.button_pressed = true
+	check(game._guidance_enabled("tutorials") and not game._guidance_enabled("hints"), "Tutorials can be re-enabled independently")
+	hints.button_pressed = true
+	var popup := hints.get_parent().get_parent().get_parent() as AcceptDialog
+	if popup != null: popup.queue_free()
+	await get_tree().process_frame
 
 func _check_background_notices(game: Game) -> void:
 	var billing := preload("res://scripts/online/CoinPurchases.gd").new()

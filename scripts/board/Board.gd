@@ -15,6 +15,9 @@ signal powerup_blast(kind: String, cell: Vector2i)
 signal rocket_combo(origins: Array, cells: Array)
 signal tile_burst(cell: Vector2i)
 signal player_interacted
+signal character_arrived(kind: String)
+var _match_waves := 0
+var _victor_arrived := false
 
 var _grid: Dictionary = {}
 var _last_rejection_reason := "no_match"
@@ -67,6 +70,8 @@ func initialize(level_data: Dictionary) -> bool:
 	_locked = false
 	_tap_selection = null
 	_remaining_moves = int(_level_data.get("moves", {}).get("total", 0))
+	_match_waves = 0
+	_victor_arrived = false
 	_grid.clear()
 	_clear_systems()
 	_create_systems()
@@ -337,7 +342,7 @@ func swap_tiles(position_a: Vector2i, position_b: Vector2i) -> bool:
 		_reject_move("tutorial")
 		return false
 	var special_tile: Tile = tile_a if tile_a.has_powerup() else (tile_b if tile_b.has_powerup() else null)
-	if special_tile == null and not _move_validator.is_valid_swipe(tile_a, tile_b):
+	if special_tile == null and int(tile_a.get_tile_type()) != Constants.TileType.VICTOR and int(tile_b.get_tile_type()) != Constants.TileType.VICTOR and not _move_validator.is_valid_swipe(tile_a, tile_b):
 		_reject_move("no_match")
 		_animate_invalid_move(tile_a, tile_b)
 		return false
@@ -361,11 +366,18 @@ func _animate_swap_then_resolve(tile_a: Tile, tile_b: Tile, special_tile: Tile =
 	await tween.finished
 	SignalBus.play_sfx.emit("tile_swap")
 	_spend_move()
-	if special_tile != null:
+	_match_waves = 0
+	if int(tile_a.get_tile_type()) == Constants.TileType.VICTOR or int(tile_b.get_tile_type()) == Constants.TileType.VICTOR:
+		# A disaster replaces pieces, without collecting evidence or damaging blockers.
+		powerup_blast.emit("victor", tile_a.get_grid_position())
+		await animate_match_tiles(get_all_tiles())
+		repair_dead_board(true)
+	elif special_tile != null:
 		var partner := tile_b if special_tile == tile_a else tile_a
 		await _resolve_special_powerup(special_tile, partner)
 	else:
 		await _cascade_processor.process_animated(self)
+	await _finish_character_turn()
 	_locked = false
 	turn_resolved.emit()
 	if _board_shuffler != null and _board_shuffler.needs_shuffle(self):
@@ -394,7 +406,7 @@ func notify_match_tiles(tiles: Array, inventory_hit: bool = false) -> void:
 	var cells: Array = []
 	for tile in tiles:
 		if tile != null:
-			tile_types.append(tile.get_tile_type())
+			tile_types.append(-1 if bool(tile.get_meta("collection_counted", false)) else tile.get_meta("wildcard_type", tile.get_tile_type()))
 			cells.append(tile.get_grid_position())
 	match_collected.emit(tile_types)
 	tiles_matched_with_cells.emit(tile_types, cells)
@@ -602,18 +614,23 @@ func create_powerup_for_match(matches: Array) -> Tile:
 	var kind := "rocket"
 	var powerup_type := Constants.PowerupType.ROCKET
 	var available: Array = powerup_config.get("available", [])
-	if has_intersection and available.has("BOMB"):
-		kind = "bomb"
-		powerup_type = Constants.PowerupType.BOMB
-	elif best_size >= 5 and available.has("THUNDER"):
+	if best_size >= 5 and available.has("THUNDER"):
 		kind = "thunder"
 		powerup_type = Constants.PowerupType.THUNDER
+	elif has_intersection and available.has("BOMB"):
+		kind = "bomb"
+		powerup_type = Constants.PowerupType.BOMB
 	elif available.has("ROCKET"):
 		kind = "rocket"
 		powerup_type = Constants.PowerupType.ROCKET
 	else:
 		return null
 	var center := selected_match.get_center_tile() as Tile
+	if center != null and (int(center.get_tile_type()) == Constants.TileType.ETHAN or center.has_powerup()):
+		for piece in selected_match.get_tiles():
+			if int(piece.get_tile_type()) != Constants.TileType.ETHAN and not piece.has_powerup():
+				center = piece
+				break
 	if center == null:
 		return null
 	center.set_powerup(powerup_type)
@@ -765,7 +782,7 @@ func use_booster_at(kind: String, position: Vector2i) -> bool:
 	_required_booster_target = Vector2i(-1, -1)
 	booster_used.emit(kind)
 	powerup_blast.emit(kind, position)
-	_spend_move()
+	_match_waves = 0
 	_resolve_external_clear(targets, kind, true, [], kind in ["rocket","bomb","thunder"])
 	return true
 
@@ -814,7 +831,14 @@ func _resolve_special_powerup(powerup_tile: Tile, partner: Tile) -> void:
 	powerup_tile.clear_powerup()
 	powerup_tile.remove_meta("powerup_kind")
 	var combo_origins: Array = [origin, partner.get_grid_position()] if is_rocket_combo else []
-	await _resolve_external_clear(targets, "rocket_combo" if is_rocket_combo else kind, false, combo_origins)
+	# Snapshot natural matches BEFORE the blast removes tiles and gravity breaks them.
+	var matches := _match_finder.find_all_matches(self)
+	if not matches.is_empty(): _match_waves += 1
+	tag_wildcard_matches(matches)
+	for found in matches:
+		targets.append_array(found.get_tiles())
+	var preserved := create_powerup_for_match(matches)
+	await _resolve_external_clear(targets, "rocket_combo" if is_rocket_combo else kind, false, combo_origins, false, preserved)
 
 
 func _special_targets(kind: String, origin: Vector2i, target_type: int) -> Array:
@@ -871,8 +895,8 @@ func play_celebration_shake(intensity: float = 1.0) -> void:
 	_shake_tween.finished.connect(func(): position = _shake_origin)
 
 
-func _resolve_external_clear(tiles: Array, effect: String, finish_turn: bool = true, combo_origins: Array = [], inventory_hit: bool = false) -> void:
-	var unique_tiles := expand_special_targets(tiles)
+func _resolve_external_clear(tiles: Array, effect: String, finish_turn: bool = true, combo_origins: Array = [], inventory_hit: bool = false, preserved: Tile = null) -> void:
+	var unique_tiles := expand_special_targets(tiles, preserved)
 	if unique_tiles.is_empty():
 		if finish_turn:
 			_locked = false
@@ -890,6 +914,9 @@ func _resolve_external_clear(tiles: Array, effect: String, finish_turn: bool = t
 	elif effect != "rocket_combo":
 		SignalBus.play_sfx.emit("powerup_" + effect)
 	notify_match_tiles(unique_tiles,inventory_hit)
+	if preserved != null:
+		preserved.set_meta("collection_counted", true)
+		unique_tiles.erase(preserved)
 	var burst := create_tween().set_parallel(true)
 	for tile in unique_tiles:
 		burst.tween_property(tile, "scale", Vector2.ONE * 1.22, 0.08)
@@ -903,6 +930,7 @@ func _resolve_external_clear(tiles: Array, effect: String, finish_turn: bool = t
 	await animate_falling_tiles(refill_movements)
 	await _cascade_processor.process_animated(self)
 	if finish_turn:
+		await _finish_character_turn()
 		if _board_shuffler != null and _board_shuffler.needs_shuffle(self):
 			_board_shuffler.shuffle(self)
 		_locked = false
@@ -951,8 +979,13 @@ func get_all_tiles() -> Array:
 	return _grid.values()
 
 
-func repair_dead_board() -> bool:
-	var replacement := _board_generator.generate(_level_data)
+func repair_dead_board(refresh_seed := false) -> bool:
+	var definition := _level_data.duplicate(true)
+	if refresh_seed:
+		var metadata: Dictionary = definition.get("metadata", {}).duplicate(true)
+		metadata["seed"] = int(metadata.get("seed", 0)) + (int(definition.moves.total) - _remaining_moves) * 104729 + 333
+		definition["metadata"] = metadata
+	var replacement := _board_generator.generate(definition)
 	if replacement.is_empty():
 		return false
 	cancel_pointer_gesture()
@@ -962,6 +995,56 @@ func repair_dead_board() -> bool:
 	_grid = replacement
 	for cell in _grid:
 		_attach_tile(_grid[cell], cell)
+	return true
+
+
+func tag_wildcard_matches(matches: Array) -> void:
+	var objectives: Array = _level_data.get("objectives", [])
+	var goal := int(Constants.TileType.get(str(objectives[0].get("target", "")), -1)) if not objectives.is_empty() else -1
+	for found in matches:
+		var matched_kind := -1
+		for piece in found.get_tiles():
+			if int(piece.get_tile_type()) != Constants.TileType.ETHAN:
+				matched_kind = int(piece.get_tile_type())
+				break
+		for piece in found.get_tiles():
+			if int(piece.get_tile_type()) == Constants.TileType.ETHAN and (not piece.has_meta("wildcard_type") or int(piece.get_meta("wildcard_type", -1)) != goal):
+				piece.set_meta("wildcard_type", matched_kind)
+
+
+func _finish_character_turn() -> void:
+	var rules: Dictionary = ConfigLoader.load_config(Constants.ConfigPaths.ECONOMY).get("board_characters", {})
+	if int(_level_data.get("level_id", 1)) < int(rules.get("first_level", 24)) or _remaining_moves <= 0:
+		return
+	if _match_waves >= int(rules.get("ethan_cascade_waves", 3)):
+		if _place_character(Constants.TileType.ETHAN):
+			character_arrived.emit("ethan")
+			# Earned wildcards resolve any line they complete immediately.
+			await _cascade_processor.process_animated(self)
+	var total := int(_level_data.get("moves", {}).get("total", 0))
+	if not _victor_arrived and total > 0 and total - _remaining_moves >= ceili(total * float(rules.get("victor_move_fraction", 0.75))):
+		if _place_character(Constants.TileType.VICTOR):
+			_victor_arrived = true
+			character_arrived.emit("victor")
+
+
+func _place_character(kind: int) -> bool:
+	for tile in get_all_tiles():
+		if int(tile.get_tile_type()) == kind: return false
+	var candidates: Array[Vector2i] = []
+	for cell in _grid:
+		var tile: Tile = get_tile(cell)
+		if tile != null and not is_swap_blocked(cell) and not tile.has_powerup() and int(tile.get_tile_type()) not in [Constants.TileType.ETHAN, Constants.TileType.VICTOR]:
+			if kind == Constants.TileType.VICTOR:
+				var reachable := false
+				for neighbor in get_neighbors(cell):
+					if not is_swap_blocked(neighbor.get_grid_position()): reachable = true
+				if not reachable: continue
+			candidates.append(cell)
+	if candidates.is_empty(): return false
+	var cell: Vector2i = candidates[RandomGenerator.random_int(0, candidates.size() - 1)]
+	remove_tile(cell)
+	set_tile(cell, _tile_factory.create_tile_at(kind, cell), false)
 	return true
 
 

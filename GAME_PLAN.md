@@ -185,6 +185,12 @@ The case file does not prefill evidence descriptions, future lessons, whole unse
 
 ### Expressive gameplay feedback
 
+Tray boosters consume inventory but preserve the remaining move count, including any cascades they trigger. Swapping a special piece already on the board still spends one move. Settings provides independent, persistent Move Hints and Tutorials switches, both enabled by default. Coaching panels include a Help Settings shortcut, and the opening map guidance explains these controls. Disabling tutorials safely releases forced input without completing unseen lessons; players can turn either option back on later.
+
+Booster swaps collect both the blast and any ordinary match formed by the swap before gravity runs. Count each objective piece once, including pieces retained as new specials. Five in a straight line creates Thunder when available; announce that reward after the turn resolves so match praise cannot hide it.
+
+From the character lesson at level 24, Ethan is earned through a three-wave cascade and never enters through random spawning. Ethan plus two ordinary pieces of the same type forms an automatic match. Victor also stays out of random spawning: he appears once per attempt after 75% of the move budget is used, if a move remains. Swapping Victor costs one move and replaces all tiles, preserving blockers and granting no collection credit. Existing tray rescue assists remain separate consumables.
+
 Objective pieces stay visible while following curved sparkling trails from the board into the actual objective icon, rescue-assist tray, or coin counter. Arrival pulses the destination and shows a grouped gain. Results wait for the final collection flight, with board input locked during that short delivery.
 
 Destroyed obstacles throw textured fragments, expanding rings and larger damage labels. Rockets sweep a bright cross; bombs produce radial bursts; thunder branches across the board. Powerful moves trigger a stronger board shake that always returns to its original position. Praise text escalates in place instead of stacking repeated banners.

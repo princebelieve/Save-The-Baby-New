@@ -63,5 +63,10 @@
   "character_rewards": {
     "victor_coins_per_tile": 2,
     "assist_tiles_per_reward": 3
+  },
+  "board_characters": {
+    "first_level": 24,
+    "ethan_cascade_waves": 3,
+    "victor_move_fraction": 0.75
   }
 }

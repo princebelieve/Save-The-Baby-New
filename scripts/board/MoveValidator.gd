@@ -42,18 +42,29 @@ func would_create_match(board, tile_a, tile_b) -> bool:
 func _simulate_swap(board, first_position: Vector2i, second_position: Vector2i) -> bool:
 	if board.get_tile(first_position) == null or board.get_tile(second_position) == null:
 		return false
-	# Validate against a virtual layout. Moving live tiles here was also snapping
-	# sprites while move hints and shuffle checks searched the board.
+	if int(board.get_tile(first_position).get_tile_type()) == Constants.TileType.VICTOR or int(board.get_tile(second_position).get_tile_type()) == Constants.TileType.VICTOR:
+		return true
+	# Check each possible ordinary type across a wildcard-containing line.
 	for origin in [first_position, second_position]:
-		var type := _swapped_type(board, origin, first_position, second_position)
 		for direction in [Vector2i.RIGHT, Vector2i.DOWN]:
-			var count := 1
-			for sign_value in [-1, 1]:
-				var cursor: Vector2i = origin + direction * sign_value
-				while board.is_inside(cursor) and _swapped_type(board, cursor, first_position, second_position) == type:
-					count += 1
-					cursor += direction * sign_value
-			if count >= 3: return true
+			var candidates: Dictionary = {}
+			for offset in range(-2, 3):
+				var kind := _swapped_type(board, origin + direction * offset, first_position, second_position)
+				if kind >= 0 and kind not in [Constants.TileType.ETHAN, Constants.TileType.VICTOR]: candidates[kind] = true
+			for kind in candidates:
+				var center := _swapped_type(board, origin, first_position, second_position)
+				if center not in [kind, Constants.TileType.ETHAN]: continue
+				var count := 1
+				var ordinary := 1 if center == kind else 0
+				for sign_value in [-1, 1]:
+					var cursor: Vector2i = origin + direction * sign_value
+					while board.is_inside(cursor):
+						var value := _swapped_type(board, cursor, first_position, second_position)
+						if value not in [kind, Constants.TileType.ETHAN]: break
+						count += 1
+						if value == kind: ordinary += 1
+						cursor += direction * sign_value
+				if count >= 3 and ordinary >= 2: return true
 	return false
 
 

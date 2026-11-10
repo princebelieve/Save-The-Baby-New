@@ -4,6 +4,7 @@ class_name TutorialOverlay
 signal acknowledged
 signal skipped
 signal page_presented(index: int, message: String)
+signal help_settings_requested
 
 const SHADE := Color(0.10, 0.065, 0.03, 0.78)
 
@@ -210,6 +211,13 @@ func _build_bubble() -> void:
 	_previous_button.add_theme_font_size_override("font_size", 32)
 	_previous_button.pressed.connect(_previous_page)
 	footer.add_child(_previous_button)
+	var help_settings := Button.new()
+	help_settings.name = "HelpSettings"
+	help_settings.text = "HELP SETTINGS"
+	help_settings.custom_minimum_size = Vector2(172, 64)
+	help_settings.tooltip_text = "Turn move hints and tutorials on or off."
+	help_settings.pressed.connect(func(): help_settings_requested.emit())
+	bubble_content.add_child(help_settings)
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	footer.add_child(spacer)
@@ -251,7 +259,7 @@ func _layout_tip() -> void:
 	var body_width := maxf(120.0, bubble_width - 68.0 - portrait_width)
 	var font := _body_label.get_theme_font("font")
 	var body_height := ceilf(font.get_multiline_string_size(_body_label.text, HORIZONTAL_ALIGNMENT_LEFT, body_width, 32).y) + 24.0
-	var action_height := 100.0 if _acknowledge_button.visible else 0.0
+	var action_height := (100.0 if _acknowledge_button.visible else 0.0) + 76.0
 	var visible_body_height := minf(body_height, viewport.y * 0.55 - 80.0 - action_height)
 	_body_label.custom_minimum_size = Vector2(0, body_height)
 	_body_scroll.custom_minimum_size = Vector2(0, visible_body_height)

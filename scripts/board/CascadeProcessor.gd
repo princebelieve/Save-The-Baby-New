@@ -45,6 +45,8 @@ func process_animated(board) -> void:
 		if matches.is_empty():
 			break
 		var matched_tiles: Array = []
+		board._match_waves += 1
+		board.tag_wildcard_matches(matches)
 		var matched_positions: Dictionary = {}
 		for found_match in matches:
 			var tiles: Array = found_match.get_tiles()
@@ -59,6 +61,7 @@ func process_animated(board) -> void:
 			matched_positions[tile.get_grid_position()] = tile
 		board.notify_match_tiles(matched_tiles)
 		if preserved_powerup != null:
+			preserved_powerup.set_meta("collection_counted", true)
 			matched_positions.erase(preserved_powerup.get_grid_position())
 			matched_tiles.erase(preserved_powerup)
 		await board.animate_match_tiles(matched_tiles)
