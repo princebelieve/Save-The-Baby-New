@@ -1,0 +1,9 @@
+# Action audio palette
+
+Generate the original effects with `python tools/generate_action_sfx.py`. This writes mono, 44.1 kHz, 16-bit PCM WAV assets to `assets/audio/sfx/actions/`, plus a listening page and numerical manifest in `.test-data/audio-actions/`. The generator uses mathematical oscillators and deterministic noise; it contains no sampled recordings or borrowed melodies. Existing speech recordings and background music remain separate.
+
+The sound vocabulary is deliberately short: wooden taps for UI and landing, a rising bubble for a swap, a descending tap for rejection, a three-note pluck for matches, brighter versions for later cascade waves, and a two-note bell for objective arrival. Rocket, bomb and Thunder have different envelopes and textures. Creating each special also has a different short phrase. Ethan's arrival rises, while Victor's arrival descends. Victory and failure have short musical stings alongside the existing spoken result cues.
+
+Sounds are attached to actual action events: swaps begin with their movement; falling has a quiet air cue followed by a landing tap; objective chimes follow the existing collection-arrival event. Powerup sound emission belongs to the blast handler, avoiding a second emission from external-clear resolution. Rocket-combo visuals emit one combo cue without combat recordings. Per-event limits and lower levels for repeated tile effects keep the main action audible.
+
+Regenerate assets and let Godot import them before testing. Run `powershell -ExecutionPolicy Bypass -File tools/run_checks.ps1 -Suite action_audio_checks` for asset loading, cue duration, mappings, duplicate limiting, actual bomb/rocket-combo playback events and fall/landing order. These checks establish technical behavior, not subjective sound quality; audition in the running game and on phone speakers before considering the palette final.

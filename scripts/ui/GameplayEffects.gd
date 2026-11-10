@@ -197,10 +197,8 @@ func rocket_salvo(origins: Array[Vector2], targets: Array[Vector2]) -> void:
 		pull.tween_property(launcher,"rotation",-0.12,0.08)
 		pull.tween_property(launcher,"modulate:a",0.0,0.11).set_delay(0.12)
 		pull.chain().tween_callback(launcher.queue_free)
-	SignalBus.play_sfx.emit("kung_fu_shout")
 	await get_tree().create_timer(0.24).timeout
-	SignalBus.play_sfx.emit("rocket_launch")
-	SignalBus.play_sfx.emit("gunfire_burst")
+	SignalBus.play_sfx.emit("rocket_combo")
 	for index in targets.size():
 		var from: Vector2 = origins[index % origins.size()]
 		var to: Vector2 = targets[index]

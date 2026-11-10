@@ -358,13 +358,13 @@ func swap_tiles(position_a: Vector2i, position_b: Vector2i) -> bool:
 
 
 func _animate_swap_then_resolve(tile_a: Tile, tile_b: Tile, special_tile: Tile = null) -> void:
+	SignalBus.play_sfx.emit("tile_swap")
 	var destination_a := _cell_center(tile_a.get_grid_position())
 	var destination_b := _cell_center(tile_b.get_grid_position())
 	var tween := create_tween().set_parallel(true)
 	tween.tween_property(tile_a, "position", destination_a, 0.16).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	tween.tween_property(tile_b, "position", destination_b, 0.16).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	await tween.finished
-	SignalBus.play_sfx.emit("tile_swap")
 	_spend_move()
 	_match_waves = 0
 	if int(tile_a.get_tile_type()) == Constants.TileType.VICTOR or int(tile_b.get_tile_type()) == Constants.TileType.VICTOR:
@@ -908,11 +908,6 @@ func _resolve_external_clear(tiles: Array, effect: String, finish_turn: bool = t
 			combo_cells.append(tile.get_grid_position())
 		rocket_combo.emit(combo_origins, combo_cells)
 		await get_tree().create_timer(0.49 + combo_cells.size() * 0.022).timeout
-	elif effect == "thunder":
-		SignalBus.play_sfx.emit("thunder_crack")
-		SignalBus.play_sfx.emit("thunder_roll")
-	elif effect != "rocket_combo":
-		SignalBus.play_sfx.emit("powerup_" + effect)
 	notify_match_tiles(unique_tiles,inventory_hit)
 	if preserved != null:
 		preserved.set_meta("collection_counted", true)
@@ -962,7 +957,7 @@ func animate_match_tiles(tiles: Array, emit_bursts: bool = true) -> void:
 func animate_falling_tiles(movements: Array) -> void:
 	if movements.is_empty():
 		return
-	SignalBus.play_sfx.emit("tile_drop")
+	SignalBus.play_sfx.emit("tile_fall")
 	var tween := create_tween().set_parallel(true)
 	for movement in movements:
 		var tile: Tile = movement["tile"]
@@ -973,6 +968,7 @@ func animate_falling_tiles(movements: Array) -> void:
 				tween.tween_property(tile, "scale", Vector2.ONE, 0.36).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
 			tween.tween_property(tile, "position", movement["to"], 0.30).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
 	await tween.finished
+	SignalBus.play_sfx.emit("tile_drop")
 
 
 func get_all_tiles() -> Array:

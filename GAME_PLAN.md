@@ -185,6 +185,8 @@ The case file does not prefill evidence descriptions, future lessons, whole unse
 
 ### Expressive gameplay feedback
 
+Use an original, coherent action-sound palette: short taps, slides, pops and ascending cascade tones for routine play; separate creation and activation cues for each special; a bright Ethan cue and an ominous Victor cue. Trigger sound with the corresponding movement or impact, with landing audio at arrival. Keep repeated tile effects quieter than special actions, and avoid unrelated combat recordings in puzzle effects. Regenerate the action palette with `tools/generate_action_sfx.py`; audition it in the game rather than judging filenames.
+
 Tray boosters consume inventory but preserve the remaining move count, including any cascades they trigger. Swapping a special piece already on the board still spends one move. Settings provides independent, persistent Move Hints and Tutorials switches, both enabled by default. Coaching panels include a Help Settings shortcut, and the opening map guidance explains these controls. Disabling tutorials safely releases forced input without completing unseen lessons; players can turn either option back on later.
 
 Booster swaps collect both the blast and any ordinary match formed by the swap before gravity runs. Count each objective piece once, including pieces retained as new specials. Five in a straight line creates Thunder when available; announce that reward after the turn resolves so match praise cannot hide it.

@@ -2707,6 +2707,7 @@ func _on_rocket_combo(origins: Array, cells: Array) -> void:
 
 
 func _on_powerup_blast(kind: String, cell: Vector2i) -> void:
+	SignalBus.play_sfx.emit("powerup_" + kind)
 	var first := _board.get_cell_screen_rect(Vector2i.ZERO)
 	var last := _board.get_cell_screen_rect(Vector2i(_board.get_width()-1,_board.get_height()-1))
 	_effects().powerup("bomb" if kind == "ethan" else kind,_board.get_cell_screen_rect(cell).get_center(),first.merge(last))
@@ -2768,7 +2769,8 @@ func _on_tiles_matched(tile_types: Array) -> void:
 	if victor_matches > 0:
 		reward_notices.append("VICTOR +%d ETHAN COINS" % (victor_matches * int(character_config.get("victor_coins_per_tile",2))))
 	var special_reward_text := " | ".join(reward_notices)
-	SignalBus.play_sfx.emit("tile_match")
+	var wave := clampi(_board._match_waves, 1, 3) if _board != null else 1
+	SignalBus.play_sfx.emit("tile_match" if wave == 1 else "tile_match_%d" % wave)
 	var rank := 0
 	if tile_types.size() >= 12:
 		feedback_caption = "WONDERFUL!"
@@ -2826,6 +2828,7 @@ func _show_match_feedback(caption: String, sound_id: String, shake_board: bool) 
 
 
 func _on_character_arrived(kind: String) -> void:
+	SignalBus.play_sfx.emit("ethan_earned" if kind == "ethan" else "victor_arrived")
 	_discover_journal_fact("characters", 0)
 	_turn_reward_notices.append("ETHAN EARNED | Wildcard: Ethan + two matching tiles" if kind == "ethan" else "VICTOR ARRIVED | Swap him to replace the board; blockers remain")
 
@@ -2836,7 +2839,7 @@ func _on_special_created(kind: String) -> void:
 			_turn_reward_notices.append("FIVE IN A ROW | THUNDER CREATED")
 	_record_daily_mission("specials", 1)
 	_discover_journal_fact(kind, 0)
-	SignalBus.play_sfx.emit("special_created")
+	SignalBus.play_sfx.emit("special_%s_created" % kind)
 	_special_moves_created += 1
 	var rewards: Array = []
 	if _reward_manager != null:
@@ -3443,11 +3446,13 @@ func _show_level_result(won: bool) -> void:
 	entrance.tween_property(card, "scale", Vector2.ONE, 0.42).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	if won:
 		SignalBus.play_sfx.emit("level_victory")
+		SignalBus.play_sfx.emit("win_sting")
 		if _story_objective_sound_pending:
 			_story_objective_sound_pending = false
 			_play_story_objective_sound_after_mission()
 	else:
 		SignalBus.play_sfx.emit("level_failure")
+		SignalBus.play_sfx.emit("lose_sting")
 
 
 func _calculate_level_stars() -> int:
