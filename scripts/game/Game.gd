@@ -9,6 +9,8 @@ const CAMPAIGN_PROGRESS_PATH := "user://campaign_progress.cfg"
 var _daily_rewards_layer: CanvasLayer
 var _portrait_layer: CanvasLayer
 var _portrait_puzzle: PortraitPuzzle
+var _restoration_invite: Control
+var _portrait_continuation := Callable()
 var _portrait_gallery: Node
 var _completed_portrait_id := ""
 var _progress_transaction := false
@@ -2150,7 +2152,7 @@ func _show_level_briefing(route_id: String) -> void:
 	card_bounds.custom_minimum_size = Vector2(minf(610.0, get_viewport_rect().size.x * 0.92), minf(1020.0, get_viewport_rect().size.y * 0.94))
 	center.add_child(card_bounds)
 	panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	panel.add_theme_stylebox_override("panel", _make_parchment_panel_style(82, 100))
+	panel.add_theme_stylebox_override("panel", MobileGameUI.style(Color("#fff4d9")))
 	card_bounds.add_child(panel)
 	panel.modulate.a = 0.0
 	panel.scale = Vector2(0.94, 0.94)
@@ -2177,15 +2179,16 @@ func _show_level_briefing(route_id: String) -> void:
 	content.add_theme_constant_override("separation", 10)
 	paper_sheet.add_child(content)
 	var level_id := int(level_data.get("level_id", 1))
-	var level_title := _make_label("INVESTIGATION %02d" % level_id, 18)
+	var level_title := _make_label("CASE %02d" % level_id, 36)
 	level_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	content.add_child(level_title)
-	var title := _make_label(str(level_data.get("name", "The First Clue")), 30)
+	var title := _make_label(str(level_data.get("name", "The First Clue")), 44)
+	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	content.add_child(title)
 
 	var portrait := TextureRect.new()
-	portrait.custom_minimum_size = Vector2(220, 210)
+	portrait.custom_minimum_size = Vector2(220, 160)
 	portrait.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -2199,11 +2202,13 @@ func _show_level_briefing(route_id: String) -> void:
 	var route_label := _make_label("APPROACH | " + _chosen_route_label.to_upper(), 20)
 	route_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	content.add_child(route_label)
+	route_label.hide()
 	var description := _make_label(str(level_data.get("description", "")), 22)
 	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	description.custom_minimum_size.x = 0
 	description.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	content.add_child(description)
+	description.hide()
 	var route_briefings := {
 		"police": "Detective Morris coordinates the investigation. David checks the records, and Amara supplies the history behind them.",
 		"signal": "David traces the technical evidence while Amara checks its meaning against what she knows.",
@@ -2215,7 +2220,9 @@ func _show_level_briefing(route_id: String) -> void:
 	route_detail.custom_minimum_size.x = 0
 	route_detail.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	content.add_child(route_detail)
-	route_detail.visible = level_data.get("story",{}).has("briefings")
+	route_detail.hide()
+	var story_details := MobileGameUI.button(content, "Case story", func(): _show_detail(str(level_data.get("name", "The case")), description.text + "\n\n" + route_detail.text), MobileGameUI.PURPLE)
+	story_details.name = "BriefingStoryDetails"
 
 	var objective := _get_primary_objective(level_data)
 	var objective_panel := PanelContainer.new()
@@ -2232,36 +2239,38 @@ func _show_level_briefing(route_id: String) -> void:
 	objective_row.add_theme_constant_override("separation", 16)
 	objective_panel.add_child(objective_row)
 	var objective_icon := TextureRect.new()
-	objective_icon.custom_minimum_size = Vector2(82, 82)
+	objective_icon.custom_minimum_size = Vector2(112, 112)
 	objective_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	objective_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	objective_icon.texture = ResourceManager.load_texture(_objective_icon_path(str(objective.get("target", ""))))
 	objective_row.add_child(objective_icon)
 	var objective_copy := VBoxContainer.new()
 	objective_copy.alignment = BoxContainer.ALIGNMENT_CENTER
-	var objective_heading := _make_label("MISSION OBJECTIVE", 20)
+	var objective_heading := _make_label("YOUR GOAL", 32)
 	objective_copy.add_child(objective_heading)
-	var objective_text := _make_label(_format_objective(objective), 22)
+	var objective_text := _make_label(_format_objective(objective), 44)
+	objective_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	objective_copy.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	objective_copy.add_child(objective_text)
 	objective_row.add_child(objective_copy)
 
 	var moves_total := int(level_data.get("moves", {}).get("total", 0))
 	var difficulty := str(level_data.get("difficulty", "NORMAL")).replace("_", " ")
-	var difficulty_label := _make_label("DIFFICULTY | " + difficulty, 20)
+	var difficulty_label := _make_label(difficulty, 32)
 	difficulty_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	difficulty_label.add_theme_color_override("font_color", Color("#80502b"))
 	content.add_child(difficulty_label)
-	var moves := _make_label("MATCH THE GOAL | %d MOVES" % moves_total, 21)
+	var moves := _make_label("%d MOVES" % moves_total, 40)
 	moves.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	content.add_child(moves)
 	if bool(level_data.get("settings",{}).get("return_assistance",false)):
-		var welcome := _make_label("WELCOME BACK | +4 moves and a refreshed evidence mix for this attempt.",20)
+		var welcome := _make_label("Welcome back! +4 moves",36)
 		welcome.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		content.add_child(welcome)
 	var sealed := _has_inventory_seal(level_data)
 	if sealed:
 		var recommended := str(level_data.get("metadata",{}).get("recommended_booster","rocket"))
-		var suggestion := _make_label("RECOMMENDED SUPPLY | " + recommended.to_upper(),20)
+		var suggestion := _make_label("TRY A " + recommended.to_upper(),36)
 		suggestion.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		content.add_child(suggestion)
 		var supplies := _make_menu_button("VIEW " + recommended.to_upper() + " OFFER")
@@ -2276,8 +2285,9 @@ func _show_level_briefing(route_id: String) -> void:
 			content.add_child(gift)
 
 	_apply_parchment_text(content)
+	content.move_child(story_details, content.get_child_count() - 1)
 	var play := _make_menu_button("PLAY")
-	play.custom_minimum_size = Vector2(350, 82)
+	play.custom_minimum_size = Vector2(350, 96)
 	play.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	play.pressed.connect(_play_ui_confirm)
 	play.pressed.connect(_begin_level.bind(route_id), CONNECT_ONE_SHOT)
@@ -2974,7 +2984,7 @@ func _show_tutorial_goal_feedback() -> void:
 	if _board != null:
 		_board.lock()
 	var hud_target := _moves_label.get_global_rect().merge(_objective_label.get_global_rect())
-	var message := "That match used one move and refilled the board. MOVES shows %d turns left; GOAL tracks %d of %d keys. Other symbols clear space but do not add key evidence."
+	var message := "%d moves left. You collected %d of %d keys. Match the goal symbol!"
 	_show_tutorial_tip(
 		message % [_moves_remaining, _evidence_count, _evidence_goal],
 		hud_target,
@@ -2993,13 +3003,13 @@ func _show_tutorial_obstacle_result() -> void:
 	var level_data: Dictionary = level_manager.get_level_data() if level_manager != null else {}
 	var obstacles: Array = level_data.get("obstacles", {}).get("items", [])
 	var target_rect := _objective_label.get_global_rect()
-	var message := "That match damaged the marked obstacle. Match beside each layer until it breaks; only the clue shown on the goal card advances the evidence count."
+	var message := "One layer down! Match beside the blocker again to break it."
 	if not obstacles.is_empty():
 		var obstacle: Dictionary = obstacles[0]
 		var cell := Vector2i(int(obstacle.get("x", -1)), int(obstacle.get("y", -1)))
 		target_rect = _board.get_cell_screen_rect(cell)
 		var obstacle_name := str(obstacle.get("type", "obstacle")).replace("_", " ").to_upper()
-		message = "You hit the %s. Matches beside it remove one health layer; clear it completely to finish the BLOCKERS mission. Watch its health fly up after each hit." % obstacle_name
+		message = "%s hit! Match beside it again to remove the next layer." % obstacle_name
 	_tutorial_action = "explain_obstacle"
 	_show_tutorial_tip(message, target_rect, "DAVID", "res://assets/sprites/characters/david_portrait_v2.png", true)
 
@@ -3023,14 +3033,14 @@ func _show_tutorial_special_created() -> void:
 	_board.set_required_swap([special_cell, neighbor])
 	_board.unlock()
 	var target_rect := _board.get_cell_screen_rect(special_cell).merge(_board.get_cell_screen_rect(neighbor))
-	_show_tutorial_tip("Four in a line made a rocket. Swap it with the glowing neighbor to fire its row and column. Special pieces activate through a swap.", target_rect, "DAVID", "res://assets/sprites/characters/david_portrait_v2.png")
+	_show_tutorial_tip("A Rocket! Swap it with the glowing neighbor to clear a cross.", target_rect, "DAVID", "res://assets/sprites/characters/david_portrait_v2.png")
 
 
 func _show_tutorial_special_result() -> void:
 	_tutorial_action = "explain_special_result"
 	if _board != null:
 		_board.lock()
-	_show_tutorial_tip("The rocket cleared its row and column in one move. Amara sends a matching booster after 15 special pieces. Use specials to clear a blocked path or reach mission evidence.", _objective_label.get_global_rect(), "DAVID", "res://assets/sprites/characters/david_portrait_v2.png", true)
+	_show_tutorial_tip("The Rocket cleared a row and column. Aim the next one at your goal!", _objective_label.get_global_rect(), "DAVID", "res://assets/sprites/characters/david_portrait_v2.png", true)
 
 
 func _show_tutorial_booster_result() -> void:
@@ -3042,7 +3052,7 @@ func _show_tutorial_booster_result() -> void:
 		"bomb": consequence = "The bomb clears pieces around the target."
 		"thunder": consequence = "Thunder clears every piece of the chosen type."
 		"ethan": consequence = "The gift placed Ethan near useful clues. He completes a match with two identical neighbors and grants five moves."
-	_show_tutorial_tip("%s The booster count dropped by one; boosters are limited. Save the next one for a useful obstacle or hard-to-reach clue." % consequence, _objective_label.get_global_rect(), "DAVID", "res://assets/sprites/characters/david_portrait_v2.png", true)
+	_show_tutorial_tip("%s You kept your moves!" % consequence, _objective_label.get_global_rect(), "DAVID", "res://assets/sprites/characters/david_portrait_v2.png", true)
 
 
 func _on_tutorial_acknowledged() -> void:
@@ -3627,6 +3637,12 @@ func _dismiss_level_result() -> void:
 func _next_level_after_win() -> void:
 	if _ads.busy:
 		return
+	if DailyActivities.invitation_pending(_campaign_progress, TimeHelper.current_unix_time()):
+		_campaign_progress.set_value("daily", "portrait_offer_presented", DailyActivities.slot_at(TimeHelper.current_unix_time()))
+		_persist_campaign_progress()
+		_portrait_continuation = _next_level_after_win
+		_open_portrait_puzzle()
+		return
 	await _show_result_ad()
 	var level_manager := get_node_or_null("Managers/LevelManager")
 	var level_data: Dictionary = level_manager.get_level_data() if level_manager != null else {}
@@ -3719,6 +3735,7 @@ func _record_level_completion() -> bool:
 	_last_daily_stamp = stamp
 	if not stamp.is_empty():
 		_grant_activity_coins(int(stamp.coins))
+	DailyActivities.offer_for_clear(_campaign_progress, _current_level_id, old_stars == 0, TimeHelper.current_unix_time())
 	_progress_transaction = false
 	_persist_campaign_progress()
 	return old_stars == 0
@@ -3741,9 +3758,8 @@ func _start_academy_lesson(level_data: Dictionary) -> void:
 		# Mark on presentation so retrying or relaunching never forces the lesson again.
 		# The complete pages are archived in the case file for optional review.
 		_campaign_progress.set_value("academy_completed", str(lesson["id"]), true)
-		# The Academy already teaches this case. Archive its short practice prompt
-		# so it can be reviewed, but do not put the player through both tutorials.
-		_campaign_progress.set_value("tutorials", str(_current_level_id), true)
+		# One illustrated introduction, followed by the authored board practice.
+		# Full reference facts remain available in the case file below.
 		var level_tutorial: Dictionary = level_data.get("tutorial", {})
 		var level_steps: Array = level_tutorial.get("steps", [])
 		if not level_steps.is_empty():
@@ -3778,7 +3794,7 @@ func _start_academy_lesson(level_data: Dictionary) -> void:
 		_tutorial_active = true
 		_tutorial_action = "academy_lesson"
 		_board.lock()
-		_show_tutorial_tip("\n".join(lesson["pages"]), _objective_label.get_global_rect(), "DAVID", "res://assets/sprites/characters/david_portrait_v2.png", true)
+		_show_tutorial_tip(str(lesson.get("intro", lesson["pages"][0])), _objective_label.get_global_rect(), "DAVID", "res://assets/sprites/characters/david_portrait_v2.png", true)
 		return
 	_start_practice_tutorial(level_data)
 
@@ -3892,7 +3908,7 @@ func _start_practice_tutorial(level_data: Dictionary) -> void:
 			_hint_label.text = "BOOSTER TRAINING | " + _tutorial_booster_kind.to_upper()
 			_refresh_tutorial_controls()
 			_show_tutorial_tip(
-				str(tutorial_steps[0].get("message", "Learn to use your new booster.")) + " A practice booster is provided if your supply is empty. Tap Continue to try it.",
+				"Try your %s. Tray boosters keep your moves!" % _tutorial_booster_kind.capitalize(),
 				_objective_label.get_global_rect(),
 				"DAVID",
 				"res://assets/sprites/characters/david_portrait_v2.png",
@@ -3925,6 +3941,10 @@ func _start_practice_tutorial(level_data: Dictionary) -> void:
 			if _board != null:
 				_board.set_required_swap(guided_swap)
 			var base_message := str(tutorial_steps[0].get("message", "Swap the highlighted neighboring pieces to make a match."))
+			if _current_level_id == 1:
+				base_message = "Swap the glowing neighbors to match three."
+			elif _tutorial_mechanic == "damage_obstacle":
+				base_message = "Match beside the marked blocker to remove a layer."
 			if tutorial_mechanic_unavailable:
 				if _current_level_id == 16:
 					base_message = "This board has no safe four-piece setup yet. Make the glowing match; we will show you a rocket when one appears."
@@ -3956,14 +3976,9 @@ func _start_practice_tutorial(level_data: Dictionary) -> void:
 
 func _on_tutorial_page_presented(index: int, message: String) -> void:
 	if _tutorial_action == "academy_lesson":
-		for lesson in _academy_lessons():
-			if str(lesson["id"]) != _academy_lesson_id: continue
-			var journal_pages: Array = lesson.get("journal_pages", [])
-			if index >= journal_pages.size(): return
-			var fact: Dictionary = journal_pages[index]
-			if not fact.is_empty() and CaseJournal.discover(_campaign_progress, str(fact["id"]), str(fact["title"]), str(fact["fact"]), message, str(fact["illustration"]), _current_level_id):
-				_persist_campaign_progress()
-			return
+		# The short invitation is not an authored reference page. Preserve the
+		# complete original facts archived by _start_academy_lesson instead.
+		return
 	elif _tutorial_action == "campaign_map_intro":
 		if CaseJournal.discover(_campaign_progress, "map", "Using the campaign map", "navigation", message, "res://assets/sprites/props/evidence_briefcase.jpeg", _current_level_id):
 			_persist_campaign_progress()
@@ -4075,36 +4090,28 @@ func _open_portrait_puzzle() -> void:
 	if not attempt.is_empty():
 		_show_portrait_attempt(attempt)
 		return
+	var offer := DailyActivities.earned_offer(_campaign_progress, now)
+	if offer.is_empty():
+		return
 	_portrait_layer = CanvasLayer.new()
 	_portrait_layer.layer = 20
 	add_child(_portrait_layer)
-	var screen := Control.new()
-	screen.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_portrait_layer.add_child(screen)
-	MobileGameUI.background(screen)
-	var margin := MarginContainer.new()
-	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	for side in ["left", "right", "top", "bottom"]:
-		margin.add_theme_constant_override("margin_" + side, 24)
-	screen.add_child(margin)
-	var column := MobileGameUI.column(margin, 20)
-	MobileGameUI.label(column, "Restore evidence", 48)
-	MobileGameUI.spacer(column)
 	var config := DailyActivities.settings()
 	var challenge := DailyActivities.puzzle_for_slot(DailyActivities.slot_at(now))
-	var hero := MobileGameUI.card(column, MobileGameUI.PURPLE)
-	var hero_content := MobileGameUI.column(hero)
-	MobileGameUI.image(hero_content, MobileGameUI.COIN, Vector2(120, 100))
-	MobileGameUI.label(hero_content, "+%d coins" % int(config.portrait_coins), 64, Color.WHITE)
-	MobileGameUI.label(hero_content, "%d pieces | %d minutes" % [int(challenge.columns) * int(challenge.rows), int(challenge.seconds) / 60], 42, Color.WHITE)
-	var ready := DailyActivities.available(_campaign_progress, now)
-	MobileGameUI.label(column, "Swap pieces to restore the picture.\nThe timer keeps running if you leave." if ready else "This puzzle slot is finished.\nNew puzzles at 00:00 and 12:00 UTC.", 36)
-	MobileGameUI.spacer(column)
-	MobileGameUI.button(column, "Start puzzle" if ready else "Come back for the next puzzle", func():
-		_close_portrait_puzzle()
-		_start_portrait_attempt()
-	, MobileGameUI.PINK).disabled = not ready
-	MobileGameUI.button(column, "Return to investigation", _close_portrait_puzzle)
+	var invitation := preload("res://scripts/ui/RestorationInvite.gd").new()
+	invitation.details = {"portrait": str(config.portraits[DailyActivities.slot_at(now) % config.portraits.size()]), "booster": str(offer.booster), "coins": int(config.portrait_coins), "seconds": int(challenge.seconds), "pieces": int(challenge.columns) * int(challenge.rows), "teach": _guidance_enabled("tutorials") and not bool(_campaign_progress.get_value("tutorials", "restoration_practice", false))}
+	invitation.practiced.connect(func():
+		_campaign_progress.set_value("tutorials", "restoration_practice", true)
+		_persist_campaign_progress())
+	invitation.started.connect(func():
+		if DailyActivities.earned_offer(_campaign_progress, TimeHelper.current_unix_time()).is_empty() or int(offer.slot) != DailyActivities.slot_at(TimeHelper.current_unix_time()):
+			invitation._copy.text = "This challenge expired. Continue the investigation for another chance."
+			return
+		_close_portrait_puzzle(false)
+		_start_portrait_attempt())
+	invitation.dismissed.connect(_close_portrait_puzzle)
+	_restoration_invite = invitation
+	_portrait_layer.add_child(invitation)
 
 
 func _start_portrait_attempt() -> void:
@@ -4149,19 +4156,27 @@ func _complete_portrait_puzzle(slot: int) -> void:
 	var result := DailyActivities.finish_portrait(_campaign_progress, slot, TimeHelper.current_unix_time())
 	if not result.is_empty():
 		_grant_activity_coins(int(result.coins))
+		var booster := str(result.get("booster", ""))
+		if booster in ["rocket", "bomb", "thunder"] and _economy_manager != null:
+			_economy_manager.add_booster(booster, 1)
 	_progress_transaction = false
 	_persist_campaign_progress()
 	if not result.is_empty() and _portrait_puzzle != null:
-		_portrait_puzzle.show_reward(int(result.coins), int(result.streak))
+		_portrait_puzzle.show_reward(int(result.coins), int(result.streak), str(result.get("booster", "")))
 	if not result.is_empty() and not completed_attempt.is_empty():
 		_completed_portrait_id = _portrait_gallery.record_completed(str(completed_attempt.portrait),slot)
 
 
-func _close_portrait_puzzle() -> void:
+func _close_portrait_puzzle(resume_followup := true) -> void:
 	if _portrait_layer != null and is_instance_valid(_portrait_layer):
 		_portrait_layer.queue_free()
 	_portrait_layer = null
 	_portrait_puzzle = null
+	_restoration_invite = null
+	if resume_followup and _portrait_continuation.is_valid():
+		var followup := _portrait_continuation
+		_portrait_continuation = Callable()
+		followup.call_deferred()
 
 
 func _record_daily_mission(kind: String, amount: int) -> void:
@@ -4205,6 +4220,7 @@ func _show_activity_settings() -> void:
 
 
 func _return_from_activity_to_map() -> void:
+	_portrait_continuation = Callable()
 	_close_portrait_puzzle()
 	_close_daily_rewards()
 	if is_instance_valid(_pause_layer): _close_pause_menu()

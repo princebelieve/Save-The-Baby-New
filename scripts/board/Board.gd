@@ -701,18 +701,7 @@ func _load_obstacles() -> void:
 		add_child(obstacle)
 		if bool(definition.get("inventory_only",false)):
 			obstacle.set_meta("inventory_only",true)
-			var seal_label := Label.new()
-			seal_label.text = "SEAL"
-			seal_label.position = Vector2(-62,-24)
-			seal_label.add_theme_font_size_override("font_size",44)
-			seal_label.add_theme_color_override("font_color",Color("#fff4ad"))
-			seal_label.add_theme_color_override("font_outline_color",Color("#281b30"))
-			seal_label.add_theme_constant_override("outline_size",10)
-			obstacle.add_child(seal_label)
-		var texture := obstacle.get_texture()
-		if texture != null:
-			var max_dimension := maxf(texture.get_width(), texture.get_height())
-			obstacle.scale = Vector2.ONE * (float(_tile_size - 8) / maxf(max_dimension, 1.0))
+		obstacle.configure_board_overlay(float(_tile_size), bool(definition.get("inventory_only",false)))
 		_obstacles[cell] = obstacle
 
 

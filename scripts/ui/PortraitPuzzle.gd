@@ -175,13 +175,21 @@ func _select(index: int) -> void:
 	completed.emit(int(_attempt.slot))
 
 
-func show_reward(coins: int, streak: int) -> void:
+func show_reward(coins: int, streak: int, booster: String = "") -> void:
 	_running = false
 	_message.text = "Evidence restored! +%d coins" % coins
 	_timer_label.text = "DONE"
 	_progress_label.text = "%d / %d" % [_pieces.size(), _pieces.size()]
 	_save_button.tooltip_text = "%d day streak" % streak
 	_save_button.show()
+	if not booster.is_empty() and not _message.get_parent().has_node("EarnedSupply"):
+		var supply := HBoxContainer.new()
+		supply.name = "EarnedSupply"
+		supply.alignment = BoxContainer.ALIGNMENT_CENTER
+		_message.get_parent().add_child(supply)
+		_message.get_parent().move_child(supply, _message.get_index() + 1)
+		MobileGameUI.image(supply, "res://assets/sprites/powerups/" + booster + "_powerup_icon.jpeg", Vector2(70, 70))
+		MobileGameUI.display_label(supply, "+1 " + booster.capitalize() + " earned!", 40)
 
 func show_gallery_status(message: String) -> void:
 	_gallery_message.text = message

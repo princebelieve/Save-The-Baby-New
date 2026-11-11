@@ -17,6 +17,8 @@ signal clicked(obstacle)
 var _state: ObstacleState
 var _behavior: ObstacleBehavior = null
 var _pending_texture: Texture2D
+var _overlay_size := 0.0
+var _health_label: Label
 
 @onready var _sprite: Sprite2D = $Sprite2D
 @onready var _animation_player: AnimationPlayer = $AnimationPlayer
@@ -53,6 +55,7 @@ func reset() -> void:
 		_behavior.reset()
 
 	reset_modulate()
+	_update_health_label()
 	if _animation_player != null:
 		_animation_player.stop()
 
@@ -67,6 +70,7 @@ func get_obstacle_state() -> ObstacleState:
 
 func set_obstacle_state(state: ObstacleState) -> void:
 	_state = state
+	_update_health_label()
 
 
 func duplicate_obstacle_state() -> ObstacleState:
@@ -128,12 +132,14 @@ func damage(amount: int) -> void:
 	if _state == null:
 		return
 	_state.damage(amount)
+	_update_health_label()
 
 
 func heal(amount: int) -> void:
 	if _state == null:
 		return
 	_state.heal(amount)
+	_update_health_label()
 
 
 func is_destroyed() -> bool:
@@ -184,7 +190,55 @@ func get_texture() -> Texture2D:
 
 func reset_modulate() -> void:
 	if _sprite:
-		_sprite.modulate = Color(1, 1, 1, 1)
+		_sprite.modulate = Color(1, 1, 1, 0.24 if _overlay_size > 0 else 1.0)
+
+
+func configure_board_overlay(cell_size: float, reinforced := false) -> void:
+	# Fade only the covering artwork. Keep the small identity/health badges solid
+	# so the tile underneath is readable without hiding the obstacle itself.
+	_overlay_size = cell_size - 8.0
+	var texture := get_texture()
+	if texture != null:
+		_sprite.scale = Vector2.ONE * (_overlay_size / maxf(texture.get_width(), texture.get_height()))
+	reset_modulate()
+	var badge := Sprite2D.new()
+	badge.name = "BlockerBadge"
+	badge.texture = texture
+	if texture != null:
+		badge.scale = Vector2.ONE * (cell_size * 0.30 / maxf(texture.get_width(), texture.get_height()))
+	badge.position = Vector2(-cell_size * 0.29, cell_size * 0.29)
+	add_child(badge)
+	_health_label = Label.new()
+	_health_label.name = "BlockerHealth"
+	_health_label.position = Vector2(cell_size * 0.14, -cell_size * 0.47)
+	_health_label.size = Vector2(cell_size * 0.30, cell_size * 0.26)
+	_health_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_health_label.add_theme_font_size_override("font_size", maxi(12, roundi(cell_size * 0.22)))
+	_health_label.add_theme_color_override("font_color", Color("#fff4ad"))
+	_health_label.add_theme_color_override("font_outline_color", Color("#281b30"))
+	_health_label.add_theme_constant_override("outline_size", 3)
+	add_child(_health_label)
+	_update_health_label()
+	if reinforced:
+		var seal := Label.new()
+		seal.text = "SEAL"
+		seal.position = Vector2(-cell_size * 0.14, cell_size * 0.22)
+		seal.add_theme_font_size_override("font_size", maxi(9, roundi(cell_size * 0.16)))
+		seal.add_theme_color_override("font_color", Color("#fff4ad"))
+		seal.add_theme_color_override("font_outline_color", Color("#281b30"))
+		seal.add_theme_constant_override("outline_size", 2)
+		add_child(seal)
+	queue_redraw()
+
+
+func _update_health_label() -> void:
+	if is_instance_valid(_health_label) and _state != null:
+		_health_label.text = str(_state.get_health())
+
+
+func _draw() -> void:
+	if _overlay_size > 0:
+		draw_rect(Rect2(Vector2.ONE * -_overlay_size * 0.5, Vector2.ONE * _overlay_size), Color(0.94, 0.72, 0.30, 0.9), false, 2.0)
 
 
 # =========================================================

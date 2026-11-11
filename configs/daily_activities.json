@@ -4,6 +4,9 @@
   "slot_hours": 12,
   "portrait_seconds": 120,
   "portrait_coins": 15,
+  "portrait_first_case": 3,
+  "portrait_case_interval": 4,
+  "portrait_reward_booster": "rocket",
   "streak_coins": [
     5,
     10,

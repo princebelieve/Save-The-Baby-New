@@ -22,12 +22,8 @@ func _process(delta: float) -> void:
 		return
 	_daily_tick = 1.0
 	var now := TimeHelper.current_unix_time()
-	var config := DailyActivities.settings()
-	var seconds := (DailyActivities.slot_at(now) + 1) * int(config.slot_hours) * 3600 - now
-	var active := not DailyActivities.active_attempt(_daily_progress, now).is_empty()
-	var ready := DailyActivities.available(_daily_progress, now)
-	_portrait_button.text = "Resume portrait" if active else ("Restore portrait: +%d coins" % int(config.portrait_coins) if ready else "Next portrait in %02d:%02d:%02d" % [seconds / 3600, (seconds % 3600) / 60, seconds % 60])
-	_portrait_button.disabled = not active and not ready
+	_portrait_button.text = ""
+	_portrait_button.hide()
 	var stamped := DailyActivities.day_at(now) == int(_daily_progress.get_value("daily", "last_day", -1))
 	_daily_label.text = "%d days on the case | %s" % [int(_daily_progress.get_value("daily", "streak", 0)), "Briefing complete" if stamped else "Daily briefing ready"]
 
@@ -134,7 +130,7 @@ func _build_map() -> void:
 	scroll.name = "CampaignScroll"
 	scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	scroll.offset_top = 118.0
-	scroll.offset_bottom = -460.0
+	scroll.offset_bottom = -340.0
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 	add_child(scroll)
@@ -193,11 +189,11 @@ func _build_map() -> void:
 	var footer_background := ColorRect.new()
 	footer_background.color = Color("#102c2b")
 	footer_background.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
-	footer_background.offset_top = -460
+	footer_background.offset_top = -340
 	add_child(footer_background)
 	var footer := VBoxContainer.new()
 	footer.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
-	footer.offset_top = -450
+	footer.offset_top = -330
 	footer.offset_left = 16
 	footer.offset_right = -16
 	footer.add_theme_constant_override("separation", 5)
@@ -213,6 +209,7 @@ func _build_map() -> void:
 	range_label.add_theme_font_size_override("font_size", 32)
 	footer.add_child(range_label)
 	_portrait_button = MobileGameUI.button(footer, "Restore portrait", portrait_requested.emit)
+	_portrait_button.hide()
 	_daily_label = Label.new()
 	_daily_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_daily_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

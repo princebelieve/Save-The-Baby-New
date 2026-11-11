@@ -176,7 +176,7 @@ Verification artifacts: `tests/academy_playthrough.tscn` exercises actual pointe
 
 ### Gameplay guidance, case files and choice cards
 
-Gameplay tutorials use a compact David speech bubble, a highlighted target and animated gesture. Keep text to two readable lines per page, with Next/Continue and a top X, next to the actual board or HUD target. Longer instructions continue across pages without losing their content or their journal association. Illustrated modal cards belong to case-file details and story choices; they must not replace interactive guidance.
+Gameplay tutorials use a David speech card, a highlighted target and animated gesture. Use the existing Baloo lettering at 40 logical units on the 720-wide canvas, with up to three measured lines per page, immediate text, Next/Continue and a top X. Measure and render the same font and width. A concise Academy introduction leads to authored board practice; full reference facts remain in the case file. The existing Help Settings shortcut opens the existing settings screen.
 
 Amara's case file is a persistent journal of instructions actually presented and skills actually performed. Each authored lesson page identifies its skill, stable fact ID, exact title and illustration. Only the visible page is recorded. Skipping cannot unlock unread pages; revisiting a rule cannot duplicate it. Performing a swap, creating or firing a special, using a booster, matching a character, or damaging a blocker also records the corresponding skill. Repeated lessons add knowledge to the existing skill card instead of creating another copy.
 
@@ -198,3 +198,13 @@ Objective pieces stay visible while following curved sparkling trails from the b
 Destroyed obstacles throw textured fragments, expanding rings and larger damage labels. Rockets sweep a bright cross; bombs produce radial bursts; thunder branches across the board. Powerful moves trigger a stronger board shake that always returns to its original position. Praise text escalates in place instead of stacking repeated banners.
 
 Nice, Excellent and Wonderful use compatible processed copies of the supplied recordings. Request only the strongest praise per turn, serialize voice playback, wait until impact effects finish, use a praise cooldown, and prioritize mission announcements. Preserve original recordings and the working music path. Effects must remain noninteractive, bounded and safely cancel when leaving or resetting a level.
+
+### Earned challenges and composed phone cards — November 11 update
+
+Research and accepted corrections are in `docs/design/Experience_Implementation_Decisions.md`, with ten visual references in `docs/references/candy-crush/`. Typography, illustration, rewards and buttons are composed as one card using live text; a permanent map button is not the main introduction to a side activity.
+
+Restoration is now an earned supply challenge after eligible first clears (case 3, then every four numbered cases), at most one opportunity per twelve-hour slot. The next-case transition introduces its actual picture, time and prize; Continue investigation resumes the original action. Case Rewards retains access to an unstarted earned opportunity or active attempt. The map no longer advertises a permanent restoration action, and Daily briefing leads back to the investigation.
+
+Preview and a two-fragment practice swap are untimed. Explicit Start creates the attempt, with its full advertised duration even across reset. New earned attempts reward one Rocket plus the existing coins; reward snapshots and claim markers prevent repeat grants. Existing saved attempts retain their original reward. Tutorials off bypasses the new demonstration. Background time and reference viewing during a started attempt still count.
+
+The mission card emphasizes the goal illustration, larger goal/count/moves and Play. Case story opens the extra narrative. A new season presentation and additional life/move reward systems remain follow-up work, not features claimed by this pass.

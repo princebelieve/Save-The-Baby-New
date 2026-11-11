@@ -56,7 +56,7 @@ func _run() -> void:
 	check(DailyActivities.finish_portrait(progress, int(attempt.slot), int(attempt.deadline) + 1).is_empty(), "Expired puzzle pays nothing")
 	var boundary := ConfigFile.new()
 	attempt = DailyActivities.start_portrait(boundary, now - 100 + 43199)
-	check(int(attempt.deadline) == now - 100 + 43200, "Attempt ends at slot rollover")
+	check(int(attempt.deadline) == now - 100 + 43199 + int(DailyActivities.puzzle_for_slot(int(attempt.slot)).seconds), "Starting near reset grants the full advertised duration")
 	for portrait in DailyActivities.settings().portraits:
 		check(ResourceLoader.exists(str(portrait)), "Portrait asset exists: %s" % portrait)
 	var catalog: Array = DailyActivities.settings().portraits

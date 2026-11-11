@@ -7,6 +7,9 @@ signal page_presented(index: int, message: String)
 signal help_settings_requested
 
 const SHADE := Color(0.10, 0.065, 0.03, 0.78)
+const DISPLAY_FONT := preload("res://assets/fonts/Baloo2-Variable.ttf")
+const BODY_SIZE := 40
+const CARD_WIDTH := 660.0
 
 var _spotlight := Rect2()
 var _shade_panels: Array[ColorRect] = []
@@ -55,8 +58,8 @@ func show_tip(message: String, target_rect: Rect2, speaker_name: String = "DAVID
 	_source_indices.clear()
 	_source_texts.clear()
 	_last_chunks.clear()
-	var width := minf(570.0, get_viewport_rect().size.x - 36.0)
-	var text_width := maxf(120.0, width - 68.0 - (104.0 if not portrait_path.is_empty() else 0.0))
+	var width := minf(CARD_WIDTH, get_viewport_rect().size.x - 36.0)
+	var text_width := maxf(120.0, width - 56.0)
 	var font := _body_label.get_theme_font("font")
 	var paragraphs := message.split("\n", false)
 	for source_index in paragraphs.size():
@@ -64,7 +67,7 @@ func show_tip(message: String, target_rect: Rect2, speaker_name: String = "DAVID
 		var chunk := ""
 		for word in paragraph.split(" ", false):
 			var candidate := chunk + (" " if not chunk.is_empty() else "") + word
-			if not chunk.is_empty() and font.get_multiline_string_size(candidate, HORIZONTAL_ALIGNMENT_LEFT, text_width, 22).y > font.get_height(22) * 2.0 + 2.0:
+			if not chunk.is_empty() and font.get_multiline_string_size(candidate, HORIZONTAL_ALIGNMENT_LEFT, text_width, BODY_SIZE).y > font.get_height(BODY_SIZE) * 3.0 + 2.0:
 				_append_chunk(chunk, source_index, paragraph, false)
 				chunk = ""
 			chunk += (" " if not chunk.is_empty() else "") + word
@@ -131,15 +134,16 @@ func _build_bubble() -> void:
 	add_child(_bubble)
 	var bubble_content := VBoxContainer.new()
 	bubble_content.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	bubble_content.offset_left = 22
-	bubble_content.offset_top = 106
-	bubble_content.offset_right = -22
-	bubble_content.offset_bottom = -14
+	bubble_content.offset_left = 28
+	bubble_content.offset_top = 18
+	bubble_content.offset_right = -28
+	bubble_content.offset_bottom = -18
 	bubble_content.add_theme_constant_override("separation", 6)
 	bubble_content.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_bubble.add_child(bubble_content)
 	var guide_title := Label.new()
-	guide_title.text = "FIELD GUIDE"
+	guide_title.text = ""
+	guide_title.hide()
 	guide_title.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
 	guide_title.offset_left = 22
 	guide_title.offset_right = -110
@@ -167,6 +171,7 @@ func _build_bubble() -> void:
 	_heading = Label.new()
 	_heading.text = "DAVID"
 	_heading.add_theme_font_size_override("font_size", 32)
+	_heading.add_theme_font_override("font", DISPLAY_FONT)
 	_heading.add_theme_color_override("font_color", Color("#995221"))
 	_heading.add_theme_color_override("font_outline_color", Color("#fffaf0"))
 	_heading.add_theme_constant_override("outline_size", 2)
@@ -174,7 +179,8 @@ func _build_bubble() -> void:
 	content.add_child(_heading)
 	_body_label = Label.new()
 	_body_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_body_label.add_theme_font_size_override("font_size", 32)
+	_body_label.add_theme_font_size_override("font_size", BODY_SIZE)
+	_body_label.add_theme_font_override("font", DISPLAY_FONT)
 	_body_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_body_label.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	_body_label.add_theme_color_override("font_color", Color("#4b2d1a"))
@@ -183,14 +189,16 @@ func _build_bubble() -> void:
 	_body_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_body_scroll = ScrollContainer.new()
 	_body_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_body_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	_body_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	content.add_child(_body_scroll)
+	bubble_content.add_child(_body_scroll)
 	_body_scroll.add_child(_body_label)
 	_acknowledge_button = Button.new()
 	_acknowledge_button.text = "CONTINUE"
 	_acknowledge_button.custom_minimum_size = Vector2(220, 92)
 	_acknowledge_button.size_flags_horizontal = Control.SIZE_SHRINK_END
 	_acknowledge_button.add_theme_font_size_override("font_size", 32)
+	_acknowledge_button.add_theme_font_override("font", DISPLAY_FONT)
 	_acknowledge_button.add_theme_color_override("font_color", Color("#4b2d1a"))
 	var ack_style := StyleBoxFlat.new()
 	ack_style.bg_color = Color("#d8b77b")
@@ -209,12 +217,22 @@ func _build_bubble() -> void:
 	_previous_button.text = "BACK"
 	_previous_button.custom_minimum_size = Vector2(120, 92)
 	_previous_button.add_theme_font_size_override("font_size", 32)
+	_previous_button.add_theme_font_override("font", DISPLAY_FONT)
 	_previous_button.pressed.connect(_previous_page)
 	footer.add_child(_previous_button)
 	var help_settings := Button.new()
 	help_settings.name = "HelpSettings"
 	help_settings.text = "HELP SETTINGS"
 	help_settings.custom_minimum_size = Vector2(172, 64)
+	help_settings.add_theme_font_size_override("font_size", 32)
+	help_settings.add_theme_font_override("font", DISPLAY_FONT)
+	help_settings.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	help_settings.add_theme_stylebox_override("normal", ack_style)
+	help_settings.add_theme_stylebox_override("hover", ack_hover)
+	help_settings.add_theme_stylebox_override("pressed", ack_style)
+	help_settings.add_theme_color_override("font_color", Color("#4b2d1a"))
+	_previous_button.add_theme_stylebox_override("normal", ack_style)
+	_previous_button.add_theme_stylebox_override("hover", ack_hover)
 	help_settings.tooltip_text = "Turn move hints and tutorials on or off."
 	help_settings.pressed.connect(func(): help_settings_requested.emit())
 	bubble_content.add_child(help_settings)
@@ -227,6 +245,8 @@ func _build_bubble() -> void:
 	_skip_button.custom_minimum_size = Vector2(92, 92)
 	_skip_button.tooltip_text = "Skip coaching"
 	_skip_button.add_theme_color_override("font_color", Color("#4b2d1a"))
+	_skip_button.add_theme_stylebox_override("normal", ack_style)
+	_skip_button.add_theme_stylebox_override("hover", ack_hover)
 	_skip_button.pressed.connect(func():
 		hide_tip()
 		skipped.emit())
@@ -254,17 +274,16 @@ func _layout_tip() -> void:
 	_set_panel(_shade_panels[2], Vector2(hole.end.x, hole.position.y), Vector2(viewport.x - hole.end.x, hole.size.y))
 	_set_panel(_shade_panels[3], Vector2(0, hole.end.y), Vector2(viewport.x, viewport.y - hole.end.y))
 
-	var bubble_width := minf(570.0, viewport.x - 36.0)
-	var portrait_width := 104.0 if _speaker_portrait.visible else 0.0
-	var body_width := maxf(120.0, bubble_width - 68.0 - portrait_width)
+	var bubble_width := minf(CARD_WIDTH, viewport.x - 36.0)
+	var body_width := maxf(120.0, bubble_width - 56.0)
 	var font := _body_label.get_theme_font("font")
-	var body_height := ceilf(font.get_multiline_string_size(_body_label.text, HORIZONTAL_ALIGNMENT_LEFT, body_width, 32).y) + 24.0
+	var body_height := ceilf(font.get_multiline_string_size(_body_label.text, HORIZONTAL_ALIGNMENT_LEFT, body_width, BODY_SIZE).y) + 12.0
 	var action_height := (100.0 if _acknowledge_button.visible else 0.0) + 76.0
-	var visible_body_height := minf(body_height, viewport.y * 0.55 - 80.0 - action_height)
+	var visible_body_height := body_height
 	_body_label.custom_minimum_size = Vector2(0, body_height)
 	_body_scroll.custom_minimum_size = Vector2(0, visible_body_height)
-	var row_height := maxf(visible_body_height + 80.0, 112.0 if _speaker_portrait.visible else 0.0)
-	var bubble_height := row_height + action_height + 120.0
+	var row_height := 112.0 if _speaker_portrait.visible else 48.0
+	var bubble_height := row_height + visible_body_height + action_height + 58.0
 	_bubble.custom_minimum_size = Vector2(bubble_width, bubble_height)
 	_bubble.size = Vector2(bubble_width, bubble_height)
 	var bubble_x := clampf(hole.get_center().x - bubble_width * 0.5, 18.0, viewport.x - bubble_width - 18.0)
@@ -276,6 +295,7 @@ func _layout_tip() -> void:
 		_pointer.position = Vector2(clampf(hole.get_center().x - 14.0, 20.0, viewport.x - 48.0), bubble_y - 16.0)
 	else:
 		_pointer.position = Vector2(clampf(hole.get_center().x - 14.0, 20.0, viewport.x - 48.0), bubble_y + bubble_height - 2.0)
+	bubble_y = clampf(bubble_y, 18.0, maxf(18.0, viewport.y - bubble_height - 18.0))
 	_pointer.polygon = pointer_points
 	_bubble.position = Vector2(bubble_x, bubble_y)
 	_top_scroll_roll.position = Vector2(5, 0)
@@ -301,14 +321,10 @@ func _make_scroll_roll() -> Panel:
 
 func _update_page() -> void:
 	_body_label.text = _pages[_page]
-	_body_label.visible_characters = 0
+	_body_label.visible_characters = -1
 	SignalBus.play_sfx.emit("case_open")
 	if _page_typing_tween != null and _page_typing_tween.is_running():
 		_page_typing_tween.kill()
-	_page_typing_tween = create_tween()
-	_page_typing_tween.tween_property(_body_label, "visible_characters", _body_label.text.length(), maxf(0.35, _body_label.text.length() * 0.022))
-	_page_typing_tween.finished.connect(_on_page_typing_finished.bind(_page))
-	_tutorial_typing_ticks(_page)
 	_body_scroll.scroll_vertical = 0
 	_acknowledge_button.visible = _page < _pages.size() - 1 or _needs_ack
 	_acknowledge_button.text = "SHOW TEXT" if _acknowledge_button.visible else ""

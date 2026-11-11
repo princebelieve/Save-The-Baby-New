@@ -40,7 +40,8 @@
                     "illustration": "res://assets/sprites/ui/icons/life_icon.png"
                 },
                 {}
-            ]
+            ],
+            "intro": "Help me rescue Ethan. Let us make our first match!"
         },
         {
             "level": 4,
@@ -84,7 +85,8 @@
                     "fact": "milestones",
                     "illustration": "res://assets/sprites/ui/icons/coins_icon.png"
                 }
-            ]
+            ],
+            "intro": "Match four in a straight line to create a rocket."
         },
         {
             "level": 6,
@@ -135,7 +137,8 @@
                     "fact": "blast",
                     "illustration": "res://assets/sprites/powerups/bomb_powerup_icon.jpeg"
                 }
-            ]
+            ],
+            "intro": "Intersecting matches in a T or L create a bomb."
         },
         {
             "level": 8,
@@ -186,7 +189,8 @@
                     "fact": "double",
                     "illustration": "res://assets/sprites/powerups/thunder_powerup_icon.jpeg"
                 }
-            ]
+            ],
+            "intro": "Match five in a straight line to create thunder."
         },
         {
             "level": 9,
@@ -218,7 +222,8 @@
                     "fact": "blockers",
                     "illustration": "res://assets/sprites/powerups/tiles/key_objective_icon.jpeg"
                 }
-            ]
+            ],
+            "intro": "Match beside the chain to break its layers."
         },
         {
             "level": 12,
@@ -248,7 +253,8 @@
                     "fact": "blockers",
                     "illustration": "res://assets/sprites/powerups/tiles/key_objective_icon.jpeg"
                 }
-            ]
+            ],
+            "intro": "Break the locks to free the tiles underneath."
         },
         {
             "level": 16,
@@ -273,7 +279,8 @@
                     "fact": "moves",
                     "illustration": "res://assets/sprites/obstacles/missile_obstacle_icon.jpeg"
                 }
-            ]
+            ],
+            "intro": "These missiles block the board. Match beside them to clear a layer."
         },
         {
             "level": 20,
@@ -298,7 +305,8 @@
                     "fact": "reach",
                     "illustration": "res://assets/sprites/powerups/tiles/key_objective_icon.jpeg"
                 }
-            ]
+            ],
+            "intro": "Match beside electric traps to clear the way."
         },
         {
             "level": 24,
@@ -335,7 +343,8 @@
                     "fact": "target",
                     "illustration": "res://assets/sprites/characters/ethan_portrait_cutout.png"
                 }
-            ]
+            ],
+            "intro": "Ethan joins two matching clues and gives you five moves!"
         },
         {
             "level": 28,
@@ -372,7 +381,8 @@
                     "fact": "double",
                     "illustration": "res://assets/sprites/powerups/thunder_powerup_icon.jpeg"
                 }
-            ]
+            ],
+            "intro": "Swap two neighboring specials together to combine their effects."
         },
         {
             "level": 33,
@@ -402,7 +412,8 @@
                     "fact": "reach",
                     "illustration": "res://assets/sprites/powerups/tiles/key_objective_icon.jpeg"
                 }
-            ]
+            ],
+            "intro": "A small match can set up a stronger second move."
         },
         {
             "level": 41,
@@ -417,7 +428,8 @@
                 {},
                 {},
                 {}
-            ]
+            ],
+            "intro": "Watch the goal. Every useful match brings us closer to Ethan."
         }
     ]
 }

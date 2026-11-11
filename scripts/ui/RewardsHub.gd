@@ -97,6 +97,10 @@ func _home() -> void:
 	MobileGameUI.label(column, str(streak), 100, Color.WHITE)
 	MobileGameUI.label(column, "DAYS ON THE CASE", 36, Color.WHITE)
 	MobileGameUI.button(_body, "Daily briefing  >", func(): _open("daily"), MobileGameUI.PINK)
+	var offer := DailyActivities.earned_offer(_progress, TimeHelper.current_unix_time())
+	var active := DailyActivities.active_attempt(_progress, TimeHelper.current_unix_time())
+	if not offer.is_empty() or not active.is_empty():
+		MobileGameUI.button(_body, "Resume earned challenge" if not active.is_empty() else "Earned challenge: +1 Rocket", play_requested.emit, MobileGameUI.TEAL)
 	var collection: Dictionary = _progress.get_value("daily", "portraits", {})
 	var collected := 0
 	for path in DailyActivities.settings().portraits:
@@ -138,7 +142,7 @@ func _daily() -> void:
 	MobileGameUI.button(pages, "<", _change_day.bind(-1)).disabled = _day == 0
 	MobileGameUI.label(pages, "%d / 7" % (_day + 1), 36).size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	MobileGameUI.button(pages, ">", _change_day.bind(1)).disabled = _day == 6
-	MobileGameUI.button(_body, "Restore evidence", play_requested.emit, MobileGameUI.PINK)
+	MobileGameUI.button(_body, "Play next case", map_requested.emit, MobileGameUI.PINK)
 	MobileGameUI.button(_body, "How rewards work", func(): _open("rules"), MobileGameUI.PURPLE)
 
 

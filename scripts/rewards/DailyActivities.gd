@@ -56,7 +56,28 @@ static func stamp(progress: ConfigFile, now: int) -> Dictionary:
 
 
 static func available(progress: ConfigFile, now: int) -> bool:
-	return clock_valid(progress, now) and slot_at(now) > int(progress.get_value("daily", "portrait_slot", -1))
+	return clock_valid(progress, now) and active_attempt(progress, now).is_empty() and slot_at(now) > int(progress.get_value("daily", "portrait_slot", -1))
+
+
+static func offer_for_clear(progress: ConfigFile, level: int, first_clear: bool, now: int) -> Dictionary:
+	var config := settings()
+	var first := int(config.get("portrait_first_case", 3))
+	if not first_clear or level < first or posmod(level - first, maxi(1, int(config.get("portrait_case_interval", 4)))) != 0 or not available(progress, now):
+		return {}
+	if int(progress.get_value("daily", "portrait_offer", {}).get("slot", -1)) == slot_at(now):
+		return {}
+	var offer := {"slot": slot_at(now), "case": level, "booster": str(config.get("portrait_reward_booster", "rocket"))}
+	progress.set_value("daily", "portrait_offer", offer)
+	return offer
+
+
+static func earned_offer(progress: ConfigFile, now: int) -> Dictionary:
+	var offer: Dictionary = progress.get_value("daily", "portrait_offer", {})
+	return offer.duplicate(true) if int(offer.get("slot", -1)) == slot_at(now) and available(progress, now) else {}
+
+
+static func invitation_pending(progress: ConfigFile, now: int) -> bool:
+	return not earned_offer(progress, now).is_empty() and int(progress.get_value("daily", "portrait_offer_presented", -1)) != slot_at(now)
 
 
 static func record_mission(progress: ConfigFile, kind: String, amount: int, now: int) -> int:
@@ -85,6 +106,7 @@ static func start_portrait(progress: ConfigFile, now: int) -> Dictionary:
 	var config := settings()
 	var slot := slot_at(now)
 	var challenge := puzzle_for_slot(slot)
+	var earned := earned_offer(progress, now)
 	var portrait: String = config.portraits[slot % config.portraits.size()]
 	var count := int(challenge.columns) * int(challenge.rows)
 	var pieces: Array[int] = []
@@ -103,9 +125,10 @@ static func start_portrait(progress: ConfigFile, now: int) -> Dictionary:
 	if solved:
 		pieces[0] = 1
 		pieces[1] = 0
-	var deadline := mini(now + int(challenge.seconds), (slot + 1) * int(config.slot_hours) * 3600)
+	var deadline := now + int(challenge.seconds)
 	var attempt := {"slot": slot, "portrait": portrait, "pieces": pieces, "deadline": deadline,
-		"columns": int(challenge.columns), "rows": int(challenge.rows), "difficulty": str(challenge.name)}
+		"columns": int(challenge.columns), "rows": int(challenge.rows), "difficulty": str(challenge.name),
+		"booster": str(earned.get("booster", "")), "coins": int(config.portrait_coins)}
 	progress.set_value("daily", "portrait_slot", slot)
 	progress.set_value("daily", "last_seen", now)
 	progress.set_value("daily", "attempt", attempt)
@@ -114,7 +137,7 @@ static func start_portrait(progress: ConfigFile, now: int) -> Dictionary:
 
 static func active_attempt(progress: ConfigFile, now: int) -> Dictionary:
 	var attempt: Dictionary = progress.get_value("daily", "attempt", {})
-	if not clock_valid(progress, now) or attempt.is_empty() or now >= int(attempt.deadline) or int(attempt.slot) != slot_at(now):
+	if not clock_valid(progress, now) or attempt.is_empty() or now >= int(attempt.deadline):
 		return {}
 	return attempt.duplicate(true)
 
@@ -134,7 +157,7 @@ static func finish_portrait(progress: ConfigFile, slot: int, now: int) -> Dictio
 	collection[str(attempt.portrait)] = int(collection.get(str(attempt.portrait), 0)) + 1
 	progress.set_value("daily", "portraits", collection)
 	var daily := stamp(progress, now)
-	return {"coins": int(settings().portrait_coins) + int(daily.get("coins", 0)), "streak": int(progress.get_value("daily", "streak", 0))}
+	return {"coins": int(attempt.get("coins", settings().portrait_coins)) + int(daily.get("coins", 0)), "streak": int(progress.get_value("daily", "streak", 0)), "booster": str(attempt.get("booster", ""))}
 
 
 static func puzzle_for_slot(slot: int) -> Dictionary:

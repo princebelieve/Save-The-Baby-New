@@ -7,6 +7,7 @@ const PINK := Color("#d94388")
 const PURPLE := Color("#7350b5")
 const GOLD := Color("#ffc85a")
 const COIN := "res://assets/sprites/ui/icons/coins_icon.png"
+const DISPLAY_FONT := preload("res://assets/fonts/Baloo2-Variable.ttf")
 
 static func background(parent: Control) -> void:
 	var art := TextureRect.new()
@@ -55,6 +56,7 @@ static func button(parent: Node, value: String, action: Callable, color: Color =
 	control.custom_minimum_size = Vector2(92, 92)
 	control.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	control.add_theme_font_size_override("font_size", 36)
+	control.add_theme_font_override("font", DISPLAY_FONT)
 	for state in ["normal", "hover", "pressed", "disabled", "focus"]:
 		var fill := color
 		if state == "hover": fill = color.lightened(0.12)
@@ -68,6 +70,15 @@ static func button(parent: Node, value: String, action: Callable, color: Color =
 	control.pressed.connect(action)
 	if parent != null: parent.add_child(control)
 	return control
+
+static func display_label(parent: Node, value: String, font_size: int = 40, color: Color = INK) -> Label:
+	var text := label(parent, value, font_size, color)
+	if parent is HBoxContainer:
+		text.autowrap_mode = TextServer.AUTOWRAP_OFF
+	text.add_theme_font_override("font", DISPLAY_FONT)
+	text.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.16) if color == Color.WHITE else Color("#fff8e8"))
+	text.add_theme_constant_override("outline_size", 2)
+	return text
 
 static func image(parent: Node, path: String, minimum: Vector2 = Vector2(90, 90)) -> TextureRect:
 	var art := TextureRect.new()
