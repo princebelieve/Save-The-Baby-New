@@ -55,7 +55,13 @@
     "victor_arrived": "res://assets/audio/sfx/actions/victor_arrived.wav",
     "powerup_victor": "res://assets/audio/sfx/actions/powerup_victor.wav",
     "win_sting": "res://assets/audio/sfx/actions/win_sting.wav",
-    "lose_sting": "res://assets/audio/sfx/actions/lose_sting.wav"
+    "lose_sting": "res://assets/audio/sfx/actions/lose_sting.wav",
+    "screen_map": "res://assets/audio/sfx/actions/screen_map.wav",
+    "screen_briefing": "res://assets/audio/sfx/actions/screen_briefing.wav",
+    "screen_play": "res://assets/audio/sfx/actions/screen_play.wav",
+    "foley_bomb": "res://assets/audio/sfx/actions/foley_bomb.wav",
+    "foley_thunder": "res://assets/audio/sfx/actions/foley_thunder.wav",
+    "foley_rocket": "res://assets/audio/sfx/actions/foley_rocket.wav"
   },
   "volume_defaults": {
     "master": 1.0,
@@ -101,7 +107,13 @@
     "win_sting": -5,
     "lose_sting": -5,
     "powerup_rocket": -5,
-    "clue_collected": -10
+    "clue_collected": -10,
+    "screen_map": -9,
+    "screen_briefing": -9,
+    "screen_play": -9,
+    "foley_bomb": -8,
+    "foley_thunder": -8,
+    "foley_rocket": -8
   },
   "audio_bus_mapping": {
     "music": "Music",
@@ -301,6 +313,44 @@
     "lose_sting": {
       "cooldown_ms": 120,
       "max_instances": 1
+    },
+    "screen_map": {
+      "cooldown_ms": 120,
+      "max_instances": 1
+    },
+    "screen_briefing": {
+      "cooldown_ms": 120,
+      "max_instances": 1
+    },
+    "screen_play": {
+      "cooldown_ms": 120,
+      "max_instances": 1
+    },
+    "foley_bomb": {
+      "cooldown_ms": 180,
+      "max_instances": 1
+    },
+    "foley_thunder": {
+      "cooldown_ms": 180,
+      "max_instances": 1
+    },
+    "foley_rocket": {
+      "cooldown_ms": 180,
+      "max_instances": 1
     }
+  },
+  "sfx_layers": {
+    "powerup_bomb": [
+      "foley_bomb"
+    ],
+    "powerup_thunder": [
+      "foley_thunder"
+    ],
+    "powerup_rocket": [
+      "foley_rocket"
+    ],
+    "rocket_combo": [
+      "foley_rocket"
+    ]
   }
 }

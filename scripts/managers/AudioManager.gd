@@ -159,6 +159,10 @@ func play_sfx(sound) -> void:
 	var limits: Dictionary = _audio_config.get("sfx_limits", {}).get(id, {})
 	if now - int(_last_sfx_tick.get(id, -10000)) < int(limits.get("cooldown_ms", 45)):
 		return
+	if id.begins_with("screen_"):
+		# A newly opened screen replaces the prior screen's transition phrase.
+		for active_id in _sfx_ids_by_player.values().duplicate():
+			if str(active_id).begins_with("screen_"): stop_sfx(active_id)
 	var instances := 0
 	for active_id in _sfx_ids_by_player.values():
 		if str(active_id) == id: instances += 1
@@ -188,6 +192,12 @@ func play_sfx(sound) -> void:
 	player.play()
 
 	emit_signal("sound_played", sound)
+	# Physical accents layer under the existing musical cue at the same event.
+	# Layer definitions are leaves, keeping this graph acyclic.
+	var layers: Dictionary = _audio_config.get("sfx_layers", {})
+	for layer_id in layers.get(id, []):
+		if str(layer_id) != id and not layers.has(str(layer_id)):
+			play_sfx(str(layer_id))
 
 
 func stop_sfx(sound) -> void:

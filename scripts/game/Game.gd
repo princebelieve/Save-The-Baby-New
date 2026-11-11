@@ -1921,6 +1921,7 @@ func _begin_story_typing(copy: String) -> void:
 
 
 func _show_campaign_map(route_id: String) -> void:
+	SignalBus.play_sfx.emit("screen_map")
 	_waiting_for_collection = false
 	_turn_praise_rank = 0
 	if is_instance_valid(_gameplay_effects): _gameplay_effects.clear()
@@ -2071,6 +2072,7 @@ func _on_story_finished(story_id: String) -> void:
 
 
 func _show_level_briefing(route_id: String) -> void:
+	SignalBus.play_sfx.emit("screen_briefing")
 	SignalBus.play_sfx.emit("case_open")
 	if _story_layer != null and is_instance_valid(_story_layer):
 		_story_layer.queue_free()
@@ -2348,6 +2350,7 @@ func _objective_icon_path(target: String) -> String:
 
 
 func _begin_level(_route_id: String) -> void:
+	SignalBus.play_sfx.emit("screen_play")
 	_turn_reward_notices.clear()
 	var selected_manager := get_node_or_null("Managers/LevelManager")
 	var selected_data: Dictionary = selected_manager.get_level_data() if selected_manager != null else {}
