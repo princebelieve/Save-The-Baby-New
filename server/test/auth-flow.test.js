@@ -12,9 +12,9 @@ async function fixture(t) {
  t.after(()=>{server.closeAllConnections();return new Promise(resolve=>server.close(resolve));});
  const base=`http://127.0.0.1:${server.address().port}`;
  const post=async(path,body,token)=>fetch(base+path,{method:'POST',headers:{'Content-Type':'application/json',...(token?{Authorization:`Bearer ${token}`}:{})},body:JSON.stringify(body)});
- async function start() {
+ async function start(desktopReturn) {
   const verifier='proof-for-this-device-'.repeat(4);
-  const response=await post('/auth/start',{challenge:hash(verifier),accountMode:'self'});
+  const response=await post('/auth/start',{challenge:hash(verifier),accountMode:'self',desktopReturn});
   const flow=await response.json();assert.equal(flow.expiresIn,900);
   const noticeResponse=await fetch(base+`/auth/google/start?flow=${flow.flow}`);
   const notice=await noticeResponse.text();
@@ -39,7 +39,7 @@ test('existing Google sign-in keeps progress and exposes a persistent Android re
  const response=await f.callback(state);assert.equal(response.status,200);
  const html=await response.text();
  assert.equal(response.headers.get('cache-control'),'no-store');
- assert.equal(response.headers.get('x-auth-return-version'),'2');
+ assert.equal(response.headers.get('x-auth-return-version'),'3');
  assert.match(html,/id="return-to-game"/);
  assert.match(html,/>Return to Save the Baby Game<\/a>/);
  assert.match(html,/intent:\/\/auth\/complete#Intent;scheme=savethebaby;package=com\.savethebaby\.game;/);
@@ -50,6 +50,33 @@ test('existing Google sign-in keeps progress and exposes a persistent Android re
  assert.equal(login.userId,userId);assert.equal(login.wallet,500);assert.equal(login.revision,7);assert.deepEqual(login.save,save);
  const fallback=await fetch(f.base+'/auth/return',{headers:{'User-Agent':'Chrome Android'}});
  assert.equal(fallback.status,200);assert.match(await fallback.text(),/Return to Save the Baby Game/);
+});
+
+test('desktop callback returns to the running game without an installed protocol handler',async t=>{
+ const f=await fixture(t),desktopReturn={port:18543,token:'a'.repeat(64)};
+ const state=await f.start(desktopReturn);
+ const response=await fetch(f.base+`/auth/google/callback?state=${state.flow}&code=${state.flow}`,{headers:{Cookie:state.cookie,'User-Agent':'Windows Chrome'}});
+ assert.equal(response.status,200);
+ const html=await response.text();
+ assert.match(html,new RegExp(`href="http://127\\.0\\.0\\.1:18543/return/${desktopReturn.token}"`));
+ assert.doesNotMatch(html,/href="savethebaby:/);
+ assert.doesNotMatch(html,/Open using the app link/);
+ // The cookie is cleared on success, so refreshing must remain successful.
+ for(const claim of [false,true]) {
+  if(claim) assert.equal((await f.poll(state)).status,200);
+  const refreshed=await fetch(f.base+`/auth/google/callback?state=${state.flow}&code=${state.flow}`,{headers:{'User-Agent':'Windows Chrome'}});
+  assert.equal(refreshed.status,200);
+  assert.match(await refreshed.text(),/data-sign-in-state="complete"/);
+ }
+ const emulated=await fetch(f.base+`/auth/google/callback?state=${state.flow}&code=${state.flow}`,{headers:{'User-Agent':'Chrome Android'}});
+ assert.match(await emulated.text(),/href="http:\/\/127\.0\.0\.1:18543\/return\//,'mobile emulation must still return to the desktop game that started login');
+});
+
+test('desktop return accepts only a bounded loopback port and random path, never a remote URL',async t=>{
+ const f=await fixture(t);
+ for(const desktopReturn of [{port:80,token:'a'.repeat(64)},{port:70000,token:'a'.repeat(64)},{port:18543,token:'../evil'},{port:'18543',token:'a'.repeat(64)}]) {
+  assert.equal((await f.post('/auth/start',{challenge:hash('proof'),desktopReturn})).status,400);
+ }
 });
 
 test('first-time Google registration retains the return button after the game redeems login',async t=>{

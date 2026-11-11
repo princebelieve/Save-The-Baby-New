@@ -24,14 +24,16 @@ const accountPageStyles = `<style>
 
 const LOGIN_LIFETIME_MS = 15 * 60 * 1000;
 
-function sendAuthReturn(req,res,{title='Return to Save The Baby',message='Open the game to continue your sign-in.',status=200,baseUrl='',complete=false}={}) {
+function sendAuthReturn(req,res,{title='Return to Save The Baby',message='Open the game to continue your sign-in.',status=200,baseUrl='',complete=false,desktopReturn=null}={}) {
  const android=/Android/i.test(req.get('user-agent')||'');
  const appLink='savethebaby://auth/complete';
  const fallback=encodeURIComponent(`${baseUrl}/auth/return`);
- const returnLink=android?`intent://auth/complete#Intent;scheme=savethebaby;package=com.savethebaby.game;S.browser_fallback_url=${fallback};end`:appLink;
+ const desktopLink=desktopReturn?`http://127.0.0.1:${desktopReturn.port}/return/${desktopReturn.token}`:null;
+ const returnLink=desktopLink||(android?`intent://auth/complete#Intent;scheme=savethebaby;package=com.savethebaby.game;S.browser_fallback_url=${fallback};end`:appLink);
  // Chrome requires a user gesture to launch another app. Keep the completion
  // page and its button visible instead of immediately navigating away.
- return res.set('Cache-Control','no-store').set('X-Auth-Return-Version','2').set('Content-Security-Policy',"default-src 'none'; style-src 'unsafe-inline'; frame-ancestors 'none'; base-uri 'none'").status(status).type('html').send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#e8dfca"><title>${escapeHtml(title)} - Save The Baby</title>${accountPageStyles}</head><body><main data-sign-in-state="${complete?'complete':'return'}"><p class="brand">Save The Baby account</p><h1>${escapeHtml(title)}</h1><p class="intro">${escapeHtml(message)}</p><a id="return-to-game" class="button" href="${escapeHtml(returnLink)}">Return to Save the Baby Game</a><p>Tap the button to open Save The Baby. If your browser does not open the game, switch back to the game yourself. Your pending sign-in will resume there.</p><p><a href="${appLink}">Open using the app link</a></p></main></body></html>`);
+ const guidance=desktopLink?'The game must still be running. This button reconnects to the desktop game you used to start sign-in.':android?'Tap the button to open the installed Android game.':'Testing in Godot on a computer? Switch back to the game window. This older sign-in attempt has no desktop return connection; start a new sign-in from the updated game to enable the button.';
+ return res.set('Cache-Control','no-store').set('X-Auth-Return-Version','3').set('Content-Security-Policy',"default-src 'none'; style-src 'unsafe-inline'; frame-ancestors 'none'; base-uri 'none'").status(status).type('html').send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#e8dfca"><title>${escapeHtml(title)} - Save The Baby</title>${accountPageStyles}</head><body><main data-sign-in-state="${complete?'complete':'return'}"><p class="brand">Save The Baby account</p><h1>${escapeHtml(title)}</h1><p class="intro">${escapeHtml(message)}</p><a id="return-to-game" class="button" href="${escapeHtml(returnLink)}">Return to Save the Baby Game</a><p>${guidance}</p></main></body></html>`);
 }
 
 function sendAuthError(req,res,baseUrl) {
@@ -107,7 +109,13 @@ export function createApp({db, client, oauth, play, baseUrl, clientId, commerceE
   const challenge=req.body.challenge; requireThat(typeof challenge==='string'&&/^[a-f0-9]{64}$/.test(challenge),400,'Invalid login challenge');
   const accountMode=req.body.accountMode??'self';
   requireThat(['self','guardian'].includes(accountMode),400,'Invalid account mode');
-  const id=random(); await flows.insertOne({_id:id,challenge,accountMode,nonce:random(),expires:new Date(Date.now()+LOGIN_LIFETIME_MS),status:'created'});
+  const handoff=req.body.desktopReturn;
+  let desktopReturn=null;
+  if(handoff&&Object.keys(handoff).length) {
+   requireThat(Number.isInteger(handoff.port)&&handoff.port>=1024&&handoff.port<=65535&&typeof handoff.token==='string'&&/^[a-f0-9]{64}$/.test(handoff.token),400,'Invalid desktop return connection');
+   desktopReturn={port:handoff.port,token:handoff.token};
+  }
+  const id=random(); await flows.insertOne({_id:id,challenge,accountMode,desktopReturn,nonce:random(),expires:new Date(Date.now()+LOGIN_LIFETIME_MS),status:'created'});
   res.json({flow:id,url:`${baseUrl}/auth/google/start?flow=${id}`,expiresIn:LOGIN_LIFETIME_MS/1000});
  });
  app.get('/auth/google/start',async(req,res)=>{
@@ -155,6 +163,14 @@ export function createApp({db, client, oauth, play, baseUrl, clientId, commerceE
   res.redirect(303,oauth.generateAuthUrl({scope:['openid','profile'],state:flow._id,nonce:flow.nonce,prompt:'select_account',access_type:'online'}));
  });
  app.get('/auth/google/callback',async(req,res)=>{
+  requireThat(typeof req.query.state==='string'&&/^[A-Za-z0-9_-]{43}$/.test(req.query.state),400,'Invalid login flow');
+  const previous=await flows.findOne({_id:req.query.state,expires:{$gt:new Date()}});
+  req.desktopReturn=previous?.desktopReturn;
+  // Reloading the browser callback must not exchange the one-use Google code
+  // again, or report a missing cookie after we deliberately cleared it.
+  if(previous&&['complete','claimed'].includes(previous.status)) {
+   return sendAuthReturn(req,res,{title:"You're signed in",message:'This sign-in is already complete. Return to the game to continue.',baseUrl,complete:true,desktopReturn:previous.desktopReturn});
+  }
   const cookie=(req.get('cookie')||'').split(';').map(x=>x.trim()).find(x=>x.startsWith('sb_oauth='))?.slice(9);
   requireThat(cookie,400,'Login browser session is missing');
   const flow=await flows.findOneAndUpdate({_id:req.query.state,status:'browser',browserHash:hash(cookie),expires:{$gt:new Date()}},{$set:{status:'exchanging'}},{returnDocument:'after'});
@@ -170,7 +186,7 @@ export function createApp({db, client, oauth, play, baseUrl, clientId, commerceE
   await users.updateOne({_id:userId},{$set:{name:String(claims.name||'Player').slice(0,100),accountNotice:{version:1,mode:flow.accountMode,acknowledgedAt:flow.ownerAcknowledgedAt}},$setOnInsert:{wallet:0,save:null,revision:0,created:new Date()}},{upsert:true});
   await flows.updateOne({_id:flow._id,status:'exchanging'},{$set:{status:'complete',userId,expires:new Date(Date.now()+10*60*1000)}});
   res.clearCookie('sb_oauth',{path:'/auth/google'});
-  return sendAuthReturn(req,res,{title:"You're signed in",message:'Your Google account is connected. Return to the game to finish loading your account.',baseUrl,complete:true});
+  return sendAuthReturn(req,res,{title:"You're signed in",message:'Your Google account is connected. Return to the game to finish loading your account.',baseUrl,complete:true,desktopReturn:flow.desktopReturn});
  });
  app.post('/auth/poll',async(req,res)=>{
   const {flow:id,verifier}=req.body;
@@ -268,7 +284,7 @@ export function createApp({db, client, oauth, play, baseUrl, clientId, commerceE
    try {await flows.updateOne({_id:req.authFlowId,status:'exchanging'},{$set:{status:'failed',failure:message}});} catch { /* Retain the original error response. */ }
   }
   if(req.path.startsWith('/auth/google/')) {
-   return sendAuthReturn(req,res,{title:'Sign-in needs attention',message,status,baseUrl});
+   return sendAuthReturn(req,res,{title:'Sign-in needs attention',message:message==='Login browser session is missing'?'Your browser did not retain this sign-in session. Return to the game and start a new sign-in.':message,status,baseUrl,desktopReturn:req.desktopReturn});
   }
   return res.status(status).json({error:status>=500?'Service unavailable. Please retry.':error.message});
  });

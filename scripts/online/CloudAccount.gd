@@ -32,6 +32,7 @@ var _login_poll_timer: Timer
 var _sync_timer: Timer
 var _pending_save: Dictionary = {}
 var _ready_to_sync := false
+var _desktop_return: Node
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -131,7 +132,12 @@ func sign_in(account_mode := "") -> void:
 	_login_active = true
 	login_starting.emit()
 	var verifier := Crypto.new().generate_random_bytes(32).hex_encode()
-	var start := await api("/auth/start", HTTPClient.METHOD_POST, {"challenge":verifier.sha256_text(),"accountMode":selected_mode}, false, 75.0)
+	if not is_instance_valid(_desktop_return):
+		_desktop_return = preload("res://scripts/online/DesktopLoginReturn.gd").new()
+		add_child(_desktop_return)
+		_desktop_return.returned.connect(resume_login)
+	var handoff: Dictionary = _desktop_return.start()
+	var start := await api("/auth/start", HTTPClient.METHOD_POST, {"challenge":verifier.sha256_text(),"accountMode":selected_mode,"desktopReturn":handoff}, false, 75.0)
 	if generation != _login_generation:
 		return
 	if start.has("error"):
