@@ -1254,6 +1254,13 @@ func _show_gameplay_audio_settings() -> void:
 
 
 func _prepare_dialog(dialog: AcceptDialog) -> void:
+	# Paper dialogs need their own readable defaults, including controls added later.
+	var paper_theme := Theme.new()
+	for control_type in ["Label", "Button", "CheckButton", "CheckBox"]:
+		for state in ["font_color", "font_hover_color", "font_pressed_color", "font_hover_pressed_color", "font_focus_color"]:
+			paper_theme.set_color(state, control_type, Color("#4b3424"))
+	paper_theme.set_color("default_color", "RichTextLabel", Color("#4b3424"))
+	dialog.theme = paper_theme
 	dialog.process_mode = Node.PROCESS_MODE_ALWAYS
 	dialog.dialog_autowrap = true
 	dialog.borderless = true
@@ -1288,18 +1295,21 @@ func _prepare_dialog(dialog: AcceptDialog) -> void:
 	panel.content_margin_top = 18 if dialog.has_meta("custom_heading") else 24
 	dialog.add_theme_stylebox_override("panel", panel)
 	var label := dialog.get_label()
-	label.add_theme_font_override("font", DISPLAY_FONT)
-	label.add_theme_font_size_override("font_size", 32)
+	label.add_theme_font_override("font", ThemeDB.fallback_font)
+	label.add_theme_font_size_override("font_size", 28)
 	label.add_theme_color_override("font_color", Color("#4b3424"))
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	var buttons: Array[Button] = [dialog.get_ok_button()]
 	if dialog is ConfirmationDialog:
 		buttons.append(dialog.get_cancel_button())
+	for extra in dialog.find_children("*", "Button", true, false):
+		if not buttons.has(extra): buttons.append(extra)
 	for button in buttons:
 		button.custom_minimum_size = Vector2(200, 92)
-		button.add_theme_font_size_override("font_size", 32)
-		button.add_theme_font_override("font", DISPLAY_FONT)
-		button.add_theme_color_override("font_color", Color("#4b2d1a"))
+		button.add_theme_font_size_override("font_size", 26)
+		button.add_theme_font_override("font", ThemeDB.fallback_font)
+		for state in ["font_color", "font_hover_color", "font_pressed_color", "font_hover_pressed_color", "font_focus_color"]:
+			button.add_theme_color_override(state, Color("#4b2d1a"))
 		var style := StyleBoxFlat.new()
 		style.bg_color = Color("#d8b77b")
 		style.border_color = Color("#8b572b")
@@ -1342,15 +1352,30 @@ func _show_audio_settings(parent_layer: Node) -> void:
 	heading.add_theme_color_override("font_outline_color", Color("#f4e2bd"))
 	settings.add_child(heading)
 	for preference in ["hints", "tutorials"]:
+		var guidance_row := HBoxContainer.new()
+		guidance_row.add_theme_constant_override("separation", 12)
+		settings.add_child(guidance_row)
+		var guidance_label := Label.new()
+		guidance_label.name = "HintsLabel" if preference == "hints" else "TutorialsLabel"
+		guidance_label.text = "Move hints" if preference == "hints" else "Tutorials"
+		guidance_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		guidance_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		guidance_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		guidance_label.add_theme_font_size_override("font_size", 30)
+		guidance_label.add_theme_color_override("font_color", Color("#4b3424"))
+		guidance_row.add_child(guidance_label)
 		var toggle := CheckButton.new()
 		toggle.name = "HintsEnabled" if preference == "hints" else "TutorialsEnabled"
-		toggle.custom_minimum_size.y = 92
+		toggle.custom_minimum_size = Vector2(150, 92)
+		toggle.size_flags_horizontal = Control.SIZE_SHRINK_END
 		toggle.add_theme_font_size_override("font_size", 30)
-		toggle.add_theme_color_override("font_color", Color("#4b3424"))
+		for state in ["font_color", "font_hover_color", "font_pressed_color", "font_hover_pressed_color", "font_focus_color", "font_disabled_color"]:
+			toggle.add_theme_color_override(state, Color("#4b3424"))
 		toggle.button_pressed = _guidance_enabled(preference)
-		toggle.text = ("MOVE HINTS: " if preference == "hints" else "TUTORIALS: ") + ("ON" if toggle.button_pressed else "OFF")
+		toggle.text = "ON" if toggle.button_pressed else "OFF"
+		toggle.tooltip_text = "Enable move hints" if preference == "hints" else "Enable tutorials"
 		toggle.toggled.connect(_set_guidance_enabled.bind(preference, toggle))
-		settings.add_child(toggle)
+		guidance_row.add_child(toggle)
 	var help_note := _make_label("Choose the help you want. You can turn either option back on here at any time.", 22)
 	help_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	help_note.add_theme_color_override("font_color", Color("#4b3424"))
@@ -1388,20 +1413,22 @@ func _show_audio_settings(parent_layer: Node) -> void:
 	var legal_links := VBoxContainer.new()
 	legal_links.add_theme_constant_override("separation", 10)
 	for legal_page in [
-		{"title": "PRIVACY POLICY", "path": "res://legal/privacy_policy.md"},
 		{"title": "TERMS AND CONDITIONS", "path": "res://legal/terms_and_conditions.md"}
 	]:
 		var legal_button := _make_menu_button(str(legal_page["title"]))
 		legal_button.custom_minimum_size = Vector2(0, 92)
 		legal_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		legal_button.add_theme_font_size_override("font_size", 32)
-		legal_button.pressed.connect(_show_legal_document.bind(parent_layer, str(legal_page["title"]), str(legal_page["path"])))
+		legal_button.pressed.connect(_show_legal_document.bind(popup, str(legal_page["title"]), str(legal_page["path"])))
 		legal_links.add_child(legal_button)
 	settings.add_child(legal_links)
 	var account_button := _make_menu_button("ACCOUNT & COINS")
 	account_button.disabled = _launch_layer == null and _campaign_layer == null
 	account_button.tooltip_text = "Available from the title screen or campaign map."
-	account_button.pressed.connect(func(): _account_panel.show_account())
+	account_button.pressed.connect(func():
+		popup.hide()
+		popup.queue_free()
+		_account_panel.show_account.call_deferred())
 	settings.add_child(account_button)
 	var ad_provider := get_node_or_null("/root/AdProvider")
 	if ad_provider != null and ad_provider.privacy_options_required():
@@ -1414,6 +1441,14 @@ func _show_audio_settings(parent_layer: Node) -> void:
 	settings.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	settings_scroll.add_child(settings)
 	popup.add_child(settings_scroll)
+	var privacy_button := popup.add_button("PRIVACY POLICY", false, "privacy_policy")
+	privacy_button.name = "PrivacyPolicyShortcut"
+	privacy_button.add_theme_font_size_override("font_size", 26)
+	for state in ["normal", "hover", "pressed", "focus"]:
+		privacy_button.add_theme_stylebox_override(state, popup.get_ok_button().get_theme_stylebox(state))
+	for state in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
+		privacy_button.add_theme_color_override(state, Color("#4b3424"))
+	privacy_button.pressed.connect(_show_legal_document.bind(popup, "PRIVACY POLICY", "res://legal/privacy_policy.md"))
 	if _tutorial_active and _tutorial_action == "settings":
 		popup.confirmed.connect(_on_tutorial_settings_confirmed, CONNECT_ONE_SHOT)
 	popup.confirmed.connect(popup.queue_free, CONNECT_ONE_SHOT)
@@ -1427,7 +1462,7 @@ func _guidance_enabled(preference: String) -> bool:
 
 func _set_guidance_enabled(enabled: bool, preference: String, toggle: CheckButton) -> void:
 	_campaign_progress.set_value("preferences", preference, enabled)
-	toggle.text = ("MOVE HINTS: " if preference == "hints" else "TUTORIALS: ") + ("ON" if enabled else "OFF")
+	toggle.text = "ON" if enabled else "OFF"
 	_persist_campaign_progress()
 	if preference == "hints":
 		_reset_idle_hint_timer()
@@ -1455,6 +1490,8 @@ func _show_legal_document(parent_layer: Node, title: String, path: String) -> vo
 	var viewport_size := get_viewport_rect().size
 	var popup := AcceptDialog.new()
 	popup.title = title
+	popup.name = "PrivacyPolicyDialog" if path.ends_with("privacy_policy.md") else "TermsDialog"
+	popup.set_meta("custom_heading", true)
 	popup.ok_button_text = "CLOSE"
 	var online_url := "https://sbi.globalcreest.com/save-the-baby/privacy-policy" if path.ends_with("privacy_policy.md") else "https://sbi.globalcreest.com/save-the-baby/terms-and-conditions"
 	popup.add_button("OPEN WEB PAGE", true, "open_legal_page")
@@ -1465,15 +1502,25 @@ func _show_legal_document(parent_layer: Node, title: String, path: String) -> vo
 	popup.process_mode = Node.PROCESS_MODE_ALWAYS
 	_prepare_dialog(popup)
 	popup.get_label().hide()
+	var content := VBoxContainer.new()
+	content.add_theme_constant_override("separation", 12)
+	var heading := Label.new()
+	heading.text = title
+	heading.add_theme_font_size_override("font_size", 30)
+	heading.add_theme_color_override("font_color", Color("#4b3424"))
+	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	content.add_child(heading)
 	var body := RichTextLabel.new()
+	body.name = "LegalDocumentBody"
 	body.bbcode_enabled = false
 	body.text = _legal_markdown_to_plain_text(markdown)
 	body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	body.scroll_active = true
-	body.custom_minimum_size = Vector2(minf(500.0, viewport_size.x * 0.78), minf(600.0, viewport_size.y * 0.66))
-	body.add_theme_color_override("default_color", Color("#fff3d5"))
-	body.add_theme_font_size_override("normal_font_size", 17)
-	popup.add_child(body)
+	body.custom_minimum_size = Vector2(minf(500.0, viewport_size.x * 0.78), minf(520.0, viewport_size.y * 0.52))
+	body.add_theme_color_override("default_color", Color("#4b3424"))
+	body.add_theme_font_size_override("normal_font_size", 26)
+	content.add_child(body)
+	popup.add_child(content)
 	parent_layer.add_child(popup)
 	popup.confirmed.connect(popup.queue_free, CONNECT_ONE_SHOT)
 	popup.canceled.connect(popup.queue_free, CONNECT_ONE_SHOT)

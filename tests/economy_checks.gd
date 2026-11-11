@@ -2,6 +2,20 @@ extends Node
 
 var failures: Array[String] = []
 
+class SlowCatalog extends Node:
+	signal released
+	var user_id := "local-catalog-test"
+	var player_name := "Test player"
+	var wallet := 0
+	var conflict := false
+	var busy := false
+	var response := {"error": "Offline", "status": 0}
+	func signed_in() -> bool: return true
+	func configured() -> bool: return true
+	func api(_path: String, _method: HTTPClient.Method = HTTPClient.METHOD_GET, _data: Dictionary = {}, _authenticated := true, _timeout_seconds := 25.0) -> Dictionary:
+		await released
+		return response
+
 class OfflineAccount extends "res://scripts/online/CloudAccount.gd":
 	func api(_path: String, _method: HTTPClient.Method = HTTPClient.METHOD_GET, _data: Dictionary = {}, _authenticated := true, _timeout_seconds := 25.0) -> Dictionary:
 		return {"error": "Could not connect.", "status": 0}
@@ -40,6 +54,7 @@ func _run() -> void:
 	account.token = ""
 	account.user_id = ""
 	await _check_help_preferences(game)
+	await _check_account_opening(game)
 	await _check_background_notices(game)
 	economy.set_coins(1000)
 	economy.set_lives(0)
@@ -119,6 +134,27 @@ func _check_help_preferences(game: Game) -> void:
 	var tutorials: CheckButton = game.find_child("TutorialsEnabled", true, false)
 	check(hints != null and tutorials != null, "Settings exposes separate hints and tutorial controls")
 	if hints == null or tutorials == null: return
+	var settings_window := hints.get_window() as AcceptDialog
+	var privacy := settings_window.find_child("PrivacyPolicyShortcut", true, false) as Button
+	check(privacy != null and privacy.is_visible_in_tree(), "Privacy policy has a fixed Settings footer button")
+	if privacy != null:
+		privacy.pressed.emit()
+		var policy_opened := false
+		for window in game.find_children("*", "AcceptDialog", true, false):
+			if window.title == "PRIVACY POLICY":
+				policy_opened = window.visible
+				window.queue_free()
+		check(policy_opened, "Privacy footer opens the local policy without a network request")
+		await get_tree().process_frame
+	for id in ["HintsLabel", "TutorialsLabel"]:
+		var label := game.find_child(id, true, false) as Label
+		check(label != null and label.is_visible_in_tree() and not label.text.is_empty(), "Settings keeps the guidance name visible: " + id)
+		if label != null:
+			check(label.get_theme_color("font_color").srgb_to_linear().get_luminance() < 0.1, "Guidance labels contrast with the light panel")
+	if "--capture-settings" in OS.get_cmdline_user_args() and DisplayServer.get_name() != "headless":
+		for frame in 8: await get_tree().process_frame
+		await RenderingServer.frame_post_draw
+		get_viewport().get_texture().get_image().save_png("res://.test-data/settings-guidance.png")
 	game._board.unlock()
 	game._board.set_required_swap([Vector2i(0,0), Vector2i(1,0)])
 	var tutorial_record: Variant = game._campaign_progress.get_value("tutorials", str(game._current_level_id), false)
@@ -136,9 +172,53 @@ func _check_help_preferences(game: Game) -> void:
 	tutorials.button_pressed = true
 	check(game._guidance_enabled("tutorials") and not game._guidance_enabled("hints"), "Tutorials can be re-enabled independently")
 	hints.button_pressed = true
-	var popup := hints.get_parent().get_parent().get_parent() as AcceptDialog
-	if popup != null: popup.queue_free()
+	var popup := hints.get_window() as AcceptDialog
+	if popup != null:
+		var open_account: Button
+		for button in popup.find_children("*", "Button", true, false):
+			if button.text == "ACCOUNT & COINS": open_account = button
+		if open_account != null and not open_account.disabled:
+			open_account.pressed.emit()
+			for frame in 3: await get_tree().process_frame
+			check(not is_instance_valid(popup) and is_instance_valid(game._account_panel._login_dialog) and game._account_panel._login_dialog.visible, "Account opens from Settings after releasing the Settings modal")
+			if is_instance_valid(game._account_panel._login_dialog): game._account_panel._login_dialog.queue_free()
+		else:
+			popup.queue_free()
 	await get_tree().process_frame
+
+func _check_account_opening(game: Game) -> void:
+	var panel: Node = game._account_panel
+	var real_account: Node = panel.account
+	var slow := SlowCatalog.new()
+	add_child(slow)
+	panel.account = slow
+	panel.show_account()
+	var dialog: AcceptDialog = panel._login_dialog
+	check(is_instance_valid(dialog) and dialog.visible, "Signed-in account panel opens before slow catalog responds")
+	panel.show_account()
+	check(panel._login_dialog == dialog, "Repeated account clicks reuse the open dialog")
+	for frame in 3: await get_tree().process_frame
+	var entries: VBoxContainer = dialog.find_child("AccountSupplyEntries", true, false)
+	check(entries != null and entries.get_child_count() == 1, "Slow prices have an inline loading state")
+	slow.released.emit()
+	for frame in 3: await get_tree().process_frame
+	var retry: Button
+	for child in entries.get_children():
+		if child is Button and child.text == "RETRY ONLINE PRICES": retry = child
+	check(retry != null, "Offline prices offer retry without blocking the account screen")
+	if retry != null:
+		slow.response = {"shopVersion": 2, "supplies": {"rocket": {"price": 150}}}
+		retry.pressed.emit()
+		slow.released.emit()
+		for frame in 3: await get_tree().process_frame
+		check(entries.get_child_count() == 1 and entries.get_child(0) is Button and entries.get_child(0).text.contains("150 purchased coins"), "Retry populates supplies after prices arrive")
+	panel._load_account_supplies(dialog, entries, slow.user_id)
+	dialog.queue_free()
+	for frame in 3: await get_tree().process_frame
+	slow.released.emit()
+	for frame in 3: await get_tree().process_frame
+	panel.account = real_account
+	slow.queue_free()
 
 func _check_background_notices(game: Game) -> void:
 	var billing := preload("res://scripts/online/CoinPurchases.gd").new()

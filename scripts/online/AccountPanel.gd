@@ -61,6 +61,8 @@ func _safe_menu() -> bool:
 	return game._launch_layer != null or game._campaign_layer != null or game._result_layer != null or game._briefing_layer != null
 
 func show_account() -> void:
+	if is_instance_valid(_login_dialog) and not _login_dialog.is_queued_for_deletion() and _login_dialog.visible:
+		return
 	if preload("res://scripts/debug/DeveloperTools.gd").enabled():
 		_notice("Accounts and purchases are disabled in Developer Play. This session uses a separate test save.")
 		return
@@ -75,9 +77,6 @@ func show_account() -> void:
 	if purchases.busy or account.busy:
 		_notice("A purchase or sync is still running. Try again when it finishes.")
 		return
-	if account.signed_in():
-		var catalog: Dictionary = await account.api("/v1/catalog")
-		_supplies = catalog.get("supplies",{}) if int(catalog.get("shopVersion",0)) >= 2 else {}
 	var dialog := AcceptDialog.new()
 	_login_dialog = dialog
 	_login_buttons.clear()
@@ -151,12 +150,13 @@ func show_account() -> void:
 		supply_label.text = "USE PURCHASED COINS"
 		_style_section_label(supply_label)
 		content.add_child(supply_label)
-		for kind in _supplies:
-			if kind == "continue":
-				continue
-			var supply: Dictionary = _supplies[kind]
-			var ethan_full: bool = kind == "ethan" and game._economy_manager.get_ethan_count() >= EthanInventory.MAX_ASSISTS
-			_button(content,"%s - %d purchased coins" % ["Refill to 5 lives" if kind == "lives" else "+1 " + kind.capitalize(),int(supply.price)],_spend.bind(kind),account.wallet<int(supply.price) or account.conflict or ethan_full or (kind in ["life","lives"] and game._economy_manager.get_lives() >= 5))
+		var supply_entries := VBoxContainer.new()
+		supply_entries.name = "AccountSupplyEntries"
+		content.add_child(supply_entries)
+		var loading := Label.new()
+		loading.text = "Loading online prices..."
+		loading.add_theme_color_override("font_color", Color("#4b3424"))
+		supply_entries.add_child(loading)
 		_button(content,"CHECK PENDING PURCHASES",func(): purchases.restore())
 		_button(content,"SIGN OUT",func(): account.sign_out())
 		_button(content,"DELETE ONLINE ACCOUNT",_confirm_delete)
@@ -172,6 +172,34 @@ func show_account() -> void:
 	dialog.get_ok_button().text = "CLOSE"
 	dialog.canceled.connect(dialog.queue_free)
 	dialog.popup_centered_clamped(Vector2i(int(content.custom_minimum_size.x+56),int(scroll.custom_minimum_size.y+112)))
+	if account.signed_in():
+		_load_account_supplies.call_deferred(dialog, content.find_child("AccountSupplyEntries", true, false), str(account.user_id))
+
+
+func _load_account_supplies(dialog: AcceptDialog, entries: VBoxContainer, owner: String) -> void:
+	if not is_instance_valid(dialog) or not is_instance_valid(entries): return
+	for child in entries.get_children():
+		if child is BaseButton: child.disabled = true
+	var catalog: Dictionary = await account.api("/v1/catalog", HTTPClient.METHOD_GET, {}, true, 8.0)
+	if not is_instance_valid(dialog) or dialog.is_queued_for_deletion() or dialog != _login_dialog or not is_instance_valid(entries) or not account.signed_in() or str(account.user_id) != owner:
+		return
+	for child in entries.get_children():
+		entries.remove_child(child)
+		child.queue_free()
+	_supplies = catalog.get("supplies", {}) if not catalog.has("error") and int(catalog.get("shopVersion", 0)) >= 2 else {}
+	if _supplies.is_empty():
+		var unavailable := Label.new()
+		unavailable.text = "Online prices are unavailable. You can close this screen and keep playing."
+		unavailable.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		unavailable.add_theme_color_override("font_color", Color("#4b3424"))
+		entries.add_child(unavailable)
+		_button(entries, "RETRY ONLINE PRICES", _load_account_supplies.bind(dialog, entries, owner), false, true)
+		return
+	for kind in _supplies:
+		if kind == "continue": continue
+		var supply: Dictionary = _supplies[kind]
+		var ethan_full: bool = kind == "ethan" and game._economy_manager.get_ethan_count() >= EthanInventory.MAX_ASSISTS
+		_button(entries, "%s - %d purchased coins" % ["Refill to 5 lives" if kind == "lives" else "+1 " + kind.capitalize(), int(supply.price)], _spend.bind(kind), account.wallet < int(supply.price) or account.conflict or ethan_full or (kind in ["life", "lives"] and game._economy_manager.get_lives() >= 5))
 
 func _style_section_label(label: Label) -> void:
 	label.add_theme_font_override("font",Game.DISPLAY_FONT)
@@ -228,9 +256,27 @@ func _on_login_start_failed(text: String) -> void:
 
 func _confirm_purchase(product: String, price: String) -> void:
 	var confirm := ConfirmationDialog.new()
+	confirm.set_meta("custom_heading", true)
 	game._prepare_dialog(confirm)
 	confirm.title = "GOOGLE PLAY PURCHASE"
-	confirm.dialog_text = "%d coins for %s.\n\n%sGoogle Play will handle payment and any purchase approval required by your family settings. Coins are added only after payment is confirmed.\n\nCoins belong to the signed-in game account: %s." % [purchases.PRODUCTS[product],price,"Ask your parent or guardian to continue.\n\n" if account.needs_parent_account() else "",account.player_name]
+	confirm.get_label().hide()
+	var content := VBoxContainer.new()
+	content.add_theme_constant_override("separation", 12)
+	var heading := Label.new()
+	heading.text = "GOOGLE PLAY PURCHASE"
+	heading.add_theme_font_size_override("font_size", 28)
+	content.add_child(heading)
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.custom_minimum_size = Vector2(minf(520, game.get_viewport_rect().size.x * .75), minf(480, game.get_viewport_rect().size.y * .45))
+	content.add_child(scroll)
+	var body := Label.new()
+	body.text = "%d coins for %s.\n\n%sGoogle Play will handle payment and any purchase approval required by your family settings. Coins are added only after payment is confirmed.\n\nCoins belong to the signed-in game account: %s." % [purchases.PRODUCTS[product],price,"Ask your parent or guardian to continue.\n\n" if account.needs_parent_account() else "",account.player_name]
+	body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	body.add_theme_font_size_override("font_size", 26)
+	scroll.add_child(body)
+	confirm.add_child(content)
 	confirm.ok_button_text = "CONTINUE TO GOOGLE PLAY"
 	confirm.confirmed.connect(func(): purchases.buy(product))
 	confirm.confirmed.connect(confirm.queue_free)
@@ -239,7 +285,7 @@ func _confirm_purchase(product: String, price: String) -> void:
 		game._coin_shop._dialog.add_child(confirm)
 	else:
 		game.add_child(confirm)
-	confirm.popup_centered_clamped(Vector2i(520,340))
+	confirm.popup_centered_clamped(Vector2i(600,760))
 
 func _button(parent: Control,title: String,action: Callable,disabled := false,keep_open := false) -> void:
 	var button := game._make_menu_button(title)
