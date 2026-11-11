@@ -2505,6 +2505,7 @@ func _on_board_created() -> void:
 	_board.turn_resolved.connect(_on_board_turn_resolved)
 	_board.special_created.connect(_on_special_created)
 	_board.character_arrived.connect(_on_character_arrived)
+	_board.ethan_matched.connect(func(extra_moves: int): _turn_reward_notices.append("ETHAN MATCHED | +%d MOVES" % extra_moves))
 	_board.special_activated.connect(_on_special_activated)
 	_board.powerup_blast.connect(_on_powerup_blast)
 	_board.rocket_combo.connect(_on_rocket_combo)
@@ -2813,9 +2814,9 @@ func _on_tiles_matched(tile_types: Array) -> void:
 	if victor_matches > 0:
 		_discover_journal_fact("characters", 2)
 	if ethan_matches > 0:
-		reward_notices.append("ETHAN +%d RESCUE ASSIST%s" % [ethan_matches, "" if ethan_matches == 1 else "S"])
+		reward_notices.append("ETHAN +%d WILDCARD GIFT%s" % [ethan_matches, "" if ethan_matches == 1 else "S"])
 	if detective_matches > 0:
-		reward_notices.append("DETECTIVE +%d RESCUE ASSIST%s" % [detective_matches, "" if detective_matches == 1 else "S"])
+		reward_notices.append("DETECTIVE +%d ETHAN GIFT%s" % [detective_matches, "" if detective_matches == 1 else "S"])
 	if victor_matches > 0:
 		reward_notices.append("VICTOR +%d ETHAN COINS" % (victor_matches * int(character_config.get("victor_coins_per_tile",2))))
 	var special_reward_text := " | ".join(reward_notices)
@@ -2880,7 +2881,7 @@ func _show_match_feedback(caption: String, sound_id: String, shake_board: bool) 
 func _on_character_arrived(kind: String) -> void:
 	SignalBus.play_sfx.emit("ethan_earned" if kind == "ethan" else "victor_arrived")
 	_discover_journal_fact("characters", 0)
-	_turn_reward_notices.append("ETHAN EARNED | Wildcard: Ethan + two matching tiles" if kind == "ethan" else "VICTOR ARRIVED | Swap him to replace the board; blockers remain")
+	_turn_reward_notices.append("ETHAN IS HERE | Wildcard: Ethan + two matching tiles" if kind == "ethan" else "VICTOR ARRIVED | Swap him to replace the board; blockers remain")
 
 
 func _on_special_created(kind: String) -> void:
@@ -3040,6 +3041,7 @@ func _show_tutorial_booster_result() -> void:
 	match _tutorial_booster_kind:
 		"bomb": consequence = "The bomb clears pieces around the target."
 		"thunder": consequence = "Thunder clears every piece of the chosen type."
+		"ethan": consequence = "The gift placed Ethan near useful clues. He completes a match with two identical neighbors and grants five moves."
 	_show_tutorial_tip("%s The booster count dropped by one; boosters are limited. Save the next one for a useful obstacle or hard-to-reach clue." % consequence, _objective_label.get_global_rect(), "DAVID", "res://assets/sprites/characters/david_portrait_v2.png", true)
 
 
@@ -3139,6 +3141,10 @@ func _on_booster_pressed(kind: String) -> void:
 	if int(_booster_inventory.get(kind, 0)) <= 0:
 		_open_booster_shop(kind)
 		return
+	if kind == "ethan":
+		if not _board.use_ethan_gift():
+			_effects().notice("Ethan cannot be placed right now. Your gift is saved.", DISPLAY_FONT)
+		return
 	if _selected_booster == kind:
 		_cancel_booster_targeting()
 		return
@@ -3150,7 +3156,7 @@ func _on_booster_pressed(kind: String) -> void:
 		_board.unlock()
 		_board.set_booster_mode(kind)
 		var target_rect := _board.get_cell_screen_rect(_tutorial_target_cell)
-		var message := "Tap the glowing piece to use %s. This clears nearby evidence." % kind.capitalize()
+		var message := "Tap the glowing piece to use %s. This applies its effect at your chosen target." % kind.capitalize()
 		_hint_label.text = "BOOSTER TRAINING | TARGET THE GLOWING PIECE"
 		_show_tutorial_tip(message, target_rect, "DAVID", "res://assets/sprites/characters/david_portrait_v2.png")
 		_refresh_tutorial_controls()
@@ -3164,7 +3170,7 @@ func _show_booster_confirmation(kind: String) -> void:
 		"rocket": "Choose a tile. Rocket clears its full row and column.",
 		"bomb": "Choose a tile. Bomb clears the tiles around it.",
 		"thunder": "Choose a tile. Thunder clears every tile of that type.",
-		"ethan": "Choose a tile. Ethan clears a 3 by 3 rescue area. You can hold up to two assists."
+		"ethan": "Tap Ethan to place him near objective clues automatically. Matching him with two identical tiles grants five moves. You can hold two gifts."
 	}
 	_booster_confirm_layer = CanvasLayer.new()
 	_booster_confirm_layer.name = "BoosterConfirmationLayer"

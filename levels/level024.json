@@ -115,7 +115,7 @@
         "steps": [
             {
                 "mechanic": "character_tiles",
-                "message": "A three-wave cascade earns an Ethan wildcard: Ethan plus two matching pieces clears automatically. Victor arrives once after 75% of your moves are used. Swap him to replace all tiles without collecting clues or clearing blockers. Detective matches still earn the separate rescue assists used by the Ethan tray."
+                "message": "A three-wave cascade earns an Ethan wildcard: Ethan plus two matching pieces clears automatically. Victor arrives once after 75% of your moves are used. Swap him to replace all tiles without collecting clues or clearing blockers. Detective matches can grant Ethan gifts. Tap a tray gift to place that same wildcard near useful objective clues automatically. Matching Ethan grants five extra moves."
             }
         ]
     },

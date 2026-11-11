@@ -32,8 +32,8 @@
       "amount": 1
     },
     "ethan_assist": {
-      "name": "Ethan rescue assist",
-      "description": "Choose a tile. Ethan clears a 3 by 3 rescue area. You can hold up to two assists.",
+      "name": "Ethan wildcard gift",
+      "description": "Tap Ethan to place him near objective clues automatically. Ethan plus two matching pieces clears the match and grants five moves. You can hold two gifts.",
       "category": "special",
       "currency": "coins",
       "price": 400,
@@ -67,6 +67,7 @@
   "board_characters": {
     "first_level": 24,
     "ethan_cascade_waves": 3,
+    "ethan_match_moves": 5,
     "victor_move_fraction": 0.75
   }
 }

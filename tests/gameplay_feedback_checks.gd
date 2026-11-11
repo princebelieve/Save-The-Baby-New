@@ -73,11 +73,21 @@ func _ready() -> void:
 	game._economy_manager.set_ethan_count(99)
 	check(game._economy_manager.get_ethan_count() == EthanInventory.MAX_ASSISTS, "Ethan assists must stop at the two-assist cap")
 	game._economy_manager.set_ethan_count(1)
-	var ethan_clear_sizes: Array[int] = []
-	board.tiles_matched_with_cells.connect(func(_type, cells): ethan_clear_sizes.append(cells.size()))
-	check(board.use_booster_at("ethan", Vector2i(3,3)), "Ethan assist must activate")
+	# Isolate gifted placement from any Ethan already earned by the earlier cascade.
+	for tile in board.get_all_tiles():
+		if int(tile.get_tile_type()) == Constants.TileType.ETHAN:
+			var cell: Vector2i = tile.get_grid_position()
+			board.remove_tile(cell)
+			board.set_tile(cell, board._tile_factory.create_tile_at(Constants.TileType.KEY, cell), false)
+	var placement := Vector2i(-1,-1)
+	for tile in board.get_all_tiles():
+		if not board.is_swap_blocked(tile.get_grid_position()) and not tile.has_powerup() and int(tile.get_tile_type()) not in [Constants.TileType.ETHAN,Constants.TileType.VICTOR]:
+			placement = tile.get_grid_position()
+			break
+	var moves_before := board.get_remaining_moves()
+	check(placement.x >= 0 and board.use_booster_at("ethan", placement), "Ethan gift places the wildcard")
 	await settle()
-	check(not ethan_clear_sizes.is_empty() and ethan_clear_sizes[0] <= 9, "Ethan must clear at most a three by three area")
+	check(board.get_remaining_moves() == moves_before, "Ethan placement and its matches preserve moves")
 	check(game._economy_manager.get_ethan_count() == 0, "Tiles cleared by Ethan must not generate another assist")
 	game._effects().praise("WONDERFUL!",Game.DISPLAY_FONT)
 	await capture("04_celebration")

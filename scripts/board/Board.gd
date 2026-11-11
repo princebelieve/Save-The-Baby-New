@@ -16,8 +16,10 @@ signal rocket_combo(origins: Array, cells: Array)
 signal tile_burst(cell: Vector2i)
 signal player_interacted
 signal character_arrived(kind: String)
+signal ethan_matched(extra_moves: int)
 var _match_waves := 0
 var _victor_arrived := false
+var _special_hit_wave := false
 
 var _grid: Dictionary = {}
 var _last_rejection_reason := "no_match"
@@ -72,6 +74,7 @@ func initialize(level_data: Dictionary) -> bool:
 	_remaining_moves = int(_level_data.get("moves", {}).get("total", 0))
 	_match_waves = 0
 	_victor_arrived = false
+	_special_hit_wave = false
 	_grid.clear()
 	_clear_systems()
 	_create_systems()
@@ -402,16 +405,23 @@ func _cell_center(grid_position: Vector2i) -> Vector2:
 
 
 func notify_match_tiles(tiles: Array, inventory_hit: bool = false) -> void:
+	var booster_hit := inventory_hit or _special_hit_wave
+	_special_hit_wave = false
 	var tile_types: Array = []
 	var cells: Array = []
 	for tile in tiles:
 		if tile != null:
+			if int(tile.get_tile_type()) == Constants.TileType.ETHAN and tile.has_meta("wildcard_type") and not bool(tile.get_meta("ethan_rewarded", false)):
+				tile.set_meta("ethan_rewarded", true)
+				var bonus := int(ConfigLoader.load_config(Constants.ConfigPaths.ECONOMY).get("board_characters", {}).get("ethan_match_moves", 5))
+				add_reward_moves(bonus)
+				ethan_matched.emit(bonus)
 			tile_types.append(-1 if bool(tile.get_meta("collection_counted", false)) else tile.get_meta("wildcard_type", tile.get_tile_type()))
 			cells.append(tile.get_grid_position())
 	match_collected.emit(tile_types)
 	tiles_matched_with_cells.emit(tile_types, cells)
 	SignalBus.matches_found.emit(tiles)
-	_damage_nearby_obstacles(tiles,inventory_hit)
+	_damage_nearby_obstacles(tiles,booster_hit)
 
 
 func find_valid_swap() -> Array[Vector2i]:
@@ -742,39 +752,35 @@ func _damage_nearby_obstacles(tiles: Array, inventory_hit: bool = false) -> void
 		obstacles_cleared.emit(cleared)
 
 
+func use_ethan_gift() -> bool:
+	if _locked: return false
+	var placement := preload("res://scripts/board/EthanPlacement.gd").choose(self)
+	return placement.x >= 0 and use_booster_at("ethan", placement)
+
+
 func use_booster_at(kind: String, position: Vector2i) -> bool:
 	if _locked or not is_inside(position) or get_tile(position) == null:
 		return false
 	if _required_booster_target != Vector2i(-1, -1) and position != _required_booster_target:
 		return false
+	if kind == "ethan":
+		var piece: Tile = get_tile(position)
+		if is_swap_blocked(position) or piece.has_powerup() or int(piece.get_tile_type()) in [Constants.TileType.ETHAN, Constants.TileType.VICTOR]: return false
+		for tile in get_all_tiles():
+			if int(tile.get_tile_type()) == Constants.TileType.ETHAN: return false
+		_locked = true
+		_booster_mode = ""
+		_required_booster_target = Vector2i(-1,-1)
+		_match_waves = 0
+		booster_used.emit(kind)
+		_replace_character_at(Constants.TileType.ETHAN, position)
+		character_arrived.emit("ethan")
+		_resolve_gifted_ethan()
+		return true
+	if kind not in ["hammer", "rocket", "bomb", "thunder", "ethan"]:
+		return false
 	var target: Tile = get_tile(position)
-	var targets: Array = []
-	match kind:
-		"hammer":
-			targets.append(target)
-		"rocket":
-			for x in range(get_width()):
-				var row_tile: Tile = get_tile(Vector2i(x, position.y))
-				if row_tile != null: targets.append(row_tile)
-			for y in range(get_height()):
-				var column_tile: Tile = get_tile(Vector2i(position.x, y))
-				if column_tile != null and not targets.has(column_tile): targets.append(column_tile)
-		"bomb":
-			for y in range(maxi(0, position.y - 1), mini(get_height(), position.y + 2)):
-				for x in range(maxi(0, position.x - 1), mini(get_width(), position.x + 2)):
-					var area_tile: Tile = get_tile(Vector2i(x, y))
-					if area_tile != null: targets.append(area_tile)
-		"thunder":
-			var target_type: int = target.get_tile_type()
-			for tile in _grid.values():
-				if tile.get_tile_type() == target_type: targets.append(tile)
-		"ethan":
-			for y in range(maxi(0, position.y - 1), mini(get_height(), position.y + 2)):
-				for x in range(maxi(0, position.x - 1), mini(get_width(), position.x + 2)):
-					var rescue_tile: Tile = get_tile(Vector2i(x, y))
-					if rescue_tile != null: targets.append(rescue_tile)
-		_:
-			return false
+	var targets := _special_targets(kind, position, int(target.get_tile_type()))
 	if targets.is_empty():
 		return false
 	_locked = true
@@ -850,15 +856,17 @@ func _special_targets(kind: String, origin: Vector2i, target_type: int) -> Array
 		match kind:
 			"thunder": hit = int(tile.get_tile_type()) == target_type
 			"bomb": hit = absi(delta.x) <= 1 and absi(delta.y) <= 1
+			"hammer": hit = delta == Vector2i.ZERO
 			"large_bomb": hit = absi(delta.x) <= 2 and absi(delta.y) <= 2
 			"wide_rocket": hit = absi(delta.x) <= 1 or absi(delta.y) <= 1
-			_: hit = delta.x == 0 or delta.y == 0
+			"rocket": hit = delta.x == 0 or delta.y == 0
 		if hit:
 			targets.append(tile)
 	return targets
 
 
 func expand_special_targets(tiles: Array, excluded: Tile = null) -> Array:
+	_special_hit_wave = false
 	var expanded: Array = []
 	for tile in tiles:
 		if is_instance_valid(tile) and not expanded.has(tile):
@@ -870,6 +878,7 @@ func expand_special_targets(tiles: Array, excluded: Tile = null) -> Array:
 		if tile == excluded or not tile.has_powerup():
 			continue
 		var kind := str(tile.get_meta("powerup_kind", "rocket"))
+		if kind in ["rocket", "bomb", "thunder"]: _special_hit_wave = true
 		tile.clear_powerup()
 		tile.remove_meta("powerup_kind")
 		special_activated.emit(kind)
@@ -908,7 +917,7 @@ func _resolve_external_clear(tiles: Array, effect: String, finish_turn: bool = t
 			combo_cells.append(tile.get_grid_position())
 		rocket_combo.emit(combo_origins, combo_cells)
 		await get_tree().create_timer(0.49 + combo_cells.size() * 0.022).timeout
-	notify_match_tiles(unique_tiles,inventory_hit)
+	notify_match_tiles(unique_tiles,inventory_hit or effect in ["rocket", "bomb", "thunder", "rocket_combo"])
 	if preserved != null:
 		preserved.set_meta("collection_counted", true)
 		unique_tiles.erase(preserved)
@@ -1010,7 +1019,7 @@ func tag_wildcard_matches(matches: Array) -> void:
 
 func _finish_character_turn() -> void:
 	var rules: Dictionary = ConfigLoader.load_config(Constants.ConfigPaths.ECONOMY).get("board_characters", {})
-	if int(_level_data.get("level_id", 1)) < int(rules.get("first_level", 24)) or _remaining_moves <= 0:
+	if int(_level_data.get("level_id", 1)) < int(rules.get("first_level", 24)):
 		return
 	if _match_waves >= int(rules.get("ethan_cascade_waves", 3)):
 		if _place_character(Constants.TileType.ETHAN):
@@ -1018,10 +1027,23 @@ func _finish_character_turn() -> void:
 			# Earned wildcards resolve any line they complete immediately.
 			await _cascade_processor.process_animated(self)
 	var total := int(_level_data.get("moves", {}).get("total", 0))
-	if not _victor_arrived and total > 0 and total - _remaining_moves >= ceili(total * float(rules.get("victor_move_fraction", 0.75))):
+	if not _victor_arrived and _remaining_moves > 0 and total > 0 and total - _remaining_moves >= ceili(total * float(rules.get("victor_move_fraction", 0.75))):
 		if _place_character(Constants.TileType.VICTOR):
 			_victor_arrived = true
 			character_arrived.emit("victor")
+
+
+func _resolve_gifted_ethan() -> void:
+	await _cascade_processor.process_animated(self)
+	await _finish_character_turn()
+	if _board_shuffler != null and _board_shuffler.needs_shuffle(self): _board_shuffler.shuffle(self)
+	_locked = false
+	turn_resolved.emit()
+
+
+func _replace_character_at(kind: int, cell: Vector2i) -> void:
+	remove_tile(cell)
+	set_tile(cell, _tile_factory.create_tile_at(kind, cell), false)
 
 
 func _place_character(kind: int) -> bool:
@@ -1038,9 +1060,13 @@ func _place_character(kind: int) -> bool:
 				if not reachable: continue
 			candidates.append(cell)
 	if candidates.is_empty(): return false
+	if kind == Constants.TileType.ETHAN:
+		var placement := preload("res://scripts/board/EthanPlacement.gd").choose(self)
+		if placement.x < 0: return false
+		_replace_character_at(kind, placement)
+		return true
 	var cell: Vector2i = candidates[RandomGenerator.random_int(0, candidates.size() - 1)]
-	remove_tile(cell)
-	set_tile(cell, _tile_factory.create_tile_at(kind, cell), false)
+	_replace_character_at(kind, cell)
 	return true
 
 

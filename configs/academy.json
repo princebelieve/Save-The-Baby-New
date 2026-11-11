@@ -49,7 +49,7 @@
             "pages": [
                 "Match four in a straight line to create a rocket.",
                 "Swap a rocket with a neighbor to clear its row and column.",
-                "The tray rocket works differently: tap it, then choose a target.",
+                "Rocket clears a row and column wherever it is used. From the tray, tap Rocket and choose its target; on the board, swap it with a neighbor.",
                 "Tray boosters are limited. Aim where a blast will advance the goal.",
                 "Creating 15 special pieces earns a matching booster supply."
             ],
@@ -144,7 +144,7 @@
             "pages": [
                 "Match five in a straight line to create thunder.",
                 "Swap thunder with a normal piece to clear that piece type.",
-                "The tray thunder clears the type of the piece you tap.",
+                "Thunder clears every piece of the selected type wherever it is used: tap that type from the tray, or swap the board Thunder with it.",
                 "Choose the goal symbol when you can. Random clearing wastes its reach.",
                 "Thunder with a special spreads its blast across a piece type.",
                 "Two thunder pieces clear the board. Aim combinations at your goals."
@@ -303,12 +303,12 @@
         {
             "level": 24,
             "id": "characters",
-            "title": "Portraits and rescue assists",
+            "title": "Ethan gifts and Victor disasters",
             "pages": [
                 "Ethan is an earned wildcard, not a random board piece.",
-                "A three-wave cascade earns one Ethan wildcard. Ethan plus two matching pieces completes a match automatically. Detective matches still earn tray assists.",
+                "A three-wave cascade earns one Ethan wildcard. Ethan plus two matching pieces completes a match automatically and grants five moves once. Detective matches can grant Ethan gifts.",
                 "Victor arrives once after 75% of your moves are spent. Swap him to replace every tile. This costs one move, leaves blockers intact, and grants no collection credit.",
-                "You can hold two assists. Spend one in the Ethan tray to clear a chosen three by three area."
+                "You can hold two Ethan gifts. Tap the tray to place him automatically: beside two objective clues when possible, otherwise where he can help on the next move. Placement costs no move."
             ],
             "journal_pages": [
                 {
@@ -331,7 +331,7 @@
                 },
                 {
                     "id": "ethan_assist",
-                    "title": "Using Ethan rescue assists",
+                    "title": "Placing Ethan wildcard gifts",
                     "fact": "target",
                     "illustration": "res://assets/sprites/characters/ethan_portrait_cutout.png"
                 }
