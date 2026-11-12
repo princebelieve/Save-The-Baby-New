@@ -22,9 +22,18 @@ Intentional reach limits: Android below 7.0/API 24, devices without OpenGL ES 3.
 
 Target API 36 meets the currently documented update requirement. This does not establish the target SDK of the older production artifact. Verify the active production version in Play Console. Native alignment and signing checks are recorded with the version 9 artifacts.
 
-## Checks that require Play Console
+## Authenticated API audit completed later on 12 November
 
-The available integrations do not expose Play Console. No claim is made about live country targeting, manual device exclusions, Android vitals, policy notices, rollout percentages, acquisition performance or an unlisted distribution setting.
+The existing service account successfully inspected Play tracks, production countries and listings. The helper created a temporary API edit solely to obtain these snapshots, then deleted it without committing or publishing any changes. Raw response: `.private/google-access/play-visibility.json`.
+
+- Production release `8 (1.0.0)` is `completed`, with version code 8. Version 9 is not yet live, so the local Vulkan compatibility fix has not reached production users.
+- The production response lists 177 countries/regions and `restOfWorld: true`. Nigeria, the UK and US are included. No broad country restriction was found in this response.
+- The listing response contains en-GB copy still advertising 50 levels. No additional localized listings were returned.
+- No manual device exclusions, account-specific eligibility, policy status or acquisition ranking data were inspected by these API calls.
+
+## Checks that still require Console information
+
+The local API helper now exposes the verified production/country/listing data above. No claim is made about manual device exclusions, Android vitals, policy notices, acquisition performance or an unlisted distribution setting.
 
 Review Production > Countries/regions; Publishing overview; Policy status; Reach and devices > Device catalog; and Android vitals. Compare direct-link installation with search results on a supported device and Google Play account. Low search placement is different from an unavailable listing.
 

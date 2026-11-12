@@ -10,6 +10,7 @@ __pycache__/
 *.py[cod]
 
 /.tmp/
+/.private/
 
 /server/node_modules/
 **/.env

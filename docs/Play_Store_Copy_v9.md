@@ -1,8 +1,8 @@
 # Version 9 listing copy — draft, not published
 
-Apply with the version 9 production release. Keep the current title unless the owner chooses the optional descriptive title.
+Apply with the version 9 production release. Keep the existing title while a distinctive name and competing titles are reviewed.
 
-Optional title: **Save The Baby: Match 3 Rescue**
+Title: **Save The Baby**. The previous suggested rename is withdrawn pending naming research; no uniqueness claim is made.
 
 Short description:
 
@@ -14,7 +14,7 @@ Ethan has vanished. Help David and Amara follow the evidence in a story-driven m
 
 MATCH CLUES AND CLEAR THE WAY
 
-Swap neighboring pieces, complete objectives and clear blockers through a campaign of 1,050 puzzle levels. Create Rockets, Bombs and Thunder specials to help with difficult boards.
+Swap neighboring pieces, complete objectives and clear blockers as the investigation unfolds. Create Rockets, Bombs and Thunder specials to help with difficult boards.
 
 MAKE EVERY TOOL COUNT
 
