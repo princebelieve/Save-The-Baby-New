@@ -9,6 +9,22 @@ const GOLD := Color("#ffc85a")
 const COIN := "res://assets/sprites/ui/icons/coins_icon.png"
 const DISPLAY_FONT := preload("res://assets/fonts/Baloo2-Variable.ttf")
 
+static func present(control: Control, sound: String = "case_open") -> void:
+	SignalBus.play_sfx.emit(sound)
+	control.modulate.a = 0.0
+	control.create_tween().tween_property(control, "modulate:a", 1.0, 0.18)
+
+static func fit_card(control: Control, maximum: Vector2, margin: float = 48.0) -> void:
+	var viewport := control.get_viewport()
+	var fit := func():
+		if is_instance_valid(control):
+			var bounds := viewport.get_visible_rect().size - Vector2.ONE * margin
+			control.custom_minimum_size = Vector2(minf(maximum.x, bounds.x), minf(maximum.y, bounds.y))
+	fit.call()
+	viewport.size_changed.connect(fit)
+	control.tree_exiting.connect(func():
+		if viewport.size_changed.is_connected(fit): viewport.size_changed.disconnect(fit))
+
 static func background(parent: Control) -> void:
 	var art := TextureRect.new()
 	var texture := GradientTexture2D.new()
@@ -39,6 +55,25 @@ static func card(parent: Node, color: Color = Color.WHITE) -> PanelContainer:
 	parent.add_child(panel)
 	return panel
 
+static func reward_tile(parent: Node, kind: String, amount: int, caption: String = "") -> Control:
+	var panel := card(parent, Color("#fff4d9"))
+	var row := HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", 14)
+	panel.add_child(row)
+	var path := COIN
+	if kind in ["rocket", "bomb", "thunder"]: path = "res://assets/sprites/powerups/" + kind + "_powerup_icon.jpeg"
+	elif kind in ["life", "lives"]: path = "res://assets/sprites/ui/icons/life_icon.png"
+	image(row, path, Vector2(68, 68))
+	var copy := column(row, 0)
+	copy.custom_minimum_size.x = 340
+	var text := display_label(copy, "%s%d %s" % ["+" if amount >= 0 else "", amount, kind.capitalize()], 40)
+	text.name = "RewardAmount"
+	if caption in ["Case reward", "Daily stamp reward"]:
+		display_label(copy, caption, 32, PURPLE)
+	if not caption.is_empty(): panel.tooltip_text = caption
+	return panel
+
 static func label(parent: Node, value: String, font_size: int = 34, color: Color = INK) -> Label:
 	var text := Label.new()
 	text.text = value
@@ -46,6 +81,7 @@ static func label(parent: Node, value: String, font_size: int = 34, color: Color
 	text.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	text.add_theme_font_size_override("font_size", font_size)
+	text.add_theme_font_override("font", DISPLAY_FONT)
 	text.add_theme_color_override("font_color", color)
 	parent.add_child(text)
 	return text
@@ -67,7 +103,8 @@ static func button(parent: Node, value: String, action: Callable, color: Color =
 		control.add_theme_stylebox_override(state, box)
 	control.add_theme_color_override("font_color", Color.WHITE)
 	control.add_theme_color_override("font_disabled_color", Color.WHITE)
-	control.pressed.connect(action)
+	control.pressed.connect(func(): SignalBus.play_sfx.emit("ui_click"))
+	if action.is_valid(): control.pressed.connect(action)
 	if parent != null: parent.add_child(control)
 	return control
 

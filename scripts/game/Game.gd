@@ -7,6 +7,7 @@ const OPENING_STORY_PATH := "res://stories/opening_story.json"
 const CAMPAIGN_PROGRESS_PATH := "user://campaign_progress.cfg"
 
 var _daily_rewards_layer: CanvasLayer
+var _chapter_layer: CanvasLayer
 var _portrait_layer: CanvasLayer
 var _portrait_puzzle: PortraitPuzzle
 var _restoration_invite: Control
@@ -159,7 +160,12 @@ func _handle_back_request() -> void:
 		if dialog.visible:
 			dialog.hide()
 			return
-	if _detail_layer != null and is_instance_valid(_detail_layer):
+	if is_instance_valid(_chapter_layer):
+		_chapter_layer.queue_free()
+		_chapter_layer = null
+		if not is_instance_valid(_campaign_layer):
+			_show_campaign_map(_current_route_id)
+	elif _detail_layer != null and is_instance_valid(_detail_layer):
 		_close_detail()
 	elif _case_file_layer != null and is_instance_valid(_case_file_layer):
 		_close_case_file()
@@ -1055,7 +1061,7 @@ func _show_pause_menu(force_pause: bool = false) -> void:
 
 
 func _make_menu_button(caption: String) -> Button:
-	return MobileGameUI.button(null, caption, _play_ui_click)
+	return MobileGameUI.button(null, caption, Callable())
 
 
 func _make_parchment_panel_style(horizontal_margin: float, vertical_margin: float) -> StyleBoxTexture:
@@ -2055,6 +2061,8 @@ func _on_campaign_level_selected(level_id: int, route_id: String) -> void:
 		_tutorial_action = ""
 	var level_manager := get_node_or_null("Managers/LevelManager")
 	var authored := JsonLoader.load_file("res://levels/level%03d.json" % level_id)
+	if _show_new_chapter(authored, route_id):
+		return
 	var attempt_variant := Recovery.preview(_campaign_progress,authored,TimeHelper.current_unix_time())
 	if level_manager == null or not level_manager.load_level(level_id,attempt_variant):
 		DebugLogger.error("Game: Could not load selected level %03d." % level_id)
@@ -2073,6 +2081,31 @@ func _on_campaign_level_selected(level_id: int, route_id: String) -> void:
 		_start_campaign_story(story_id)
 	else:
 		_show_level_briefing(route_id)
+
+
+func _show_new_chapter(data: Dictionary, route: String) -> bool:
+	var metadata: Dictionary = data.get("metadata", {})
+	var chapter := str(int(metadata.get("chapter_id", 0)))
+	if chapter == "0" or bool(_campaign_progress.get_value("chapter_introductions", chapter, false)):
+		return false
+	if is_instance_valid(_chapter_layer): return true
+	_chapter_layer = CanvasLayer.new()
+	_chapter_layer.layer = 23
+	add_child(_chapter_layer)
+	var intro := preload("res://scripts/ui/ChapterTransition.gd").new()
+	intro.details = metadata.duplicate(true)
+	var background := str(metadata.get("map_background", ""))
+	intro.details.art = "res://assets/sprites/backgrounds/" + background
+	if not ResourceLoader.exists(intro.details.art):
+		intro.details.art = "res://assets/sprites/characters/amara_and_ethan_portrait.jpeg"
+	intro.continued.connect(func():
+		_campaign_progress.set_value("chapter_introductions", chapter, true)
+		_persist_campaign_progress()
+		_chapter_layer.queue_free()
+		_chapter_layer = null
+		_on_campaign_level_selected(int(data.get("level_id", 1)), route))
+	_chapter_layer.add_child(intro)
+	return true
 
 
 func _start_campaign_story(story_id: String) -> void:
@@ -3397,9 +3430,14 @@ func _show_level_result(won: bool) -> void:
 	veil.add_child(center)
 	var card := MobileGameUI.card(center, Color("#eef4ff"))
 	card.custom_minimum_size = Vector2(minf(672.0, get_viewport_rect().size.x - 32), minf(1040.0, get_viewport_rect().size.y - 48))
+	MobileGameUI.fit_card(card, Vector2(672, 1040))
+	var layout := VBoxContainer.new()
+	layout.add_theme_constant_override("separation", 12)
+	card.add_child(layout)
 	var scroll := ScrollContainer.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	card.add_child(scroll)
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	layout.add_child(scroll)
 	var content := VBoxContainer.new()
 	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	content.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -3420,7 +3458,7 @@ func _show_level_result(won: bool) -> void:
 	var result_manager := get_node_or_null("Managers/LevelManager")
 	var result_data: Dictionary = result_manager.get_level_data() if result_manager != null else {}
 	if won and _is_story_final_level(result_data):
-		var story_complete := _make_label("LEAD VERIFIED", 22)
+		var story_complete := _make_label("LEAD VERIFIED", 36)
 		story_complete.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		story_complete.add_theme_color_override("font_color", Color("#8b572b"))
 		content.add_child(story_complete)
@@ -3469,7 +3507,19 @@ func _show_level_result(won: bool) -> void:
 			detail_text += "\nCase %03d is now unlocked." % mini(_highest_unlocked_level, _current_level_id + 1)
 		else:
 			detail_text += "\nDavid's search continues as new investigations are added."
-	var detail := _make_label(detail_text, 32)
+	if won:
+		MobileGameUI.reward_tile(content, "coins", coins_earned, "Case reward")
+		if not _last_daily_stamp.is_empty():
+			MobileGameUI.reward_tile(content, "coins", int(_last_daily_stamp.coins), "Daily stamp reward")
+		MobileGameUI.display_label(content, "Case %03d unlocked" % mini(_highest_unlocked_level, _current_level_id + 1) if has_next_level else "Investigation complete", 40)
+	else:
+		var lives_row := HBoxContainer.new()
+		lives_row.alignment = BoxContainer.ALIGNMENT_CENTER
+		content.add_child(lives_row)
+		MobileGameUI.image(lives_row, "res://assets/sprites/ui/icons/life_icon.png", Vector2(64,64))
+		MobileGameUI.display_label(lives_row, "%d lives left" % _economy_manager.get_lives(), 40)
+	MobileGameUI.button(content, "Case summary", _show_detail.bind("Case summary", detail_text), MobileGameUI.PURPLE)
+	var detail := _make_label("The search continues." if won else "Out of moves. Try a new approach.", 36)
 	detail.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	detail.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	detail.add_theme_color_override("font_color", MobileGameUI.INK)
@@ -3478,34 +3528,38 @@ func _show_level_result(won: bool) -> void:
 	detail.add_theme_constant_override("outline_size", 1)
 	detail.add_theme_constant_override("shadow_offset_x", 1)
 	detail.add_theme_constant_override("shadow_offset_y", 1)
-	detail.add_theme_font_size_override("font_size", 32)
+	detail.add_theme_font_size_override("font_size", 36)
 	content.add_child(detail)
+	var actions := VBoxContainer.new()
+	actions.name = "ResultActions"
+	actions.add_theme_constant_override("separation", 10)
+	layout.add_child(actions)
 	if won:
-		var next := _make_menu_button("NEXT CHAPTER" if has_after_story else ("NEXT CASE" if has_next_level else "RETURN TO MAP"))
+		var next := MobileGameUI.button(null, "NEXT CHAPTER" if has_after_story else ("NEXT CASE" if has_next_level else "RETURN TO MAP"), Callable(), MobileGameUI.PINK)
 		next.pressed.connect(_next_level_after_win)
-		content.add_child(next)
+		actions.add_child(next)
 	else:
 		if _economy_manager == null or _economy_manager.get_lives() > 0:
-			var retry := _make_menu_button("RETRY CASE")
+			var retry := MobileGameUI.button(null, "RETRY CASE", Callable(), MobileGameUI.PINK)
 			retry.pressed.connect(_retry_current_level)
-			content.add_child(retry)
+			actions.add_child(retry)
 		if _can_buy_continue():
 			var play_on := _make_menu_button("CONTINUE: +5 MOVES")
 			play_on.pressed.connect(_show_continue_shop)
-			content.add_child(play_on)
+			actions.add_child(play_on)
 		var life_shop := _make_menu_button("LIFE SHOP")
 		life_shop.pressed.connect(_show_life_shop)
-		content.add_child(life_shop)
+		actions.add_child(life_shop)
 	if won and first_clear and int(reward_info.get("coins", 0)) > 0:
-		_add_reward_offer(content, "Watch an ad: +%d bonus coins" % int(reward_info.get("coins", 0)), "completion", func():
+		_add_reward_offer(actions, "Watch an ad: +%d bonus coins" % int(reward_info.get("coins", 0)), "completion", func():
 			_economy_manager.add_coins(int(reward_info.get("coins", 0)))
 			_persist_campaign_progress()
 		)
 	elif not won and not _ad_revived:
-		_add_reward_offer(content, "Watch ad: +5 moves", "continue", _reward_continue)
+		_add_reward_offer(actions, "Watch ad: +5 moves", "continue", _reward_continue)
 	var map_button := _make_menu_button("INVESTIGATION MAP")
 	map_button.pressed.connect(_return_to_campaign_map)
-	content.add_child(map_button)
+	actions.add_child(map_button)
 	card.modulate.a = 0.0
 	var entrance := create_tween().set_parallel(true)
 	entrance.tween_property(card, "modulate:a", 1.0, 0.3)
@@ -4204,8 +4258,28 @@ func _show_daily_rewards() -> void:
 		_close_daily_rewards()
 		_open_portrait_puzzle()
 	)
+	hub.supply_claim_requested.connect(_claim_daily_supply)
 	_daily_rewards_layer.add_child(hub)
 	add_child(_daily_rewards_layer)
+
+
+func _claim_daily_supply(key: String) -> void:
+	var pending: Dictionary = _campaign_progress.get_value("daily", "supply_rewards", {})
+	var kind := str(pending.get(key, {}).get("kind", ""))
+	if _economy_manager == null: return
+	if kind == "life" and _economy_manager.get_lives() >= 5:
+		_show_detail("Lives are full", "Your earned life is saved. Claim it when you need it.")
+		return
+	_progress_transaction = true
+	var reward := DailyActivities.claim_supply(_campaign_progress, key, TimeHelper.current_unix_time())
+	if not reward.is_empty():
+		if kind == "life": _economy_manager.add_life(1)
+		else: _economy_manager.add_booster(kind, 1)
+	_progress_transaction = false
+	_persist_campaign_progress()
+	if is_instance_valid(_daily_rewards_layer):
+		_daily_rewards_layer.get_node("RewardsHub")._render()
+	if not reward.is_empty(): SignalBus.play_sfx.emit("ui_confirm")
 
 
 func _close_daily_rewards() -> void:

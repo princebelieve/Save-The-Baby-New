@@ -1,6 +1,6 @@
 param(
     [string]$Godot = "C:\Users\ASUS\My Tools\Godot\4.6.3\Godot_v4.6.3-stable_win64.exe",
-    [ValidateSet("release_checks", "progression_daily_checks", "random_release_checks", "streak_release_checks", "economy_checks", "difficulty_checks", "story_checks", "developer_checks", "gallery_checks", "mobile_ui_checks", "level48_checks", "character_booster_checks", "action_audio_checks", "dialog_readability_checks", "experience_checks")]
+    [ValidateSet("release_checks", "progression_daily_checks", "random_release_checks", "streak_release_checks", "economy_checks", "difficulty_checks", "story_checks", "developer_checks", "gallery_checks", "mobile_ui_checks", "level48_checks", "character_booster_checks", "action_audio_checks", "dialog_readability_checks", "experience_checks", "journey_checks")]
     [string]$Suite = "release_checks",
     [switch]$Resume,
     [ValidateRange(1, 3600)]

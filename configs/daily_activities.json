@@ -30,12 +30,14 @@
       "id": "specials",
       "title": "Create 2 special pieces",
       "target": 2,
+      "supply": "rocket",
       "coins": 10
     },
     {
       "id": "blockers",
       "title": "Clear 3 blockers",
       "target": 3,
+      "supply": "life",
       "coins": 15
     }
   ],

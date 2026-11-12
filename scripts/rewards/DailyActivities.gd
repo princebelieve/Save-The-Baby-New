@@ -94,10 +94,26 @@ static func record_mission(progress: ConfigFile, kind: String, amount: int, now:
 		counts[kind] = mini(target, previous + amount)
 		if previous < target and int(counts[kind]) >= target:
 			coins = int(mission.coins)
+			var supply := str(mission.get("supply", ""))
+			if supply in ["rocket", "bomb", "thunder", "life"]:
+				var pending: Dictionary = progress.get_value("daily", "supply_rewards", {})
+				pending["%d:%s" % [today, kind]] = {"kind": supply, "amount": 1}
+				progress.set_value("daily", "supply_rewards", pending)
 	progress.set_value("daily", "mission_day", today)
 	progress.set_value("daily", "missions", counts)
 	progress.set_value("daily", "last_seen", now)
 	return coins
+
+
+static func claim_supply(progress: ConfigFile, key: String, now: int) -> Dictionary:
+	if not clock_valid(progress, now): return {}
+	var pending: Dictionary = progress.get_value("daily", "supply_rewards", {})
+	var reward: Dictionary = pending.get(key, {})
+	if str(reward.get("kind", "")) not in ["rocket", "bomb", "thunder", "life"] or int(reward.get("amount", 0)) != 1: return {}
+	pending.erase(key)
+	progress.set_value("daily", "supply_rewards", pending)
+	progress.set_value("daily", "last_seen", now)
+	return reward.duplicate(true)
 
 
 static func start_portrait(progress: ConfigFile, now: int) -> Dictionary:

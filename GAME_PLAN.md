@@ -207,4 +207,12 @@ Restoration is now an earned supply challenge after eligible first clears (case 
 
 Preview and a two-fragment practice swap are untimed. Explicit Start creates the attempt, with its full advertised duration even across reset. New earned attempts reward one Rocket plus the existing coins; reward snapshots and claim markers prevent repeat grants. Existing saved attempts retain their original reward. Tutorials off bypasses the new demonstration. Background time and reference viewing during a started attempt still count.
 
-The mission card emphasizes the goal illustration, larger goal/count/moves and Play. Case story opens the extra narrative. A new season presentation and additional life/move reward systems remain follow-up work, not features claimed by this pass.
+The mission card emphasizes the goal illustration, larger goal/count/moves and Play. Case story opens the extra narrative. The November 12 completion below supersedes the earlier remaining-work note.
+
+### Five-stage experience completion — November 12
+
+Completed in order: illustrated authored chapter/season introductions with persisted seen state; normal-play daily tasks with Rocket and life claims; visual victory/failure/daily rewards with pinned primary actions and optional summaries; shared typography, reward tiles, button styles, sounds and transitions; graphical phone-layout walkthrough and returning-session regression checks.
+
+Task prizes persist until claimed, including across daily resets; full lives defer an earned life rather than discarding it. Chapter introductions do not bypass locks or repeat on ordinary replay. Back restores the map even when a chapter was entered from Next Case. Result cards resize to keep the main actions available on short screens. No new stored move currency or unlimited-life system was introduced.
+
+Implementation, exact test coverage and remaining physical-device validation limits are recorded in `docs/testing/Experience_Journey_Completion.md`. Phone-layout screenshots are under `.test-data/journey-*.png`.

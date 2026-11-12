@@ -50,9 +50,7 @@ func _ready() -> void:
 	MobileGameUI.button(content, "Continue investigation", dismissed.emit, MobileGameUI.TEAL).name = "DeclineRestoration"
 	if not bool(details.get("teach", true)):
 		MobileGameUI.button(content, "How to play", show_practice, MobileGameUI.PURPLE)
-	SignalBus.play_sfx.emit("case_open")
-	card.modulate.a = 0.0
-	card.create_tween().tween_property(card, "modulate:a", 1.0, 0.18)
+	MobileGameUI.present(card)
 
 func _start() -> void:
 	if bool(details.get("teach", true)) and not _practice_solved:

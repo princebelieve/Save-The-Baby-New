@@ -1,5 +1,9 @@
 # Experience research corrections and implementation decisions
 
+**November 12 follow-through:** the five requested subsequent stages are now
+implemented and verified. See [the completion record](../testing/Experience_Journey_Completion.md).
+The notes below retain the historical boundary of the November 11 first pass.
+
 11 November 2026. This supersedes the earlier suggestion that a permanent bonus
 menu alone solves side-activity discovery. The user authorized implementation
 after recording the research; no further planning approval is required.

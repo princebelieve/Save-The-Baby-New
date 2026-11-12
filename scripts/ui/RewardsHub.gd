@@ -6,6 +6,7 @@ signal settings_requested
 signal case_file_requested
 signal closed
 signal play_requested
+signal supply_claim_requested(key: String)
 
 var _progress: ConfigFile
 var _gallery: Node
@@ -86,6 +87,8 @@ func _render() -> void:
 		"goals": _goals()
 		"settings": _settings()
 		"rules": _rules()
+		"prizes": _prizes()
+	MobileGameUI.present(_body)
 
 
 func _home() -> void:
@@ -107,6 +110,9 @@ func _home() -> void:
 		if int(collection.get(str(path), 0)) > 0: collected += 1
 	MobileGameUI.button(_body, "Evidence archive  %d / %d  >" % [collected, DailyActivities.settings().portraits.size()], func(): _open("album"))
 	MobileGameUI.button(_body, "Field objectives  >", func(): _open("goals"), MobileGameUI.PURPLE)
+	var pending: Dictionary = _progress.get_value("daily", "supply_rewards", {})
+	if not pending.is_empty():
+		MobileGameUI.button(_body, "%d rewards ready!" % pending.size(), func(): _open("prizes"), MobileGameUI.PINK)
 	MobileGameUI.spacer(_body)
 	MobileGameUI.button(_body, "Archive settings", func(): _open("settings"), MobileGameUI.PURPLE)
 
@@ -127,15 +133,26 @@ func _daily() -> void:
 	var config := DailyActivities.settings()
 	var today := DailyActivities.day_at(TimeHelper.current_unix_time())
 	var stamped := int(_progress.get_value("daily", "last_day", -1)) == today
-	MobileGameUI.label(_body, "DAY %d" % (_day + 1), 48)
+	var stamps := HBoxContainer.new()
+	stamps.alignment = BoxContainer.ALIGNMENT_CENTER
+	stamps.add_theme_constant_override("separation", 6)
+	_body.add_child(stamps)
+	var reached := _current_reward_day()
+	for index in 7:
+		var stamp := MobileGameUI.card(stamps, MobileGameUI.TEAL if index < reached or (index == reached and stamped) else Color("#e8e1f1"))
+		stamp.custom_minimum_size.x = 72
+		var style := MobileGameUI.style(MobileGameUI.TEAL if index < reached or (index == reached and stamped) else Color("#e8e1f1"), 16)
+		style.set_content_margin_all(6)
+		stamp.add_theme_stylebox_override("panel", style)
+		MobileGameUI.display_label(stamp, str(index + 1), 36, Color.WHITE if index < reached or (index == reached and stamped) else MobileGameUI.INK)
 	var hero := MobileGameUI.card(_body, MobileGameUI.PURPLE)
 	hero.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	var column := MobileGameUI.column(hero, 6)
 	column.alignment = BoxContainer.ALIGNMENT_CENTER
 	MobileGameUI.image(column, MobileGameUI.COIN, Vector2(140, 100))
 	MobileGameUI.label(column, "+%d" % int(config.streak_coins[_day]), 80, Color.WHITE)
-	MobileGameUI.label(column, "COINS", 36, Color.WHITE)
 	MobileGameUI.label(column, ("Briefing complete" if stamped else "Today's briefing") if _day == _current_reward_day() else "Reward preview", 34, Color.WHITE)
+	MobileGameUI.display_label(_body, "Today's stamp earned!" if stamped else "Win a case to earn today's stamp.", 36)
 	var pages := HBoxContainer.new()
 	pages.add_theme_constant_override("separation", 16)
 	_body.add_child(pages)
@@ -217,14 +234,38 @@ func _goals() -> void:
 		var column := MobileGameUI.column(card)
 		MobileGameUI.label(column, str(mission.title), 38)
 		var amount := mini(int(mission.target), int(counts.get(str(mission.id), 0)))
-		MobileGameUI.label(column, "%d / %d" % [amount, int(mission.target)], 56, MobileGameUI.PURPLE)
+		MobileGameUI.label(column, "%d / %d  |  +%d coins" % [amount, int(mission.target), int(mission.coins)], 36, MobileGameUI.PURPLE)
 		var bar := ProgressBar.new()
 		bar.custom_minimum_size.y = 32
 		bar.max_value = int(mission.target)
 		bar.value = amount
 		bar.show_percentage = false
+		var track := MobileGameUI.style(Color("#d8dce7"), 12)
+		track.set_content_margin_all(0)
+		var fill := MobileGameUI.style(MobileGameUI.TEAL, 12)
+		fill.set_content_margin_all(0)
+		bar.add_theme_stylebox_override("background", track)
+		bar.add_theme_stylebox_override("fill", fill)
 		column.add_child(bar)
-		MobileGameUI.label(column, "+%d coins" % int(mission.coins), 36)
+		var kind := str(mission.get("supply", ""))
+		if not kind.is_empty():
+			MobileGameUI.reward_tile(column, kind, 1, "Task prize")
+	MobileGameUI.spacer(_body)
+	MobileGameUI.button(_body, "Back to case rewards", go_back)
+
+
+func _prizes() -> void:
+	_title.text = "Your earned prizes"
+	MobileGameUI.spacer(_body)
+	var pending: Dictionary = _progress.get_value("daily", "supply_rewards", {})
+	# One claim at a time keeps the screen usable even after a long absence.
+	if not pending.is_empty():
+		var key: String = str(pending.keys()[0])
+		var reward: Dictionary = pending[key]
+		MobileGameUI.reward_tile(_body, str(reward.kind), 1)
+		MobileGameUI.button(_body, "Claim reward", supply_claim_requested.emit.bind(key), MobileGameUI.PINK)
+	else:
+		MobileGameUI.display_label(_body, "All prizes collected!", 40)
 	MobileGameUI.spacer(_body)
 	MobileGameUI.button(_body, "Back to case rewards", go_back)
 
