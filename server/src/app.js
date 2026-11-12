@@ -1,4 +1,5 @@
 import express from 'express';
+import {fileURLToPath} from 'node:url';
 import {hash,random,HttpError,requireThat,PACKS,SUPPLIES,MAX_ETHAN_ASSISTS,validateSave,verifyPurchase,addSupply,profile} from './domain.js';
 
 const accountPageStyles = `<style>
@@ -33,7 +34,7 @@ function sendAuthReturn(req,res,{title='Return to Save The Baby',message='Open t
  // Chrome requires a user gesture to launch another app. Keep the completion
  // page and its button visible instead of immediately navigating away.
  const guidance=desktopLink?'The game must still be running. This button reconnects to the desktop game you used to start sign-in.':android?'Tap the button to open the installed Android game.':'Testing in Godot on a computer? Switch back to the game window. This older sign-in attempt has no desktop return connection; start a new sign-in from the updated game to enable the button.';
- return res.set('Cache-Control','no-store').set('X-Auth-Return-Version','3').set('Content-Security-Policy',"default-src 'none'; style-src 'unsafe-inline'; frame-ancestors 'none'; base-uri 'none'").status(status).type('html').send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#e8dfca"><title>${escapeHtml(title)} - Save The Baby</title>${accountPageStyles}</head><body><main data-sign-in-state="${complete?'complete':'return'}"><p class="brand">Save The Baby account</p><h1>${escapeHtml(title)}</h1><p class="intro">${escapeHtml(message)}</p><a id="return-to-game" class="button" href="${escapeHtml(returnLink)}">Return to Save the Baby Game</a><p>${guidance}</p></main></body></html>`);
+ return res.set('Cache-Control','no-store').set('X-Auth-Return-Version','3').set('Content-Security-Policy',"default-src 'none'; style-src 'unsafe-inline'; script-src 'self'; frame-ancestors 'none'; base-uri 'none'").status(status).type('html').send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#e8dfca"><title>${escapeHtml(title)} - Save The Baby</title>${accountPageStyles}<script src="/auth/feedback.js" defer></script></head><body><main data-sign-in-state="${complete?'complete':'return'}"><p class="brand">Save The Baby account</p><h1>${escapeHtml(title)}</h1><p class="intro">${escapeHtml(message)}</p><a id="return-to-game" class="button" href="${escapeHtml(returnLink)}">Return to Save the Baby Game</a><p>${guidance}</p></main></body></html>`);
 }
 
 function sendAuthError(req,res,baseUrl) {
@@ -50,6 +51,7 @@ export function createApp({db, client, oauth, play, baseUrl, clientId, commerceE
  app.use(express.urlencoded({extended:false,limit:'8kb'}));
  app.use((req,_res,next)=>{req.body ??= {}; next();});
  app.use((req,res,next)=>{res.set({'Cache-Control':'no-store','Referrer-Policy':'no-referrer','X-Content-Type-Options':'nosniff','Content-Security-Policy':"default-src 'none'; frame-ancestors 'none'; form-action 'self'"}); next();});
+ app.get('/auth/feedback.js',(_req,res)=>res.type('js').sendFile(fileURLToPath(new URL('./auth-feedback.js',import.meta.url))));
  app.get('/health',(_req,res)=>res.json({ok:true}));
  app.get('/auth/return',(req,res)=>sendAuthReturn(req,res,{baseUrl}));
  app.get('/account-deletion',(_req,res)=>res.set('Content-Security-Policy',"default-src 'none'; style-src 'unsafe-inline'; frame-ancestors 'none'; form-action 'self'").type('html').send(`<!doctype html>
@@ -83,7 +85,7 @@ export function createApp({db, client, oauth, play, baseUrl, clientId, commerceE
     <p class="intro">You can delete your online account and the cloud data connected to it from inside the game.</p>
     <ol class="steps">
       <li>Open Save The Baby and sign in to the account you want to delete.</li>
-      <li>From the title screen or campaign map, open <strong>Settings → Account &amp; Coins</strong>.</li>
+      <li>From the title screen or campaign map, open <strong>Settings â†’ Account &amp; Coins</strong>.</li>
       <li>Choose <strong>Delete Online Account</strong> and confirm.</li>
     </ol>
     <a class="button" href="mailto:info@sbi.globalcreest.com?subject=Save%20The%20Baby%20account%20deletion&amp;body=Please%20delete%20my%20Save%20The%20Baby%20online%20account.%0A%0AMy%20Player%20ID%3A%20">Email support to request deletion</a>
@@ -127,7 +129,7 @@ export function createApp({db, client, oauth, play, baseUrl, clientId, commerceE
   // This page posts its acknowledgement to the API's own /auth/google/authorize
   // route. Chrome still blocked the configured origin under form-action, so this
   // narrowly scoped page omits that directive; default-src does not govern forms.
-  res.set('Content-Security-Policy',"default-src 'none'; style-src 'unsafe-inline'; frame-ancestors 'none'").type('html').send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#e8dfca"><title>Save The Baby account</title>${accountPageStyles}</head><body><main>
+  res.set('Content-Security-Policy',"default-src 'none'; style-src 'unsafe-inline'; script-src 'self'; frame-ancestors 'none'").type('html').send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#e8dfca"><title>Save The Baby account</title>${accountPageStyles}<script src="/auth/feedback.js" defer></script></head><body><main>
 <p class="brand">Save The Baby account</p><h1>${parent?'Parent or guardian sign-in':'Sign in with Google'}</h1><span class="step">Google sign-in: step 1 of 2</span>
 <p class="intro">${parent?'Use your own Google account to manage cloud saves for a child who plays this game.':'Sign in to back up your progress and restore it on another device. Google handles your password; Save The Baby never receives it.'}</p>
 <section class="details"><p>When you use cloud saves, we use your Google account ID and profile name to identify your account. We store game progress and purchase records with service providers so you can restore progress and manage purchased coins. Google Play handles payments; we do not receive your card details.</p></section>

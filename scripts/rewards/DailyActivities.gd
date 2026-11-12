@@ -144,7 +144,7 @@ static func start_portrait(progress: ConfigFile, now: int) -> Dictionary:
 	var deadline := now + int(challenge.seconds)
 	var attempt := {"slot": slot, "portrait": portrait, "pieces": pieces, "deadline": deadline,
 		"columns": int(challenge.columns), "rows": int(challenge.rows), "difficulty": str(challenge.name),
-		"booster": str(earned.get("booster", "")), "coins": int(config.portrait_coins)}
+		"booster": str(earned.get("booster", "")), "coins": int(config.portrait_coins), "points": count * int(config.get("portrait_points_per_piece", 25))}
 	progress.set_value("daily", "portrait_slot", slot)
 	progress.set_value("daily", "last_seen", now)
 	progress.set_value("daily", "attempt", attempt)
@@ -173,7 +173,7 @@ static func finish_portrait(progress: ConfigFile, slot: int, now: int) -> Dictio
 	collection[str(attempt.portrait)] = int(collection.get(str(attempt.portrait), 0)) + 1
 	progress.set_value("daily", "portraits", collection)
 	var daily := stamp(progress, now)
-	return {"coins": int(attempt.get("coins", settings().portrait_coins)) + int(daily.get("coins", 0)), "streak": int(progress.get_value("daily", "streak", 0)), "booster": str(attempt.get("booster", ""))}
+	return {"coins": int(attempt.get("coins", settings().portrait_coins)) + int(daily.get("coins", 0)), "streak": int(progress.get_value("daily", "streak", 0)), "booster": str(attempt.get("booster", "")), "points": int(attempt.get("points", count * int(settings().get("portrait_points_per_piece", 25))))}
 
 
 static func puzzle_for_slot(slot: int) -> Dictionary:

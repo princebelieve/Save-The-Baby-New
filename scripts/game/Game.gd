@@ -81,6 +81,10 @@ var _result_layer: CanvasLayer
 var _result_in_progress := false
 var _result_stars_earned := 1
 var _current_level_points := 0
+var _victory_settled := false
+var _victory_animating := false
+var _victory_bonus_points := 0
+signal victory_bonus_step(kind: String, points: int)
 var _clear_bonus_coins := 0
 var _evidence_count: int = 0
 var _evidence_goal: int = 10
@@ -150,6 +154,7 @@ func _notification(what: int) -> void:
 
 
 func _handle_back_request() -> void:
+	if _victory_animating: return
 	var developer := get_node_or_null("DeveloperTools")
 	if developer != null and developer._panel.visible:
 		developer.close()
@@ -232,6 +237,7 @@ func _ready() -> void:
 		for kind in ["rocket", "bomb", "thunder"]:
 			var count := int(saved_boosters.get(kind, starting_boosters.get(kind, 0)))
 			_economy_manager.set_booster_count(kind, count)
+			_booster_inventory[kind] = count
 		_economy_manager.set_ethan_count(int(_campaign_progress.get_value("campaign", "ethan", economy_config.get("starting_ethan", 0))))
 	_board_manager = get_node_or_null("Managers/BoardManager")
 	if _board_manager != null:
@@ -2064,6 +2070,7 @@ func _on_campaign_level_selected(level_id: int, route_id: String) -> void:
 	if _show_new_chapter(authored, route_id):
 		return
 	var attempt_variant := Recovery.preview(_campaign_progress,authored,TimeHelper.current_unix_time())
+	attempt_variant = preload("res://scripts/game/PlayerTools.gd").apply(attempt_variant, _campaign_progress)
 	if level_manager == null or not level_manager.load_level(level_id,attempt_variant):
 		DebugLogger.error("Game: Could not load selected level %03d." % level_id)
 		return
@@ -2440,6 +2447,9 @@ func _objective_icon_path(target: String) -> String:
 
 
 func _begin_level(_route_id: String) -> void:
+	_configure_player_tools()
+	_victory_settled = false
+	_victory_bonus_points = 0
 	SignalBus.play_sfx.emit("screen_play")
 	_turn_reward_notices.clear()
 	var selected_manager := get_node_or_null("Managers/LevelManager")
@@ -2675,6 +2685,8 @@ func _on_lives_changed(lives: int) -> void:
 
 
 func _on_ethan_changed(count: int) -> void:
+	if count > 0:
+		_campaign_progress.set_value("tool_unlocks", "ethan", true)
 	_booster_inventory["ethan"] = count
 	if _booster_buttons.has("ethan"):
 		var count_label := _booster_buttons["ethan"]["count"] as Label
@@ -2683,11 +2695,16 @@ func _on_ethan_changed(count: int) -> void:
 		var pop := create_tween()
 		pop.tween_property(count_label, "scale", Vector2.ONE, 0.2).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	_campaign_progress.set_value("campaign", "ethan", count)
+	if count > 0:
+		_configure_player_tools()
+		_refresh_tutorial_controls()
 	_persist_campaign_progress()
 
 
 func _on_boosters_changed(boosters: Dictionary) -> void:
 	for kind in ["rocket", "bomb", "thunder"]:
+		if int(boosters.get(kind, 0)) > int(_booster_inventory.get(kind, 0)):
+			_campaign_progress.set_value("tool_unlocks", kind, true)
 		_booster_inventory[kind] = int(boosters.get(kind, 0))
 		if _booster_buttons.has(kind):
 			var count_label := _booster_buttons[kind]["count"] as Label
@@ -2695,8 +2712,19 @@ func _on_boosters_changed(boosters: Dictionary) -> void:
 			count_label.scale = Vector2(1.15, 1.15)
 			var pop := create_tween()
 			pop.tween_property(count_label, "scale", Vector2.ONE, 0.2).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_configure_player_tools()
 	_refresh_tutorial_controls()
 	_save_inventory_progress()
+
+
+func _configure_player_tools() -> void:
+	var manager := get_node_or_null("Managers/LevelManager")
+	if manager == null or manager.get_level_data().is_empty(): return
+	var data := preload("res://scripts/game/PlayerTools.gd").apply(manager.get_level_data(), _campaign_progress)
+	manager.update_player_tools(data.settings, data.powerups)
+	if is_instance_valid(_board):
+		_board._level_data["settings"] = data.settings.duplicate(true)
+		_board._level_data["powerups"] = data.powerups.duplicate(true)
 
 
 func _save_inventory_progress() -> void:
@@ -3509,6 +3537,8 @@ func _show_level_result(won: bool) -> void:
 			detail_text += "\nDavid's search continues as new investigations are added."
 	if won:
 		MobileGameUI.reward_tile(content, "coins", coins_earned, "Case reward")
+		if _victory_bonus_points > 0:
+			MobileGameUI.display_label(content, "+%d victory bonus points" % _victory_bonus_points, 36, MobileGameUI.PURPLE)
 		if not _last_daily_stamp.is_empty():
 			MobileGameUI.reward_tile(content, "coins", int(_last_daily_stamp.coins), "Daily stamp reward")
 		MobileGameUI.display_label(content, "Case %03d unlocked" % mini(_highest_unlocked_level, _current_level_id + 1) if has_next_level else "Investigation complete", 40)
@@ -3593,30 +3623,93 @@ func _play_star_stamp_feedback() -> void:
 
 
 func _play_board_clear_celebration() -> void:
-	if _board == null:
+	if _board == null or _victory_settled:
 		return
+	_victory_settled = true
+	_victory_animating = true
+	var board := _board
+	var rules: Dictionary = ConfigLoader.load_config(Constants.ConfigPaths.ECONOMY).get("victory_bonus", {})
+	var panel := MobileGameUI.card(get_node("HUD"), Color("#fff4d9"))
+	panel.name = "VictoryBonus"
+	panel.position = Vector2(36, 134)
+	panel.size.x = get_viewport_rect().size.x - 72
+	var counter := MobileGameUI.display_label(panel, "Victory bonus!", 36)
+	var moves := maxi(0, board.get_remaining_moves())
+	var move_points := int(rules.get("points_per_move", 100))
+	for move in moves:
+		_current_level_points += move_points
+		_victory_bonus_points += move_points
+		_moves_label.text = str(moves - move - 1)
+		counter.text = "Score %d  (+%d)" % [_current_level_points, move_points]
+		SignalBus.play_sfx.emit("objective_collected")
+		victory_bonus_step.emit("move", move_points)
+		await get_tree().create_timer(clampf(1.8 / maxf(1, moves), 0.025, 0.10)).timeout
+		if not is_instance_valid(board):
+			_victory_animating = false
+			panel.queue_free()
+			return
 	var remaining_specials: Array[Tile] = []
-	for value in _board._grid.values():
+	for value in board._grid.values():
 		var tile := value as Tile
 		if is_instance_valid(tile) and tile.has_powerup():
 			remaining_specials.append(tile)
-	_current_level_points += remaining_specials.size() * 250
-	_clear_bonus_coins = mini(25, remaining_specials.size() * 5)
+	remaining_specials.sort_custom(func(a: Tile, b: Tile): return a.get_grid_position().y * board.get_width() + a.get_grid_position().x < b.get_grid_position().y * board.get_width() + b.get_grid_position().x)
+	_clear_bonus_coins = 0
+	var first_clear := int(_completed_levels.get(str(_current_level_id), 0)) == 0
 	for special in remaining_specials:
-		SignalBus.play_sfx.emit("powerup_activate")
-		var blast := create_tween()
-		blast.tween_property(special, "scale", Vector2(1.55, 0.15), 0.12).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
-		blast.tween_property(special, "scale", Vector2.ZERO, 0.12)
-		await blast.finished
-	for value in _board._grid.values():
+		if not is_instance_valid(special): continue
+		var kind := str(special.get_meta("powerup_kind", "rocket"))
+		var cell := special.get_grid_position()
+		_on_powerup_blast(kind, cell)
+		var target_type := int(special.get_tile_type())
+		if kind == "thunder":
+			var counts := {}
+			for tile in board.get_all_tiles():
+				if not tile.has_powerup(): counts[int(tile.get_tile_type())] = int(counts.get(int(tile.get_tile_type()), 0)) + 1
+			var most := 0
+			for type in counts:
+				if int(counts[type]) > most:
+					most = int(counts[type])
+					target_type = int(type)
+		var targets: Array = board._special_targets(kind, cell, target_type)
+		if not targets.has(special): targets.append(special)
+		var cleared: Array[Tile] = []
+		var points := int(rules.get("points_per_booster", 250))
+		for tile in targets:
+			# Every saved booster gets its own turn, even inside another blast.
+			if tile != special and tile.has_powerup(): continue
+			cleared.append(tile)
+			if tile != special: points += int(rules.get("points_per_tile", 10))
+			var hit := create_tween().set_parallel(true)
+			hit.tween_property(tile, "scale", Vector2.ZERO, 0.28).set_delay(0.12)
+			hit.tween_property(tile, "modulate:a", 0.0, 0.22).set_delay(0.18)
+		_current_level_points += points
+		_victory_bonus_points += points
+		if first_clear: _clear_bonus_coins = mini(int(rules.get("maximum_coins", 25)), _clear_bonus_coins + int(rules.get("coins_per_booster", 5)))
+		counter.text = "%s +%d | Score %d" % [kind.capitalize(), points, _current_level_points]
+		_effects().gain(board.get_cell_screen_rect(cell).get_center(), points)
+		victory_bonus_step.emit(kind, points)
+		await get_tree().create_timer(0.68).timeout
+		if not is_instance_valid(board):
+			_victory_animating = false
+			panel.queue_free()
+			return
+		for tile in cleared:
+			if is_instance_valid(tile): board.remove_tile(tile.get_grid_position())
+		SignalBus.play_sfx.emit("objective_collected")
+	counter.text = "+%d bonus points | +%d coins" % [_victory_bonus_points, _clear_bonus_coins]
+	await get_tree().create_timer(0.55).timeout
+	for value in board._grid.values():
 		var tile := value as Tile
 		if is_instance_valid(tile):
 			var leave := create_tween()
 			leave.tween_property(tile, "position:y", tile.position.y + get_viewport_rect().size.y, 0.34).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
 			leave.parallel().tween_property(tile, "rotation", randf_range(-0.24, 0.24), 0.34)
 	await get_tree().create_timer(0.38).timeout
-	_board.clear()
-	_board.queue_redraw()
+	board.clear()
+	board.queue_redraw()
+	panel.queue_free()
+	_victory_animating = false
 
 
 func _play_story_objective_sound_after_mission() -> void:
@@ -3765,6 +3858,7 @@ func _record_level_completion() -> bool:
 	point_records[str(_current_level_id)] = maxi(_current_level_points, int(point_records.get(str(_current_level_id), 0)))
 	_campaign_progress.set_value("campaign", "level_points", point_records)
 	var total_points := 0
+	total_points += int(_campaign_progress.get_value("campaign", "restoration_points", 0))
 	for points in point_records.values():
 		total_points += int(points)
 	_campaign_progress.set_value("campaign", "total_points", total_points)
@@ -4059,6 +4153,7 @@ func _add_reward_offer(parent: Control, label: String, placement: String, reward
 	var refresh := func():
 		if is_instance_valid(button):
 			button.disabled = not _ads.available("rewarded") or _ads.claimed(_ad_key(placement))
+			button.text = "Ad in progress…" if _ads.busy else label
 			button.tooltip_text = "Reward granted only after completing the ad." if not button.disabled else "No ad available right now."
 	_ads.availability_changed.connect(refresh)
 	button.tree_exiting.connect(func():
@@ -4100,9 +4195,20 @@ func _show_result_ad() -> void:
 		return
 	_result_ad_shown = true
 	if _ads.available("interstitial"):
+		var waiting_buttons: Array[Button] = []
+		for child in _result_layer.find_children("*", "Button", true, false):
+			if not child.disabled:
+				child.set_meta("idle_caption", child.text)
+				child.text = "Please wait…"
+				child.disabled = true
+				waiting_buttons.append(child)
 		_ads.show_ad("interstitial", "level_end")
 		if _ads.busy:
 			await _ads.finished
+		for button in waiting_buttons:
+			if is_instance_valid(button):
+				button.text = str(button.get_meta("idle_caption"))
+				button.disabled = false
 
 
 func _reward_continue() -> void:
@@ -4210,13 +4316,16 @@ func _complete_portrait_puzzle(slot: int) -> void:
 	var result := DailyActivities.finish_portrait(_campaign_progress, slot, TimeHelper.current_unix_time())
 	if not result.is_empty():
 		_grant_activity_coins(int(result.coins))
+		var points := int(result.get("points", 0))
+		_campaign_progress.set_value("campaign", "restoration_points", int(_campaign_progress.get_value("campaign", "restoration_points", 0)) + points)
+		_campaign_progress.set_value("campaign", "total_points", int(_campaign_progress.get_value("campaign", "total_points", 0)) + points)
 		var booster := str(result.get("booster", ""))
 		if booster in ["rocket", "bomb", "thunder"] and _economy_manager != null:
 			_economy_manager.add_booster(booster, 1)
 	_progress_transaction = false
 	_persist_campaign_progress()
 	if not result.is_empty() and _portrait_puzzle != null:
-		_portrait_puzzle.show_reward(int(result.coins), int(result.streak), str(result.get("booster", "")))
+		_portrait_puzzle.show_reward(int(result.coins), int(result.streak), str(result.get("booster", "")), int(result.get("points", 0)))
 	if not result.is_empty() and not completed_attempt.is_empty():
 		_completed_portrait_id = _portrait_gallery.record_completed(str(completed_attempt.portrait),slot)
 

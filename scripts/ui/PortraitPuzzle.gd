@@ -28,6 +28,9 @@ var _board_host: CenterContainer
 var _menu: Control
 var _overlay: Control
 var _gallery_message: Label
+var _swipe_from := -1
+var _swipe_start := Vector2.ZERO
+var _suppress_tap := false
 
 
 func configure(attempt: Dictionary) -> void:
@@ -98,10 +101,12 @@ func _ready() -> void:
 				style.border_color = MobileGameUI.GOLD
 				style.set_border_width_all(5)
 			button.add_theme_stylebox_override(state, style)
-		button.pressed.connect(_select.bind(index))
+		button.pressed.connect(func():
+			if not _suppress_tap: _select(index))
+		button.gui_input.connect(_piece_input.bind(index))
 		_grid.add_child(button)
 		_buttons.append(button)
-	_message = MobileGameUI.label(content, "Select two fragments to swap", 34)
+	_message = MobileGameUI.label(content, "Swipe a fragment, or tap two to swap", 34)
 	_gallery_message = MobileGameUI.label(content, "", 32)
 	_gallery_message.hide()
 	_save_button = MobileGameUI.button(content, "Save image", save_requested.emit, MobileGameUI.PINK)
@@ -131,7 +136,7 @@ func _show_help() -> void:
 	MobileGameUI.label(column, "Reference image", 44, Color.WHITE)
 	var picture := MobileGameUI.image(column, str(_attempt.portrait))
 	picture.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	MobileGameUI.label(column, "Tap one piece, then another to swap.\nThe timer keeps running.", 34, Color.WHITE)
+	MobileGameUI.label(column, "Swipe one fragment onto another, or tap two.\nThe timer keeps running.", 34, Color.WHITE)
 	MobileGameUI.button(column, "Resume restoration", func(): _overlay.queue_free())
 
 
@@ -157,14 +162,25 @@ func _select(index: int) -> void:
 		return
 	if _selected < 0:
 		_selected = index
+		SignalBus.play_sfx.emit("booster_select")
 	elif _selected == index:
 		_selected = -1
 	else:
+		var first := _selected
+		var was_correct := int(_pieces[first]) == first
+		var other_was_correct := int(_pieces[index]) == index
+		var old_first: Texture2D = _buttons[first].icon
+		var old_second: Texture2D = _buttons[index].icon
 		var temporary: int = int(_pieces[index])
 		_pieces[index] = _pieces[_selected]
 		_pieces[_selected] = temporary
 		_selected = -1
+		SignalBus.play_sfx.emit("tile_swap")
+		if (int(_pieces[first]) == first and not was_correct) or (int(_pieces[index]) == index and not other_was_correct):
+			SignalBus.play_sfx.emit("tile_match")
 		pieces_changed.emit(int(_attempt.slot), _pieces.duplicate())
+		_refresh_pieces(_image)
+		_animate_swap(first, index, old_first, old_second)
 	_refresh_pieces(ResourceManager.load_texture(str(_attempt.portrait)))
 	for piece in _pieces.size():
 		if int(_pieces[piece]) != piece:
@@ -173,11 +189,63 @@ func _select(index: int) -> void:
 	for button in _buttons:
 		button.disabled = true
 	completed.emit(int(_attempt.slot))
+	SignalBus.play_sfx.emit("win_sting")
 
 
-func show_reward(coins: int, streak: int, booster: String = "") -> void:
+func _piece_input(event: InputEvent, index: int) -> void:
+	if not _running or is_instance_valid(_menu) or is_instance_valid(_overlay): return
+	var down := false
+	var released := false
+	var point := Vector2.ZERO
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		down = event.pressed
+		released = not event.pressed
+		point = _buttons[index].get_global_transform() * event.position
+	elif event is InputEventScreenTouch:
+		if event.index != 0: return
+		down = event.pressed
+		released = not event.pressed
+		point = _buttons[index].get_global_transform() * event.position
+	else: return
+	if down:
+		_swipe_from = index
+		_swipe_start = point
+	elif released and _swipe_from == index:
+		_swipe_from = -1
+		if point.distance_to(_swipe_start) < 18.0: return
+		for target in _buttons.size():
+			if target != index and _buttons[target].get_global_rect().has_point(point):
+				_suppress_tap = true
+				_selected = index
+				_select(target)
+				call_deferred("_release_swipe")
+				return
+
+
+func _release_swipe() -> void:
+	_suppress_tap = false
+
+
+func _animate_swap(first: int, second: int, first_image: Texture2D, second_image: Texture2D) -> void:
+	for pair in [[first, second, first_image], [second, first, second_image]]:
+		var ghost := TextureRect.new()
+		ghost.texture = pair[2]
+		ghost.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		ghost.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		ghost.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		ghost.position = get_global_transform().affine_inverse() * _buttons[pair[0]].get_global_rect().position
+		ghost.size = _buttons[pair[0]].size
+		ghost.z_index = 5
+		add_child(ghost)
+		var tween := create_tween()
+		tween.tween_property(ghost, "position", get_global_transform().affine_inverse() * _buttons[pair[1]].get_global_rect().position, 0.18).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+		tween.tween_callback(ghost.queue_free)
+
+
+func show_reward(coins: int, streak: int, booster: String = "", points: int = 0) -> void:
 	_running = false
 	_message.text = "Evidence restored! +%d coins" % coins
+	if points > 0: _message.text += "\n+%d points" % points
 	_timer_label.text = "DONE"
 	_progress_label.text = "%d / %d" % [_pieces.size(), _pieces.size()]
 	_save_button.tooltip_text = "%d day streak" % streak

@@ -12,6 +12,8 @@ var _pending: Dictionary = {}
 var _verifying := false
 var _server_enabled := false
 var _checking_catalog := false
+var _restore_waiting := false
+var _restore_ok := false
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -80,7 +82,10 @@ func _on_products(response: Dictionary) -> void:
 
 func available(product: String) -> bool:
 	var account := get_node("/root/CloudAccount")
-	return _server_enabled and not busy and account.configured() and account.signed_in() and _billing != null and _billing.is_ready() and products.has(product)
+	return _server_enabled and not processing_purchase() and account.configured() and account.signed_in() and _billing != null and _billing.is_ready() and products.has(product)
+
+func processing_purchase() -> bool:
+	return busy or _verifying
 
 func buy(product: String) -> void:
 	if not available(product):
@@ -107,7 +112,24 @@ func restore() -> void:
 	_billing.query_purchases(BillingClient.ProductType.INAPP)
 	_verify_pending()
 
+func check_pending() -> String:
+	if _billing == null or not _billing.is_ready():
+		return "Google Play is unavailable. Check pending purchases on your Android device."
+	if busy or _restore_waiting: return "A purchase check is already running."
+	_restore_waiting = true
+	_restore_ok = false
+	restore()
+	var deadline := Time.get_ticks_msec() + 30000
+	while (_restore_waiting or _verifying) and Time.get_ticks_msec() < deadline:
+		await get_tree().create_timer(0.1).timeout
+	var timed_out := _restore_waiting or _verifying
+	_restore_waiting = false
+	if timed_out: return "Purchase check timed out. Pending purchases remain saved; you can try again."
+	return "Purchase check finished. Confirmed coins appear in your balance." if _restore_ok else "Google Play could not check purchases. Please try again."
+
 func _on_purchases(response: Dictionary) -> void:
+	_restore_waiting = false
+	_restore_ok = int(response.get("response_code",-1)) == BillingClient.BillingResponseCode.OK
 	var initiated_purchase := busy
 	busy = false
 	if int(response.get("response_code",-1)) != BillingClient.BillingResponseCode.OK:
@@ -132,6 +154,7 @@ func _verify_pending() -> void:
 	if _verifying or not account.signed_in():
 		return
 	_verifying = true
+	if not _pending.is_empty(): changed.emit()
 	for purchase_token in _pending.keys():
 		var owner: String = account.user_id
 		var response: Dictionary = await account.api("/v1/purchases/google",HTTPClient.METHOD_POST,{"productId":_pending[purchase_token],"purchaseToken":purchase_token})

@@ -11,6 +11,7 @@ var _was_locked := true
 var _focus := ""
 var _status := ""
 var _packs_only := false
+var _catalog_loading := false
 
 const ITEMS := {"life":"life", "lives":"life_refill", "rocket":"rocket_booster", "bomb":"bomb_booster", "thunder":"thunder_booster", "ethan":"ethan_assist", "continue":"continue"}
 
@@ -67,9 +68,13 @@ func open(current_game: Game, focus := "") -> void:
 	_load_catalog()
 
 func _load_catalog() -> void:
+	if _catalog_loading: return
 	var account := get_node("/root/CloudAccount")
 	if account.signed_in():
+		_catalog_loading = true
+		_refresh()
 		var response: Dictionary = await account.api("/v1/catalog")
+		_catalog_loading = false
 		if not response.has("error") and int(response.get("shopVersion",0)) >= 2:
 			_catalog = response.get("supplies",{})
 		else:
@@ -116,10 +121,12 @@ func _refresh() -> void:
 	_text("COINS AVAILABLE: %d\nEarned: %d  |  Purchased: %d\nYou can spend both balances here. Earned coins are used first." % [earned+paid,earned,paid])
 	if not _status.is_empty():
 		_text(_status)
-	if _busy:
+	if _catalog_loading:
+		_text("Loading online prices… Earned-coin supplies remain available.")
+	if _busy or purchases.processing_purchase():
 		_text("Confirming your purchase. Please wait…")
-	_dialog.get_ok_button().disabled = _busy
-	if _busy:
+	_dialog.get_ok_button().disabled = _busy or purchases.processing_purchase()
+	if _busy or purchases.processing_purchase():
 		return
 	if _packs_only:
 		_button("BACK TO SUPPLIES",func():
@@ -258,6 +265,6 @@ func _redeem_continue() -> void:
 		_close()
 
 func _close() -> void:
-	if not _busy and is_instance_valid(_layer):
+	if not _busy and not get_node("/root/CoinPurchases").processing_purchase() and is_instance_valid(_layer):
 		_dialog.hide()
 		_layer.queue_free()

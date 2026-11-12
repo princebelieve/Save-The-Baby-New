@@ -41,6 +41,12 @@ test('existing Google sign-in keeps progress and exposes a persistent Android re
  assert.equal(response.headers.get('cache-control'),'no-store');
  assert.equal(response.headers.get('x-auth-return-version'),'3');
  assert.match(html,/id="return-to-game"/);
+	assert.match(html,/script src="\/auth\/feedback.js" defer/);
+	assert.match(response.headers.get('content-security-policy'),/script-src 'self'/);
+	const feedback=await fetch(f.base+'/auth/feedback.js');
+	assert.equal(feedback.status,200);
+	assert.match(feedback.headers.get('content-type'),/javascript/);
+	assert.match(await feedback.text(),/Opening game/);
  assert.match(html,/>Return to Save the Baby Game<\/a>/);
  assert.match(html,/intent:\/\/auth\/complete#Intent;scheme=savethebaby;package=com\.savethebaby\.game;/);
  assert.doesNotMatch(html,/http-equiv="refresh"/);

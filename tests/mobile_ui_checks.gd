@@ -76,7 +76,7 @@ func _run() -> void:
 		puzzle._select(0)
 		puzzle._select(8)
 		check(not puzzle._running, "solving puzzle ends the timer")
-		puzzle.show_reward(15, 1, "rocket")
+		puzzle.show_reward(15, 1, "rocket", 225)
 		await settle()
 		inspect(puzzle, "completed %d" % height)
 		puzzle.queue_free()

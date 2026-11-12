@@ -11,6 +11,9 @@ var _login_spinner: ProgressBar
 var _login_status: Label
 var _login_buttons: Array[Button] = []
 var _background_status := ""
+var _operation_dialog: AcceptDialog
+var _operation_busy := false
+var _operation_notice := ""
 const OWNER_PATH := "user://progress_owner.cfg"
 
 func initialize(current_game: Game) -> void:
@@ -61,6 +64,7 @@ func _safe_menu() -> bool:
 	return game._launch_layer != null or game._campaign_layer != null or game._result_layer != null or game._briefing_layer != null
 
 func show_account() -> void:
+	if _operation_busy: return
 	if is_instance_valid(_login_dialog) and not _login_dialog.is_queued_for_deletion() and _login_dialog.visible:
 		return
 	if preload("res://scripts/debug/DeveloperTools.gd").enabled():
@@ -157,8 +161,8 @@ func show_account() -> void:
 		loading.text = "Loading online prices..."
 		loading.add_theme_color_override("font_color", Color("#4b3424"))
 		supply_entries.add_child(loading)
-		_button(content,"CHECK PENDING PURCHASES",func(): purchases.restore())
-		_button(content,"SIGN OUT",func(): account.sign_out())
+		_button(content,"CHECK PENDING PURCHASES",_check_pending_purchases)
+		_button(content,"SIGN OUT",_sign_out)
 		_button(content,"DELETE ONLINE ACCOUNT",_confirm_delete)
 	var scroll := ScrollContainer.new()
 	scroll.custom_minimum_size = Vector2(content.custom_minimum_size.x,mini(940,int(game.get_viewport_rect().size.y*0.76)))
@@ -222,7 +226,11 @@ func _sign_in(owner_mode: String) -> void:
 
 func _on_login_starting() -> void:
 	if not is_instance_valid(_login_dialog): return
-	for button in _login_buttons: button.disabled = true
+	for button in _login_buttons:
+		if not is_instance_valid(button): continue
+		if not button.has_meta("idle_caption"): button.set_meta("idle_caption", button.text)
+		button.disabled = true
+		button.text = "Signing in…"
 	_login_dialog.get_ok_button().disabled = false
 	_login_spinner.show()
 	_login_status.text = "Preparing Google sign-in..."
@@ -251,7 +259,10 @@ func _on_login_start_failed(text: String) -> void:
 	_login_spinner.hide()
 	_login_status.text = text
 	_login_status.show()
-	for button in _login_buttons: button.disabled = false
+	for button in _login_buttons:
+		if not is_instance_valid(button): continue
+		button.disabled = bool(button.get_meta("idle_disabled", false))
+		button.text = str(button.get_meta("idle_caption", button.text))
 	_login_dialog.get_ok_button().disabled = false
 
 func _confirm_purchase(product: String, price: String) -> void:
@@ -293,9 +304,14 @@ func _button(parent: Control,title: String,action: Callable,disabled := false,ke
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	button.add_theme_font_size_override("font_size",34)
 	button.disabled = disabled
-	if keep_open: _login_buttons.append(button)
+	if keep_open:
+		button.set_meta("idle_disabled", disabled)
+		_login_buttons.append(button)
 	button.pressed.connect(func():
 		if keep_open:
+			if title == "RETRY ONLINE PRICES":
+				await preload("res://scripts/ui/ButtonFeedback.gd").run(button, action, "Loading prices…")
+				return
 			action.call()
 			return
 		var window := button.get_window()
@@ -306,6 +322,9 @@ func _button(parent: Control,title: String,action: Callable,disabled := false,ke
 	parent.add_child(button)
 
 func _notice(text: String) -> void:
+	if _operation_busy:
+		_operation_notice = text
+		return
 	if is_instance_valid(game):
 		game._show_shop_notice(text, "ACCOUNT & COINS")
 
@@ -355,7 +374,9 @@ func _upload() -> void:
 	if _owner != account.user_id:
 		_notice("Load your Google account's cloud progress first. Your guest progress is backed up separately.")
 		return
+	if not _begin_operation("Saving cloud progress…"): return
 	var result: Dictionary = await account.upload(_snapshot())
+	_end_operation()
 	if not result.has("error"):
 		_notice("Progress saved to your Google account.")
 
@@ -372,7 +393,9 @@ func _confirm_download() -> void:
 	confirm.popup_centered_clamped(Vector2i(520,260))
 
 func _download() -> void:
+	if not _begin_operation("Loading cloud progress…"): return
 	var result: Dictionary = await account.download()
+	_end_operation()
 	if result.has("error"):
 		_notice(str(result.error))
 	elif result.get("save") is Dictionary:
@@ -396,7 +419,45 @@ func _apply(profile: Dictionary) -> void:
 	get_tree().reload_current_scene()
 
 func _spend(kind: String) -> void:
+	if not _begin_operation("Confirming your supply…"): return
 	await spend_supply(kind,int(_supplies.get(kind,{}).get("price",-1)),false)
+	_end_operation()
+
+func _begin_operation(caption: String) -> bool:
+	if _operation_busy: return false
+	_operation_busy = true
+	_operation_dialog = AcceptDialog.new()
+	game._prepare_dialog(_operation_dialog)
+	_operation_dialog.title = "ACCOUNT & COINS"
+	_operation_dialog.dialog_text = caption
+	_operation_dialog.get_ok_button().text = "Please wait…"
+	_operation_dialog.get_ok_button().disabled = true
+	_operation_dialog.dialog_close_on_escape = false
+	game.add_child(_operation_dialog)
+	_operation_dialog.popup_centered_clamped(Vector2i(480, 220))
+	return true
+
+func _end_operation() -> void:
+	_operation_busy = false
+	if is_instance_valid(_operation_dialog):
+		_operation_dialog.hide()
+		_operation_dialog.queue_free()
+	_operation_dialog = null
+	if not _operation_notice.is_empty():
+		var message := _operation_notice
+		_operation_notice = ""
+		_notice.call_deferred(message)
+
+func _sign_out(delete_account := false) -> void:
+	if not _begin_operation("Deleting online account…" if delete_account else "Signing out…"): return
+	await account.sign_out(delete_account)
+	_end_operation()
+
+func _check_pending_purchases() -> void:
+	if not _begin_operation("Checking pending purchases…"): return
+	var result: String = await purchases.check_pending()
+	_end_operation()
+	_notice(result)
 
 func spend_supply(kind: String, expected_price: int, use_earned: bool) -> bool:
 	if purchases.busy or account.busy:
@@ -464,7 +525,7 @@ func _confirm_delete() -> void:
 	confirm.title = "DELETE ONLINE ACCOUNT?"
 	confirm.dialog_text = "Delete your cloud progress and purchased coin balance? Purchase records needed to prevent duplicate credits may be retained. This cannot be undone."
 	confirm.ok_button_text = "DELETE ACCOUNT"
-	confirm.confirmed.connect(func(): account.sign_out(true))
+	confirm.confirmed.connect(_sign_out.bind(true))
 	confirm.confirmed.connect(confirm.queue_free)
 	confirm.canceled.connect(confirm.queue_free)
 	game.add_child(confirm)

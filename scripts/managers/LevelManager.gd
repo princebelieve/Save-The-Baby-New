@@ -51,6 +51,11 @@ func reload_level() -> bool:
 	return load_level(_current_level)
 
 
+func update_player_tools(settings: Dictionary, powerups: Dictionary) -> void:
+	_level_data["settings"] = settings.duplicate(true)
+	_level_data["powerups"] = powerups.duplicate(true)
+
+
 func start_level() -> void:
 	if _level_data.is_empty():
 		DebugLogger.warning("LevelManager: Cannot start. No level loaded.")

@@ -86,7 +86,7 @@ static func label(parent: Node, value: String, font_size: int = 34, color: Color
 	parent.add_child(text)
 	return text
 
-static func button(parent: Node, value: String, action: Callable, color: Color = TEAL) -> Button:
+static func button(parent: Node, value: String, action: Callable, color: Color = TEAL, pending_caption := "") -> Button:
 	var control := Button.new()
 	control.text = value
 	control.custom_minimum_size = Vector2(92, 92)
@@ -104,7 +104,9 @@ static func button(parent: Node, value: String, action: Callable, color: Color =
 	control.add_theme_color_override("font_color", Color.WHITE)
 	control.add_theme_color_override("font_disabled_color", Color.WHITE)
 	control.pressed.connect(func(): SignalBus.play_sfx.emit("ui_click"))
-	if action.is_valid(): control.pressed.connect(action)
+	if action.is_valid():
+		if pending_caption.is_empty(): control.pressed.connect(action)
+		else: control.pressed.connect(func(): await preload("res://scripts/ui/ButtonFeedback.gd").run(control, action, pending_caption))
 	if parent != null: parent.add_child(control)
 	return control
 

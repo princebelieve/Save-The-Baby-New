@@ -216,3 +216,15 @@ Completed in order: illustrated authored chapter/season introductions with persi
 Task prizes persist until claimed, including across daily resets; full lives defer an earned life rather than discarding it. Chapter introductions do not bypass locks or repeat on ordinary replay. Back restores the map even when a chapter was entered from Next Case. Result cards resize to keep the main actions available on short screens. No new stored move currency or unlimited-life system was introduced.
 
 Implementation, exact test coverage and remaining physical-device validation limits are recorded in `docs/testing/Experience_Journey_Completion.md`. Phone-layout screenshots are under `.test-data/journey-*.png`.
+
+### Restoration gestures and visible victory settlement
+
+Restoration now supports native touch swipes, mouse drags and two taps, with fragment motion, swap/placement sounds and a completion sting. A completed picture adds 25 points per fragment to persistent total player points, alongside its existing coins, eligible daily stamp and earned Rocket. Later case-score recalculation preserves restoration points.
+
+After a Match 3 win, remaining moves visibly count down at 100 points each. Board boosters then fire their actual effects individually, scoring 250 plus 10 per ordinary tile cleared; other saved boosters wait their turn. The existing first-clear coin bonus stays capped at 25. Only after the count-up and blasts do remaining tiles leave and the result appear. This settlement cannot award twice. Verification and reward accounting are recorded in `docs/testing/Restoration_and_Victory_Feedback.md`.
+
+Replay tool continuity: learned or earned Rocket, Bomb, Thunder and Ethan access follows the player into earlier levels. Early replays preserve inventory and special-match creation; fresh players retain staged introductions. Covered by replay_tools_checks (including save/reload with empty stock). Restoration card swaps emit tile_swap feedback for drag and tap input.
+
+Button loading audit completed: auth, cloud operations, online prices, payments/verification and ad waits now provide visible pending feedback and duplicate protection. Retry/cancellation checks and audit: docs/testing/Button_Loading_Feedback.md. Browser changes are local until backend deployment.
+
+Android v9 release: signed APK and AAB generated and verified with matching content and symbols. Removed required Vulkan filtering by using the mobile Compatibility renderer; actual OpenGL mobile UI checks passed. Production listing verified public in Nigeria; visibility audit and updated listing draft saved under docs. No Play Console upload or Render deployment performed.

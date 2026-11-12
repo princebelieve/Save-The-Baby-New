@@ -60,6 +60,13 @@
     "thunder": 0
   },
   "starting_ethan": 0,
+  "victory_bonus": {
+    "points_per_move": 100,
+    "points_per_booster": 250,
+    "points_per_tile": 10,
+    "coins_per_booster": 5,
+    "maximum_coins": 25
+  },
   "character_rewards": {
     "victor_coins_per_tile": 2,
     "assist_tiles_per_reward": 3
