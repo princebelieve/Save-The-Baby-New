@@ -1,8 +1,8 @@
 # Version 9 listing copy — draft, not published
 
-Apply with the version 9 production release. Keep the existing title while a distinctive name and competing titles are reviewed.
+Apply with the version 9 production release. The owner approved the descriptive title on 12 November 2026.
 
-Title: **Save The Baby**. The previous suggested rename is withdrawn pending naming research; no uniqueness claim is made.
+Title: **Save The Baby: Match 3 Rescue**. Owner-approved; no uniqueness or trademark-clearance claim is made.
 
 Short description:
 

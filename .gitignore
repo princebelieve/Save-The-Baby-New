@@ -11,6 +11,7 @@ __pycache__/
 
 /.tmp/
 /.private/
+/exports/marketing-v9/
 
 /server/node_modules/
 **/.env
