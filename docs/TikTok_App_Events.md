@@ -141,9 +141,12 @@ upload has been made. Version code remains 11; choose a new code for Play if 11
 was already uploaded.
 
 The local policy and generated docs/legal/privacy-policy.html are updated.
-Publishing https://sbi.globalcreest.com/save-the-baby/privacy-policy requires
-updating the separate company website repository; it was not changed/deployed
-here. No Render backend change is needed. Preserve unrelated working-tree edits.
+The matching privacy-policy.html has now also been copied into the correct
+company website repository, C:/Users/ASUS/sbibhadodetechnologies. Its HTML,
+canonical route and policy/source match were checked. The policy-only change was committed as 0622eae and pushed to GitHub main
+after explicit publisher approval. The public URL returned HTTP 200 with the
+18 November 2026 date and TikTok disclosure, without the old age-questionnaire
+text. Website publication is verified. No Render backend change is needed. Preserve unrelated working-tree edits.
 
 References:
 - https://github.com/tiktok/tiktok-business-android-sdk/tree/1.7.1
