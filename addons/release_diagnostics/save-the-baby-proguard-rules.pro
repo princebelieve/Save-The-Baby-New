@@ -15,5 +15,10 @@
 -keep class org.godotengine.plugin.googleplaybilling.** { *; }
 -keep class com.savethebaby.** { *; }
 
+# TikTok App Events SDK and its lifecycle / billing reflection.
+-keep class com.tiktok.** { *; }
+-keep class com.android.billingclient.api.** { *; }
+-keep class androidx.lifecycle.** { *; }
+
 -keepattributes Signature,InnerClasses,EnclosingMethod,*Annotation*,SourceFile,LineNumberTable
 -renamesourcefileattribute SourceFile

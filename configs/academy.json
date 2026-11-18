@@ -314,9 +314,10 @@
             "title": "Ethan gifts and Victor disasters",
             "pages": [
                 "Ethan is an earned wildcard, not a random board piece.",
-                "A three-wave cascade earns one Ethan wildcard. Ethan plus two matching pieces completes a match automatically and grants five moves once. Detective matches can grant Ethan gifts.",
+                "Earn Ethan with five in a row, an L/T/cross match, two separate matches at once, a four-wave cascade, or swapping two board specials together.",
+                "Each feat earns one per turn; different feats stack. Pattern rewards need ordinary clues without Ethan. Match Ethan with two clues for five extra moves.",
                 "Victor arrives once after 75% of your moves are spent. Swap him to replace every tile. This costs one move, leaves blockers intact, and grants no collection credit.",
-                "You can hold two Ethan gifts. Tap the tray to place him automatically: beside two objective clues when possible, otherwise where he can help on the next move. Placement costs no move."
+                "Save as many Ethan gifts as you earn. Tap the tray to place one beside objective clues, or where he can help on the next move. Placement costs no move."
             ],
             "journal_pages": [
                 {

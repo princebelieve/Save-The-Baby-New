@@ -22,13 +22,13 @@ Vendor changes skip downloading unused iOS binaries when iOS is disabled (`binar
 
 The publisher must configure the applicable messages for this app in AdMob Privacy & messaging. Consent update/form errors do not bypass consent: ads remain unavailable until consent is obtained or not required. AD PRIVACY OPTIONS is available in settings when UMP requires it. This repository does not have access to the AdMob dashboard or publishing credentials.
 
-The privacy policy source and generated HTML now describe advertising. Publish those updated legal pages at the URLs used by the store listing, and update Google Play's ads/Data safety declarations for the SDK before distributing the ads-enabled release. All ad requests use child-directed treatment and maximum content rating G, applied before SDK initialization. UMP receives the under-age-of-consent flag. The merged Android release manifest includes `android.permission.AD_ID` and the `ACCESS_ADSERVICES_*` permissions contributed by Google Mobile Ads SDK 24.9.0. Keep the Play Console ads and Data safety declarations consistent with the SDK and these manifest permissions. Only the Google ads bridge is installed; no third-party mediation adapters are bundled.
+The privacy policy source and generated HTML now describe advertising. Publish those updated legal pages at the URLs used by the store listing, and update Google Play's ads/Data safety declarations for the SDK before distributing the ads-enabled release. All ad requests retain maximum content rating G, applied before SDK initialization. Child-directed/under-age treatment is applied to existing known under-age answers, rather than every player. A G ad content cap does not imply a child-directed audience. The merged Android release manifest includes `android.permission.AD_ID` and the `ACCESS_ADSERVICES_*` permissions contributed by Google Mobile Ads SDK 24.9.0. Keep the Play Console ads and Data safety declarations consistent with the SDK and these manifest permissions. Only the Google ads bridge is installed; no third-party mediation adapters are bundled.
 
 Test the debug APK on Android for ad load, optional reward completion/cancel, full-screen failure, resume, offline behavior and regional consent. AdMob account/store review and inventory can still limit live ad serving. No store upload is performed by this integration.
 
 ## Verification
 
-Run `Godot --headless --path . --script res://tests/ad_checks.gd` for manager callback/claim checks, `--script res://tests/ad_provider_checks.gd` for the native adapter lifecycle checks, and `tools/run_checks.ps1` for release checks.
+Run `Godot --headless --path . --script res://tests/ad_checks.gd` for manager callback/claim checks, `Godot --headless --path . res://tests/ad_provider_checks.tscn` for adapter lifecycle checks, and `tools/run_checks.ps1` for release checks. The provider scene loads after project autoloads, matching normal game startup.
 
 Sources: https://github.com/poingstudios/godot-admob-plugin/releases/tag/v5.1.0 and https://poingstudios.github.io/godot-admob-plugin/latest/.
 
@@ -38,9 +38,22 @@ Set `--ad-preview` as a user argument when running the project, or launch the Go
 
 ## Audience decision
 
-Android asks for an age group before starting ad consent or loading ads. No option is preselected; Prefer not to say is available. Only a coarse category is saved locally in user://ad_age_group.cfg, never a date of birth, and it is not uploaded. All choices retain the same gameplay, ads, optional login and purchases. All users receive child-directed, G-rated ads; the prompt does not enable personalized ads for adults.
+The added age questionnaire has been removed. Existing coarse age answers from
+older releases are reused only for known under-age handling. No birth date is
+collected and the category is not uploaded. A 7+ store content rating and choosing
+child-suitable ads do not, by themselves, classify every player as a child.
 
-For this implementation, select Yes to child-suitable ads from a certified network, and select the neutral age screen certification. These declarations must describe the eventual uploaded build, not earlier APKs. Native Android ad delivery still requires device verification. AdMob dashboard changes (for example adding mediation networks) must preserve this policy.
+On the connected Vivo test phone, Google UMP reported **publisher misconfiguration:
+no form(s) configured** for app ID `ca-app-pub-7480928068306811~8170975262`.
+This blocks the valid privacy state before ads are requested; it is distinct from
+AdMob app verification and from an ad server no-fill response. Publish an
+applicable message for this exact app in AdMob Privacy & messaging. Do not work
+around a missing publisher configuration by pretending consent was obtained.
+
+The native wrapper also connected its initialization/consent listeners after
+invoking the native operation. Those listeners now connect first, with a
+synchronous-completion regression test. Local logs distinguish initialization,
+loaded ads and load errors (code/domain/message).
 
 Families SDK list: https://support.google.com/googleplay/android-developer/answer/12955712
 Targeting: https://developers.google.com/admob/android/targeting

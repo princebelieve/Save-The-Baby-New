@@ -64,10 +64,9 @@ func update(
 	if _plugin:
 		self._on_consent_info_updated_success_callback = on_consent_info_updated_success
 		self._on_consent_info_updated_failure_callback = on_consent_info_updated_failure
-		_plugin.update(consent_request.convert_to_dictionary())
-
 		safe_connect(_plugin, "on_consent_info_updated_success", _on_consent_info_updated_success)
 		safe_connect(_plugin, "on_consent_info_updated_failure", _on_consent_info_updated_failure)
+		_plugin.update(consent_request.convert_to_dictionary())
 
 
 func reset():

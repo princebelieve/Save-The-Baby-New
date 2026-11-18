@@ -109,8 +109,7 @@ func show_account() -> void:
 	if not account.configured():
 		status.text = "Google account sign-in is unavailable right now. You can continue playing as a guest."
 	if not account.signed_in():
-		_button(content,"SIGN IN WITH GOOGLE",_sign_in.bind("adult"),not account.configured(),true)
-		_button(content,"PARENT / GUARDIAN SIGN-IN",_sign_in.bind("guardian"),not account.configured(),true)
+		_button(content,"SIGN IN WITH GOOGLE",_sign_in,not account.configured(),true)
 		_login_spinner = ProgressBar.new()
 		_login_spinner.indeterminate = true
 		_login_spinner.custom_minimum_size = Vector2(0,20)
@@ -136,7 +135,7 @@ func show_account() -> void:
 			_on_login_starting()
 			_on_login_status_changed("Waiting for Google sign-in. Finish in your browser, then tap Return to game.")
 			_button(content,"CHECK SIGN-IN STATUS",account.resume_login,false,true)
-			_button(content,"CANCEL SIGN-IN",_cancel_sign_in,false,true)
+			_on_login_browser_opened()
 	else:
 		_button(content,"SAVE TO CLOUD",_upload)
 		_button(content,"LOAD CLOUD PROGRESS",_confirm_download)
@@ -202,8 +201,7 @@ func _load_account_supplies(dialog: AcceptDialog, entries: VBoxContainer, owner:
 	for kind in _supplies:
 		if kind == "continue": continue
 		var supply: Dictionary = _supplies[kind]
-		var ethan_full: bool = kind == "ethan" and game._economy_manager.get_ethan_count() >= EthanInventory.MAX_ASSISTS
-		_button(entries, "%s - %d purchased coins" % ["Refill to 5 lives" if kind == "lives" else "+1 " + kind.capitalize(), int(supply.price)], _spend.bind(kind), account.wallet < int(supply.price) or account.conflict or ethan_full or (kind in ["life", "lives"] and game._economy_manager.get_lives() >= 5))
+		_button(entries, "%s - %d purchased coins" % ["Refill to 5 lives" if kind == "lives" else "+1 " + kind.capitalize(), int(supply.price)], _spend.bind(kind), account.wallet < int(supply.price) or account.conflict or (kind in ["life", "lives"] and game._economy_manager.get_lives() >= 5))
 
 func _style_section_label(label: Label) -> void:
 	label.add_theme_font_override("font",Game.DISPLAY_FONT)
@@ -220,7 +218,8 @@ func _style_account_scrollbar(scrollbar: VScrollBar) -> void:
 			style.bg_color = Color("#946333")
 		scrollbar.add_theme_stylebox_override(style_name,style)
 
-func _sign_in(owner_mode: String) -> void:
+func _sign_in() -> void:
+	var owner_mode := "guardian" if account.needs_parent_account() else "adult"
 	account.set_account_owner_mode(owner_mode)
 	account.sign_in("self" if owner_mode == "adult" else "guardian")
 
@@ -304,7 +303,7 @@ func _button(parent: Control,title: String,action: Callable,disabled := false,ke
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	button.add_theme_font_size_override("font_size",34)
 	button.disabled = disabled
-	if keep_open:
+	if keep_open and title == "SIGN IN WITH GOOGLE":
 		button.set_meta("idle_disabled", disabled)
 		_login_buttons.append(button)
 	button.pressed.connect(func():

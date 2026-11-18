@@ -1,7 +1,6 @@
 extends Node
 class_name EthanInventory
 
-const MAX_ASSISTS := 2
 
 # =========================================================
 # PURPOSE
@@ -51,7 +50,7 @@ func add_ethan(amount: int) -> void:
 	if amount <= 0:
 		return
 
-	_ethan_count = mini(MAX_ASSISTS, _ethan_count + amount)
+	_ethan_count += amount
 
 
 func remove_ethan(amount: int) -> void:

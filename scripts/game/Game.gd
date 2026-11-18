@@ -2558,6 +2558,7 @@ func _on_board_created() -> void:
 	_board.turn_resolved.connect(_on_board_turn_resolved)
 	_board.special_created.connect(_on_special_created)
 	_board.character_arrived.connect(_on_character_arrived)
+	_board.ethan_earned.connect(_on_ethan_earned)
 	_board.ethan_matched.connect(func(extra_moves: int): _turn_reward_notices.append("ETHAN MATCHED | +%d MOVES" % extra_moves))
 	_board.special_activated.connect(_on_special_activated)
 	_board.powerup_blast.connect(_on_powerup_blast)
@@ -2949,6 +2950,13 @@ func _show_match_feedback(caption: String, sound_id: String, shake_board: bool) 
 		_board.play_celebration_shake(intensity)
 
 
+func _on_ethan_earned(reason: String) -> void:
+	_economy_manager.add_ethan(1)
+	_discover_journal_fact("characters", 0)
+	SignalBus.play_sfx.emit("ethan_earned")
+	_turn_reward_notices.append("%s | ETHAN +1 IN TRAY" % reason)
+
+
 func _on_character_arrived(kind: String) -> void:
 	SignalBus.play_sfx.emit("ethan_earned" if kind == "ethan" else "victor_arrived")
 	_discover_journal_fact("characters", 0)
@@ -3001,8 +3009,16 @@ func _on_special_activated(kind: String) -> void:
 	_discover_journal_fact(kind, 1)
 
 
+func _settled_turn_reward_notices() -> Array[String]:
+	var notices := _turn_reward_notices.duplicate()
+	# Arrival is queued before cascades; Ethan may already have matched by now.
+	if _board == null or not _board.get_all_tiles().any(func(tile): return int(tile.get_tile_type()) == Constants.TileType.ETHAN):
+		notices.erase("ETHAN IS HERE | Wildcard: Ethan + two matching tiles")
+	return notices
+
+
 func _on_board_turn_resolved() -> void:
-	var earned_notices := _turn_reward_notices.duplicate()
+	var earned_notices := _settled_turn_reward_notices()
 	_turn_reward_notices.clear()
 	_turn_praise_rank = 0
 	_suppress_character_rewards_this_turn = false

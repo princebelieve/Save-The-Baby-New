@@ -54,6 +54,23 @@ func run() -> void:
 	var game: Game = preload("res://scenes/game/Game.tscn").instantiate()
 	add_child(game)
 	await get_tree().create_timer(2).timeout
+	game._account_panel.show_account()
+	var account_dialog: AcceptDialog = game._account_panel._login_dialog
+	var google_buttons := 0
+	var guardian_buttons := 0
+	for candidate in account_dialog.find_children("*", "Button", true, false):
+		if candidate.text == "SIGN IN WITH GOOGLE": google_buttons += 1
+		if candidate.text == "PARENT / GUARDIAN SIGN-IN": guardian_buttons += 1
+	check(google_buttons == 1 and guardian_buttons == 0, "one unambiguous Google sign-in button")
+	game._account_panel._on_login_browser_opened()
+	game._account_panel._on_login_browser_opened()
+	var cancel_buttons := 0
+	for candidate in account_dialog.find_children("*", "Button", true, false):
+		if candidate.text == "CANCEL SIGN-IN": cancel_buttons += 1
+	check(cancel_buttons == 1, "browser handoff must not duplicate cancel sign-in")
+	account_dialog.hide()
+	account_dialog.queue_free()
+	await get_tree().process_frame
 	var account := SlowAccount.new()
 	add_child(account)
 	var panel := preload("res://scripts/online/AccountPanel.gd").new()

@@ -46,6 +46,7 @@ func process_animated(board) -> void:
 			break
 		var matched_tiles: Array = []
 		board._match_waves += 1
+		board.record_ethan_matches(matches)
 		board.tag_wildcard_matches(matches)
 		var matched_positions: Dictionary = {}
 		for found_match in matches:

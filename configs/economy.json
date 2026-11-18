@@ -73,7 +73,7 @@
   },
   "board_characters": {
     "first_level": 24,
-    "ethan_cascade_waves": 3,
+    "ethan_cascade_waves": 4,
     "ethan_match_moves": 5,
     "victor_move_fraction": 0.75
   }

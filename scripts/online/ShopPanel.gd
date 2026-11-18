@@ -143,7 +143,7 @@ func _refresh() -> void:
 			_button("USE SAVED +5 MOVES",_redeem_continue,not game._can_buy_continue())
 			continue
 		var item: Dictionary = game._economy_manager.get_shop_item(ITEMS[kind])
-		var blocked: bool = (kind in ["life","lives"] and game._economy_manager.get_lives() >= 5) or (kind == "ethan" and game._economy_manager.get_ethan_count() >= EthanInventory.MAX_ASSISTS)
+		var blocked: bool = kind in ["life","lives"] and game._economy_manager.get_lives() >= 5
 		if kind == "continue" and not game._can_buy_continue():
 			blocked = true
 		var name := str(item.get("name",kind))
@@ -210,7 +210,7 @@ func _complete_buy(kind: String, price: int) -> void:
 	if kind == "continue" and int(game._campaign_progress.get_value("campaign","continue_credits",0)) > 0:
 		_redeem_continue()
 		return
-	if (kind in ["life","lives"] and game._economy_manager.get_lives() >= 5) or (kind == "ethan" and game._economy_manager.get_ethan_count() >= EthanInventory.MAX_ASSISTS):
+	if kind in ["life","lives"] and game._economy_manager.get_lives() >= 5:
 		_refresh()
 		return
 	_busy = true

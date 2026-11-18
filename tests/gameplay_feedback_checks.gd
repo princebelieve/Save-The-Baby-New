@@ -71,7 +71,7 @@ func _ready() -> void:
 	check(game._effects().pending_collections == 0,"Clearing effects must cancel pending flights safely")
 	await check_voice_lane()
 	game._economy_manager.set_ethan_count(99)
-	check(game._economy_manager.get_ethan_count() == EthanInventory.MAX_ASSISTS, "Ethan assists must stop at the two-assist cap")
+	check(game._economy_manager.get_ethan_count() == 99, "Ethan inventory preserves rewards beyond the former cap")
 	game._economy_manager.set_ethan_count(1)
 	# Isolate gifted placement from any Ethan already earned by the earlier cascade.
 	for tile in board.get_all_tiles():

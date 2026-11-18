@@ -42,23 +42,40 @@ class AuthReturnExportPlugin extends EditorExportPlugin:
 		var exported := RegEx.new()
 		exported.compile('android:exported="[^"]+"')
 		updated = exported.sub(updated, 'android:exported="true"')
-		if original != updated:
-			var output := FileAccess.open(path, FileAccess.WRITE)
-			if output == null:
-				push_error("Account return: cannot update the Android game activity.")
-				return
-			output.store_string(source.replace(original, updated))
+		source = source.replace(original, updated)
+		# Old templates retained a VIEW filter; the activity hook also injected it
+		# into the launcher alias. Remove those copies before adding one handler.
+		var filters := RegEx.new()
+		filters.compile("(?s)<intent-filter\\b[^>]*>.*?</intent-filter>")
+		for filter_match in filters.search_all(source):
+			var contents := filter_match.get_string()
+			if contents.contains('android:scheme="savethebaby"') and contents.contains('android:host="auth"'):
+				source = source.replace(contents, "")
+		var output := FileAccess.open(path, FileAccess.WRITE)
+		if output == null:
+			push_error("Account return: cannot update Android manifest.")
+			return
+		output.store_string(source)
+		output.close()
+		var target := build_dir.path_join("src/main/java/com/savethebaby/auth")
+		var error := DirAccess.make_dir_recursive_absolute(target)
+		if error == OK:
+			error = DirAccess.copy_absolute("res://addons/auth_return/android/AuthReturnActivity.java", target.path_join("AuthReturnActivity.java"))
+		if error != OK:
+			push_error("Account return: cannot install browser return handler.")
 
-	func _get_android_manifest_activity_element_contents(_platform: EditorExportPlatform, _debug: bool) -> String:
+	func _get_android_manifest_application_element_contents(_platform: EditorExportPlatform, _debug: bool) -> String:
 		if str(get_option("package/unique_name")) == "com.savethebaby.developer":
 			return ""
-		# The generated release manifest discards children from the template's
-		# activity. Use Godot's activity hook so this filter survives that merge.
-		return """
-        <intent-filter>
-            <action android:name="android.intent.action.VIEW" />
-            <category android:name="android.intent.category.DEFAULT" />
-            <category android:name="android.intent.category.BROWSABLE" />
-            <data android:scheme="savethebaby" android:host="auth" android:path="/complete" />
-        </intent-filter>
-"""
+		return '''
+        <activity android:name="com.savethebaby.auth.AuthReturnActivity"
+            android:exported="true" android:noHistory="true"
+            android:excludeFromRecents="true" android:theme="@android:style/Theme.NoDisplay">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="savethebaby" android:host="auth" android:path="/complete" />
+            </intent-filter>
+        </activity>
+'''

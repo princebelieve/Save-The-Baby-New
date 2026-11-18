@@ -232,3 +232,14 @@ Android v9 release: signed APK and AAB generated and verified with matching cont
 Marketing delivery: 20 Godot captures and 8 framed store screenshots, restoration and David instruction/story scenes included; portrait and landscape ~42-second H.264/AAC trailers and YouTube thumbnail/copy created in exports/marketing-v9. Both videos fully decoded and audio verified; PNGs are RGB 1080x1920. Company website project now includes Play Store button and approved title; live deployment awaits Vercel connection. Details: docs/testing/Marketing_Assets_Delivery.md.
 
 Animated ad delivered: portrait and YouTube MP4s, 26.8 seconds, sliding/fading text and scene/audio crossfades; both decode/audio checks passed. Website Play Store button pushed via existing GitHub main branch (c93c798); Vercel deployment success and live button verified. No direct Vercel deploy used. See docs/testing/Animated_Ad_and_Website_Deployment.md.
+
+## 13 November 2026 — Playable promotion and website preview
+
+- Replaced the company homepage's static Save The Baby placeholder with an embedded, real interactive HTML5 preview; added the same preview and the animated gameplay MP4 to the game landing page.
+- Built separate website, Google Ads ExitApi and MRAID-adapter variants from `tools/playable/`; Google Ads ZIP is 2,256,764 bytes and contains a single responsive HTML file with inline game artwork.
+- Preview includes real match-three swaps, invalid-swap rollback, key collection, cascades, special creation, a free tray rocket, optional sound, replay and a post-play Install action. Clearly disclosed as a promotional preview with no saved progress.
+- Rule checks and six Chrome scenarios passed (four viewport sizes, store popup, Google exit, MRAID ready/viewability). Website phone/desktop iframe gameplay and video metadata checks passed locally.
+- Canonical website commit `99a6658` pushed through Git; Vercel reports deployment success. No paid ad campaign created or funded, and no ad-network moderation approval claimed.
+- Exact upload destinations and video filenames are recorded in `docs/Playable_Ad_and_Video_Uploads.md`; corrected stale upload notes referencing the deleted Documents project and a pending Vercel connection.
+
+Live follow-up: final website commit `cbc0ae8` fixes phone card sizing without relying on the extensionless reference stylesheet. Vercel deployment succeeded. Chrome checks against the public homepage and game page passed at phone and desktop sizes, including embedded gameplay, no horizontal overflow, video metadata and no script errors.

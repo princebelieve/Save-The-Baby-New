@@ -33,13 +33,12 @@ static func initialize(
 	on_initialization_complete_listener: OnInitializationCompleteListener = null
 ) -> void:
 	if _plugin:
-		_plugin.initialize()
-
 		if on_initialization_complete_listener:
 			_current_on_initialization_complete_listener = on_initialization_complete_listener
 			safe_connect(
 				_plugin, "on_initialization_complete", _on_initialization_complete, CONNECT_ONE_SHOT
 			)
+		_plugin.initialize()
 
 
 static func set_request_configuration(request_configuration: RequestConfiguration) -> void:

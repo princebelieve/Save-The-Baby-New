@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="ad.orientation" content="portrait,landscape">
+<title>Save The Baby — Play a little</title>
+<!-- AD_API -->
+<style>
+[hidden]{display:none!important}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:system-ui,sans-serif;color:#fff3d5;background:#11293b}body{background:radial-gradient(ellipse at top,#255d77,#102233 75%)}button,a{-webkit-tap-highlight-color:transparent}button{font:inherit;cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid #fff;outline-offset:3px}main{width:min(100%,440px);margin:auto;padding:14px 16px 20px;text-align:center}.brand{height:65px;max-width:240px;object-fit:contain}h1{font-size:clamp(20px,5vw,27px);margin:4px 0 8px;line-height:1.15}.eyebrow{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#f5c35c;margin:0 0 3px}.stats{display:flex;justify-content:space-between;gap:8px;margin:12px 0 9px}.stat{background:#fff5dd;color:#3c2d25;border:2px solid #d4a55c;border-radius:15px;padding:7px 10px;font-size:14px;font-weight:750;flex:1}.stat strong{font-size:20px}.stat img{width:24px;height:24px;vertical-align:middle;border-radius:5px}#board{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;padding:9px;background:#092338;border:3px solid #d7a55d;border-radius:19px;touch-action:none;box-shadow:0 12px 25px #0005}.tile{aspect-ratio:1;border:2px solid #ffffff60;border-radius:13px;background:linear-gradient(145deg,#fff5df,#d8c7ab);padding:4px;position:relative;min-width:0;transition:transform .15s,opacity .15s;box-shadow:0 3px 0 #0004}.tile img{width:100%;height:100%;object-fit:contain;pointer-events:none;border-radius:7px}.tile.selected{outline:3px solid #ffdb65;transform:scale(.91)}.tile.hint{animation:hint 1s ease-in-out infinite}.tile.clearing{animation:pop .3s ease forwards}.tile.rocket{background:#9de1ff}.tile.rocket:after{content:'★';position:absolute;right:1px;bottom:-4px;color:#bb4c00;font-size:21px;text-shadow:0 1px #fff}#status{min-height:44px;font-size:15px;line-height:1.35;margin:12px 0 6px;color:#fff3d5}#rocket{background:#fff3d7;color:#422c22;border:2px solid #dfab5d;border-radius:12px;padding:8px 14px;font-weight:750}#rocket:disabled{opacity:.5;cursor:default}#sound{background:transparent;color:#fff3d5;border:1px solid #ffffff60;border-radius:10px;padding:7px 10px;margin-left:6px;font-size:13px}.install{display:block;width:100%;border:0;border-radius:15px;margin:12px 0 0;padding:13px;background:linear-gradient(#ffd673,#efad35);color:#33241b;font-weight:850;font-size:18px;box-shadow:0 4px #a06322}.fine{font-size:11px;line-height:1.4;opacity:.75;margin:12px 0 0}.overlay{position:fixed;inset:0;background:#092033eF;display:grid;place-items:center;padding:18px;z-index:5}.overlay[hidden]{display:none}.card{max-width:370px;border:2px solid #eab85f;background:linear-gradient(#23576d,#143147);border-radius:25px;padding:25px;width:100%;box-shadow:0 20px 80px #0007}.card img{height:100px;max-width:100%;object-fit:contain}.card h2{font-size:27px;line-height:1.1;margin:12px 0}.card p{line-height:1.5;font-size:16px}.again{background:transparent;border:1px solid #ffdf9a;color:#fff3d5;border-radius:12px;padding:11px 16px;margin-top:16px}.bar{height:7px;background:#ffffff30;border-radius:8px;overflow:hidden;margin-top:9px}.bar span{display:block;height:100%;background:#ffd36d;width:0;transition:width .3s}@keyframes hint{50%{box-shadow:0 0 0 3px #ffdc70}}@keyframes pop{50%{transform:scale(1.13);filter:brightness(1.6)}100%{transform:scale(.2);opacity:0}}@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}@media(max-height:590px) and (min-width:600px){main{max-width:790px;display:grid;grid-template-columns:1fr 320px;column-gap:24px;padding:10px 20px}header{grid-column:1;align-self:end}#board{grid-column:2;grid-row:1/7}.stats{grid-column:1}.brand{height:45px}#status{min-height:36px}.fine{margin-top:8px}}@media(max-width:340px){main{padding:9px}.brand{height:47px}.tile{border-radius:9px;padding:2px}.stats{margin:8px 0}.stat{padding:5px}#status{font-size:14px}}
+</style>
+</head>
+<body>
+<main aria-label="Save The Baby playable preview">
+ <header><img class="brand" src="@@logo@@" alt="Save The Baby"><p class="eyebrow">Play a little · Match 3 Rescue</p><h1>Find the keys. Follow the clues.</h1></header>
+ <div class="stats"><div class="stat"><img src="@@key@@" alt="Keys"> <strong id="collected">0</strong> / 9<div class="bar"><span id="progress"></span></div></div><div class="stat">Moves<br><strong id="moves">6</strong></div></div>
+ <div id="board" role="group" aria-label="Match three board"></div>
+ <p id="status" role="status" aria-live="polite">Swap the glowing pieces to match three keys.</p>
+ <div><button id="rocket" type="button">🚀 Try a rocket · 1</button><button id="sound" type="button" aria-pressed="false">Sound off</button></div>
+ <button id="install" class="install" type="button" hidden>Install the full game</button>
+ <p class="fine">Short playable preview inspired by the game. Full story, restoration challenges and progress are in the Android app. Demo progress is not saved.</p>
+</main>
+<section id="end" class="overlay" role="dialog" aria-modal="true" aria-labelledby="end-title" hidden><div class="card"><img src="@@logo@@" alt="Save The Baby"><p class="eyebrow">Your next clue awaits</p><h2 id="end-title">Keep the rescue going</h2><p id="end-copy">Meet David and Amara, restore evidence and follow the search for Ethan.</p><button id="end-install" class="install" type="button">Get it on Google Play</button><button id="again" class="again" type="button">Play again</button></div></section>
+<script>
+// CONFIG
+const ASSETS=@@assets@@;
+// ENGINE
+// APP
+</script>
+</body>
+</html>

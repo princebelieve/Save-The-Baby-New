@@ -79,7 +79,7 @@ func needs_parent_account() -> bool:
 		if saved_mode in ["adult", "guardian"]:
 			return saved_mode == "guardian"
 	var settings := ConfigFile.new()
-	return settings.load("user://ad_age_group.cfg") != OK or settings.get_value("audience", "group", "unknown") != "adult"
+	return settings.load("user://ad_age_group.cfg") == OK and settings.get_value("audience", "group", "unknown") in ["under_13", "13_15", "16_17"]
 
 func set_account_owner_mode(mode: String) -> void:
 	if mode not in ["adult", "guardian"]:

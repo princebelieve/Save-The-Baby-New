@@ -35,7 +35,10 @@ RandomGenerator="*uid://uxhwmradss1c"
 ConfigLoader="*uid://cu8j86nxy8kq0"
 ResourceManager="*uid://dvkv8hfsbjwme"
 JsonLoader="*uid://bosxr5gwvr1tg"
+AudienceSettings="*res://scripts/ads/AudienceSettings.gd"
+AppPrivacy="*res://scripts/ads/AppPrivacy.gd"
 AdProvider="*res://scripts/ads/AdProvider.gd"
+PromotionAttribution="*res://scripts/ads/PromotionAttribution.gd"
 CloudAccount="*res://scripts/online/CloudAccount.gd"
 CoinPurchases="*res://scripts/online/CoinPurchases.gd"
 
@@ -51,7 +54,7 @@ window/handheld/orientation=1
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/admob/plugin.cfg", "res://addons/brand_launch/plugin.cfg", "res://addons/GodotGooglePlayBilling/plugin.cfg", "res://addons/auth_return/plugin.cfg", "res://addons/release_diagnostics/plugin.cfg", "res://addons/portrait_gallery/plugin.cfg")
+enabled=PackedStringArray("res://addons/admob/plugin.cfg", "res://addons/brand_launch/plugin.cfg", "res://addons/GodotGooglePlayBilling/plugin.cfg", "res://addons/auth_return/plugin.cfg", "res://addons/release_diagnostics/plugin.cfg", "res://addons/portrait_gallery/plugin.cfg", "res://addons/tiktok_events/plugin.cfg")
 
 [gui]
 

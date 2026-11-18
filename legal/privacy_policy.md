@@ -1,6 +1,6 @@
 # Save The Baby Privacy Policy
 
-**Effective date: 2 November 2026**
+**Effective date: 18 November 2026**
 
 This Privacy Policy explains how S.B. Ibhadode Technologies handles information when you use the current release of Save The Baby (the “Game”).
 
@@ -28,9 +28,40 @@ When purchases are enabled, Google Play handles payment and payment-method detai
 
 The Game integrates Google Mobile Ads and Google's User Messaging Platform. Full-screen advertisements may appear at the end of a level. Optional rewarded advertisements offer the gameplay benefit shown before you choose to watch. Advertisement availability depends on network access and the advertising service.
 
-Google's advertising SDK may collect and share IP addresses (which can indicate approximate location), app and advertisement interactions, diagnostic information, and device or account identifiers such as the app set ID for advertising, analytics and fraud prevention. Google states that child-directed ad requests prevent transmission of the Android advertising ID; this Game marks all ad requests as child-directed. Advertising information is processed by Google and its advertising partners under their policies; it is separate from the campaign progress stored locally by the Game. See https://policies.google.com/privacy and https://developers.google.com/admob/android/privacy/play-data-disclosure.
+Google's advertising SDK may collect and share IP addresses (which can indicate approximate location), app and advertisement interactions, diagnostic information, and device or account identifiers such as the app set ID for advertising, analytics and fraud prevention. Google states that child-directed ad requests prevent transmission of the Android advertising ID. The Game caps ad content at G; an existing known under-13 answer also receives child-directed treatment. A family-safe ad content cap does not classify every player as a child. Advertising information is processed by Google and its advertising partners under their policies; it is separate from the campaign progress stored locally by the Game. See https://policies.google.com/privacy and https://developers.google.com/admob/android/privacy/play-data-disclosure.
 
-Where required, the Game displays Google's consent message before requesting advertisements. When Google requires a privacy-options entry point, AD PRIVACY OPTIONS appears in the Game's settings so you can revisit your choices. The Game does not request access to precise GPS location, contacts, photos or microphone for advertising.
+Where required, the Game displays Google's regional privacy message before requesting advertisements. When Google requires a privacy-options entry point, AD PRIVACY OPTIONS appears in the Game's settings so you can revisit your choices. The Game does not request access to precise GPS location, contacts, photos or microphone for advertising.
+
+## TikTok promotion measurement
+
+The Android game includes the TikTok App Events SDK to measure advertisements
+promoting Save The Baby outside the Game. It runs in the background after the
+shared audience and regional privacy checks; there is no separate TikTok popup
+or TikTok measurement settings button. Google advertising consent alone does not
+authorize TikTok: where vendor consent is required, the integration checks the
+configured TikTok vendor and measurement-purpose decisions. Measurement remains
+off when the privacy state is unknown, an applicable opt-out is present, or the
+required vendor decision has not been configured.
+
+The current integration does not initialize TikTok measurement for an existing
+known under-16 answer. It does not add a separate age questionnaire or infer
+that every player is a child from the Game's content rating. Declining a regional privacy message does not
+remove gameplay or rewards. Where Google's message requires a privacy-options
+entry point, the existing AD PRIVACY OPTIONS control lets you revisit the shared
+privacy decision. A stop request cannot recall information already sent or
+cancel an HTTP request already in flight.
+
+When initialized, the SDK shares install, app-open and retention
+events, app/device information and network information such as IP address with
+TikTok to measure and improve advertisements promoting this Game. Android
+advertising ID collection, automatic purchase tracking and enhanced data postback
+are disabled in this integration. We do not send your game account identity,
+Google sign-in information, purchase tokens or campaign progress to TikTok.
+See https://www.tiktok.com/legal/page/row/privacy-policy/en.
+
+The existing AD PRIVACY OPTIONS entry remains available when Google's privacy
+flow requires it. The selected age category stays in local app storage; we do
+not send the age answer to TikTok.
 
 ## Information you send to support
 
@@ -44,7 +75,7 @@ We rely on Android’s app sandbox to protect local files. No method of storage 
 
 ## Children
 
-Before requesting ads, the Android game asks for an age group, including an option not to say. Only the selected category is saved on the device; it is not uploaded to our server. All players receive child-directed advertising treatment with a maximum ad content rating of G. These settings are applied to ad requests. The Android release includes the `AD_ID` and `ACCESS_ADSERVICES_*` permissions declared by the Google Mobile Ads SDK. Age-group answers do not remove gameplay features, ads, optional sign-in or purchases.
+The Game uses a maximum ad content rating of G for family-safe advertisements. It does not add a child-control panel or require an age questionnaire to play. If a coarse age category was saved by an earlier release, it remains local and is not uploaded to our server. Existing known under-age answers receive the applicable child-directed or under-age treatment; other players are not automatically classified as children. The Android release includes the `AD_ID` and `ACCESS_ADSERVICES_*` permissions declared by the Google Mobile Ads SDK. Age-group answers do not remove gameplay features, ads, optional sign-in or purchases.
 
 Optional sign-in, cloud saves, purchase verification and advertising services process information as described above. If you believe a child has provided personal information through the Game or support, contact **info@sbi.globalcreest.com** so we can review the request and take appropriate action.
 

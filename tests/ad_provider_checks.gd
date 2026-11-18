@@ -1,4 +1,4 @@
-extends SceneTree
+extends Node
 
 class TestProvider extends "res://scripts/ads/AdProvider.gd":
 	var reloads := 0
@@ -19,15 +19,22 @@ class FakeAd extends RefCounted:
 var rewards := 0
 var closes := 0
 
-func _initialize() -> void:
+func _ready() -> void:
 	call_deferred("_run")
 
 func _run() -> void:
 	var provider := TestProvider.new()
-	root.add_child(provider)
+	get_tree().root.add_child(provider)
 	var configuration := provider._request_configuration().convert_to_dictionary()
 	assert(configuration.max_ad_content_rating == "G")
-	assert(configuration.tag_for_child_directed_treatment == 1)
+	assert(configuration.tag_for_child_directed_treatment == -1)
+	var audience := get_node("/root/AudienceSettings")
+	audience.age_group = "under_13"
+	var child_configuration := provider._request_configuration().convert_to_dictionary()
+	assert(child_configuration.max_ad_content_rating == "G")
+	assert(child_configuration.tag_for_child_directed_treatment == 1)
+	assert(child_configuration.tag_for_under_age_of_consent == 1)
+	audience.age_group = "unknown"
 	assert(configuration.tag_for_under_age_of_consent == -1)
 	assert(not provider.is_ad_ready("rewarded"))
 	provider._initialized = true
@@ -40,29 +47,29 @@ func _run() -> void:
 	provider._loaded_at["rewarded"] = Time.get_ticks_msec()
 	assert(provider.is_ad_ready("rewarded"))
 	provider.show_ad("rewarded", "test", func(): rewards += 1, func(): closes += 1)
-	assert(paused and AudioServer.is_bus_mute(0))
+	assert(get_tree().paused and AudioServer.is_bus_mute(0))
 	assert(not provider.is_ad_ready("rewarded"))
 	ad.full_screen_content_callback.on_ad_dismissed_full_screen_content.call()
 	assert(rewards == 0 and closes == 1)
-	assert(not paused and not AudioServer.is_bus_mute(0) and ad.destroyed)
+	assert(not get_tree().paused and not AudioServer.is_bus_mute(0) and ad.destroyed)
 	ad = FakeAd.new()
 	provider._ads["rewarded"] = ad
 	provider._loaded_at["rewarded"] = Time.get_ticks_msec()
-	paused = true
+	get_tree().paused = true
 	AudioServer.set_bus_mute(0, true)
 	provider.show_ad("rewarded", "test", func(): rewards += 1, func(): closes += 1)
 	ad.reward_listener.on_user_earned_reward.call(null)
 	ad.reward_listener.on_user_earned_reward.call(null)
 	ad.full_screen_content_callback.on_ad_dismissed_full_screen_content.call()
 	assert(rewards == 1 and closes == 2)
-	assert(paused and AudioServer.is_bus_mute(0))
-	paused = false
+	assert(get_tree().paused and AudioServer.is_bus_mute(0))
+	get_tree().paused = false
 	ad = FakeAd.new()
 	provider._ads["interstitial"] = ad
 	provider._loaded_at["interstitial"] = Time.get_ticks_msec()
 	provider.show_ad("interstitial", "test", func(): rewards += 1, func(): closes += 1)
 	ad.full_screen_content_callback.on_ad_failed_to_show_full_screen_content.call(null)
-	assert(not paused and closes == 3 and rewards == 1)
+	assert(not get_tree().paused and closes == 3 and rewards == 1)
 	assert(provider.reloads == 3)
 	provider._ads["interstitial"] = FakeAd.new()
 	provider._loaded_at["interstitial"] = Time.get_ticks_msec() - provider.MAX_AD_AGE_MS
@@ -70,6 +77,6 @@ func _run() -> void:
 	AudioServer.set_bus_mute(0, original_mute)
 	ad = null
 	provider.queue_free()
-	await process_frame
+	await get_tree().process_frame
 	print("Ad provider checks passed")
-	quit()
+	get_tree().quit()

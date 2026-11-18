@@ -1,6 +1,6 @@
 import express from 'express';
 import {fileURLToPath} from 'node:url';
-import {hash,random,HttpError,requireThat,PACKS,SUPPLIES,MAX_ETHAN_ASSISTS,validateSave,verifyPurchase,addSupply,profile} from './domain.js';
+import {hash,random,HttpError,requireThat,PACKS,SUPPLIES,validateSave,verifyPurchase,addSupply,profile} from './domain.js';
 
 const accountPageStyles = `<style>
   :root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; color: #342719; background: #e8dfca; }
@@ -270,7 +270,6 @@ export function createApp({db, client, oauth, play, baseUrl, clientId, commerceE
    const earned=useEarned?Math.min(price,Number(user.save.campaign.coins)||0):0;
    const paid=price-earned;
    requireThat(user.wallet>=paid,409,'Not enough coins');
-   requireThat(kind!=='ethan'||Number(user.save.campaign.ethan||0)<MAX_ETHAN_ASSISTS,409,'Ethan assists are already full');
    requireThat(!['lives','life'].includes(kind)||Number(user.save.campaign.lives)<5,409,'Lives are already full');
    const save=addSupply(user.save,kind);save.campaign.coins=(Number(save.campaign.coins)||0)-earned;
    await users.updateOne({_id:user._id,revision},{$inc:{wallet:-paid,revision:1},$set:{save,updated:new Date()}},{session});

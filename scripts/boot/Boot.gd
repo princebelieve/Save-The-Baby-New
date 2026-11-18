@@ -102,7 +102,19 @@ func create_game_scene() -> void:
 func finish_boot() -> void:
 	if _game_scene == null:
 		return
+	if OS.get_name() == "Android" and not preload("res://scripts/debug/DeveloperTools.gd").enabled():
+		if Engine.has_singleton("PoingGodotAdMob") or Engine.has_singleton("TikTokEvents"):
+			var audience := get_node_or_null("/root/AudienceSettings")
+			if audience != null:
+				audience.start_session()
+		var promotion := get_node_or_null("/root/PromotionAttribution")
+		if promotion != null:
+			promotion.start_session()
 	var ads := get_node_or_null("/root/AdProvider")
 	if ads != null:
 		ads.start_session()
+	if OS.get_name() == "Android" and not preload("res://scripts/debug/DeveloperTools.gd").enabled():
+		var privacy := get_node_or_null("/root/AppPrivacy")
+		if privacy != null:
+			privacy.start_session()
 	queue_free()
