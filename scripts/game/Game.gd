@@ -24,7 +24,6 @@ var _result_ad_shown := false
 
 var _coin_shop: Node
 var _paid_revived := false
-var _assist_tiles := 0
 var _attempt_coins_start := 0
 var _last_recorded_coins := -1
 var _attempt_failure_recorded := false
@@ -2267,7 +2266,9 @@ func _show_level_briefing(route_id: String) -> void:
 		"signal": "David traces the technical evidence while Amara checks its meaning against what she knows.",
 		"alone": "David follows the physical trail without police backup, keeping Amara informed."
 	}
-	route_briefings = level_data.get("story",{}).get("briefings",route_briefings)
+	# Authored story scenes can omit route overrides or contain an empty map.
+	var authored_briefings: Dictionary = level_data.get("story", {}).get("briefings", {})
+	route_briefings.merge(authored_briefings, true)
 	var route_detail := _make_label(str(route_briefings.get(route_id, route_briefings["alone"])), 20)
 	route_detail.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	route_detail.custom_minimum_size.x = 0
@@ -2568,7 +2569,6 @@ func _on_board_created() -> void:
 	_ad_revived = false
 	_paid_revived = false
 	_attempt_failure_recorded = false
-	_assist_tiles = 0
 	_attempt_coins_start = _economy_manager.get_coins() if _economy_manager != null else 0
 	_result_ad_shown = false
 	_board = created_board
@@ -2883,21 +2883,11 @@ func _on_tiles_matched(tile_types: Array) -> void:
 	var feedback_sound := ""
 	var shake_board := false
 	var character_rewards := {"ethan": 0, "detective": 0, "victor": 0}
-	var target_enum := int(Constants.TileType.get(_objective_target, -1))
 	var character_config: Dictionary = ConfigLoader.load_config(Constants.ConfigPaths.ECONOMY).get("character_rewards", {})
+	var target_enum := int(Constants.TileType.get(_objective_target, -1))
 	for tile_type in tile_types:
 		if _objective_type == "COLLECT_ITEMS" and int(tile_type) == target_enum:
 			_evidence_count += 1
-		if not _suppress_character_rewards_this_turn and _economy_manager != null:
-			if int(tile_type) in [int(Constants.TileType.ETHAN), int(Constants.TileType.DETECTIVE)]:
-				_assist_tiles += 1
-				if _assist_tiles % maxi(1,int(character_config.get("assist_tiles_per_reward",3))) != 0:
-					continue
-				var assists_before := _economy_manager.get_ethan_count()
-				_economy_manager.add_ethan(1)
-				if _economy_manager.get_ethan_count() > assists_before:
-					var character_id := "ethan" if int(tile_type) == int(Constants.TileType.ETHAN) else "detective"
-					character_rewards[character_id] = int(character_rewards[character_id]) + 1
 	var reward_notices: Array[String] = []
 	var ethan_matches := int(character_rewards["ethan"])
 	var detective_matches := int(character_rewards["detective"])
@@ -2975,10 +2965,12 @@ func _show_match_feedback(caption: String, sound_id: String, shake_board: bool) 
 
 
 func _on_ethan_earned(reason: String) -> void:
-	_economy_manager.add_ethan(1)
+	if reason != "EIGHT-WAVE CASCADE" or _suppress_character_rewards_this_turn or _economy_manager == null: return
 	_discover_journal_fact("characters", 0)
+	_economy_manager.add_ethan(1)
+	_persist_campaign_progress()
 	SignalBus.play_sfx.emit("ethan_earned")
-	_turn_reward_notices.append("%s | ETHAN +1 IN TRAY" % reason)
+	_turn_reward_notices.append("INCREDIBLE CASCADE | ETHAN +1 IN TRAY")
 
 
 func _on_character_arrived(kind: String) -> void:
@@ -3281,7 +3273,7 @@ func _show_booster_confirmation(kind: String) -> void:
 		"rocket": "Choose a tile. Rocket clears its full row and column.",
 		"bomb": "Choose a tile. Bomb clears the tiles around it.",
 		"thunder": "Choose a tile. Thunder clears every tile of that type.",
-		"ethan": "Tap Ethan to place him near objective clues automatically. Matching him with two identical tiles grants five moves. You can hold two gifts."
+		"ethan": "Tap Ethan to place him near objective clues automatically. Matching him with two identical tiles grants five moves. An eight-wave cascade from one player swap earns one Ethan gift in the tray."
 	}
 	_booster_confirm_layer = CanvasLayer.new()
 	_wire_screen_audio(_booster_confirm_layer)

@@ -173,11 +173,21 @@ async function admobAudit() {
     try {
       const response = await client.request({url: `https://admob.googleapis.com/v1/${account.name}/networkReport:generate`, method: 'POST', timeout: 30000, retry: false, data: {reportSpec: {
         dateRange: {startDate: date(start), endDate: date(end)},
-        dimensions: ['DATE','AD_UNIT'], metrics: ['AD_REQUESTS','MATCHED_REQUESTS','IMPRESSIONS','CLICKS'],
+        dimensions: ['DATE','AD_UNIT'], metrics: ['AD_REQUESTS','MATCHED_REQUESTS','IMPRESSIONS','CLICKS','ESTIMATED_EARNINGS'],
         dimensionFilters: [{dimension: 'APP', matchesAny: {values: [game.appId]}}], maxReportRows: 10000,
       }}});
       entry.networkReport = response.data;
     } catch (error) { entry.networkReport = {error: safeFailure(error)}; }
+    // AD_TYPE cannot be combined with AD_REQUESTS; keep creative delivery separate.
+    try {
+      const response = await client.request({url: `https://admob.googleapis.com/v1/${account.name}/networkReport:generate`, method: 'POST', timeout: 30000, retry: false, data: {reportSpec: {
+        dateRange: {startDate: date(start), endDate: date(end)},
+        dimensions: ['DATE','AD_UNIT','AD_TYPE'], metrics: ['IMPRESSIONS','CLICKS','ESTIMATED_EARNINGS'],
+        dimensionFilters: [{dimension: 'APP', matchesAny: {values: [game.appId]}}], maxReportRows: 10000,
+      }}});
+      entry.creativeReport = response.data;
+    } catch (error) { entry.creativeReport = {error: safeFailure(error)}; }
+    entry.dashboardOnlySettings = ['highEngagementAds', 'rewardedAdPods'];
     report.accounts.push(entry);
   }
   await mkdir(privateFolder, {recursive: true, mode: 0o700});

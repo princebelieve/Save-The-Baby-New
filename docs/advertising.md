@@ -63,3 +63,32 @@ Pinned native release: https://github.com/poingstudios/godot-admob-plugin/releas
 
 After the European consent message was published, the corrected v11 APK was installed with adb install -r on the authorized Vivo test device. UMP returned IABTCF_gdprApplies=0; the previous no-forms error cleared. Runtime logs confirmed AdMob SDK initialized, interstitial loaded, and rewarded loaded. This confirms inventory loaded, not a completed impression or reward. Evidence: .test-data/published-consent-device-test.log. The auth-return URI query now resolves to one dedicated AuthReturnActivity.
 
+
+### Ethan cascade earning and ad research - 19 November 2026
+
+Final owner-approved earning rule: one player swap causing eight or more matching waves awards one Ethan gift in the tray. The initial match is wave one. The chain is resolved before awarding; nine or sixteen waves still award only one gift for that swap. Further qualifying swaps can earn more in the same level. There is no per-level or inventory cap, no accumulated hat-trick progress, and no award for ordinary tile matches or shape/special achievements. The existing character introduction at level 24 is retained. Setup and tray-booster cascades do not qualify. Existing stock, purchases, rewarded-ad offers, special creation, score and move rewards are preserved. Academy and shop instructions match this rule.
+
+Ad provider callbacks are presentation-specific: old callbacks cannot reward or dismiss the next ad. Rewarded supplies require the earned-reward callback, never dismissal alone. No local forced-watch timeout or replacement close control was added.
+
+AdMob supports ad pods: two videos within one rewarded impression, included by default through rewarded-unit Advanced settings. High-engagement ads permit rewarded skip/reward times up to sixty seconds and interstitial skip times up to twelve seconds. These are upper bounds, not minimum durations. This game's single SDK presentation supports Google's pods without manually launching a second presentation. Account settings remain unverified and unchanged. Explicit multi-ad reward bundles are separately permitted if clearly disclosed, but are not implemented here.
+
+Research:
+- https://support.google.com/admob/answer/7372450?hl=en
+- https://support.google.com/admob/answer/15525707?hl=en
+- https://support.google.com/admob/answer/7313578?hl=en
+- Developer report: https://www.reddit.com/r/incremental_games/comments/1it5i6y/
+- Player/developer discussion: https://www.reddit.com/r/AndroidGaming/comments/1h9v4ci/
+
+Godot validation: character_booster_checks passed 1,347 checks, zero failures. Includes a real legal player swap with controlled refill producing eight waves, threshold boundaries, one award per swap, repeat earning, no automatic board placement, setup/tray exclusion, retained inventory and existing booster behavior. No APK built or installed. This confirms mechanics, not the natural occurrence rate across human play.
+
+### USB release verification - 19 November 2026
+
+Built and installed a fresh release APK (build/android/SaveTheBaby-v11.apk, 246024353 bytes) over the existing Vivo V2111 installation with adb install -r; no uninstall or data clear. Android lastUpdateTime: 2026-11-19 13:09:55. Runtime logs at 13:10:48 confirmed units=production, SDK initialization succeeded at 13:10:49, rewarded loaded at 13:10:59 and interstitial loaded at 13:11:00. This establishes production-unit selection and load, not a completed native impression, reward or number of exit steps. Added presentation-specific shown/earned/closed diagnostic logs without changing Google's native exit UI. No custom Skip control or timer is implemented in the game.
+
+The broader navigation check found an empty authored story briefings dictionary replacing all fallback route text, causing access to the absent alone key. Merge authored overrides into defaults instead. continuation_checks passes with the fix; ad_provider_checks also passes. Final APK contains both the fallback fix and eight-wave Ethan rule.
+
+The first sandboxed build failed on access to a cached Gradle JAR. The normal-access build succeeded; subsequent packaging succeeded. Original build logs are .test-data/android-v11-apk-output.log and android-v11-apk-error.log. User was asked to open the exact easy-to-close ad for direct native observation; no claim of exit-screen reproduction yet.
+
+### Captured fastest-close attempt
+
+Direct observation now confirms the short exit behavior. In .test-data/sb-fast-close-followthrough.mp4, the Card Wallet interstitial's yellow bar is visibly filling at clip 70.50s, reaches nearly full at 73.75s, and is replaced by an X by 74.00s (quarter-second frame samples). The visible bar phase is approximately 3.5-4 seconds; initial native surface loading occurs before the bar is visible. Native events: displayed 18:14:41.921, dismissed 18:14:49.372, elapsed 7.451 seconds. It returns after one close without a second video/install screen. This is a confirmed contrast with the much longer Bus Fever rewarded sequence, not an unverified user report. Format logged by our app: interstitial, placement level_end, presentation 2. No earned-reward event for this automatic interstitial. The recordings compare different formats; account-side high-engagement/ad-pod settings remain unverified. Evidence: .test-data/fast-ad-detail-contact.png and .test-data/fast-close-native-events.log. No input was sent by the agent during the user's attempt.

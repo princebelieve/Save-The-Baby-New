@@ -33,7 +33,7 @@
     },
     "ethan_assist": {
       "name": "Ethan wildcard gift",
-      "description": "Tap Ethan to place him near objective clues automatically. Ethan plus two matching pieces clears the match and grants five moves. You can hold two gifts.",
+      "description": "Tap Ethan to place him near objective clues automatically. Ethan plus two matching pieces clears the match and grants five moves. An eight-wave cascade from one player swap earns one Ethan gift in the tray. Further qualifying swaps can earn more; owned gifts are preserved.",
       "category": "special",
       "currency": "coins",
       "price": 400,
@@ -68,12 +68,11 @@
     "maximum_coins": 25
   },
   "character_rewards": {
-    "victor_coins_per_tile": 2,
-    "assist_tiles_per_reward": 3
+    "victor_coins_per_tile": 2
   },
   "board_characters": {
     "first_level": 24,
-    "ethan_cascade_waves": 4,
+    "ethan_cascade_waves": 8,
     "ethan_match_moves": 5,
     "victor_move_fraction": 0.75
   }

@@ -22,6 +22,10 @@ var _active_ad: Variant
 var _was_paused := false
 var _was_muted := false
 var _cover: CanvasLayer
+var _show_generation := 0
+var _shown_at_ms := -1
+var _reward_was_earned := false
+var _unity_privacy_prepared := false
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -88,15 +92,23 @@ func _initialize_sdk() -> void:
 	if not _consent_ready or _initialized or _initializing:
 		return
 	_initializing = true
-	print("AdMob: initializing SDK")
+	if not _prepare_mediation_privacy():
+		_initializing = false
+		return
+	print("AdMob: initializing SDK; units=%s" % ("demo" if OS.is_debug_build() else "production"))
 	# Apply before initialization, which may itself preload ads. The pinned
 	# Android bridge uses play-services-ads, whose configuration supports this.
-	MobileAds.set_request_configuration(_request_configuration())
+	var configuration := _request_configuration()
+	print("AdMob request flags: " + JSON.stringify(configuration.convert_to_dictionary()))
+	MobileAds.set_request_configuration(configuration)
 	var listener := OnInitializationCompleteListener.new()
 	listener.on_initialization_complete = func(_status: InitializationStatus):
 		_initializing = false
 		_initialized = true
 		print("AdMob: SDK initialized")
+		for adapter_name in _status.adapter_status_map:
+			var adapter = _status.adapter_status_map[adapter_name]
+			print("AdMob adapter: %s; state=%s" % [adapter_name, adapter.initialization_state])
 		_load_ad("interstitial")
 		_load_ad("rewarded")
 	MobileAds.initialize(listener)
@@ -115,8 +127,23 @@ func _unit_id(kind: String) -> String:
 		return TEST_REWARDED_ID if kind == "rewarded" else TEST_INTERSTITIAL_ID
 	return REWARDED_ID if kind == "rewarded" else INTERSTITIAL_ID
 
+func _prepare_mediation_privacy() -> bool:
+	if OS.get_name() != "Android":
+		return true
+	if not Engine.has_singleton("UnityAdsPrivacy"):
+		push_error("AdMob: Unity Ads privacy bridge is missing; not requesting ads")
+		return false
+	var prepared := bool(Engine.get_singleton("UnityAdsPrivacy").prepareContextualAds())
+	if prepared and not _unity_privacy_prepared:
+		_unity_privacy_prepared = true
+		print("AdMob: Unity privacy bridge ready; contextual metadata committed")
+	return prepared
+
 func _load_ad(kind: String) -> void:
 	if not _initialized or not _consent_ready or _loading.get(kind, false):
+		return
+	if not _prepare_mediation_privacy():
+		_retry_at[kind] = Time.get_ticks_msec() + 60000
 		return
 	_loading[kind] = true
 	var loaded := func(ad):
@@ -125,6 +152,7 @@ func _load_ad(kind: String) -> void:
 			ad.destroy()
 			return
 		print("AdMob: %s loaded" % kind)
+		print("AdMob response: " + JSON.stringify(_describe_ad_response(kind, ad)))
 		_ads[kind] = ad
 		_loaded_at[kind] = Time.get_ticks_msec()
 		availability_changed.emit()
@@ -152,6 +180,11 @@ func show_ad(kind: String, _placement: String, earned: Callable, closed: Callabl
 		closed.call_deferred()
 		return
 	_showing = true
+	_show_generation += 1
+	_shown_at_ms = -1
+	_reward_was_earned = false
+	print("AdMob: showing %s; placement=%s; presentation=%d" % [kind, _placement, _show_generation])
+	var generation := _show_generation
 	_earned = earned
 	_closed = closed
 	_active_kind = kind
@@ -170,23 +203,48 @@ func show_ad(kind: String, _placement: String, earned: Callable, closed: Callabl
 	_cover.add_child(blocker)
 	add_child(_cover)
 	var callback := FullScreenContentCallback.new()
-	callback.on_ad_dismissed_full_screen_content = _finish_ad
-	callback.on_ad_failed_to_show_full_screen_content = func(_error: AdError): _finish_ad()
+	callback.on_ad_dismissed_full_screen_content = func(): _finish_ad(generation)
+	callback.on_ad_failed_to_show_full_screen_content = func(_error: AdError): _finish_ad(generation)
+	callback.on_ad_showed_full_screen_content = func():
+		if not _showing or generation != _show_generation: return
+		_shown_at_ms = Time.get_ticks_msec()
+		print("AdMob: native ad displayed; presentation=%d" % generation)
 	_active_ad.full_screen_content_callback = callback
 	availability_changed.emit()
 	if kind == "rewarded":
 		var listener := OnUserEarnedRewardListener.new()
 		listener.on_user_earned_reward = func(_item: RewardedItem):
-			if _showing and _earned.is_valid():
+			if _showing and generation == _show_generation and _active_kind == "rewarded" and _earned.is_valid():
+				_reward_was_earned = true
+				print("AdMob: reward earned; presentation=%d; elapsed_ms=%d" % [generation, _presentation_elapsed_ms()])
 				_earned.call()
 				_earned = Callable()
 		_active_ad.show(listener)
 	else:
 		_active_ad.show()
 
-func _finish_ad() -> void:
-	if not _showing:
+func _describe_ad_response(kind: String, ad: Object) -> Dictionary:
+	var details := {"kind": kind, "unit_id": _unit_id(kind)}
+	if not ad.has_method("get_response_info"): return details
+	var response = ad.get_response_info()
+	if response == null: return details
+	details["response_id"] = response.response_id
+	details["adapter"] = response.mediation_adapter_class_name
+	var source = response.loaded_adapter_response_info
+	if source != null:
+		details["ad_source"] = source.ad_source_name
+	# Never dump response extras or adapter credentials/mappings.
+	return details
+
+
+func _presentation_elapsed_ms() -> int:
+	return Time.get_ticks_msec() - _shown_at_ms if _shown_at_ms >= 0 else -1
+
+
+func _finish_ad(generation := -1) -> void:
+	if not _showing or (generation != -1 and generation != _show_generation):
 		return
+	print("AdMob: presentation closed; kind=%s; presentation=%d; elapsed_ms=%d; earned=%s" % [_active_kind, _show_generation, _presentation_elapsed_ms(), _reward_was_earned])
 	_showing = false
 	_active_ad.destroy()
 	_active_ad = null

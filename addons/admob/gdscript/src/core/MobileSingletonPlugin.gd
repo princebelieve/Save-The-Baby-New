@@ -56,10 +56,11 @@ static func _get_plugin(plugin_name: String, is_required := true) -> Object:
 static func safe_connect(
 	plugin: Object, signal_name: String, callable: Callable, flags := 0
 ) -> void:
-	if plugin and not plugin.is_connected(signal_name, callable):
+	# The project pins the 4.3.1 bridge; newer optional paid events may be absent.
+	if plugin and plugin.has_signal(signal_name) and not plugin.is_connected(signal_name, callable):
 		plugin.connect(signal_name, callable, flags)
 
 
 static func safe_disconnect(plugin: Object, signal_name: String, callable: Callable) -> void:
-	if plugin and plugin.is_connected(signal_name, callable):
+	if plugin and plugin.has_signal(signal_name) and plugin.is_connected(signal_name, callable):
 		plugin.disconnect(signal_name, callable)

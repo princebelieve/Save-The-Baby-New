@@ -6,9 +6,10 @@ class FastBoard extends Board:
 
 class CascadeRefill extends RefillSystem:
 	var waves := 0
+	var extra_waves := 3
 	func refill(board, animate: bool = false) -> Array:
 		var movements := super.refill(board, animate)
-		if waves < 3:
+		if waves < extra_waves:
 			for x in 3:
 				board.remove_tile(Vector2i(x,0))
 				board.set_tile(Vector2i(x,0), board._tile_factory.create_tile_at(Constants.TileType.CLOCK, Vector2i(x,0)), false)
@@ -144,7 +145,7 @@ func run() -> void:
 	await board._cascade_processor.process_animated(board)
 	check(board._match_waves >= 4, "four real cascade waves are recorded")
 	await board._finish_character_turn()
-	check(earned.count("FOUR-WAVE CASCADE") == 1, "a real four-wave cascade earns exactly one cascade reward")
+	check(earned.is_empty(), "automatic cascades cannot earn Ethan progress")
 	check(not board.get_all_tiles().any(func(tile): return int(tile.get_tile_type()) == Constants.TileType.ETHAN), "cascade reward never places Ethan automatically")
 	board.queue_free()
 	await get_tree().process_frame
@@ -157,7 +158,7 @@ func run() -> void:
 	board.ethan_earned.connect(func(_reason): arrivals.append("ethan"))
 	board._match_waves = 4
 	await board._finish_character_turn()
-	check(arrivals.count("ethan") == 1, "four waves earn one Ethan")
+	check(arrivals.count("ethan") == 0, "four waves do not qualify for Ethan")
 	board._match_waves = 0
 	board._remaining_moves = 11
 	await board._finish_character_turn()
@@ -322,85 +323,40 @@ func check_smart_ethan() -> void:
 
 
 func check_rare_ethan_rewards() -> void:
-	for pair in [["rocket","rocket"],["bomb","rocket"],["thunder","bomb"],["thunder","thunder"]]:
-		var board := fixture(24)
-		var rewards: Array = []
-		board.ethan_earned.connect(func(reason): rewards.append(reason))
-		for index in 2:
-			var tile: Tile = board.get_tile(Vector2i(2 + index,2))
-			tile.set_powerup(Constants.PowerupType.get(str(pair[index]).to_upper()))
-			tile.set_meta("powerup_kind",pair[index])
-		check(board.swap_tiles(Vector2i(2,2),Vector2i(3,2)), "board special combo is legal: " + str(pair))
-		await settle(board)
-		check(rewards.count("SPECIAL COMBO") == 1, "two board specials earn one combo reward: " + str(pair))
-		board.queue_free()
-		await get_tree().process_frame
-	# These start stable and prove the feats are reachable through real legal swaps.
-	var swaps := [
-		{"name":"five", "cells":[Vector2i(0,2),Vector2i(1,2),Vector2i(3,2),Vector2i(4,2)], "reason":"FIVE IN A ROW"},
-		{"name":"L", "cells":[Vector2i(3,2),Vector2i(4,2),Vector2i(2,3),Vector2i(2,4)], "reason":"L / T / CROSS MATCH"},
-		{"name":"T", "cells":[Vector2i(1,2),Vector2i(3,2),Vector2i(2,3),Vector2i(2,4)], "reason":"L / T / CROSS MATCH"},
-	]
-	for scenario in swaps:
-		var board := fixture(24)
-		for cell in scenario.cells: put(board, cell, Constants.TileType.CLOCK)
-		put(board, Vector2i(2,1), Constants.TileType.CLOCK)
-		var earned: Array = []
-		board.ethan_earned.connect(func(reason): earned.append(reason))
-		check(not board.get_match_finder().has_matches(board), "rare swap starts stable: " + scenario.name)
-		check(board.swap_tiles(Vector2i(2,1),Vector2i(2,2)), "rare swap is legal: " + scenario.name)
-		await settle(board)
-		check(earned.count(scenario.reason) == 1, "real swap awards rare feat once: " + scenario.name)
-		board.queue_free()
-		await get_tree().process_frame
-	var double_board := fixture(24)
-	for cell in [Vector2i(2,2),Vector2i(3,1),Vector2i(3,3)]: put(double_board,cell,Constants.TileType.CLOCK)
-	for cell in [Vector2i(3,2),Vector2i(2,1),Vector2i(2,3)]: put(double_board,cell,Constants.TileType.FINGERPRINT)
-	var double_rewards: Array = []
-	double_board.ethan_earned.connect(func(reason): double_rewards.append(reason))
-	check(not double_board.get_match_finder().has_matches(double_board), "double swap starts stable")
-	check(double_board.swap_tiles(Vector2i(2,2),Vector2i(3,2)), "two different clues can form a double match in one swap")
-	await settle(double_board)
-	check(double_rewards.count("DOUBLE MATCH") == 1, "real double swap awards one Ethan")
-	double_board.queue_free()
-	await get_tree().process_frame
-	var cases := [
-		{"name":"five horizontal", "cells":[Vector2i(0,0),Vector2i(1,0),Vector2i(2,0),Vector2i(3,0),Vector2i(4,0)], "rewards":["FIVE IN A ROW"]},
-		{"name":"six vertical", "cells":[Vector2i(0,0),Vector2i(0,1),Vector2i(0,2),Vector2i(0,3),Vector2i(0,4),Vector2i(0,5)], "rewards":["FIVE IN A ROW"]},
-		{"name":"L", "cells":[Vector2i(0,0),Vector2i(1,0),Vector2i(2,0),Vector2i(0,1),Vector2i(0,2)], "rewards":["L / T / CROSS MATCH"]},
-		{"name":"T", "cells":[Vector2i(0,0),Vector2i(1,0),Vector2i(2,0),Vector2i(1,1),Vector2i(1,2)], "rewards":["L / T / CROSS MATCH"]},
-		{"name":"cross", "cells":[Vector2i(0,1),Vector2i(1,1),Vector2i(2,1),Vector2i(1,0),Vector2i(1,2)], "rewards":["L / T / CROSS MATCH"]},
-		{"name":"double", "cells":[Vector2i(0,0),Vector2i(1,0),Vector2i(2,0),Vector2i(3,3),Vector2i(4,3),Vector2i(5,3)], "rewards":["DOUBLE MATCH"]},
-		{"name":"stacked feats", "cells":[Vector2i(0,0),Vector2i(1,0),Vector2i(2,0),Vector2i(3,0),Vector2i(4,0),Vector2i(0,1),Vector2i(0,2)], "rewards":["FIVE IN A ROW","L / T / CROSS MATCH"]},
-		{"name":"ordinary four", "cells":[Vector2i(0,0),Vector2i(1,0),Vector2i(2,0),Vector2i(3,0)], "rewards":[]},
-	]
-	for scenario in cases:
-		var board := fixture(24)
-		for cell in scenario.cells: put(board, cell, Constants.TileType.CLOCK)
-		var earned: Array = []
-		board.ethan_earned.connect(func(reason): earned.append(reason))
-		var matches := board.get_match_finder().find_all_matches(board)
-		board.record_ethan_matches(matches)
-		board.record_ethan_matches(matches)
-		await board._finish_character_turn()
-		check(earned.size() == scenario.rewards.size(), "rare feat count and duplicate protection: " + scenario.name)
-		for reason in scenario.rewards: check(earned.has(reason), "rare feat identified: " + scenario.name)
-		await board._finish_character_turn()
-		check(earned.size() == scenario.rewards.size(), "resolved feat cannot pay twice: " + scenario.name)
-		board.queue_free()
-		await get_tree().process_frame
 	var board := fixture(24)
-	for x in 5: put(board, Vector2i(x,0), Constants.TileType.CLOCK)
-	put(board, Vector2i(2,0), Constants.TileType.ETHAN)
 	var earned: Array = []
 	board.ethan_earned.connect(func(reason): earned.append(reason))
-	board.record_ethan_matches(board.get_match_finder().find_all_matches(board))
-	board._match_waves = 3
+	for waves in [0, 4, 7]:
+		board._match_waves = waves
+		await board._finish_character_turn(true)
+		check(earned.is_empty(), "fewer than eight waves cannot earn a gift")
+	for waves in [8, 9, 16]:
+		var before := earned.size()
+		board._match_waves = waves
+		await board._finish_character_turn(true)
+		check(earned.size() == before + 1, "one qualifying swap earns exactly one gift even beyond eight waves")
+		await board._finish_character_turn(true)
+		check(earned.size() == before + 1, "finishing the same swap again cannot duplicate its gift")
+	board._match_waves = 12
 	await board._finish_character_turn()
-	check(earned.is_empty(), "wildcard-assisted five and three waves do not earn rare rewards")
-	board._match_waves = 4
-	await board._finish_character_turn()
-	check(earned == ["FOUR-WAVE CASCADE"], "four waves earn one saved Ethan")
+	check(earned.size() == 3, "setup and tray booster cascades cannot award gifts")
+	board.queue_free()
+	await get_tree().process_frame
+	# A real legal swap followed by controlled refill exercises the production path.
+	board = fixture(24)
+	var refill := CascadeRefill.new()
+	refill.extra_waves = 7
+	refill.initialize(board._board_generator)
+	board.add_child(refill)
+	board._cascade_processor._refill_system = refill
+	for cell in [Vector2i(0,0), Vector2i(1,0), Vector2i(2,1)]: put(board, cell, Constants.TileType.CLOCK)
+	var real_rewards: Array = []
+	board.ethan_earned.connect(func(reason): real_rewards.append(reason))
+	check(not board.get_match_finder().has_matches(board), "cascade fixture starts without free matches")
+	check(board.swap_tiles(Vector2i(2,1), Vector2i(2,0)), "cascade begins with a legal player swap")
+	await settle(board)
+	check(real_rewards == ["EIGHT-WAVE CASCADE"], "real eight-wave player cascade earns one gift")
+	check(not board.get_all_tiles().any(func(tile): return int(tile.get_tile_type()) == Constants.TileType.ETHAN), "earning a gift never places Ethan on the board")
 	board.queue_free()
 	await get_tree().process_frame
 
@@ -444,17 +400,24 @@ func check_ethan_tray_button() -> void:
 	check(game._settled_turn_reward_notices().has("ETHAN IS HERE | Wildcard: Ethan + two matching tiles"), "arrival notice remains when Ethan is still on the board")
 	game._turn_reward_notices.clear()
 	game._economy_manager.set_ethan_count(0)
+	game._current_level_id = 24
 	board._level_data.level_id = 24
-	board._match_waves = 4
+	board._match_waves = 8
 	var tiles_before := board.get_all_tiles().duplicate()
 	var moves_before := board.get_remaining_moves()
-	await board._finish_character_turn()
+	await board._finish_character_turn(true)
 	check(game._economy_manager.get_ethan_count() == 1 and game._booster_inventory.ethan == 1, "earned Ethan updates persistent inventory and tray")
 	check(board.get_all_tiles() == tiles_before and board.get_remaining_moves() == moves_before, "earning Ethan preserves the board and waits for player use even with Ethan already present")
-	check(game._turn_reward_notices.has("FOUR-WAVE CASCADE | ETHAN +1 IN TRAY"), "earned Ethan notice explains he is saved in the tray")
+	check(game._turn_reward_notices.has("INCREDIBLE CASCADE | ETHAN +1 IN TRAY"), "earned Ethan notice explains he is saved in the tray")
 	game._economy_manager.set_ethan_count(99)
-	game._turn_reward_notices.clear()
-	game._on_ethan_earned("FIVE IN A ROW")
-	check(game._economy_manager.get_ethan_count() == 100 and game._turn_reward_notices.has("FIVE IN A ROW | ETHAN +1 IN TRAY"), "earned rewards keep accumulating beyond the old tray cap")
+	for reason in ["FIVE IN A ROW", "SPECIAL COMBO", "FOUR-WAVE CASCADE"]: game._on_ethan_earned(reason)
+	check(game._economy_manager.get_ethan_count() == 99, "old common achievements cannot award gifts")
+	for i in range(3): game._on_ethan_earned("EIGHT-WAVE CASCADE")
+	check(game._economy_manager.get_ethan_count() == 102, "further qualifying swaps earn more with no inventory or level cap")
+	for i in range(60): game._on_tiles_matched([Constants.TileType.DETECTIVE])
+	check(game._economy_manager.get_ethan_count() == 102, "ordinary character tiles cannot farm gifts")
+	game._suppress_character_rewards_this_turn = true
+	game._on_ethan_earned("EIGHT-WAVE CASCADE")
+	check(game._economy_manager.get_ethan_count() == 102, "scripted clears cannot award gifts")
 	game.queue_free()
 	await get_tree().process_frame

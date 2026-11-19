@@ -23,7 +23,12 @@
 extends EditorExportPlugin
 
 const PLUGIN_NAME := "ads"
-var _dependency_library := ["com.google.android.gms:play-services-ads:24.9.0"]
+var _dependency_library := [
+	"com.google.android.gms:play-services-ads:24.9.0",
+	# Google's tested pair for GMA 24.9.0; explicit SDK needed by the privacy bridge.
+	"com.unity3d.ads:unity-ads:4.16.6",
+	"com.google.ads.mediation:unity:4.16.6.0",
+]
 
 func _supports_platform(platform: EditorExportPlatform) -> bool:
 	return platform is EditorExportPlatformAndroid

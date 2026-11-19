@@ -11,6 +11,8 @@
 
 # The installed AdMob AARs have empty consumer rules. Preserve their callbacks.
 -keep class com.poingstudios.godot.admob.** { *; }
+# AdMob instantiates mediation adapters by their class names from the server.
+-keep class com.google.ads.mediation.unity.** { *; }
 # Billing classes and callbacks are reached via the Godot bridge.
 -keep class org.godotengine.plugin.googleplaybilling.** { *; }
 -keep class com.savethebaby.** { *; }

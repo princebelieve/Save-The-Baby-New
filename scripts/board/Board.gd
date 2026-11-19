@@ -19,7 +19,6 @@ signal character_arrived(kind: String)
 signal ethan_earned(reason: String)
 signal ethan_matched(extra_moves: int)
 var _match_waves := 0
-var _ethan_feats: Dictionary = {}
 var _victor_arrived := false
 var _special_hit_wave := false
 
@@ -75,7 +74,6 @@ func initialize(level_data: Dictionary) -> bool:
 	_tap_selection = null
 	_remaining_moves = int(_level_data.get("moves", {}).get("total", 0))
 	_match_waves = 0
-	_ethan_feats.clear()
 	_victor_arrived = false
 	_special_hit_wave = false
 	_grid.clear()
@@ -402,7 +400,7 @@ func _animate_swap_then_resolve(tile_a: Tile, tile_b: Tile, special_tile: Tile =
 		await _resolve_special_powerup(special_tile, partner)
 	else:
 		await _cascade_processor.process_animated(self)
-	await _finish_character_turn()
+	await _finish_character_turn(true)
 	_locked = false
 	turn_resolved.emit()
 	if _board_shuffler != null and _board_shuffler.needs_shuffle(self):
@@ -820,8 +818,6 @@ func _resolve_special_powerup(powerup_tile: Tile, partner: Tile) -> void:
 	var target_type := int(partner.get_tile_type())
 	var origin := powerup_tile.get_grid_position()
 	var partner_kind := str(partner.get_meta("powerup_kind", "")) if partner.has_powerup() else ""
-	if not partner_kind.is_empty():
-		_ethan_feats["SPECIAL COMBO"] = true
 	var is_rocket_combo := kind == "rocket" and partner_kind == "rocket"
 	if not is_rocket_combo:
 		powerup_blast.emit(kind, origin)
@@ -856,7 +852,6 @@ func _resolve_special_powerup(powerup_tile: Tile, partner: Tile) -> void:
 	# Snapshot natural matches BEFORE the blast removes tiles and gravity breaks them.
 	var matches := _match_finder.find_all_matches(self)
 	if not matches.is_empty(): _match_waves += 1
-	record_ethan_matches(matches)
 	tag_wildcard_matches(matches)
 	for found in matches:
 		targets.append_array(found.get_tiles())
@@ -1043,35 +1038,13 @@ func tag_wildcard_matches(matches: Array) -> void:
 				piece.set_meta("wildcard_type", matched_kind)
 
 
-func record_ethan_matches(matches: Array) -> void:
-	# Inspect natural lines before powerups expand the clear or alter the pieces.
-	var lines: Array = []
-	for found in matches:
-		var pieces: Array = found.get_tiles()
-		if pieces.any(func(tile): return int(tile.get_tile_type()) in [Constants.TileType.ETHAN, Constants.TileType.VICTOR]):
-			continue
-		lines.append(pieces)
-		if pieces.size() >= 5:
-			_ethan_feats["FIVE IN A ROW"] = true
-	for first in range(lines.size()):
-		for second in range(first + 1, lines.size()):
-			var intersects := false
-			for piece in lines[first]:
-				if lines[second].has(piece):
-					intersects = true
-					break
-			_ethan_feats["L / T / CROSS MATCH" if intersects else "DOUBLE MATCH"] = true
-
-
-func _finish_character_turn() -> void:
+func _finish_character_turn(player_swap := false) -> void:
 	var rules: Dictionary = ConfigLoader.load_config(Constants.ConfigPaths.ECONOMY).get("board_characters", {})
 	if int(_level_data.get("level_id", 1)) < int(rules.get("first_level", 24)):
 		return
-	if _match_waves >= int(rules.get("ethan_cascade_waves", 4)):
-		_ethan_feats["FOUR-WAVE CASCADE"] = true
-	for reason in _ethan_feats:
-		ethan_earned.emit(reason)
-	_ethan_feats.clear()
+	# Count the initial match plus its automatic cascade waves, once per swap.
+	if player_swap and _match_waves >= int(rules.get("ethan_cascade_waves", 8)):
+		ethan_earned.emit("EIGHT-WAVE CASCADE")
 	_match_waves = 0
 	var total := int(_level_data.get("moves", {}).get("total", 0))
 	if not _victor_arrived and _remaining_moves > 0 and total > 0 and total - _remaining_moves >= ceili(total * float(rules.get("victor_move_fraction", 0.75))):

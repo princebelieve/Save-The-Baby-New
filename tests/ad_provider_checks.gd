@@ -9,6 +9,9 @@ class FakeAd extends RefCounted:
 	var full_screen_content_callback: FullScreenContentCallback
 	var reward_listener: OnUserEarnedRewardListener
 	var destroyed := false
+	var response_info: ResponseInfo
+	func get_response_info() -> ResponseInfo:
+		return response_info
 	func show(listener = null) -> void:
 		reward_listener = listener
 	func destroy() -> void:
@@ -43,12 +46,21 @@ func _run() -> void:
 	var original_mute := AudioServer.is_bus_mute(0)
 	AudioServer.set_bus_mute(0, false)
 	var ad := FakeAd.new()
+	ad.response_info = ResponseInfo.new(null, [], {"private_extra": "omit"}, "test_adapter", "test_response")
+	var details := provider._describe_ad_response("rewarded", ad)
+	assert(details.response_id == "test_response" and details.adapter == "test_adapter")
+	assert(not details.has("response_extras") and not details.has("ad_unit_mapping"))
 	provider._ads["rewarded"] = ad
 	provider._loaded_at["rewarded"] = Time.get_ticks_msec()
 	assert(provider.is_ad_ready("rewarded"))
 	provider.show_ad("rewarded", "test", func(): rewards += 1, func(): closes += 1)
 	assert(get_tree().paused and AudioServer.is_bus_mute(0))
 	assert(not provider.is_ad_ready("rewarded"))
+	ad.full_screen_content_callback.on_ad_showed_full_screen_content.call()
+	assert(provider._presentation_elapsed_ms() >= 0)
+	var stale_shown := ad.full_screen_content_callback.on_ad_showed_full_screen_content
+	var stale_reward := ad.reward_listener.on_user_earned_reward
+	var stale_close := ad.full_screen_content_callback.on_ad_dismissed_full_screen_content
 	ad.full_screen_content_callback.on_ad_dismissed_full_screen_content.call()
 	assert(rewards == 0 and closes == 1)
 	assert(not get_tree().paused and not AudioServer.is_bus_mute(0) and ad.destroyed)
@@ -58,7 +70,14 @@ func _run() -> void:
 	get_tree().paused = true
 	AudioServer.set_bus_mute(0, true)
 	provider.show_ad("rewarded", "test", func(): rewards += 1, func(): closes += 1)
+	stale_shown.call()
+	assert(provider._shown_at_ms == -1)
+	stale_reward.call(null)
+	stale_close.call()
+	assert(rewards == 0 and closes == 1 and provider._showing)
+	ad.full_screen_content_callback.on_ad_showed_full_screen_content.call()
 	ad.reward_listener.on_user_earned_reward.call(null)
+	assert(provider._reward_was_earned)
 	ad.reward_listener.on_user_earned_reward.call(null)
 	ad.full_screen_content_callback.on_ad_dismissed_full_screen_content.call()
 	assert(rewards == 1 and closes == 2)

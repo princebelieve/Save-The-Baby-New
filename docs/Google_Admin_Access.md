@@ -41,3 +41,7 @@ The helper uses an expiring loopback callback bound only to 127.0.0.1, random st
 The owner completed consent, and both `admob-status` and `admob-audit` succeeded on 12 November 2026. Save The Baby is approved and correctly linked, with both configured ad units present. See `docs/testing/AdMob_Audit_2026-11-12.md` for findings and remaining dashboard checks. Run `node server/scripts/google-admin-access.js admob-audit` to refresh the app inventory and 30-day activity report.
 
 References: [Play setup](https://developers.google.com/android-publisher/getting_started), [AdMob OAuth setup](https://developers.google.com/admob/api/v1/auth), [desktop OAuth and PKCE](https://developers.google.com/identity/protocols/oauth2/native-app).
+
+## Verified again on 19 November 2026
+
+Existing owner authorization remains usable: admob-audit succeeded without reconnecting. It reads inventory, request/match/impression counts, estimated earnings and a separate served-creative AD_TYPE report. See docs/testing/AdMob_Audit_2026-11-19.md. High-engagement ads and rewarded Ad pods are not exposed in the public AdUnit API response; API read permission cannot inspect those dashboard switches. No account configuration changed.
