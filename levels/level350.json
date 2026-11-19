@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Critical Case: Close this investigation and hear what the original studio recording changes for the family.",
+  "description": "Lami gives corroborating evidence and remains available.",
   "difficulty": "CRITICAL_CASE",
   "level_id": 350,
   "metadata": {
     "chapter_end_level": 350,
     "chapter_id": 36,
     "chapter_start_level": 341,
-    "chapter_title": "An Unbroken Original",
+    "chapter_title": "The First Accomplice",
     "generator_version": 2,
     "map_background": "factory_map_section_cutout.png",
     "map_landmark": "police_car_topdown_cutout.png",
@@ -36,13 +36,32 @@
     "recommended_booster": "thunder",
     "scout_supply": false,
     "season": 3,
-    "season_title": "A Web of Mirrors",
-    "episode_id": 30
+    "season_title": "The Woman Who Waited",
+    "episode_id": 30,
+    "balance_revision": 1,
+    "balance_base_moves": 30,
+    "balance_reinforced_cells": [
+      {
+        "x": 1,
+        "y": 5,
+        "health": 1
+      },
+      {
+        "x": 5,
+        "y": 5,
+        "health": 1
+      },
+      {
+        "x": 4,
+        "y": 6,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 30
+    "total": 27
   },
-  "name": "An Unbroken Original 10",
+  "name": "The First Accomplice 10",
   "objectives": [
     {
       "amount": 30,
@@ -53,20 +72,20 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 1,
         "y": 5,
         "inventory_only": false
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 5,
         "y": 5
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "chain",
         "x": 4,
         "y": 6
@@ -122,12 +141,8 @@
     "after_level": "serial030_outro",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the original studio recording. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the original studio recording. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the original studio recording. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the original studio recording without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into the first accomplice advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

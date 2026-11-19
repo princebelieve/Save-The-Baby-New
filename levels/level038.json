@@ -1,180 +1,189 @@
 {
-    "story": {
-        "return_to_map": true,
-        "after_level": "",
-        "before_level": "",
-        "first_clear": ""
-    },
-    "metadata": {
-        "chapter_end_level": 40,
-        "map_landmark": "bush_topdown_variant_cutout.png",
-        "version": 1,
-        "notes": "Academy progression: teach before availability, then practice and mastery.",
-        "author": "Save The Baby",
-        "chapter_title": "Forest Path",
-        "map_background": "river_waterfall_map_tile_cutout.png",
-        "chapter_start_level": 31,
-        "chapter_id": 5,
-        "map_props": [
-            "bush_topdown_variant_cutout.png",
-            "tree_bush_topdown_cutout.png"
-        ],
-        "balance_version": 2
-    },
-    "board": {
-        "columns": 8,
-        "spawn_points": [],
-        "tile_size": 64,
-        "locked_cells": [],
-        "blocked_cells": [
-            [
-                0,
-                0
-            ],
-            [
-                1,
-                0
-            ],
-            [
-                6,
-                7
-            ],
-            [
-                7,
-                7
-            ],
-            [
-                0,
-                7
-            ],
-            [
-                1,
-                7
-            ],
-            [
-                6,
-                0
-            ],
-            [
-                7,
-                0
-            ]
-        ],
-        "rows": 8
-    },
-    "powerups": {
-        "enabled": true,
-        "available": [
-            "ROCKET",
-            "BOMB",
-            "THUNDER"
-        ]
-    },
-    "tile_pool": {
-        "tiles": [
-            "key",
-            "phone",
-            "fingerprint",
-            "recorder",
-            "clock",
-            "ethan",
-            "detective",
-            "victor"
-        ],
-        "weights": [
-            18,
-            18,
-            18,
-            18,
-            18,
-            1,
-            1,
-            1
-        ]
-    },
-    "difficulty": "STANDARD",
-    "objectives": [
-        {
-            "type": "COLLECT_ITEMS",
-            "target": "PHONE",
-            "amount": 30
-        }
+  "story": {
+    "return_to_map": true,
+    "after_level": "",
+    "before_level": "",
+    "first_clear": ""
+  },
+  "metadata": {
+    "chapter_end_level": 40,
+    "map_landmark": "bush_topdown_variant_cutout.png",
+    "version": 1,
+    "notes": "Academy progression: teach before availability, then practice and mastery.",
+    "author": "Save The Baby",
+    "chapter_title": "Forest Path",
+    "map_background": "river_waterfall_map_tile_cutout.png",
+    "chapter_start_level": 31,
+    "chapter_id": 5,
+    "map_props": [
+      "bush_topdown_variant_cutout.png",
+      "tree_bush_topdown_cutout.png"
     ],
-    "audio": {
-        "music": "",
-        "victory": "",
-        "game_over": ""
-    },
-    "level_id": 38,
-    "settings": {
-        "allow_shuffle": true,
-        "allow_boosters": true,
-        "time_limit": 0,
-        "available_boosters": [
-            "rocket",
-            "bomb",
-            "thunder",
-            "ethan"
-        ]
-    },
-    "description": "Follow David's trail through Forest Path and gather the evidence that can lead to Ethan.",
-    "tutorial": {
-        "enabled": false,
-        "steps": []
-    },
-    "obstacles": {
-        "items": [
-            {
-                "x": 1,
-                "y": 4,
-                "type": "missile",
-                "health": 1
-            },
-            {
-                "x": 6,
-                "y": 3,
-                "type": "electric_trap",
-                "health": 1
-            },
-            {
-                "x": 2,
-                "y": 2,
-                "type": "chain",
-                "health": 1
-            },
-            {
-                "x": 5,
-                "y": 5,
-                "type": "lock",
-                "health": 1
-            },
-            {
-                "x": 2,
-                "y": 5,
-                "type": "missile",
-                "health": 1
-            },
-            {
-                "x": 5,
-                "y": 2,
-                "type": "electric_trap",
-                "health": 1
-            }
-        ]
-    },
-    "background": {
-        "parallax": false,
-        "image": "res://assets/sprites/backgrounds/dirt_board_background.jpeg"
-    },
-    "moves": {
-        "total": 32
-    },
-    "rewards": {
-        "powerups": [],
-        "perfect_bonus": 20,
-        "coins": 45,
-        "stars": 3,
-        "first_try_bonus": 10
-    },
-    "name": "The Missing Radio"
+    "balance_version": 2,
+    "balance_revision": 1,
+    "balance_base_moves": 32,
+    "balance_reinforced_cells": [
+      {
+        "x": 1,
+        "y": 4,
+        "health": 1
+      }
+    ]
+  },
+  "board": {
+    "columns": 8,
+    "spawn_points": [],
+    "tile_size": 64,
+    "locked_cells": [],
+    "blocked_cells": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        6,
+        7
+      ],
+      [
+        7,
+        7
+      ],
+      [
+        0,
+        7
+      ],
+      [
+        1,
+        7
+      ],
+      [
+        6,
+        0
+      ],
+      [
+        7,
+        0
+      ]
+    ],
+    "rows": 8
+  },
+  "powerups": {
+    "enabled": true,
+    "available": [
+      "ROCKET",
+      "BOMB",
+      "THUNDER"
+    ]
+  },
+  "tile_pool": {
+    "tiles": [
+      "key",
+      "phone",
+      "fingerprint",
+      "recorder",
+      "clock",
+      "ethan",
+      "detective",
+      "victor"
+    ],
+    "weights": [
+      18,
+      18,
+      18,
+      18,
+      18,
+      1,
+      1,
+      1
+    ]
+  },
+  "difficulty": "STANDARD",
+  "objectives": [
+    {
+      "type": "COLLECT_ITEMS",
+      "target": "PHONE",
+      "amount": 30
+    }
+  ],
+  "audio": {
+    "music": "",
+    "victory": "",
+    "game_over": ""
+  },
+  "level_id": 38,
+  "settings": {
+    "allow_shuffle": true,
+    "allow_boosters": true,
+    "time_limit": 0,
+    "available_boosters": [
+      "rocket",
+      "bomb",
+      "thunder",
+      "ethan"
+    ]
+  },
+  "description": "Follow David's trail through Forest Path and gather the evidence that can lead to Ethan.",
+  "tutorial": {
+    "enabled": false,
+    "steps": []
+  },
+  "obstacles": {
+    "items": [
+      {
+        "x": 1,
+        "y": 4,
+        "type": "missile",
+        "health": 2
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "type": "electric_trap",
+        "health": 1
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "type": "chain",
+        "health": 1
+      },
+      {
+        "x": 5,
+        "y": 5,
+        "type": "lock",
+        "health": 1
+      },
+      {
+        "x": 2,
+        "y": 5,
+        "type": "missile",
+        "health": 1
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "type": "electric_trap",
+        "health": 1
+      }
+    ]
+  },
+  "background": {
+    "parallax": false,
+    "image": "res://assets/sprites/backgrounds/dirt_board_background.jpeg"
+  },
+  "moves": {
+    "total": 30
+  },
+  "rewards": {
+    "powerups": [],
+    "perfect_bonus": 20,
+    "coins": 45,
+    "stars": 3,
+    "first_try_bonus": 10
+  },
+  "name": "The Missing Radio"
 }

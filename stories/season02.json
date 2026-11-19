@@ -1,82 +1,47 @@
 {
   "story_id": "season02",
-  "title": "The False Signal",
-  "background_music": "suspense_opening",
+  "title": "A Debt That Never Existed",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/iron_gate_map_tile.jpeg",
   "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
   "characters": [
     "david",
     "amara",
     "victor",
-    "detective_morris",
-    "ethan"
+    "detective_morris"
   ],
   "scenes": [
     {
-      "scene_id": "season02_reveal",
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "Detective Morris",
-            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
-            "text": "Morris finds the station was searched minutes before they arrived."
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "David isolates a second signal moving beneath the village. Amara knows the old routes below those streets."
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "David discovers fresh fingerprints on the hatch, small enough to belong to a child."
-          }
-        ]
-      },
+      "scene_id": "season02",
+      "stage_direction": "Rain, interrupted sleep and a missing infant. Preserve the distinction between Amara's true sighting and the unexplained means of entry.",
       "dialogues": [
         {
           "speaker": "David",
           "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "I trace the message to a shuttered relay station. Three phones repeat the call with different timestamps. Amara recognizes the background sound; I check which recording came first."
+          "text": "When he says money, what does he mean?"
         },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "One recording contains Ethan humming the tune Amara used to calm him. The final note is cut off by a metallic slam."
+          "text": "Ethan's father left a portion of his wealth for him. Victor calls it his reward."
         },
         {
-          "speaker": "Victor",
-          "portrait": "res://assets/sprites/characters/victor_portrait_v2.png",
-          "text": "A new message arrives from Victor: \"Good. Now stop asking the wrong question.\""
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "For what?"
+        },
+        {
+          "speaker": "Amara",
+          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+          "text": "For being near me when something good happened. That is how he counts other people's lives."
+        },
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "We keep the call record and what you remember. We won't let his word become the name of a real debt."
         }
       ],
-      "choices": [
-        {
-          "id": "police",
-          "label": "Bring Morris to secure the relay",
-          "impact": "Morris can secure the relay station, though a formal search may make the caller move.",
-          "response": "Morris: I will keep the station covered while you check the recording.",
-          "speaker": "Detective Morris"
-        },
-        {
-          "id": "signal",
-          "label": "Decode the next lead with Amara",
-          "impact": "David checks the technical evidence. Amara connects it to the people and history behind the records, without police assistance.",
-          "response": "David preserves the original record and tests the next connection while Amara checks its meaning against what she remembers.",
-          "speaker": "David"
-        },
-        {
-          "id": "alone",
-          "label": "Enter through the service hatch",
-          "impact": "David can enter through the hatch before anyone clears the station, with no backup inside.",
-          "response": "David: I will check the hatch first. If it is a decoy, I will get out.",
-          "speaker": "David"
-        }
-      ]
+      "choices": []
     }
   ],
   "metadata": {
@@ -84,6 +49,8 @@
     "chapter": 2,
     "season": 1,
     "campaign_levels": "006-010",
-    "episode": "A continuing rescue mystery; the final clue opens the next episode."
+    "episode": "A continuing rescue mystery; the final clue opens the next episode.",
+    "authored_dialogue_revision": 1,
+    "ethan_status": "missing"
   }
 }

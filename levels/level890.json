@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Close this investigation and hear what the club visitor invitation changes for the family.",
+  "description": "The player separates Ethan's safety from the intermediary's liability.",
   "difficulty": "HARD",
   "level_id": 890,
   "metadata": {
     "chapter_end_level": 890,
     "chapter_id": 90,
     "chapter_start_level": 881,
-    "chapter_title": "The Visitor Invitation",
+    "chapter_title": "The Intermediary's Fear",
     "generator_version": 2,
     "map_background": "factory_map_section_cutout.png",
     "map_landmark": "police_car_topdown_cutout.png",
@@ -34,13 +34,32 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 7789813,
     "season": 9,
-    "season_title": "The Price of Glory",
-    "episode_id": 84
+    "season_title": "The House That Must Answer",
+    "episode_id": 84,
+    "balance_revision": 1,
+    "balance_base_moves": 30,
+    "balance_reinforced_cells": [
+      {
+        "x": 6,
+        "y": 1,
+        "health": 1
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "health": 1
+      },
+      {
+        "x": 6,
+        "y": 6,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 30
+    "total": 27
   },
-  "name": "The Visitor Invitation 10",
+  "name": "The Intermediary's Fear 10",
   "objectives": [
     {
       "amount": 30,
@@ -51,19 +70,19 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "tape",
         "x": 6,
         "y": 1
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 3,
         "y": 2
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "chain",
         "x": 6,
         "y": 6
@@ -119,12 +138,8 @@
     "after_level": "serial084_outro",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the club visitor invitation. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the club visitor invitation. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the club visitor invitation. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the club visitor invitation without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into the intermediary's fear advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

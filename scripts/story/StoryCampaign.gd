@@ -23,6 +23,10 @@ static func episode_for(level_id: int) -> Dictionary:
 	return episode
 
 static func apply_to_level(data: Dictionary) -> Dictionary:
+	# Revision 3 publishes authored narrative with the level. Never regenerate
+	# conversations or reveal later discoveries in the pre-level description.
+	if int(JsonLoader.load_file("res://configs/story_campaign.json").get("version", 1)) >= 3:
+		return data
 	var episode := episode_for(int(data.get("level_id",0)))
 	if episode.is_empty():
 		return data
@@ -56,7 +60,7 @@ static func resolve_choice(story_id: String, choice_id: String) -> Dictionary:
 			for choice in scene.get("choices",[]):
 				if str(choice.get("id","")) == choice_id:
 					return choice
-	return {"id":choice_id,"label":choice_id.capitalize(),"response":"This decision sets the approach for the next investigation."}
+	return {"id":choice_id,"label":choice_id.capitalize(),"speaker":"David","response":"This saved decision records the approach chosen at that point in the investigation."}
 
 static func compact_history(progress: ConfigFile) -> void:
 	var value: Variant = progress.get_value("story_choices","history",{})

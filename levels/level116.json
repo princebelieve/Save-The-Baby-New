@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "The collection carried bedding to a guesthouse with a private rear stair.",
+  "description": "An innocent worker is blamed for a trace.",
   "difficulty": "EASY",
   "level_id": 116,
   "metadata": {
     "chapter_end_level": 120,
     "chapter_id": 13,
     "chapter_start_level": 111,
-    "chapter_title": "Folded Linen",
+    "chapter_title": "The Wrong Footprints",
     "generator_version": 2,
     "map_background": "river_map_section_cutout.png",
     "map_landmark": "wooden_bridge_cutout.png",
@@ -34,13 +34,16 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 1660507,
     "season": 1,
-    "season_title": "The River Between Us",
-    "episode_id": 7
+    "season_title": "The Door That Never Opened",
+    "episode_id": 7,
+    "balance_revision": 1,
+    "balance_base_moves": 34,
+    "balance_reinforced_cells": []
   },
   "moves": {
-    "total": 34
+    "total": 33
   },
-  "name": "Folded Linen 06",
+  "name": "The Wrong Footprints 06",
   "objectives": [
     {
       "amount": 18,
@@ -95,12 +98,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the laundry collection tag. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the laundry collection tag. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the laundry collection tag. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the laundry collection tag without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into the wrong footprints advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

@@ -25,14 +25,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "The money is not his. I will not sign away Ethan's future to validate his story.",
+  "description": "The authenticated record is preserved.",
   "difficulty": "MEDIUM",
   "level_id": 244,
   "metadata": {
     "chapter_end_level": 250,
     "chapter_id": 26,
     "chapter_start_level": 241,
-    "chapter_title": "Control Refused",
+    "chapter_title": "Money Is Not a Father",
     "generator_version": 2,
     "map_background": "factory_map_section_cutout.png",
     "map_landmark": "police_car_topdown_cutout.png",
@@ -43,13 +43,27 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 2674139,
     "season": 2,
-    "season_title": "The Borrowed Fortune",
-    "episode_id": 20
+    "season_title": "The Fortune He Claimed",
+    "episode_id": 20,
+    "balance_revision": 1,
+    "balance_base_moves": 32,
+    "balance_reinforced_cells": [
+      {
+        "x": 1,
+        "y": 6,
+        "health": 1
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 32
+    "total": 30
   },
-  "name": "Control Refused 04",
+  "name": "Money Is Not a Father 04",
   "objectives": [
     {
       "amount": 24,
@@ -60,13 +74,13 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "chain",
         "x": 1,
         "y": 6
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "tape",
         "x": 2,
         "y": 1
@@ -116,12 +130,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the rejected account mandate. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the rejected account mandate. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the rejected account mandate. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the rejected account mandate without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into money is not a father advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

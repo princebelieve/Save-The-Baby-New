@@ -4,6 +4,14 @@ var calls := 0
 var failures := 0
 var checks := 0
 
+class UpdatingPurchases extends Node:
+	const PRODUCTS := {"coins_500": 500}
+	var products: Dictionary = {}
+	func available(product: String) -> bool:
+		return products.has(product)
+	func availability_message() -> String:
+		return "Loading prices..." if products.is_empty() else ""
+
 class SlowAccount extends Node:
 	signal finish
 	var user_id := "test"
@@ -46,6 +54,36 @@ func run() -> void:
 	finish.emit()
 	check(calls == 2, "closing screen during request is safe")
 	var synchronous := MobileGameUI.button(self, "Practice", Callable())
+	check(synchronous.mouse_filter == Control.MOUSE_FILTER_STOP, "ordinary buttons continue to block input to the board")
+	var scrolling := ScrollContainer.new()
+	var list := VBoxContainer.new()
+	scrolling.add_child(list)
+	add_child(scrolling)
+	var scroll_button := MobileGameUI.button(list, "Scroll over me", Callable())
+	check(scroll_button.mouse_filter == Control.MOUSE_FILTER_PASS, "swipes over scroll-list buttons reach the scroll container")
+	scroll_button.disabled = true
+	check(scroll_button.mouse_filter == Control.MOUSE_FILTER_PASS, "unavailable scroll-list buttons do not trap swipes")
+	scrolling.queue_free()
+	var purchase_panel := preload("res://scripts/online/AccountPanel.gd").new()
+	var updating := UpdatingPurchases.new()
+	add_child(updating)
+	purchase_panel.purchases = updating
+	add_child(purchase_panel)
+	purchase_panel._login_dialog = AcceptDialog.new()
+	add_child(purchase_panel._login_dialog)
+	var pack := Button.new()
+	purchase_panel._login_dialog.add_child(pack)
+	purchase_panel._purchase_status = Label.new()
+	purchase_panel._login_dialog.add_child(purchase_panel._purchase_status)
+	purchase_panel._coin_buttons = {"coins_500": pack}
+	purchase_panel._refresh_coin_buttons()
+	check(pack.disabled and pack.text.contains("Unavailable"), "missing product data cannot start a purchase")
+	updating.products = {"coins_500": {"formatted_price": "$1.00"}}
+	purchase_panel._refresh_coin_buttons()
+	check(not pack.disabled and pack.text == "500 COINS - $1.00", "late product response updates price and enables the existing button")
+	purchase_panel._login_dialog.queue_free()
+	purchase_panel.queue_free()
+	updating.queue_free()
 	synchronous.pressed.connect(func():
 		synchronous.text = "Complete practice first"
 		synchronous.disabled = true)

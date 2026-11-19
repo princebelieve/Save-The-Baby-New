@@ -1,91 +1,51 @@
 {
   "story_id": "serial088_outro",
-  "title": "The Transfer Truck | The next lead",
-  "background_music": "suspense_opening",
+  "title": "The Obstruction Named",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/factory_map_section.jpeg",
   "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
   "characters": [
     "david",
     "amara",
     "victor",
-    "ethan",
     "detective_morris"
   ],
   "scenes": [
     {
       "scene_id": "serial088_outro",
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "Detective Morris",
-            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
-            "text": "We will verify the delivery truck route sheet and keep its source intact. A lead is not a rescue; we cannot assume Victor stayed there.",
-            "routes": [
-              "police"
-            ]
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I will check the technical trail behind the delivery truck route sheet. Amara, tell me what the records cannot explain."
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I am following the delivery truck route sheet without police backup. Amara has my location; I am not going to turn this into a contest with Victor."
-          }
-        ]
-      },
+      "stage_direction": "The search becomes a confrontation with named decision-makers. Each signed record changes a concrete next step.",
       "dialogues": [
         {
           "speaker": "David",
           "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "The route was shortened to include an unscheduled service tunnel."
+          "text": "It is a contested instruction still being treated as active. Ethan has not vanished from their records."
         },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "The truck exits before we reach the tunnel. Its access pass records the next compound."
+          "text": "A person is deciding to leave it active."
+        },
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "We need to establish who can set it aside."
         }
       ],
-      "choices": [
-        {
-          "id": "police",
-          "label": "Coordinate the next lead with the police",
-          "impact": "Bring Morris into the next investigation and preserve the evidence behind the delivery truck route sheet.",
-          "response": "Morris takes the lead into the formal investigation. David checks the record while Amara explains its personal significance.",
-          "speaker": "Detective Morris"
-        },
-        {
-          "id": "signal",
-          "label": "Decode the next connection with Amara",
-          "impact": "David checks the technical trail from the delivery truck route sheet; Amara tests it against her own history.",
-          "response": "David saves the original record and checks its connections. Amara refuses to let Victor's version replace what she remembers.",
-          "speaker": "David"
-        },
-        {
-          "id": "alone",
-          "label": "Follow the next trail without police backup",
-          "impact": "David follows the physical lead from the delivery truck route sheet, keeping Amara informed.",
-          "response": "David sends Amara his location before moving. Finding Ethan matters more than claiming the search as his own achievement.",
-          "speaker": "David"
-        }
-      ]
+      "choices": []
     }
   ],
   "metadata": {
     "version": 2,
     "season": 9,
-    "season_title": "The Price of Glory",
+    "season_title": "The House That Must Answer",
     "episode": 8,
     "episode_id": 88,
     "campaign_levels": "921-930",
     "ethan_status": "missing",
     "season_finale": false,
-    "evidence_summary": "The route was shortened to include an unscheduled service tunnel. The truck exits before we reach the tunnel. Its access pass records the next compound."
+    "known_before": "episode_087_resolved",
+    "unlocks_fact": "episode_088_resolved",
+    "authored_dialogue_revision": 1,
+    "evidence_summary": "It is a contested instruction, not an unexplained disappearance."
   }
 }

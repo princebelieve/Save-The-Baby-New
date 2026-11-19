@@ -25,14 +25,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "The next lead is the roadside fuel transaction. We need its original source before Victor moves again.",
+  "description": "Amara disproves the fabricated assessment.",
   "difficulty": "EASY",
   "level_id": 871,
   "metadata": {
     "chapter_end_level": 880,
     "chapter_id": 89,
     "chapter_start_level": 871,
-    "chapter_title": "The Fuel Card",
+    "chapter_title": "The Mother's Name",
     "generator_version": 2,
     "map_background": "river_map_section_cutout.png",
     "map_landmark": "wooden_bridge_cutout.png",
@@ -43,13 +43,16 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 7639352,
     "season": 9,
-    "season_title": "The Price of Glory",
-    "episode_id": 83
+    "season_title": "The House That Must Answer",
+    "episode_id": 83,
+    "balance_revision": 1,
+    "balance_base_moves": 34,
+    "balance_reinforced_cells": []
   },
   "moves": {
-    "total": 34
+    "total": 33
   },
-  "name": "The Fuel Card 01",
+  "name": "The Mother's Name 01",
   "objectives": [
     {
       "amount": 18,
@@ -104,12 +107,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the roadside fuel transaction. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the roadside fuel transaction. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the roadside fuel transaction. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the roadside fuel transaction without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into the mother's name advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

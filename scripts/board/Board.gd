@@ -262,6 +262,25 @@ func is_playable_cell(position: Vector2i) -> bool:
 func is_swap_blocked(position: Vector2i) -> bool:
 	return not is_playable_cell(position) or _obstacles.has(position)
 
+func is_flow_cell(cell: Vector2i) -> bool:
+	if not is_playable_cell(cell): return false
+	var obstacle: Obstacle = _obstacles.get(cell)
+	# Tape is a coating; chains/locks anchor a captive tile, hazards occupy a cell.
+	return obstacle == null or int(obstacle.get_obstacle_type()) == int(Constants.ObstacleType.TAPE)
+
+func is_refill_source(cell: Vector2i) -> bool:
+	var sources: Array = _level_data.get("board", {}).get("spawn_points", [])
+	if sources.is_empty():
+		if not is_flow_cell(cell): return false
+		# A cut-out at the board's top exposes the first playable cell below it.
+		# An actual blocker above is never treated as an opening.
+		for y in range(cell.y):
+			if is_playable_cell(Vector2i(cell.x, y)): return false
+		return true
+	for source in sources:
+		if _read_board_cell(source) == cell: return is_flow_cell(cell)
+	return false
+
 
 func _read_board_cell(value: Variant) -> Vector2i:
 	if value is Vector2i:
@@ -699,6 +718,9 @@ func _load_obstacles() -> void:
 			continue
 		var obstacle_state := obstacle.get_obstacle_state()
 		obstacle_state.set_health(int(definition.get("health", _obstacle_database.get_health(obstacle_type))))
+		var solid := obstacle_id not in ["chain", "lock", "tape"]
+		obstacle.set_meta("solid", solid)
+		if solid: remove_tile(cell)
 		obstacle.z_index = 5
 		obstacle.position = _cell_center(cell)
 		add_child(obstacle)
@@ -970,9 +992,18 @@ func animate_falling_tiles(movements: Array) -> void:
 			if bool(movement.get("new", false)):
 				tile.scale = Vector2.ONE * 0.78
 				tween.tween_property(tile, "scale", Vector2.ONE, 0.36).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
-			tween.tween_property(tile, "position", movement["to"], 0.30).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
+			var path: Array = movement.get("path", [movement["from"], movement["to"]])
+			var duration := clampf(float(path.size() - 1) * 0.055, 0.12, 0.42)
+			tween.tween_method(_follow_fall_path.bind(tile, path), 0.0, 1.0, duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	await tween.finished
 	SignalBus.play_sfx.emit("tile_drop")
+
+
+func _follow_fall_path(progress: float, tile: Tile, path: Array) -> void:
+	if not is_instance_valid(tile) or path.size() < 2: return
+	var step := progress * (path.size() - 1)
+	var index := mini(int(step), path.size() - 2)
+	tile.position = Vector2(path[index]).lerp(Vector2(path[index + 1]), clampf(step - index, 0.0, 1.0))
 
 
 func get_all_tiles() -> Array:

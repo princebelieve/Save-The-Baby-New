@@ -25,14 +25,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "The night shift let a van through under a food delivery booking.",
+  "description": "A preserved message records mutual blame.",
   "difficulty": "EASY",
   "level_id": 676,
   "metadata": {
     "chapter_end_level": 680,
     "chapter_id": 69,
     "chapter_start_level": 671,
-    "chapter_title": "The Cold Lane",
+    "chapter_title": "The Call Between Them",
     "generator_version": 2,
     "map_background": "river_map_section_cutout.png",
     "map_landmark": "wooden_bridge_cutout.png",
@@ -43,13 +43,16 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 6095147,
     "season": 7,
-    "season_title": "The Night Routes",
-    "episode_id": 63
+    "season_title": "The Man Outside the Gate",
+    "episode_id": 63,
+    "balance_revision": 1,
+    "balance_base_moves": 34,
+    "balance_reinforced_cells": []
   },
   "moves": {
-    "total": 34
+    "total": 33
   },
-  "name": "The Cold Lane 06",
+  "name": "The Call Between Them 06",
   "objectives": [
     {
       "amount": 18,
@@ -104,12 +107,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the warehouse shift board. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the warehouse shift board. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the warehouse shift board. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the warehouse shift board without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into the call between them advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

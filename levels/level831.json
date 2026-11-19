@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "The next lead is the lodging floor plan. We need its original source before Victor moves again.",
+  "description": "Amara hears Adrian affirm his provision for Ethan.",
   "difficulty": "EASY",
   "level_id": 831,
   "metadata": {
     "chapter_end_level": 840,
     "chapter_id": 85,
     "chapter_start_level": 831,
-    "chapter_title": "Connecting Rooms",
+    "chapter_title": "His Own Voice",
     "generator_version": 2,
     "map_background": "river_map_section_cutout.png",
     "map_landmark": "wooden_bridge_cutout.png",
@@ -34,13 +34,16 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 7322592,
     "season": 8,
-    "season_title": "Names That Do Not Belong",
-    "episode_id": 79
+    "season_title": "The Night Adrian Died",
+    "episode_id": 79,
+    "balance_revision": 1,
+    "balance_base_moves": 34,
+    "balance_reinforced_cells": []
   },
   "moves": {
-    "total": 34
+    "total": 33
   },
-  "name": "Connecting Rooms 01",
+  "name": "His Own Voice 01",
   "objectives": [
     {
       "amount": 18,
@@ -95,12 +98,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the lodging floor plan. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the lodging floor plan. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the lodging floor plan. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the lodging floor plan without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into his own voice advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

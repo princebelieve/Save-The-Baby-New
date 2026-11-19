@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Trace the source of the duplicate key receipt before trusting Victor's account.",
+  "description": "Adrian's acknowledgement is recovered.",
   "difficulty": "MEDIUM",
   "level_id": 393,
   "metadata": {
     "chapter_end_level": 400,
     "chapter_id": 41,
     "chapter_start_level": 391,
-    "chapter_title": "The Duplicate Key",
+    "chapter_title": "The Name at Birth",
     "generator_version": 2,
     "map_background": "river_map_section_cutout.png",
     "map_landmark": "wooden_bridge_cutout.png",
@@ -34,13 +34,27 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 3854070,
     "season": 4,
-    "season_title": "What He Calls Love",
-    "episode_id": 35
+    "season_title": "The Heart He Couldn't Claim",
+    "episode_id": 35,
+    "balance_revision": 1,
+    "balance_base_moves": 32,
+    "balance_reinforced_cells": [
+      {
+        "x": 3,
+        "y": 3,
+        "health": 1
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 32
+    "total": 30
   },
-  "name": "The Duplicate Key 03",
+  "name": "The Name at Birth 03",
   "objectives": [
     {
       "amount": 24,
@@ -51,13 +65,13 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 3,
         "y": 3
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "chain",
         "x": 5,
         "y": 1
@@ -107,12 +121,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the duplicate key receipt. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the duplicate key receipt. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the duplicate key receipt. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the duplicate key receipt without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into the name at birth advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

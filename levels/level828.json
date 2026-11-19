@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Reconstruct the missing step around the private gate receipt.",
+  "description": "The original departure record is recovered.",
   "difficulty": "HARD",
   "level_id": 828,
   "metadata": {
     "chapter_end_level": 830,
     "chapter_id": 84,
     "chapter_start_level": 821,
-    "chapter_title": "The Gate Receipt",
+    "chapter_title": "The Unchanged Original",
     "generator_version": 2,
     "map_background": "factory_map_section_cutout.png",
     "map_landmark": "police_car_topdown_cutout.png",
@@ -34,13 +34,32 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 7298835,
     "season": 8,
-    "season_title": "Names That Do Not Belong",
-    "episode_id": 78
+    "season_title": "The Night Adrian Died",
+    "episode_id": 78,
+    "balance_revision": 1,
+    "balance_base_moves": 30,
+    "balance_reinforced_cells": [
+      {
+        "x": 1,
+        "y": 2,
+        "health": 1
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "health": 1
+      },
+      {
+        "x": 1,
+        "y": 5,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 30
+    "total": 27
   },
-  "name": "The Gate Receipt 08",
+  "name": "The Unchanged Original 08",
   "objectives": [
     {
       "amount": 30,
@@ -51,19 +70,19 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 1,
         "y": 2
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "chain",
         "x": 5,
         "y": 4
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "tape",
         "x": 1,
         "y": 5
@@ -119,12 +138,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the private gate receipt. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the private gate receipt. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the private gate receipt. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the private gate receipt without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into the unchanged original advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

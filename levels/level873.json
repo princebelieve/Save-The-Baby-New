@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Trace the source of the roadside fuel transaction before trusting Victor's account.",
+  "description": "Amara disproves the fabricated assessment.",
   "difficulty": "MEDIUM",
   "level_id": 873,
   "metadata": {
     "chapter_end_level": 880,
     "chapter_id": 89,
     "chapter_start_level": 871,
-    "chapter_title": "The Fuel Card",
+    "chapter_title": "The Mother's Name",
     "generator_version": 2,
     "map_background": "river_map_section_cutout.png",
     "map_landmark": "wooden_bridge_cutout.png",
@@ -34,13 +34,27 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 7655190,
     "season": 9,
-    "season_title": "The Price of Glory",
-    "episode_id": 83
+    "season_title": "The House That Must Answer",
+    "episode_id": 83,
+    "balance_revision": 1,
+    "balance_base_moves": 32,
+    "balance_reinforced_cells": [
+      {
+        "x": 6,
+        "y": 5,
+        "health": 1
+      },
+      {
+        "x": 2,
+        "y": 4,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 32
+    "total": 30
   },
-  "name": "The Fuel Card 03",
+  "name": "The Mother's Name 03",
   "objectives": [
     {
       "amount": 24,
@@ -51,13 +65,13 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 6,
         "y": 5
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "chain",
         "x": 2,
         "y": 4
@@ -107,12 +121,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the roadside fuel transaction. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the roadside fuel transaction. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the roadside fuel transaction. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the roadside fuel transaction without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into the mother's name advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

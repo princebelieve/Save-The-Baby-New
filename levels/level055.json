@@ -25,14 +25,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Compare the depot lift register with what the witnesses actually remember.",
+  "description": "Amara's name appears in the access log.",
   "difficulty": "HARD",
   "level_id": 55,
   "metadata": {
     "chapter_end_level": 60,
     "chapter_id": 7,
     "chapter_start_level": 51,
-    "chapter_title": "The Lift Register",
+    "chapter_title": "The Borrowed Credential",
     "generator_version": 2,
     "map_background": "river_map_section_cutout.png",
     "map_landmark": "wooden_bridge_cutout.png",
@@ -43,13 +43,22 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 1177448,
     "season": 1,
-    "season_title": "The River Between Us",
-    "episode_id": 1
+    "season_title": "The Door That Never Opened",
+    "episode_id": 1,
+    "balance_revision": 1,
+    "balance_base_moves": 32,
+    "balance_reinforced_cells": [
+      {
+        "x": 5,
+        "y": 4,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 32
+    "total": 30
   },
-  "name": "The Lift Register 05",
+  "name": "The Borrowed Credential 05",
   "objectives": [
     {
       "amount": 30,
@@ -60,7 +69,7 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "chain",
         "x": 5,
         "y": 4
@@ -128,12 +137,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the depot lift register. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the depot lift register. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the depot lift register. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the depot lift register without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into the borrowed credential advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

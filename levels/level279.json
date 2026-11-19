@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Give Amara a verified account of the printer spool entry, so she can choose the next step.",
+  "description": "A driver asks for protection before speaking.",
   "difficulty": "MEDIUM",
   "level_id": 279,
   "metadata": {
     "chapter_end_level": 280,
     "chapter_id": 29,
     "chapter_start_level": 271,
-    "chapter_title": "The Route Slip",
+    "chapter_title": "The Patient Driver",
     "generator_version": 2,
     "map_background": "river_map_section_cutout.png",
     "map_landmark": "wooden_bridge_cutout.png",
@@ -34,13 +34,27 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 2951304,
     "season": 3,
-    "season_title": "A Web of Mirrors",
-    "episode_id": 23
+    "season_title": "The Woman Who Waited",
+    "episode_id": 23,
+    "balance_revision": 1,
+    "balance_base_moves": 32,
+    "balance_reinforced_cells": [
+      {
+        "x": 2,
+        "y": 1,
+        "health": 1
+      },
+      {
+        "x": 4,
+        "y": 2,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 32
+    "total": 30
   },
-  "name": "The Route Slip 09",
+  "name": "The Patient Driver 09",
   "objectives": [
     {
       "amount": 24,
@@ -51,13 +65,13 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 2,
         "y": 1
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "chain",
         "x": 4,
         "y": 2
@@ -107,12 +121,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the printer spool entry. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the printer spool entry. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the printer spool entry. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the printer spool entry without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into the patient driver advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

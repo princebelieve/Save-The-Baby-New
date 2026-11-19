@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Close this investigation and hear what the landing bell recording changes for the family.",
+  "description": "David prepares the records while Amara prepares to speak.",
   "difficulty": "HARD",
   "level_id": 1010,
   "metadata": {
     "chapter_end_level": 1010,
     "chapter_id": 102,
     "chapter_start_level": 1001,
-    "chapter_title": "The Gate Bell",
+    "chapter_title": "Before the Review",
     "generator_version": 2,
     "map_background": "factory_map_section_cutout.png",
     "map_landmark": "police_car_topdown_cutout.png",
@@ -34,13 +34,32 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 8740093,
     "season": 10,
-    "season_title": "One Door Away",
-    "episode_id": 96
+    "season_title": "The Distance Between Two Voices",
+    "episode_id": 96,
+    "balance_revision": 1,
+    "balance_base_moves": 30,
+    "balance_reinforced_cells": [
+      {
+        "x": 5,
+        "y": 5,
+        "health": 1
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "health": 1
+      },
+      {
+        "x": 4,
+        "y": 6,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 30
+    "total": 27
   },
-  "name": "The Gate Bell 10",
+  "name": "Before the Review 10",
   "objectives": [
     {
       "amount": 30,
@@ -51,19 +70,19 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "tape",
         "x": 5,
         "y": 5
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 4,
         "y": 3
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "chain",
         "x": 4,
         "y": 6
@@ -119,12 +138,8 @@
     "after_level": "serial096_outro",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the landing bell recording. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the landing bell recording. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the landing bell recording. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the landing bell recording without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into before the review advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

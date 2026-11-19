@@ -1,128 +1,131 @@
 {
-    "story": {
-        "return_to_map": true,
-        "after_level": "",
-        "before_level": "chapter04",
-        "first_clear": ""
-    },
-    "metadata": {
-        "chapter_end_level": 30,
-        "map_landmark": "police_car_topdown_cutout.png",
-        "version": 1,
-        "notes": "Academy progression: teach before availability, then practice and mastery.",
-        "author": "Save The Baby",
-        "chapter_title": "Police Station",
-        "map_background": "riverbank_map_section_cutout.png",
-        "chapter_start_level": 23,
-        "chapter_id": 4,
-        "map_props": [
-            "police_car_topdown_cutout.png",
-            "wooden_fence_cutout.png"
-        ],
-        "balance_version": 2
-    },
-    "board": {
-        "columns": 8,
-        "spawn_points": [],
-        "tile_size": 64,
-        "locked_cells": [],
-        "blocked_cells": [],
-        "rows": 8
-    },
-    "powerups": {
-        "enabled": true,
-        "available": [
-            "ROCKET",
-            "BOMB",
-            "THUNDER"
-        ]
-    },
-    "tile_pool": {
-        "tiles": [
-            "key",
-            "phone",
-            "fingerprint",
-            "recorder",
-            "clock"
-        ],
-        "weights": [
-            20,
-            20,
-            20,
-            20,
-            20
-        ]
-    },
-    "difficulty": "STANDARD",
-    "objectives": [
-        {
-            "type": "COLLECT_ITEMS",
-            "target": "PHONE",
-            "amount": 34
-        }
+  "story": {
+    "return_to_map": true,
+    "after_level": "",
+    "before_level": "chapter04",
+    "first_clear": ""
+  },
+  "metadata": {
+    "chapter_end_level": 30,
+    "map_landmark": "police_car_topdown_cutout.png",
+    "version": 1,
+    "notes": "Academy progression: teach before availability, then practice and mastery.",
+    "author": "Save The Baby",
+    "chapter_title": "Police Station",
+    "map_background": "riverbank_map_section_cutout.png",
+    "chapter_start_level": 23,
+    "chapter_id": 4,
+    "map_props": [
+      "police_car_topdown_cutout.png",
+      "wooden_fence_cutout.png"
     ],
-    "audio": {
-        "music": "",
-        "victory": "",
-        "game_over": ""
-    },
-    "level_id": 23,
-    "settings": {
-        "allow_shuffle": true,
-        "allow_boosters": true,
-        "time_limit": 0,
-        "available_boosters": [
-            "rocket",
-            "bomb",
-            "thunder"
-        ]
-    },
-    "description": "Follow David's trail through Police Station and gather the evidence that can lead to Ethan.",
-    "tutorial": {
-        "enabled": false,
-        "steps": []
-    },
-    "obstacles": {
-        "items": [
-            {
-                "x": 6,
-                "y": 3,
-                "type": "electric_trap",
-                "health": 1
-            },
-            {
-                "x": 2,
-                "y": 2,
-                "type": "chain",
-                "health": 2
-            },
-            {
-                "x": 5,
-                "y": 5,
-                "type": "lock",
-                "health": 1
-            },
-            {
-                "x": 2,
-                "y": 5,
-                "type": "missile",
-                "health": 1
-            }
-        ]
-    },
-    "background": {
-        "parallax": false,
-        "image": "res://assets/sprites/backgrounds/grass_board_background.jpeg"
-    },
-    "moves": {
-        "total": 34
-    },
-    "rewards": {
-        "powerups": [],
-        "perfect_bonus": 20,
-        "coins": 30,
-        "stars": 3,
-        "first_try_bonus": 10
-    },
-    "name": "At the Station"
+    "balance_version": 2,
+    "balance_revision": 1,
+    "balance_base_moves": 34,
+    "balance_reinforced_cells": []
+  },
+  "board": {
+    "columns": 8,
+    "spawn_points": [],
+    "tile_size": 64,
+    "locked_cells": [],
+    "blocked_cells": [],
+    "rows": 8
+  },
+  "powerups": {
+    "enabled": true,
+    "available": [
+      "ROCKET",
+      "BOMB",
+      "THUNDER"
+    ]
+  },
+  "tile_pool": {
+    "tiles": [
+      "key",
+      "phone",
+      "fingerprint",
+      "recorder",
+      "clock"
+    ],
+    "weights": [
+      20,
+      20,
+      20,
+      20,
+      20
+    ]
+  },
+  "difficulty": "STANDARD",
+  "objectives": [
+    {
+      "type": "COLLECT_ITEMS",
+      "target": "PHONE",
+      "amount": 34
+    }
+  ],
+  "audio": {
+    "music": "",
+    "victory": "",
+    "game_over": ""
+  },
+  "level_id": 23,
+  "settings": {
+    "allow_shuffle": true,
+    "allow_boosters": true,
+    "time_limit": 0,
+    "available_boosters": [
+      "rocket",
+      "bomb",
+      "thunder"
+    ]
+  },
+  "description": "Follow David's trail through Police Station and gather the evidence that can lead to Ethan.",
+  "tutorial": {
+    "enabled": false,
+    "steps": []
+  },
+  "obstacles": {
+    "items": [
+      {
+        "x": 6,
+        "y": 3,
+        "type": "electric_trap",
+        "health": 1
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "type": "chain",
+        "health": 2
+      },
+      {
+        "x": 5,
+        "y": 5,
+        "type": "lock",
+        "health": 1
+      },
+      {
+        "x": 2,
+        "y": 5,
+        "type": "missile",
+        "health": 1
+      }
+    ]
+  },
+  "background": {
+    "parallax": false,
+    "image": "res://assets/sprites/backgrounds/grass_board_background.jpeg"
+  },
+  "moves": {
+    "total": 34
+  },
+  "rewards": {
+    "powerups": [],
+    "perfect_bonus": 20,
+    "coins": 30,
+    "stars": 3,
+    "first_try_bonus": 10
+  },
+  "name": "At the Station"
 }

@@ -25,14 +25,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "A passenger transferred to a small guest court rather than the booked destination.",
+  "description": "The warning's receipt is established.",
   "difficulty": "EASY",
   "level_id": 706,
   "metadata": {
     "chapter_end_level": 710,
     "chapter_id": 72,
     "chapter_start_level": 701,
-    "chapter_title": "The Collected Passenger",
+    "chapter_title": "A Warning Received",
     "generator_version": 2,
     "map_background": "factory_map_section_cutout.png",
     "map_landmark": "police_car_topdown_cutout.png",
@@ -43,13 +43,16 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 6332717,
     "season": 7,
-    "season_title": "The Night Routes",
-    "episode_id": 66
+    "season_title": "The Man Outside the Gate",
+    "episode_id": 66,
+    "balance_revision": 1,
+    "balance_base_moves": 34,
+    "balance_reinforced_cells": []
   },
   "moves": {
-    "total": 34
+    "total": 33
   },
-  "name": "The Collected Passenger 06",
+  "name": "A Warning Received 06",
   "objectives": [
     {
       "amount": 18,
@@ -104,12 +107,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the ride-share pickup record. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the ride-share pickup record. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the ride-share pickup record. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the ride-share pickup record without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into a warning received advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

@@ -1,55 +1,37 @@
 {
   "story_id": "serial061_intro",
-  "title": "After Closing",
-  "background_music": "suspense_opening",
+  "title": "He Has to Ask",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/riverbank_map_section.jpeg",
   "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
   "characters": [
     "david",
     "amara",
     "victor",
-    "ethan",
     "detective_morris"
   ],
   "scenes": [
     {
       "scene_id": "serial061_intro",
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "Detective Morris",
-            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
-            "text": "We will verify the market courier token and keep its source intact. A lead is not a rescue; we cannot assume Victor stayed there.",
-            "routes": [
-              "police"
-            ]
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I will check the technical trail behind the market courier token. Amara, tell me what the records cannot explain."
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I am following the market courier token without police backup. Amara has my location; I am not going to turn this into a contest with Victor."
-          }
-        ]
-      },
+      "stage_direction": "Victor's commands meet increasingly specific questions he cannot answer. His uncertainty must not be played as proof Ethan is safe.",
       "dialogues": [
+        {
+          "speaker": "Detective Morris",
+          "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
+          "text": "We will test Victor's access. Do not mistake his anger outside a gate for proof of what is inside it.",
+          "routes": [
+            "police"
+          ]
+        },
         {
           "speaker": "David",
           "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "The next lead is the market courier token. We need its original source before Victor moves again."
+          "text": "The witness heard Victor arguing at the entrance."
         },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "Ask what the porter saw, not whether the porter agrees with our theory."
+          "text": "Arguing with whom?"
         }
       ],
       "choices": []
@@ -58,11 +40,14 @@
   "metadata": {
     "version": 2,
     "season": 7,
-    "season_title": "The Night Routes",
+    "season_title": "The Man Outside the Gate",
     "episode": 1,
     "episode_id": 61,
     "campaign_levels": "651-660",
     "ethan_status": "missing",
-    "season_finale": false
+    "season_finale": false,
+    "known_before": "episode_060_resolved",
+    "unlocks_fact": "",
+    "authored_dialogue_revision": 1
   }
 }

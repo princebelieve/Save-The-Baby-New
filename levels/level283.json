@@ -25,14 +25,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Trace the source of the revised route file before trusting Victor's account.",
+  "description": "The driver identifies Ethan's feeding cup.",
   "difficulty": "MEDIUM",
   "level_id": 283,
   "metadata": {
     "chapter_end_level": 290,
     "chapter_id": 30,
     "chapter_start_level": 281,
-    "chapter_title": "The Correction",
+    "chapter_title": "The Cup She Packed",
     "generator_version": 2,
     "map_background": "factory_map_section_cutout.png",
     "map_landmark": "police_car_topdown_cutout.png",
@@ -43,13 +43,27 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 2982980,
     "season": 3,
-    "season_title": "A Web of Mirrors",
-    "episode_id": 24
+    "season_title": "The Woman Who Waited",
+    "episode_id": 24,
+    "balance_revision": 1,
+    "balance_base_moves": 32,
+    "balance_reinforced_cells": [
+      {
+        "x": 6,
+        "y": 3,
+        "health": 1
+      },
+      {
+        "x": 1,
+        "y": 3,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 32
+    "total": 30
   },
-  "name": "The Correction 03",
+  "name": "The Cup She Packed 03",
   "objectives": [
     {
       "amount": 24,
@@ -60,13 +74,13 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "chain",
         "x": 6,
         "y": 3
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "tape",
         "x": 1,
         "y": 3
@@ -116,12 +130,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the revised route file. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the revised route file. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the revised route file. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the revised route file without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into the cup she packed advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

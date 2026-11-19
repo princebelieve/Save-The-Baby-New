@@ -1,55 +1,29 @@
 {
   "story_id": "serial054_intro",
-  "title": "The Editor's Receipt",
-  "background_music": "suspense_opening",
+  "title": "The Delivery Bell",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/factory_cage_art.jpeg",
   "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
   "characters": [
     "david",
     "amara",
     "victor",
-    "ethan",
     "detective_morris"
   ],
   "scenes": [
     {
       "scene_id": "serial054_intro",
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "Detective Morris",
-            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
-            "text": "We will verify the edit-suite taxi receipt and keep its source intact. A lead is not a rescue; we cannot assume Victor stayed there.",
-            "routes": [
-              "police"
-            ]
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I will check the technical trail behind the edit-suite taxi receipt. Amara, tell me what the records cannot explain."
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I am following the edit-suite taxi receipt without police backup. Amara has my location; I am not going to turn this into a contest with Victor."
-          }
-        ]
-      },
+      "stage_direction": "Phone contact becomes tangible. Let Amara listen before David interprets what the new evidence means.",
       "dialogues": [
         {
           "speaker": "David",
           "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "The next lead is the edit-suite taxi receipt. We need its original source before Victor moves again."
+          "text": "The delivery record may explain the bell."
         },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "He sends his image one way and takes my child another."
+          "text": "Not approximately, David. I need to know how sure we can be."
         }
       ],
       "choices": []
@@ -58,11 +32,14 @@
   "metadata": {
     "version": 2,
     "season": 6,
-    "season_title": "An Audience for Victor",
+    "season_title": "A Voice in the Rain",
     "episode": 4,
     "episode_id": 54,
     "campaign_levels": "581-590",
     "ethan_status": "missing",
-    "season_finale": false
+    "season_finale": false,
+    "known_before": "episode_053_resolved",
+    "unlocks_fact": "",
+    "authored_dialogue_revision": 1
   }
 }

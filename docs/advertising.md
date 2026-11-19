@@ -58,3 +58,8 @@ loaded ads and load errors (code/domain/message).
 Families SDK list: https://support.google.com/googleplay/android-developer/answer/12955712
 Targeting: https://developers.google.com/admob/android/targeting
 Pinned native release: https://github.com/poingstudios/godot-admob-plugin/releases/tag/v4.3.1
+
+### Published-message retest — 18 November 2026
+
+After the European consent message was published, the corrected v11 APK was installed with adb install -r on the authorized Vivo test device. UMP returned IABTCF_gdprApplies=0; the previous no-forms error cleared. Runtime logs confirmed AdMob SDK initialized, interstitial loaded, and rewarded loaded. This confirms inventory loaded, not a completed impression or reward. Evidence: .test-data/published-consent-device-test.log. The auth-return URI query now resolves to one dedicated AuthReturnActivity.
+

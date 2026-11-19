@@ -3,6 +3,30 @@
     "suspense_opening": {
       "path": "res://assets/audio/music/suspense_opening.ogg",
       "loop": true
+    },
+    "case_investigation": {
+      "path": "res://assets/audio/music/case_investigation.wav",
+      "loop": true
+    },
+    "case_play": {
+      "path": "res://assets/audio/music/case_play.wav",
+      "loop": true
+    },
+    "case_pressure": {
+      "path": "res://assets/audio/music/case_pressure.wav",
+      "loop": true
+    },
+    "case_victory": {
+      "path": "res://assets/audio/music/case_victory.wav",
+      "loop": true
+    },
+    "case_setback": {
+      "path": "res://assets/audio/music/case_setback.wav",
+      "loop": true
+    },
+    "case_restoration": {
+      "path": "res://assets/audio/music/case_restoration.wav",
+      "loop": true
     }
   },
   "sfx": {
@@ -108,9 +132,9 @@
     "lose_sting": -5,
     "powerup_rocket": -5,
     "clue_collected": -10,
-    "screen_map": -9,
-    "screen_briefing": -9,
-    "screen_play": -9,
+    "screen_map": -5,
+    "screen_briefing": -5,
+    "screen_play": -5,
     "foley_bomb": -8,
     "foley_thunder": -8,
     "foley_rocket": -8

@@ -25,14 +25,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Preserve the original evidence behind the catering delivery note.",
+  "description": "The family rejection is heard in context.",
   "difficulty": "EASY",
   "level_id": 382,
   "metadata": {
     "chapter_end_level": 390,
     "chapter_id": 40,
     "chapter_start_level": 381,
-    "chapter_title": "An Unset Table",
+    "chapter_title": "The Door She Wasn't Offered",
     "generator_version": 2,
     "map_background": "factory_map_section_cutout.png",
     "map_landmark": "police_car_topdown_cutout.png",
@@ -43,13 +43,16 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 3766961,
     "season": 4,
-    "season_title": "What He Calls Love",
-    "episode_id": 34
+    "season_title": "The Heart He Couldn't Claim",
+    "episode_id": 34,
+    "balance_revision": 1,
+    "balance_base_moves": 34,
+    "balance_reinforced_cells": []
   },
   "moves": {
-    "total": 34
+    "total": 33
   },
-  "name": "An Unset Table 02",
+  "name": "The Door She Wasn't Offered 02",
   "objectives": [
     {
       "amount": 18,
@@ -104,12 +107,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the catering delivery note. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the catering delivery note. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the catering delivery note. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the catering delivery note without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into the door she wasn't offered advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

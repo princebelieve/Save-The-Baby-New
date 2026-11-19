@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Preserve the original evidence behind the unedited event feed.",
+  "description": "Victor is independently seen at the district.",
   "difficulty": "EASY",
   "level_id": 642,
   "metadata": {
     "chapter_end_level": 650,
     "chapter_id": 66,
     "chapter_start_level": 641,
-    "chapter_title": "No Standing Ovation",
+    "chapter_title": "Victor Outside",
     "generator_version": 2,
     "map_background": "factory_map_section_cutout.png",
     "map_landmark": "police_car_topdown_cutout.png",
@@ -34,13 +34,16 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 5825901,
     "season": 6,
-    "season_title": "An Audience for Victor",
-    "episode_id": 60
+    "season_title": "A Voice in the Rain",
+    "episode_id": 60,
+    "balance_revision": 1,
+    "balance_base_moves": 34,
+    "balance_reinforced_cells": []
   },
   "moves": {
-    "total": 34
+    "total": 33
   },
-  "name": "No Standing Ovation 02",
+  "name": "Victor Outside 02",
   "objectives": [
     {
       "amount": 18,
@@ -95,12 +98,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the unedited event feed. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the unedited event feed. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the unedited event feed. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the unedited event feed without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into victor outside advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

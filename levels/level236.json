@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "The booking was bait; a porter remembers a car waiting at the service door.",
+  "description": "Amara personally challenges the withholding.",
   "difficulty": "EASY",
   "level_id": 236,
   "metadata": {
     "chapter_end_level": 240,
     "chapter_id": 25,
     "chapter_start_level": 231,
-    "chapter_title": "The Unused Booking",
+    "chapter_title": "A Request in Her Voice",
     "generator_version": 2,
     "map_background": "river_map_section_cutout.png",
     "map_landmark": "wooden_bridge_cutout.png",
@@ -34,13 +34,16 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 2610787,
     "season": 2,
-    "season_title": "The Borrowed Fortune",
-    "episode_id": 19
+    "season_title": "The Fortune He Claimed",
+    "episode_id": 19,
+    "balance_revision": 1,
+    "balance_base_moves": 34,
+    "balance_reinforced_cells": []
   },
   "moves": {
-    "total": 34
+    "total": 33
   },
-  "name": "The Unused Booking 06",
+  "name": "A Request in Her Voice 06",
   "objectives": [
     {
       "amount": 18,
@@ -95,12 +98,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the prepaid hotel booking. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the prepaid hotel booking. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the prepaid hotel booking. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the prepaid hotel booking without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into a request in her voice advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

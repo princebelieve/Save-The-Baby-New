@@ -25,14 +25,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Compare the notarised contact form with what the witnesses actually remember.",
+  "description": "Victor claims Amara owes him her prosperity.",
   "difficulty": "HARD",
   "level_id": 175,
   "metadata": {
     "chapter_end_level": 180,
     "chapter_id": 19,
     "chapter_start_level": 171,
-    "chapter_title": "The Notary's Copy",
+    "chapter_title": "The Price of Shoes",
     "generator_version": 2,
     "map_background": "river_map_section_cutout.png",
     "map_landmark": "wooden_bridge_cutout.png",
@@ -43,13 +43,27 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 2127728,
     "season": 2,
-    "season_title": "The Borrowed Fortune",
-    "episode_id": 13
+    "season_title": "The Fortune He Claimed",
+    "episode_id": 13,
+    "balance_revision": 1,
+    "balance_base_moves": 30,
+    "balance_reinforced_cells": [
+      {
+        "x": 1,
+        "y": 6,
+        "health": 1
+      },
+      {
+        "x": 2,
+        "y": 4,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 30
+    "total": 27
   },
-  "name": "The Notary's Copy 05",
+  "name": "The Price of Shoes 05",
   "objectives": [
     {
       "amount": 30,
@@ -60,13 +74,13 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "chain",
         "x": 1,
         "y": 6
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "tape",
         "x": 2,
         "y": 4
@@ -128,12 +142,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the notarised contact form. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the notarised contact form. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the notarised contact form. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the notarised contact form without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into the price of shoes advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

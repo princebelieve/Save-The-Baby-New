@@ -91,11 +91,27 @@ func _run() -> void:
 	puzzle.configure({"portrait":portrait,"slot":123,"pieces":[0,1,2,3,4,5,6,7,8],"deadline":TimeHelper.current_unix_time()+120})
 	add_child(puzzle)
 	check(not puzzle._save_button.visible,"gallery button hidden before completion")
+	puzzle._swipe_from = 2
+	puzzle._notification(Node.NOTIFICATION_APPLICATION_PAUSED)
+	check(puzzle._swipe_from == -1 and puzzle._resume_needed,"backgrounding clears interrupted restoration gesture")
+	puzzle._show_resume()
+	check(is_instance_valid(puzzle._overlay),"returning to restoration provides a visible resume action")
 	puzzle.show_reward(15,1)
+	check(puzzle._overlay.name == "RestorationResult", "victory replaces reference with dedicated result screen")
+	var continuations := 0
+	for action in puzzle._overlay.find_children("*", "Button", true, false):
+		if action.text == "CONTINUE INVESTIGATION": continuations += 1
+	check(continuations == 1, "victory has one clear continuation")
 	check(puzzle._save_button.visible,"completed puzzle exposes save button")
 	puzzle.show_gallery_status("Saved to gallery")
 	check(puzzle._gallery_message.text == "Saved to gallery","gallery result appears separately from coin reward")
 	puzzle.queue_free()
+	var expired := PortraitPuzzle.new()
+	expired.configure({"portrait":portrait,"slot":124,"pieces":[1,0,2,3,4,5,6,7,8],"deadline":TimeHelper.current_unix_time()-1})
+	add_child(expired)
+	expired._process(0)
+	check(expired._finished and expired._overlay.name == "RestorationResult", "expired restoration exits the inert board into a result screen")
+	expired.queue_free()
 	restored.queue_free()
 	native.queue_free()
 	await settle()

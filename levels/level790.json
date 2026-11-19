@@ -25,14 +25,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Close this investigation and hear what the cabinet access code changes for the family.",
+  "description": "The timeline is reconstructed.",
   "difficulty": "HARD",
   "level_id": 790,
   "metadata": {
     "chapter_end_level": 790,
     "chapter_id": 80,
     "chapter_start_level": 781,
-    "chapter_title": "The Hired Cabinet",
+    "chapter_title": "Before the Announcement",
     "generator_version": 2,
     "map_background": "factory_map_section_cutout.png",
     "map_landmark": "police_car_topdown_cutout.png",
@@ -43,13 +43,32 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 6997913,
     "season": 8,
-    "season_title": "Names That Do Not Belong",
-    "episode_id": 74
+    "season_title": "The Night Adrian Died",
+    "episode_id": 74,
+    "balance_revision": 1,
+    "balance_base_moves": 30,
+    "balance_reinforced_cells": [
+      {
+        "x": 5,
+        "y": 2,
+        "health": 1
+      },
+      {
+        "x": 1,
+        "y": 5,
+        "health": 1
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 30
+    "total": 27
   },
-  "name": "The Hired Cabinet 10",
+  "name": "Before the Announcement 10",
   "objectives": [
     {
       "amount": 30,
@@ -60,19 +79,19 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "chain",
         "x": 5,
         "y": 2
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "tape",
         "x": 1,
         "y": 5
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 3,
         "y": 1
@@ -128,12 +147,8 @@
     "after_level": "serial074_outro",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the cabinet access code. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the cabinet access code. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the cabinet access code. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the cabinet access code without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into before the announcement advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "The next lead is the office staff rota. We need its original source before Victor moves again.",
+  "description": "The team confronts the transport contractor.",
   "difficulty": "EASY",
   "level_id": 591,
   "metadata": {
     "chapter_end_level": 600,
     "chapter_id": 61,
     "chapter_start_level": 591,
-    "chapter_title": "The Unwilling Witness",
+    "chapter_title": "No More Silent Cars",
     "generator_version": 2,
     "map_background": "river_map_section_cutout.png",
     "map_landmark": "wooden_bridge_cutout.png",
@@ -34,13 +34,16 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 5422032,
     "season": 6,
-    "season_title": "An Audience for Victor",
-    "episode_id": 55
+    "season_title": "A Voice in the Rain",
+    "episode_id": 55,
+    "balance_revision": 1,
+    "balance_base_moves": 34,
+    "balance_reinforced_cells": []
   },
   "moves": {
-    "total": 34
+    "total": 33
   },
-  "name": "The Unwilling Witness 01",
+  "name": "No More Silent Cars 01",
   "objectives": [
     {
       "amount": 18,
@@ -95,12 +98,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the office staff rota. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the office staff rota. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the office staff rota. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the office staff rota without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into no more silent cars advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

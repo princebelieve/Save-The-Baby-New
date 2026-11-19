@@ -25,14 +25,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Reconstruct the missing step around the amended minibus stop list.",
+  "description": "A recent photograph narrows the building type.",
   "difficulty": "HARD",
   "level_id": 628,
   "metadata": {
     "chapter_end_level": 630,
     "chapter_id": 64,
     "chapter_start_level": 621,
-    "chapter_title": "The Removed Stop",
+    "chapter_title": "The Wrong Window",
     "generator_version": 2,
     "map_background": "factory_map_section_cutout.png",
     "map_landmark": "police_car_topdown_cutout.png",
@@ -43,13 +43,32 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 5715035,
     "season": 6,
-    "season_title": "An Audience for Victor",
-    "episode_id": 58
+    "season_title": "A Voice in the Rain",
+    "episode_id": 58,
+    "balance_revision": 1,
+    "balance_base_moves": 30,
+    "balance_reinforced_cells": [
+      {
+        "x": 3,
+        "y": 5,
+        "health": 1
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "health": 1
+      },
+      {
+        "x": 4,
+        "y": 6,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 30
+    "total": 27
   },
-  "name": "The Removed Stop 08",
+  "name": "The Wrong Window 08",
   "objectives": [
     {
       "amount": 30,
@@ -60,19 +79,19 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "chain",
         "x": 3,
         "y": 5
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "tape",
         "x": 2,
         "y": 3
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 4,
         "y": 6
@@ -128,12 +147,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the amended minibus stop list. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the amended minibus stop list. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the amended minibus stop list. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the amended minibus stop list without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into the wrong window advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

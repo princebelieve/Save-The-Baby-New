@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Compare the repeater rental contract with what the witnesses actually remember.",
+  "description": "His account identifies Lami's recruiter.",
   "difficulty": "HARD",
   "level_id": 315,
   "metadata": {
     "chapter_end_level": 320,
     "chapter_id": 33,
     "chapter_start_level": 311,
-    "chapter_title": "The Rental Contract",
+    "chapter_title": "The Receiving Desk",
     "generator_version": 2,
     "map_background": "river_map_section_cutout.png",
     "map_landmark": "wooden_bridge_cutout.png",
@@ -34,13 +34,32 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 3236388,
     "season": 3,
-    "season_title": "A Web of Mirrors",
-    "episode_id": 27
+    "season_title": "The Woman Who Waited",
+    "episode_id": 27,
+    "balance_revision": 1,
+    "balance_base_moves": 30,
+    "balance_reinforced_cells": [
+      {
+        "x": 1,
+        "y": 5,
+        "health": 1
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "health": 1
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 30
+    "total": 27
   },
-  "name": "The Rental Contract 05",
+  "name": "The Receiving Desk 05",
   "objectives": [
     {
       "amount": 30,
@@ -51,19 +70,19 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 1,
         "y": 5
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "chain",
         "x": 5,
         "y": 1
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "tape",
         "x": 4,
         "y": 1
@@ -119,12 +138,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the repeater rental contract. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the repeater rental contract. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the repeater rental contract. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the repeater rental contract without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into the receiving desk advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

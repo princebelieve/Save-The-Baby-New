@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "The tracks end at a hired launch; its owner was paid to leave before our arrival.",
+  "description": "David compares conflicting access records.",
   "difficulty": "EASY",
   "level_id": 66,
   "metadata": {
     "chapter_end_level": 70,
     "chapter_id": 8,
     "chapter_start_level": 61,
-    "chapter_title": "Wet Wheels",
+    "chapter_title": "The Second Account",
     "generator_version": 2,
     "map_background": "factory_map_section_cutout.png",
     "map_landmark": "police_car_topdown_cutout.png",
@@ -34,13 +34,16 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 1264557,
     "season": 1,
-    "season_title": "The River Between Us",
-    "episode_id": 2
+    "season_title": "The Door That Never Opened",
+    "episode_id": 2,
+    "balance_revision": 1,
+    "balance_base_moves": 36,
+    "balance_reinforced_cells": []
   },
   "moves": {
-    "total": 36
+    "total": 35
   },
-  "name": "Wet Wheels 06",
+  "name": "The Second Account 06",
   "objectives": [
     {
       "amount": 18,
@@ -95,12 +98,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the trolley wheel marks. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the trolley wheel marks. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the trolley wheel marks. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the trolley wheel marks without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into the second account advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

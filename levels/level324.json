@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "I recognise Ethan's little blanket. I will not mistake that for knowing he is safe.",
+  "description": "Lami contacts Amara through a protected channel.",
   "difficulty": "MEDIUM",
   "level_id": 324,
   "metadata": {
     "chapter_end_level": 330,
     "chapter_id": 34,
     "chapter_start_level": 321,
-    "chapter_title": "The Second Compartment",
+    "chapter_title": "What Lami Believed",
     "generator_version": 2,
     "map_background": "factory_map_section_cutout.png",
     "map_landmark": "police_car_topdown_cutout.png",
@@ -34,13 +34,27 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 3307659,
     "season": 3,
-    "season_title": "A Web of Mirrors",
-    "episode_id": 28
+    "season_title": "The Woman Who Waited",
+    "episode_id": 28,
+    "balance_revision": 1,
+    "balance_base_moves": 32,
+    "balance_reinforced_cells": [
+      {
+        "x": 4,
+        "y": 2,
+        "health": 1
+      },
+      {
+        "x": 6,
+        "y": 2,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 32
+    "total": 30
   },
-  "name": "The Second Compartment 04",
+  "name": "What Lami Believed 04",
   "objectives": [
     {
       "amount": 24,
@@ -51,13 +65,13 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 4,
         "y": 2
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "chain",
         "x": 6,
         "y": 2
@@ -107,12 +121,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the locker access receipt. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the locker access receipt. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the locker access receipt. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the locker access receipt without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into what lami believed advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

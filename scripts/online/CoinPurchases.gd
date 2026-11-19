@@ -14,6 +14,7 @@ var _server_enabled := false
 var _checking_catalog := false
 var _restore_waiting := false
 var _restore_ok := false
+var _catalog_received := false
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -73,12 +74,27 @@ func _on_connected() -> void:
 
 func _on_products(response: Dictionary) -> void:
 	products = {}
+	_catalog_received = true
+	print("Google Play billing: product query code=%d, returned=%d" % [int(response.get("response_code", -1)), response.get("product_details", []).size()])
 	if int(response.get("response_code",-1)) == BillingClient.BillingResponseCode.OK:
 		for product in response.get("product_details",[]):
 			var offers: Variant = product.get("one_time_purchase_offer_details_list",[])
 			if offers is Array and not offers.is_empty():
 				products[str(product.product_id)] = offers[0]
 	changed.emit()
+
+func availability_message() -> String:
+	if _billing == null or not _billing.is_ready():
+		return "Google Play purchases are currently unavailable. You can keep playing."
+	if not _catalog_received:
+		return "Loading Google Play prices..."
+	if products.is_empty():
+		return "Google Play has not returned any coin packs. Please check that this game is installed through Google Play with an eligible account."
+	if _checking_catalog:
+		return "Checking the coin shop..."
+	if not _server_enabled:
+		return "Coin purchases are temporarily unavailable. You can keep playing."
+	return ""
 
 func available(product: String) -> bool:
 	var account := get_node("/root/CloudAccount")

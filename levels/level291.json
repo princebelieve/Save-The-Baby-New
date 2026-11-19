@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "The next lead is the maintenance door log. We need its original source before Victor moves again.",
+  "description": "David verifies the call without exposing medical records.",
   "difficulty": "EASY",
   "level_id": 291,
   "metadata": {
     "chapter_end_level": 300,
     "chapter_id": 31,
     "chapter_start_level": 291,
-    "chapter_title": "The Wrong Door",
+    "chapter_title": "The Call She Couldn't Finish",
     "generator_version": 2,
     "map_background": "river_map_section_cutout.png",
     "map_landmark": "wooden_bridge_cutout.png",
@@ -34,13 +34,16 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 3046332,
     "season": 3,
-    "season_title": "A Web of Mirrors",
-    "episode_id": 25
+    "season_title": "The Woman Who Waited",
+    "episode_id": 25,
+    "balance_revision": 1,
+    "balance_base_moves": 34,
+    "balance_reinforced_cells": []
   },
   "moves": {
-    "total": 34
+    "total": 33
   },
-  "name": "The Wrong Door 01",
+  "name": "The Call She Couldn't Finish 01",
   "objectives": [
     {
       "amount": 18,
@@ -95,12 +98,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the maintenance door log. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the maintenance door log. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the maintenance door log. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the maintenance door log without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into the call she couldn't finish advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

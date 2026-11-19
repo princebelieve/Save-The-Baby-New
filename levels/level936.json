@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "The remaining sponsor revokes Victor's pass after Amara shows the unedited evidence.",
+  "description": "Nessa traces delegated authority.",
   "difficulty": "EASY",
   "level_id": 936,
   "metadata": {
     "chapter_end_level": 940,
     "chapter_id": 95,
     "chapter_start_level": 931,
-    "chapter_title": "The Last Sponsor",
+    "chapter_title": "Behind the Signatory",
     "generator_version": 2,
     "map_background": "river_map_section_cutout.png",
     "map_landmark": "wooden_bridge_cutout.png",
@@ -34,13 +34,16 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 8154087,
     "season": 9,
-    "season_title": "The Price of Glory",
-    "episode_id": 89
+    "season_title": "The House That Must Answer",
+    "episode_id": 89,
+    "balance_revision": 1,
+    "balance_base_moves": 34,
+    "balance_reinforced_cells": []
   },
   "moves": {
-    "total": 34
+    "total": 33
   },
-  "name": "The Last Sponsor 06",
+  "name": "Behind the Signatory 06",
   "objectives": [
     {
       "amount": 18,
@@ -95,12 +98,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the compound access sponsorship. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the compound access sponsorship. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the compound access sponsorship. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the compound access sponsorship without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into behind the signatory advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

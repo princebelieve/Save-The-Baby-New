@@ -25,14 +25,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Victor copied a financial statement and removed the page identifying the source of the funds.",
+  "description": "Nessa finds a filing receipt.",
   "difficulty": "EASY",
   "level_id": 226,
   "metadata": {
     "chapter_end_level": 230,
     "chapter_id": 24,
     "chapter_start_level": 221,
-    "chapter_title": "Carbon Copies",
+    "chapter_title": "The Missing Page",
     "generator_version": 2,
     "map_background": "factory_map_section_cutout.png",
     "map_landmark": "police_car_topdown_cutout.png",
@@ -43,13 +43,16 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 2531597,
     "season": 2,
-    "season_title": "The Borrowed Fortune",
-    "episode_id": 18
+    "season_title": "The Fortune He Claimed",
+    "episode_id": 18,
+    "balance_revision": 1,
+    "balance_base_moves": 34,
+    "balance_reinforced_cells": []
   },
   "moves": {
-    "total": 34
+    "total": 33
   },
-  "name": "Carbon Copies 06",
+  "name": "The Missing Page 06",
   "objectives": [
     {
       "amount": 18,
@@ -104,12 +107,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the copy-shop stamp. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the copy-shop stamp. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the copy-shop stamp. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the copy-shop stamp without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into the missing page advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

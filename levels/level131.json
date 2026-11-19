@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "The next lead is the taxi dispatch slip. We need its original source before Victor moves again.",
+  "description": "A witness describes a woman beside the exit.",
   "difficulty": "EASY",
   "level_id": 131,
   "metadata": {
     "chapter_end_level": 140,
     "chapter_id": 15,
     "chapter_start_level": 131,
-    "chapter_title": "The Taxi Queue",
+    "chapter_title": "Someone Held It",
     "generator_version": 2,
     "map_background": "river_map_section_cutout.png",
     "map_landmark": "wooden_bridge_cutout.png",
@@ -34,13 +34,16 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 1779292,
     "season": 1,
-    "season_title": "The River Between Us",
-    "episode_id": 9
+    "season_title": "The Door That Never Opened",
+    "episode_id": 9,
+    "balance_revision": 1,
+    "balance_base_moves": 34,
+    "balance_reinforced_cells": []
   },
   "moves": {
-    "total": 34
+    "total": 33
   },
-  "name": "The Taxi Queue 01",
+  "name": "Someone Held It 01",
   "objectives": [
     {
       "amount": 18,
@@ -95,12 +98,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the taxi dispatch slip. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the taxi dispatch slip. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the taxi dispatch slip. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the taxi dispatch slip without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into someone held it advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

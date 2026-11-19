@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Give Amara a verified account of the mailbox rental form, so she can choose the next step.",
+  "description": "Orena confronts the transfer made in her name.",
   "difficulty": "MEDIUM",
   "level_id": 489,
   "metadata": {
     "chapter_end_level": 490,
     "chapter_id": 50,
     "chapter_start_level": 481,
-    "chapter_title": "The Private Mailbox",
+    "chapter_title": "The House Divides",
     "generator_version": 2,
     "map_background": "factory_map_section_cutout.png",
     "map_landmark": "police_car_topdown_cutout.png",
@@ -34,13 +34,27 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 4614294,
     "season": 5,
-    "season_title": "For Her Son",
-    "episode_id": 44
+    "season_title": "The Royal Household",
+    "episode_id": 44,
+    "balance_revision": 1,
+    "balance_base_moves": 32,
+    "balance_reinforced_cells": [
+      {
+        "x": 5,
+        "y": 2,
+        "health": 1
+      },
+      {
+        "x": 2,
+        "y": 5,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 32
+    "total": 30
   },
-  "name": "The Private Mailbox 09",
+  "name": "The House Divides 09",
   "objectives": [
     {
       "amount": 24,
@@ -51,13 +65,13 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 5,
         "y": 2
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "chain",
         "x": 2,
         "y": 5
@@ -107,12 +121,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the mailbox rental form. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the mailbox rental form. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the mailbox rental form. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the mailbox rental form without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into the house divides advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Trace the source of the station parcel register before trusting Victor's account.",
+  "description": "Victor sends part of an old love letter.",
   "difficulty": "MEDIUM",
   "level_id": 353,
   "metadata": {
     "chapter_end_level": 360,
     "chapter_id": 37,
     "chapter_start_level": 351,
-    "chapter_title": "The Old Station",
+    "chapter_title": "The Letter Victor Kept",
     "generator_version": 2,
     "map_background": "river_map_section_cutout.png",
     "map_landmark": "wooden_bridge_cutout.png",
@@ -34,13 +34,27 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 3537310,
     "season": 4,
-    "season_title": "What He Calls Love",
-    "episode_id": 31
+    "season_title": "The Heart He Couldn't Claim",
+    "episode_id": 31,
+    "balance_revision": 1,
+    "balance_base_moves": 32,
+    "balance_reinforced_cells": [
+      {
+        "x": 1,
+        "y": 4,
+        "health": 1
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 32
+    "total": 30
   },
-  "name": "The Old Station 03",
+  "name": "The Letter Victor Kept 03",
   "objectives": [
     {
       "amount": 24,
@@ -51,13 +65,13 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "tape",
         "x": 1,
         "y": 4
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 4,
         "y": 3
@@ -107,12 +121,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the station parcel register. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the station parcel register. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the station parcel register. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the station parcel register without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into the letter victor kept advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

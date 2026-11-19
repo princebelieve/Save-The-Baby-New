@@ -45,8 +45,8 @@ func record_completed(portrait: String, slot: int) -> String:
 	_state.save(STATE_PATH)
 	if auto_save():
 		request_save(id)
-	elif supported() and not bool(_state.get_value("preferences","asked",false)):
-		_offer_auto_save.call_deferred()
+	# Keep the victory screen uninterrupted. Automatic saving is an explicit
+	# preference in Daily Rewards; manual saving remains on the result screen.
 	return id
 
 func _offer_auto_save() -> void:

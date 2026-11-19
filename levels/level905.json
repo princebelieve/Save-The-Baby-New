@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Compare the business centre dispatch log with what the witnesses actually remember.",
+  "description": "The disputed movement instruction is put on hold.",
   "difficulty": "HARD",
   "level_id": 905,
   "metadata": {
     "chapter_end_level": 910,
     "chapter_id": 92,
     "chapter_start_level": 901,
-    "chapter_title": "The Message Desk",
+    "chapter_title": "Stay Where You Are",
     "generator_version": 2,
     "map_background": "factory_map_section_cutout.png",
     "map_landmark": "police_car_topdown_cutout.png",
@@ -34,13 +34,32 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 7908598,
     "season": 9,
-    "season_title": "The Price of Glory",
-    "episode_id": 86
+    "season_title": "The House That Must Answer",
+    "episode_id": 86,
+    "balance_revision": 1,
+    "balance_base_moves": 30,
+    "balance_reinforced_cells": [
+      {
+        "x": 5,
+        "y": 2,
+        "health": 1
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "health": 1
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 30
+    "total": 27
   },
-  "name": "The Message Desk 05",
+  "name": "Stay Where You Are 05",
   "objectives": [
     {
       "amount": 30,
@@ -51,19 +70,19 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "tape",
         "x": 5,
         "y": 2
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 5,
         "y": 1
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "chain",
         "x": 3,
         "y": 3
@@ -119,12 +138,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the business centre dispatch log. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the business centre dispatch log. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the business centre dispatch log. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the business centre dispatch log without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into stay where you are advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

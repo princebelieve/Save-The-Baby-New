@@ -25,14 +25,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "The assistant logged a suspicious delivery and refused to certify it.",
+  "description": "The witness describes a dispute about Ethan.",
   "difficulty": "EASY",
   "level_id": 766,
   "metadata": {
     "chapter_end_level": 770,
     "chapter_id": 78,
     "chapter_start_level": 761,
-    "chapter_title": "The Assistant's Ledger",
+    "chapter_title": "An Argument Overheard",
     "generator_version": 2,
     "map_background": "factory_map_section_cutout.png",
     "map_landmark": "police_car_topdown_cutout.png",
@@ -43,13 +43,16 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 6807857,
     "season": 8,
-    "season_title": "Names That Do Not Belong",
-    "episode_id": 72
+    "season_title": "The Night Adrian Died",
+    "episode_id": 72,
+    "balance_revision": 1,
+    "balance_base_moves": 34,
+    "balance_reinforced_cells": []
   },
   "moves": {
-    "total": 34
+    "total": 33
   },
-  "name": "The Assistant's Ledger 06",
+  "name": "An Argument Overheard 06",
   "objectives": [
     {
       "amount": 18,
@@ -104,12 +107,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the assistant payment ledger. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the assistant payment ledger. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the assistant payment ledger. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the assistant payment ledger without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into an argument overheard advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

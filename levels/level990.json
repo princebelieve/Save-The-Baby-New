@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Close this investigation and hear what the portable radio setting changes for the family.",
+  "description": "The player reconstructs the transfer chain.",
   "difficulty": "HARD",
   "level_id": 990,
   "metadata": {
     "chapter_end_level": 990,
     "chapter_id": 100,
     "chapter_start_level": 981,
-    "chapter_title": "The Local Channel",
+    "chapter_title": "Every Hand It Passed",
     "generator_version": 2,
     "map_background": "factory_map_section_cutout.png",
     "map_landmark": "police_car_topdown_cutout.png",
@@ -34,13 +34,32 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 8581713,
     "season": 10,
-    "season_title": "One Door Away",
-    "episode_id": 94
+    "season_title": "The Distance Between Two Voices",
+    "episode_id": 94,
+    "balance_revision": 1,
+    "balance_base_moves": 30,
+    "balance_reinforced_cells": [
+      {
+        "x": 1,
+        "y": 2,
+        "health": 1
+      },
+      {
+        "x": 6,
+        "y": 6,
+        "health": 1
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 30
+    "total": 27
   },
-  "name": "The Local Channel 10",
+  "name": "Every Hand It Passed 10",
   "objectives": [
     {
       "amount": 30,
@@ -51,19 +70,19 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 1,
         "y": 2
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "chain",
         "x": 6,
         "y": 6
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "tape",
         "x": 5,
         "y": 4
@@ -119,12 +138,8 @@
     "after_level": "serial094_outro",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the portable radio setting. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the portable radio setting. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the portable radio setting. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the portable radio setting without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into every hand it passed advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

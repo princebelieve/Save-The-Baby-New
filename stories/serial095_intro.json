@@ -1,55 +1,29 @@
 {
   "story_id": "serial095_intro",
-  "title": "The Voice She Knows",
-  "background_music": "suspense_opening",
+  "title": "The Time We Can Prove",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/river_waterfall_map_tile.jpeg",
   "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
   "characters": [
     "david",
     "amara",
     "victor",
-    "ethan",
     "detective_morris"
   ],
   "scenes": [
     {
       "scene_id": "serial095_intro",
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "Detective Morris",
-            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
-            "text": "We will verify the original yard recording and keep its source intact. A lead is not a rescue; we cannot assume Victor stayed there.",
-            "routes": [
-              "police"
-            ]
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I will check the technical trail behind the original yard recording. Amara, tell me what the records cannot explain."
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I am following the original yard recording without police backup. Amara has my location; I am not going to turn this into a contest with Victor."
-          }
-        ]
-      },
+      "stage_direction": "The room grows quieter as live contact approaches. The last call is real; physical reunion is still beyond this campaign.",
       "dialogues": [
-        {
-          "speaker": "David",
-          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "The next lead is the original yard recording. We need its original source before Victor moves again."
-        },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "That is my son. Keep me with the evidence, David; do not turn hope into a certainty we have not earned."
+          "text": "If that time is wrong, which journey have we been counting?"
+        },
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "We can compare it with a source neither side prepared for this dispute."
         }
       ],
       "choices": []
@@ -58,11 +32,14 @@
   "metadata": {
     "version": 2,
     "season": 10,
-    "season_title": "One Door Away",
+    "season_title": "The Distance Between Two Voices",
     "episode": 5,
     "episode_id": 95,
     "campaign_levels": "991-1000",
     "ethan_status": "missing",
-    "season_finale": false
+    "season_finale": false,
+    "known_before": "episode_094_resolved",
+    "unlocks_fact": "",
+    "authored_dialogue_revision": 1
   }
 }

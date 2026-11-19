@@ -132,14 +132,14 @@ func validate_shuffle(board) -> bool:
 # =========================================================
 
 func _randomize(board) -> bool:
-	var tiles = board.get_all_tiles()
+	var tiles = board.get_all_tiles().filter(func(tile): return not board.is_swap_blocked(tile.get_grid_position()))
 	var positions = []
 	var placement: Dictionary = {}
 	RandomGenerator.shuffle(tiles)
 	for y in range(board.get_height()):
 		for x in range(board.get_width()):
 			var cell := Vector2i(x, y)
-			if not board.has_tile(cell):
+			if not board.has_tile(cell) or board.is_swap_blocked(cell):
 				continue
 			positions.append(cell)
 			var selected := -1

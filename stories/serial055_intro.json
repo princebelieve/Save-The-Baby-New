@@ -1,55 +1,29 @@
 {
   "story_id": "serial055_intro",
-  "title": "The Unwilling Witness",
-  "background_music": "suspense_opening",
+  "title": "No More Silent Cars",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/factory_cage_art.jpeg",
   "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
   "characters": [
     "david",
     "amara",
     "victor",
-    "ethan",
     "detective_morris"
   ],
   "scenes": [
     {
       "scene_id": "serial055_intro",
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "Detective Morris",
-            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
-            "text": "We will verify the office staff rota and keep its source intact. A lead is not a rescue; we cannot assume Victor stayed there.",
-            "routes": [
-              "police"
-            ]
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I will check the technical trail behind the office staff rota. Amara, tell me what the records cannot explain."
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I am following the office staff rota without police backup. Amara has my location; I am not going to turn this into a contest with Victor."
-          }
-        ]
-      },
+      "stage_direction": "Phone contact becomes tangible. Let Amara listen before David interprets what the new evidence means.",
       "dialogues": [
-        {
-          "speaker": "David",
-          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "The next lead is the office staff rota. We need its original source before Victor moves again."
-        },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "We can protect a witness without making them disappear from the truth."
+          "text": "Then stopping that car matters as much as finding the room."
+        },
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "We know the contractor. We can challenge the movement before it happens."
         }
       ],
       "choices": []
@@ -58,11 +32,14 @@
   "metadata": {
     "version": 2,
     "season": 6,
-    "season_title": "An Audience for Victor",
+    "season_title": "A Voice in the Rain",
     "episode": 5,
     "episode_id": 55,
     "campaign_levels": "591-600",
     "ethan_status": "missing",
-    "season_finale": false
+    "season_finale": false,
+    "known_before": "episode_054_resolved",
+    "unlocks_fact": "",
+    "authored_dialogue_revision": 1
   }
 }

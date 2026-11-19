@@ -12,13 +12,25 @@ func notice(caption: String, font: Font) -> void:
 	var width := minf(620, viewport_size.x - 40)
 	panel.custom_minimum_size = Vector2(width, 92)
 	panel.position = Vector2((viewport_size.x - width) * 0.5, viewport_size.y * 0.46)
-	panel.add_theme_stylebox_override("panel", MobileGameUI.style(Color("#26394f")))
+	panel.add_theme_stylebox_override("panel", MobileGameUI.style(Color("#fff4d9")))
 	add_child(panel)
-	var label := MobileGameUI.label(panel, caption, 34, Color.WHITE)
+	var row := HBoxContainer.new()
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_theme_constant_override("separation", 14)
+	panel.add_child(row)
+	var art := "res://assets/sprites/ui/game_logo_cutout.png"
+	if caption.contains("ETHAN"):
+		art = "res://assets/sprites/characters/ethan_portrait_cutout.png"
+	elif caption.contains("VICTOR"):
+		art = "res://assets/sprites/characters/victor_portrait_cutout.png"
+	if ResourceLoader.exists(art):
+		MobileGameUI.image(row, art, Vector2(80, 80))
+	var label := MobileGameUI.label(row, caption.replace(" | ", "\n"), 30, Color("#4b3424"))
+	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	label.add_theme_font_override("font", font)
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var tween := _effect_tween().bind_node(panel)
-	tween.tween_interval(1.25)
+	tween.tween_interval(2.5)
 	tween.tween_property(panel, "modulate:a", 0.0, 0.25)
 	tween.tween_callback(panel.queue_free)
 

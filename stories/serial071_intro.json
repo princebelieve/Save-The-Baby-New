@@ -1,55 +1,37 @@
 {
   "story_id": "serial071_intro",
-  "title": "A Borrowed Identity",
-  "background_music": "suspense_opening",
+  "title": "The Appointment",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/iron_gate_map_tile.jpeg",
   "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
   "characters": [
     "david",
     "amara",
     "victor",
-    "ethan",
     "detective_morris"
   ],
   "scenes": [
     {
       "scene_id": "serial071_intro",
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "Detective Morris",
-            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
-            "text": "We will verify the false identity copy and keep its source intact. A lead is not a rescue; we cannot assume Victor stayed there.",
-            "routes": [
-              "police"
-            ]
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I will check the technical trail behind the false identity copy. Amara, tell me what the records cannot explain."
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I am following the false identity copy without police backup. Amara has my location; I am not going to turn this into a contest with Victor."
-          }
-        ]
-      },
+      "stage_direction": "Adrian's surviving records reopen grief. Leave a pause around Amara's response; David does not speak over it.",
       "dialogues": [
         {
-          "speaker": "David",
-          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "The next lead is the false identity copy. We need its original source before Victor moves again."
+          "speaker": "Detective Morris",
+          "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
+          "text": "The death inquiry and the search must share relevant evidence without turning every suspicion into a conclusion.",
+          "routes": [
+            "police"
+          ]
         },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "Those people deserve their names back too."
+          "text": "He wrote appointments in ink because he kept losing his phone."
+        },
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "Then we start with the book, not somebody's memory of his calendar."
         }
       ],
       "choices": []
@@ -58,11 +40,14 @@
   "metadata": {
     "version": 2,
     "season": 8,
-    "season_title": "Names That Do Not Belong",
+    "season_title": "The Night Adrian Died",
     "episode": 1,
     "episode_id": 71,
     "campaign_levels": "751-760",
     "ethan_status": "missing",
-    "season_finale": false
+    "season_finale": false,
+    "known_before": "episode_070_resolved",
+    "unlocks_fact": "",
+    "authored_dialogue_revision": 1
   }
 }

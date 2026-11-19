@@ -1,91 +1,51 @@
 {
   "story_id": "serial084_outro",
-  "title": "The Visitor Invitation | The next lead",
-  "background_music": "suspense_opening",
+  "title": "The Intermediary's Fear",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/factory_map_section.jpeg",
   "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
   "characters": [
     "david",
     "amara",
     "victor",
-    "ethan",
     "detective_morris"
   ],
   "scenes": [
     {
       "scene_id": "serial084_outro",
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "Detective Morris",
-            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
-            "text": "We will verify the club visitor invitation and keep its source intact. A lead is not a rescue; we cannot assume Victor stayed there.",
-            "routes": [
-              "police"
-            ]
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I will check the technical trail behind the club visitor invitation. Amara, tell me what the records cannot explain."
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I am following the club visitor invitation without police backup. Amara has my location; I am not going to turn this into a contest with Victor."
-          }
-        ]
-      },
+      "stage_direction": "The search becomes a confrontation with named decision-makers. Each signed record changes a concrete next step.",
       "dialogues": [
         {
           "speaker": "David",
           "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "The invitation promises a reconciliation Amara never accepted."
+          "text": "The witness has disclosed the receiving procedure."
         },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "The club cancels access. Victor has already collected a package from its cloakroom."
+          "text": "How many places does it lead to?"
+        },
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "Two. A bounded search this time, not another list without an end."
         }
       ],
-      "choices": [
-        {
-          "id": "police",
-          "label": "Coordinate the next lead with the police",
-          "impact": "Bring Morris into the next investigation and preserve the evidence behind the club visitor invitation.",
-          "response": "Morris takes the lead into the formal investigation. David checks the record while Amara explains its personal significance.",
-          "speaker": "Detective Morris"
-        },
-        {
-          "id": "signal",
-          "label": "Decode the next connection with Amara",
-          "impact": "David checks the technical trail from the club visitor invitation; Amara tests it against her own history.",
-          "response": "David saves the original record and checks its connections. Amara refuses to let Victor's version replace what she remembers.",
-          "speaker": "David"
-        },
-        {
-          "id": "alone",
-          "label": "Follow the next trail without police backup",
-          "impact": "David follows the physical lead from the club visitor invitation, keeping Amara informed.",
-          "response": "David sends Amara his location before moving. Finding Ethan matters more than claiming the search as his own achievement.",
-          "speaker": "David"
-        }
-      ]
+      "choices": []
     }
   ],
   "metadata": {
     "version": 2,
     "season": 9,
-    "season_title": "The Price of Glory",
+    "season_title": "The House That Must Answer",
     "episode": 4,
     "episode_id": 84,
     "campaign_levels": "881-890",
     "ethan_status": "missing",
     "season_finale": false,
-    "evidence_summary": "The invitation promises a reconciliation Amara never accepted. The club cancels access. Victor has already collected a package from its cloakroom."
+    "known_before": "episode_083_resolved",
+    "unlocks_fact": "episode_084_resolved",
+    "authored_dialogue_revision": 1,
+    "evidence_summary": "A witness discloses the receiving procedure."
   }
 }

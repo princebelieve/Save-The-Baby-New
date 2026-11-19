@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Trace the source of the original hire contract before trusting Victor's account.",
+  "description": "A second source confirms the named participant.",
   "difficulty": "MEDIUM",
   "level_id": 813,
   "metadata": {
     "chapter_end_level": 820,
     "chapter_id": 83,
     "chapter_start_level": 811,
-    "chapter_title": "The First Address",
+    "chapter_title": "Someone Else Was There",
     "generator_version": 2,
     "map_background": "river_map_section_cutout.png",
     "map_landmark": "wooden_bridge_cutout.png",
@@ -34,13 +34,27 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 7180050,
     "season": 8,
-    "season_title": "Names That Do Not Belong",
-    "episode_id": 77
+    "season_title": "The Night Adrian Died",
+    "episode_id": 77,
+    "balance_revision": 1,
+    "balance_base_moves": 32,
+    "balance_reinforced_cells": [
+      {
+        "x": 5,
+        "y": 1,
+        "health": 1
+      },
+      {
+        "x": 6,
+        "y": 2,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 32
+    "total": 30
   },
-  "name": "The First Address 03",
+  "name": "Someone Else Was There 03",
   "objectives": [
     {
       "amount": 24,
@@ -51,13 +65,13 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 5,
         "y": 1
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "chain",
         "x": 6,
         "y": 2
@@ -107,12 +121,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the original hire contract. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the original hire contract. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the original hire contract. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the original hire contract without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into someone else was there advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

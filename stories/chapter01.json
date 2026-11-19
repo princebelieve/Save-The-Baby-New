@@ -1,90 +1,63 @@
 {
   "story_id": "chapter01",
-  "title": "Amara’s Garden",
-  "background_music": "suspense_opening",
+  "title": "Behind the Bolted Door",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/garden_map_tile.jpeg",
   "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
   "characters": [
     "david",
     "amara",
-    "ethan",
-    "victor"
+    "victor",
+    "detective_morris"
   ],
   "scenes": [
     {
-      "scene_id": "chapter_01_intro",
-      "choices": [
-        {
-          "id": "police",
-          "label": "Ask Morris to secure the gate",
-          "impact": "Morris keeps Amara safe at the house while David follows the trail. Morris can watch for danger, but he needs you to share each clue before he can act.",
-          "response": "Morris keeps Amara safe at the house while David follows the trail. Ethan must come home alive.",
-          "speaker": "Detective Morris"
-        },
-        {
-          "id": "signal",
-          "label": "Decode the next lead with Amara",
-          "impact": "David checks the technical evidence. Amara connects it to the people and history behind the records, without police assistance.",
-          "response": "David preserves the original record and tests the next connection while Amara checks its meaning against what she remembers.",
-          "speaker": "David"
-        },
-        {
-          "id": "alone",
-          "label": "Follow the footprints quietly",
-          "impact": "David approaches quietly while Amara waits for his next call. You can investigate quietly, but no one will be close enough to help immediately if Victor is waiting.",
-          "response": "David approaches quietly while Amara waits for his next call. Ethan must come home alive.",
-          "speaker": "David"
-        }
-      ],
+      "scene_id": "chapter01",
+      "stage_direction": "Rain, interrupted sleep and a missing infant. Preserve the distinction between Amara's true sighting and the unexplained means of entry.",
       "dialogues": [
+        {
+          "speaker": "Detective Morris",
+          "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
+          "text": "The search starts now. Amara, tell me what you saw. David, keep the original messages and stay with her.",
+          "routes": [
+            "police"
+          ]
+        },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "The mud ends here, David. Victor knew I would follow, but he missed one thing: I heard the gate slam before the car reached the road.",
-          "animation": "fade"
+          "text": "He was beside the nursery. Ethan's blue sleeve was against his coat."
         },
         {
           "speaker": "David",
           "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "Then the gate is our first clue. We will search every footprint until we know which way he took Ethan.",
-          "animation": "fade"
+          "text": "Did you see his face before the lights failed?"
         },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "I found a key near the fence. If it belongs to Victor, it may tell us what he opened before he left.",
-          "animation": "fade"
+          "text": "Yes. Do not ask me that because the doors are locked."
+        },
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "I am asking so we keep what you saw separate from what we still need to explain."
+        },
+        {
+          "speaker": "Amara",
+          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+          "text": "Then write this first. I saw Victor take my son."
         }
       ],
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "Morris has secured the garden gate. He asks me to photograph the first clue before I move it."
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I have isolated the number that called her. We search the garden for something that matches its location."
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "The footprints end by the garden fence. I send Amara a photograph before I follow them."
-          }
-        ]
-      }
+      "choices": []
     }
   ],
   "metadata": {
     "version": 2,
     "chapter": 1,
     "campaign_levels": "001-008",
-    "tutorial_chapter": true
+    "tutorial_chapter": true,
+    "authored_dialogue_revision": 1,
+    "ethan_status": "missing"
   }
 }

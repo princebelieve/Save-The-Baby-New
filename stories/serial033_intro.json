@@ -1,55 +1,29 @@
 {
   "story_id": "serial033_intro",
-  "title": "The Reunion Invitation",
-  "background_music": "suspense_opening",
+  "title": "A Man Who Returned",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/garden_map_tile.jpeg",
   "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
   "characters": [
     "david",
     "amara",
     "victor",
-    "ethan",
     "detective_morris"
   ],
   "scenes": [
     {
       "scene_id": "serial033_intro",
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "Detective Morris",
-            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
-            "text": "We will verify the reunion invitation and keep its source intact. A lead is not a rescue; we cannot assume Victor stayed there.",
-            "routes": [
-              "police"
-            ]
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I will check the technical trail behind the reunion invitation. Amara, tell me what the records cannot explain."
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I am following the reunion invitation without police backup. Amara has my location; I am not going to turn this into a contest with Victor."
-          }
-        ]
-      },
+      "stage_direction": "Private memories interrupt the investigation. David listens without competing with either man from Amara's past.",
       "dialogues": [
-        {
-          "speaker": "David",
-          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "The next lead is the reunion invitation. We need its original source before Victor moves again."
-        },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "I never agreed to see him. The invitation is another claim over my choices."
+          "text": "Adrian came back without the car the second time."
+        },
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "What did he buy?"
         }
       ],
       "choices": []
@@ -58,11 +32,14 @@
   "metadata": {
     "version": 2,
     "season": 4,
-    "season_title": "What He Calls Love",
+    "season_title": "The Heart He Couldn't Claim",
     "episode": 3,
     "episode_id": 33,
     "campaign_levels": "371-380",
     "ethan_status": "missing",
-    "season_finale": false
+    "season_finale": false,
+    "known_before": "episode_032_resolved",
+    "unlocks_fact": "",
+    "authored_dialogue_revision": 1
   }
 }

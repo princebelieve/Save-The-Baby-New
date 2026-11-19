@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "The next lead is the speech sponsor list. We need its original source before Victor moves again.",
+  "description": "The instruction reaches a named official.",
   "difficulty": "EASY",
   "level_id": 851,
   "metadata": {
     "chapter_end_level": 860,
     "chapter_id": 87,
     "chapter_start_level": 851,
-    "chapter_title": "The Patron List",
+    "chapter_title": "An Answer Due",
     "generator_version": 2,
     "map_background": "river_map_section_cutout.png",
     "map_landmark": "wooden_bridge_cutout.png",
@@ -34,13 +34,16 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 7480972,
     "season": 9,
-    "season_title": "The Price of Glory",
-    "episode_id": 81
+    "season_title": "The House That Must Answer",
+    "episode_id": 81,
+    "balance_revision": 1,
+    "balance_base_moves": 34,
+    "balance_reinforced_cells": []
   },
   "moves": {
-    "total": 34
+    "total": 33
   },
-  "name": "The Patron List 01",
+  "name": "An Answer Due 01",
   "objectives": [
     {
       "amount": 18,
@@ -95,12 +98,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the speech sponsor list. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the speech sponsor list. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the speech sponsor list. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the speech sponsor list without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into an answer due advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

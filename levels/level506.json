@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "The sign identifies a waiting shelter, but the photographed sailing has already departed.",
+  "description": "Kellan's succession concerns are established.",
   "difficulty": "EASY",
   "level_id": 506,
   "metadata": {
     "chapter_end_level": 510,
     "chapter_id": 52,
     "chapter_start_level": 501,
-    "chapter_title": "The Reflected Sign",
+    "chapter_title": "Not the Heir They Wanted",
     "generator_version": 2,
     "map_background": "factory_map_section_cutout.png",
     "map_landmark": "police_car_topdown_cutout.png",
@@ -34,13 +34,16 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 4748917,
     "season": 5,
-    "season_title": "For Her Son",
-    "episode_id": 46
+    "season_title": "The Royal Household",
+    "episode_id": 46,
+    "balance_revision": 1,
+    "balance_base_moves": 34,
+    "balance_reinforced_cells": []
   },
   "moves": {
-    "total": 34
+    "total": 33
   },
-  "name": "The Reflected Sign 06",
+  "name": "Not the Heir They Wanted 06",
   "objectives": [
     {
       "amount": 18,
@@ -95,12 +98,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the reflected ferry sign. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the reflected ferry sign. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the reflected ferry sign. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the reflected ferry sign without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into not the heir they wanted advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Check the copy-shop stamp against an independent record.",
+  "description": "Nessa finds a filing receipt.",
   "difficulty": "MEDIUM",
   "level_id": 227,
   "metadata": {
     "chapter_end_level": 230,
     "chapter_id": 24,
     "chapter_start_level": 221,
-    "chapter_title": "Carbon Copies",
+    "chapter_title": "The Missing Page",
     "generator_version": 2,
     "map_background": "factory_map_section_cutout.png",
     "map_landmark": "police_car_topdown_cutout.png",
@@ -34,13 +34,27 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 2539516,
     "season": 2,
-    "season_title": "The Borrowed Fortune",
-    "episode_id": 18
+    "season_title": "The Fortune He Claimed",
+    "episode_id": 18,
+    "balance_revision": 1,
+    "balance_base_moves": 32,
+    "balance_reinforced_cells": [
+      {
+        "x": 5,
+        "y": 6,
+        "health": 1
+      },
+      {
+        "x": 2,
+        "y": 6,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 32
+    "total": 30
   },
-  "name": "Carbon Copies 07",
+  "name": "The Missing Page 07",
   "objectives": [
     {
       "amount": 24,
@@ -51,13 +65,13 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "tape",
         "x": 5,
         "y": 6
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 2,
         "y": 6
@@ -107,12 +121,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the copy-shop stamp. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the copy-shop stamp. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the copy-shop stamp. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the copy-shop stamp without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into the missing page advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

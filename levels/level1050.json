@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Critical Case: Close this investigation and hear what the overlooked dispatch label changes for the family.",
+  "description": "The review accepts the factual chain.",
   "difficulty": "CRITICAL_CASE",
   "level_id": 1050,
   "metadata": {
     "chapter_end_level": 1050,
     "chapter_id": 106,
     "chapter_start_level": 1041,
-    "chapter_title": "Another Door Opens",
+    "chapter_title": "The Other Side of the Line",
     "generator_version": 2,
     "map_background": "factory_map_section_cutout.png",
     "map_landmark": "police_car_topdown_cutout.png",
@@ -36,13 +36,32 @@
     "recommended_booster": "bomb",
     "scout_supply": false,
     "season": 10,
-    "season_title": "One Door Away",
-    "episode_id": 100
+    "season_title": "The Distance Between Two Voices",
+    "episode_id": 100,
+    "balance_revision": 1,
+    "balance_base_moves": 32,
+    "balance_reinforced_cells": [
+      {
+        "x": 3,
+        "y": 3,
+        "health": 1
+      },
+      {
+        "x": 4,
+        "y": 5,
+        "health": 1
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 32
+    "total": 29
   },
-  "name": "Another Door Opens 10",
+  "name": "The Other Side of the Line 10",
   "objectives": [
     {
       "amount": 30,
@@ -53,20 +72,20 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 3,
         "y": 3,
         "inventory_only": false
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "chain",
         "x": 4,
         "y": 5
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "tape",
         "x": 2,
         "y": 1
@@ -122,12 +141,8 @@
     "after_level": "serial100_outro",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the overlooked dispatch label. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the overlooked dispatch label. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the overlooked dispatch label. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the overlooked dispatch label without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into the other side of the line advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

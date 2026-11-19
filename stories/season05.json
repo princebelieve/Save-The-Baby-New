@@ -1,82 +1,47 @@
 {
   "story_id": "season05",
-  "title": "Amara's Recording",
-  "background_music": "suspense_opening",
+  "title": "The Question After the Funeral",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/factory_cage_art.jpeg",
   "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
   "characters": [
     "david",
     "amara",
     "victor",
-    "detective_morris",
-    "ethan"
+    "detective_morris"
   ],
   "scenes": [
     {
-      "scene_id": "season05_reveal",
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "Detective Morris",
-            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
-            "text": "Morris identifies a radio channel used by the quarry security team."
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "David removes noise from a copy of the recording. Amara identifies the train crossing bell beneath Ethan's signal."
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "David hears the same four beats through the factory wall. Something answers from below."
-          }
-        ]
-      },
+      "scene_id": "season05",
+      "stage_direction": "Rain, interrupted sleep and a missing infant. Preserve the distinction between Amara's true sighting and the unexplained means of entry.",
       "dialogues": [
+        {
+          "speaker": "Amara",
+          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+          "text": "Sometimes I think Victor killed Ethan's father too."
+        },
         {
           "speaker": "David",
           "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "Amara finds an old voice memo from the night Ethan vanished. Behind Victor's threat, a second voice counts four slow beats."
+          "text": "What happened that made you think it?"
         },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "Ethan used those beats to signal when he was hiding during their games. He may have been close enough to leave the clue himself."
+          "text": "He died suddenly. Nobody would answer me. Then Victor arrived as if a place had become vacant."
         },
         {
-          "speaker": "Victor",
-          "portrait": "res://assets/sprites/characters/victor_portrait_v2.png",
-          "text": "The recovered file ends with Victor saying, \"You taught him that signal.\""
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "We will not dismiss the question. We also cannot call it answered."
+        },
+        {
+          "speaker": "Amara",
+          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+          "text": "I know. Being frightened of him does not give me proof."
         }
       ],
-      "choices": [
-        {
-          "id": "police",
-          "label": "Send the recording to Morris for analysis",
-          "impact": "Morris can analyze the recording safely, but the signal may be too faint to recover.",
-          "response": "Morris: I will send the audio to the lab and keep a copy out of the station system.",
-          "speaker": "Detective Morris"
-        },
-        {
-          "id": "signal",
-          "label": "Decode the next lead with Amara",
-          "impact": "David checks the technical evidence. Amara connects it to the people and history behind the records, without police assistance.",
-          "response": "David preserves the original record and tests the next connection while Amara checks its meaning against what she remembers.",
-          "speaker": "David"
-        },
-        {
-          "id": "alone",
-          "label": "Return to the factory and listen on site",
-          "impact": "The factory may reveal the source, but returning could lead Victor straight to David.",
-          "response": "David: I will go back to the factory and check the wall while Amara stays on the call.",
-          "speaker": "David"
-        }
-      ]
+      "choices": []
     }
   ],
   "metadata": {
@@ -84,6 +49,8 @@
     "chapter": 5,
     "season": 1,
     "campaign_levels": "021-025",
-    "episode": "A continuing rescue mystery; the final clue opens the next episode."
+    "episode": "A continuing rescue mystery; the final clue opens the next episode.",
+    "authored_dialogue_revision": 1,
+    "ethan_status": "missing"
   }
 }

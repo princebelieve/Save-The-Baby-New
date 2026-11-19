@@ -1,55 +1,29 @@
 {
   "story_id": "serial034_intro",
-  "title": "An Unset Table",
-  "background_music": "suspense_opening",
+  "title": "The Door She Wasn't Offered",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/garden_map_tile.jpeg",
   "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
   "characters": [
     "david",
     "amara",
     "victor",
-    "ethan",
     "detective_morris"
   ],
   "scenes": [
     {
       "scene_id": "serial034_intro",
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "Detective Morris",
-            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
-            "text": "We will verify the catering delivery note and keep its source intact. A lead is not a rescue; we cannot assume Victor stayed there.",
-            "routes": [
-              "police"
-            ]
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I will check the technical trail behind the catering delivery note. Amara, tell me what the records cannot explain."
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I am following the catering delivery note without police backup. Amara has my location; I am not going to turn this into a contest with Victor."
-          }
-        ]
-      },
+      "stage_direction": "Private memories interrupt the investigation. David listens without competing with either man from Amara's past.",
       "dialogues": [
         {
           "speaker": "David",
           "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "The next lead is the catering delivery note. We need its original source before Victor moves again."
+          "text": "You can stop the recording whenever you want."
         },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "He likes a borrowed room to look like a home he built."
+          "text": "No. Let me hear what I have been remembering in pieces."
         }
       ],
       "choices": []
@@ -58,11 +32,14 @@
   "metadata": {
     "version": 2,
     "season": 4,
-    "season_title": "What He Calls Love",
+    "season_title": "The Heart He Couldn't Claim",
     "episode": 4,
     "episode_id": 34,
     "campaign_levels": "381-390",
     "ethan_status": "missing",
-    "season_finale": false
+    "season_finale": false,
+    "known_before": "episode_033_resolved",
+    "unlocks_fact": "",
+    "authored_dialogue_revision": 1
   }
 }

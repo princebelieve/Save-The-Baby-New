@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Critical Case: Close this investigation and hear what the courier inventory label changes for the family.",
+  "description": "The complete photograph is recovered.",
   "difficulty": "CRITICAL_CASE",
   "level_id": 200,
   "metadata": {
     "chapter_end_level": 200,
     "chapter_id": 21,
     "chapter_start_level": 191,
-    "chapter_title": "The Torn Label",
+    "chapter_title": "The Other Side of the Picture",
     "generator_version": 2,
     "map_background": "river_map_section_cutout.png",
     "map_landmark": "wooden_bridge_cutout.png",
@@ -36,13 +36,27 @@
     "recommended_booster": "thunder",
     "scout_supply": false,
     "season": 2,
-    "season_title": "The Borrowed Fortune",
-    "episode_id": 15
+    "season_title": "The Fortune He Claimed",
+    "episode_id": 15,
+    "balance_revision": 1,
+    "balance_base_moves": 30,
+    "balance_reinforced_cells": [
+      {
+        "x": 5,
+        "y": 1,
+        "health": 1
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 30
+    "total": 27
   },
-  "name": "The Torn Label 10",
+  "name": "The Other Side of the Picture 10",
   "objectives": [
     {
       "amount": 30,
@@ -53,14 +67,14 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 5,
         "y": 1,
         "inventory_only": false
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 3,
         "y": 4
@@ -122,12 +136,8 @@
     "after_level": "serial015_outro",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the courier inventory label. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the courier inventory label. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the courier inventory label. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the courier inventory label without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into the other side of the picture advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

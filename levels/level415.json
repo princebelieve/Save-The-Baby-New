@@ -25,14 +25,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Compare the depot receiving signature with what the witnesses actually remember.",
+  "description": "David recalls repairing Amara's business website.",
   "difficulty": "HARD",
   "level_id": 415,
   "metadata": {
     "chapter_end_level": 420,
     "chapter_id": 43,
     "chapter_start_level": 411,
-    "chapter_title": "Someone Else's Name",
+    "chapter_title": "Someone Who Listened",
     "generator_version": 2,
     "map_background": "river_map_section_cutout.png",
     "map_landmark": "wooden_bridge_cutout.png",
@@ -43,13 +43,32 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 4028288,
     "season": 4,
-    "season_title": "What He Calls Love",
-    "episode_id": 37
+    "season_title": "The Heart He Couldn't Claim",
+    "episode_id": 37,
+    "balance_revision": 1,
+    "balance_base_moves": 30,
+    "balance_reinforced_cells": [
+      {
+        "x": 6,
+        "y": 4,
+        "health": 1
+      },
+      {
+        "x": 3,
+        "y": 5,
+        "health": 1
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 30
+    "total": 27
   },
-  "name": "Someone Else's Name 05",
+  "name": "Someone Who Listened 05",
   "objectives": [
     {
       "amount": 30,
@@ -60,19 +79,19 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "chain",
         "x": 6,
         "y": 4
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "tape",
         "x": 3,
         "y": 5
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 5,
         "y": 4
@@ -128,12 +147,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the depot receiving signature. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the depot receiving signature. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the depot receiving signature. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the depot receiving signature without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into someone who listened advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

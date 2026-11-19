@@ -25,14 +25,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Reconstruct the missing step around the cloakroom token.",
+  "description": "Amara explains why she left Victor.",
   "difficulty": "HARD",
   "level_id": 208,
   "metadata": {
     "chapter_end_level": 210,
     "chapter_id": 22,
     "chapter_start_level": 201,
-    "chapter_title": "Numbered Coats",
+    "chapter_title": "The Proposal",
     "generator_version": 2,
     "map_background": "factory_map_section_cutout.png",
     "map_landmark": "police_car_topdown_cutout.png",
@@ -43,13 +43,27 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 2389055,
     "season": 2,
-    "season_title": "The Borrowed Fortune",
-    "episode_id": 16
+    "season_title": "The Fortune He Claimed",
+    "episode_id": 16,
+    "balance_revision": 1,
+    "balance_base_moves": 30,
+    "balance_reinforced_cells": [
+      {
+        "x": 5,
+        "y": 1,
+        "health": 1
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 30
+    "total": 27
   },
-  "name": "Numbered Coats 08",
+  "name": "The Proposal 08",
   "objectives": [
     {
       "amount": 30,
@@ -60,13 +74,13 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "chain",
         "x": 5,
         "y": 1
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "tape",
         "x": 2,
         "y": 1
@@ -128,12 +142,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the cloakroom token. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the cloakroom token. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the cloakroom token. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the cloakroom token without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into the proposal advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

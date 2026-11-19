@@ -14,6 +14,8 @@ var _background_status := ""
 var _operation_dialog: AcceptDialog
 var _operation_busy := false
 var _operation_notice := ""
+var _coin_buttons: Dictionary = {}
+var _purchase_status: Label
 const OWNER_PATH := "user://progress_owner.cfg"
 
 func initialize(current_game: Game) -> void:
@@ -35,6 +37,7 @@ func initialize(current_game: Game) -> void:
 	purchases.message.connect(_notice)
 	account.background_message.connect(_background_notice)
 	purchases.background_message.connect(_background_notice)
+	purchases.changed.connect(_refresh_coin_buttons)
 	if account.signed_in() and _owner == account.user_id:
 		account.resume_sync()
 	elif account.signed_in():
@@ -84,6 +87,7 @@ func show_account() -> void:
 	var dialog := AcceptDialog.new()
 	_login_dialog = dialog
 	_login_buttons.clear()
+	_coin_buttons.clear()
 	dialog.set_meta("custom_heading", true)
 	game._prepare_dialog(dialog)
 	dialog.title = ""
@@ -145,10 +149,16 @@ func show_account() -> void:
 		pack_label.text = "BUY COINS (GOOGLE PLAY)"
 		_style_section_label(pack_label)
 		content.add_child(pack_label)
+		_purchase_status = Label.new()
+		_purchase_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		_purchase_status.add_theme_color_override("font_color", Color("#4b3424"))
+		content.add_child(_purchase_status)
 		for product in purchases.PRODUCTS:
 			var offer: Dictionary = purchases.products.get(product,{})
 			var price := str(offer.get("formatted_price","Unavailable"))
 			_button(content,"%d COINS - %s" % [purchases.PRODUCTS[product],price],_confirm_purchase.bind(product,price),not purchases.available(product))
+			_coin_buttons[product] = content.get_child(content.get_child_count() - 1)
+		_refresh_coin_buttons()
 		var supply_label := Label.new()
 		supply_label.text = "USE PURCHASED COINS"
 		_style_section_label(supply_label)
@@ -164,6 +174,8 @@ func show_account() -> void:
 		_button(content,"SIGN OUT",_sign_out)
 		_button(content,"DELETE ONLINE ACCOUNT",_confirm_delete)
 	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.scroll_deadzone = 12
 	scroll.custom_minimum_size = Vector2(content.custom_minimum_size.x,mini(940,int(game.get_viewport_rect().size.y*0.76)))
 	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -177,6 +189,17 @@ func show_account() -> void:
 	dialog.popup_centered_clamped(Vector2i(int(content.custom_minimum_size.x+56),int(scroll.custom_minimum_size.y+112)))
 	if account.signed_in():
 		_load_account_supplies.call_deferred(dialog, content.find_child("AccountSupplyEntries", true, false), str(account.user_id))
+
+func _refresh_coin_buttons() -> void:
+	if not is_instance_valid(_login_dialog) or _login_dialog.is_queued_for_deletion(): return
+	if is_instance_valid(_purchase_status):
+		_purchase_status.text = purchases.availability_message()
+	for product in _coin_buttons:
+		var button: Button = _coin_buttons[product]
+		if not is_instance_valid(button): continue
+		var price := str(purchases.products.get(product, {}).get("formatted_price", "Unavailable"))
+		button.text = "%d COINS - %s" % [purchases.PRODUCTS[product], price]
+		button.disabled = not purchases.available(product)
 
 
 func _load_account_supplies(dialog: AcceptDialog, entries: VBoxContainer, owner: String) -> void:
@@ -265,6 +288,7 @@ func _on_login_start_failed(text: String) -> void:
 	_login_dialog.get_ok_button().disabled = false
 
 func _confirm_purchase(product: String, price: String) -> void:
+	price = str(purchases.products.get(product, {}).get("formatted_price", price))
 	var confirm := ConfirmationDialog.new()
 	confirm.set_meta("custom_heading", true)
 	game._prepare_dialog(confirm)

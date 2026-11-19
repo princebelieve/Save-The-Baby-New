@@ -1,55 +1,37 @@
 {
   "story_id": "serial081_intro",
-  "title": "The Patron List",
-  "background_music": "suspense_opening",
+  "title": "An Answer Due",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/factory_map_section.jpeg",
   "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
   "characters": [
     "david",
     "amara",
     "victor",
-    "ethan",
     "detective_morris"
   ],
   "scenes": [
     {
       "scene_id": "serial081_intro",
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "Detective Morris",
-            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
-            "text": "We will verify the speech sponsor list and keep its source intact. A lead is not a rescue; we cannot assume Victor stayed there.",
-            "routes": [
-              "police"
-            ]
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I will check the technical trail behind the speech sponsor list. Amara, tell me what the records cannot explain."
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I am following the speech sponsor list without police backup. Amara has my location; I am not going to turn this into a contest with Victor."
-          }
-        ]
-      },
+      "stage_direction": "The search becomes a confrontation with named decision-makers. Each signed record changes a concrete next step.",
       "dialogues": [
+        {
+          "speaker": "Detective Morris",
+          "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
+          "text": "The receiving authority now has a named contact for this case. I will make sure the request does not disappear between offices.",
+          "routes": [
+            "police"
+          ]
+        },
         {
           "speaker": "David",
           "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "The next lead is the speech sponsor list. We need its original source before Victor moves again."
+          "text": "The receiving office has accepted the instruction for review."
         },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "Tell them there is no reunion I agreed to. Let them see the original messages."
+          "text": "Who is answering it? I want a name."
         }
       ],
       "choices": []
@@ -58,11 +40,14 @@
   "metadata": {
     "version": 2,
     "season": 9,
-    "season_title": "The Price of Glory",
+    "season_title": "The House That Must Answer",
     "episode": 1,
     "episode_id": 81,
     "campaign_levels": "851-860",
     "ethan_status": "missing",
-    "season_finale": false
+    "season_finale": false,
+    "known_before": "episode_080_resolved",
+    "unlocks_fact": "",
+    "authored_dialogue_revision": 1
   }
 }

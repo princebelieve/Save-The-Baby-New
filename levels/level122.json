@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Preserve the original evidence behind the stair camera gap.",
+  "description": "The contractor's plan is recovered.",
   "difficulty": "EASY",
   "level_id": 122,
   "metadata": {
     "chapter_end_level": 130,
     "chapter_id": 14,
     "chapter_start_level": 121,
-    "chapter_title": "Nine Missing Minutes",
+    "chapter_title": "The Door Below",
     "generator_version": 2,
     "map_background": "factory_map_section_cutout.png",
     "map_landmark": "police_car_topdown_cutout.png",
@@ -34,13 +34,16 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 1708021,
     "season": 1,
-    "season_title": "The River Between Us",
-    "episode_id": 8
+    "season_title": "The Door That Never Opened",
+    "episode_id": 8,
+    "balance_revision": 1,
+    "balance_base_moves": 34,
+    "balance_reinforced_cells": []
   },
   "moves": {
-    "total": 34
+    "total": 33
   },
-  "name": "Nine Missing Minutes 02",
+  "name": "The Door Below 02",
   "objectives": [
     {
       "amount": 18,
@@ -95,12 +98,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the stair camera gap. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the stair camera gap. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the stair camera gap. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the stair camera gap without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into the door below advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

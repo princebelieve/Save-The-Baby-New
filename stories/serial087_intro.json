@@ -1,55 +1,29 @@
 {
   "story_id": "serial087_intro",
-  "title": "The Roof Rack",
-  "background_music": "suspense_opening",
+  "title": "Someone Sees Him",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/factory_map_section.jpeg",
   "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
   "characters": [
     "david",
     "amara",
     "victor",
-    "ethan",
     "detective_morris"
   ],
   "scenes": [
     {
       "scene_id": "serial087_intro",
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "Detective Morris",
-            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
-            "text": "We will verify the concierge vehicle photograph and keep its source intact. A lead is not a rescue; we cannot assume Victor stayed there.",
-            "routes": [
-              "police"
-            ]
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I will check the technical trail behind the concierge vehicle photograph. Amara, tell me what the records cannot explain."
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I am following the concierge vehicle photograph without police backup. Amara has my location; I am not going to turn this into a contest with Victor."
-          }
-        ]
-      },
+      "stage_direction": "The search becomes a confrontation with named decision-makers. Each signed record changes a concrete next step.",
       "dialogues": [
-        {
-          "speaker": "David",
-          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "The next lead is the concierge vehicle photograph. We need its original source before Victor moves again."
-        },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "I recognise the cot. We are closer to something he touched, not entitled to assume the rest."
+          "text": "Did the visitor see him? Not the cot. Not the cover."
+        },
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "Yes. They met Ethan and the carer in person."
         }
       ],
       "choices": []
@@ -58,11 +32,14 @@
   "metadata": {
     "version": 2,
     "season": 9,
-    "season_title": "The Price of Glory",
+    "season_title": "The House That Must Answer",
     "episode": 7,
     "episode_id": 87,
     "campaign_levels": "911-920",
     "ethan_status": "missing",
-    "season_finale": false
+    "season_finale": false,
+    "known_before": "episode_086_resolved",
+    "unlocks_fact": "",
+    "authored_dialogue_revision": 1
   }
 }

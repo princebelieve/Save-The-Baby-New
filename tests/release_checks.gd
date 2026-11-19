@@ -114,7 +114,7 @@ func _run() -> void:
 				await get_tree().process_frame
 			check(not board.is_locked(), "Level %d must finish its cascades" % level_id)
 			check(board.is_stable(), "Level %d must resolve to a stable board" % level_id)
-			check(board.get_all_tiles().size() == board.get_width() * board.get_height() - board._blocked_cells.size(), "Gravity must refill every playable cell")
+			check(not board._refill_system.needs_refill(board), "Gravity must fill open supply inlets while preserving sealed gaps")
 			check(board.get_remaining_moves() == int(data["moves"]["total"]) - 1, "One legal swap must cost exactly one move")
 			validator.free()
 		shuffler.free()
@@ -181,7 +181,7 @@ func _check_story_flow() -> void:
 	game._story_manager.end_story()
 	await get_tree().process_frame
 	check(game._pending_level_id == 0 and game._campaign_layer != null, "The last available case must return to the continuing campaign map")
-	check(audio._music_player.stream != null and audio._current_music_track == "suspense_opening", "Resuming the campaign must request background music")
+	check(audio._music_player.stream != null and audio._current_music_track == "case_investigation", "Resuming the campaign must request investigation music")
 	var music_bus := AudioServer.get_bus_index("Music")
 	check(music_bus >= 0, "Audio initialization must provide a Music bus")
 	check(audio._music_player.playing and music_bus >= 0 and not AudioServer.is_bus_mute(music_bus), "Campaign music must remain enabled during progression")

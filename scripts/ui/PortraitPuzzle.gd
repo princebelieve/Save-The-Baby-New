@@ -31,6 +31,58 @@ var _gallery_message: Label
 var _swipe_from := -1
 var _swipe_start := Vector2.ZERO
 var _suppress_tap := false
+var _resume_needed := false
+var _finished := false
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_APPLICATION_PAUSED or what == NOTIFICATION_APPLICATION_FOCUS_OUT:
+		_resume_needed = _running
+		_swipe_from = -1
+		_selected = -1
+		_suppress_tap = false
+	elif what == NOTIFICATION_APPLICATION_RESUMED or what == NOTIFICATION_APPLICATION_FOCUS_IN:
+		if _resume_needed and is_node_ready():
+			_resume_needed = false
+			_show_resume.call_deferred()
+
+func _show_resume() -> void:
+	if not _running or _finished: return
+	if _remaining() <= 0:
+		_show_outcome(false)
+		return
+	if is_instance_valid(_menu): _menu.queue_free()
+	_show_help()
+
+func _show_outcome(won: bool, reward_text := "") -> void:
+	if _finished: return
+	SignalBus.play_music.emit("case_victory" if won else "case_setback")
+	SignalBus.play_sfx.emit("case_open")
+	_finished = true
+	_running = false
+	if is_instance_valid(_menu): _menu.queue_free()
+	if is_instance_valid(_overlay):
+		remove_child(_overlay)
+		_overlay.queue_free()
+	_overlay = Control.new()
+	_overlay.name = "RestorationResult"
+	_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(_overlay)
+	MobileGameUI.background(_overlay)
+	var margin := MarginContainer.new()
+	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	for side in ["left", "right", "top", "bottom"]:
+		margin.add_theme_constant_override("margin_" + side, 28)
+	_overlay.add_child(margin)
+	var column := MobileGameUI.column(margin, 16)
+	MobileGameUI.image(column, "res://assets/sprites/ui/game_logo_cutout.png", Vector2(180, 100))
+	MobileGameUI.display_label(column, "Evidence restored!" if won else "Time to return to the case", 44)
+	var picture := MobileGameUI.image(column, str(_attempt.portrait), Vector2(160, 160))
+	picture.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	MobileGameUI.label(column, reward_text if won else "This challenge has ended. Your investigation is ready to continue.", 30)
+	MobileGameUI.button(column, "CONTINUE INVESTIGATION", closed.emit)
+	if won:
+		MobileGameUI.button(column, "SAVE PICTURE", save_requested.emit, MobileGameUI.PINK)
+	_gallery_message = MobileGameUI.label(column, "", 26)
 
 
 func configure(attempt: Dictionary) -> void:
@@ -118,6 +170,7 @@ func _ready() -> void:
 
 
 func _show_help() -> void:
+	SignalBus.play_sfx.emit("case_open")
 	if is_instance_valid(_overlay):
 		_overlay.queue_free()
 	_overlay = Control.new()
@@ -137,7 +190,9 @@ func _show_help() -> void:
 	var picture := MobileGameUI.image(column, str(_attempt.portrait))
 	picture.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	MobileGameUI.label(column, "Swipe one fragment onto another, or tap two.\nThe timer keeps running.", 34, Color.WHITE)
-	MobileGameUI.button(column, "Resume restoration", func(): _overlay.queue_free())
+	MobileGameUI.button(column, "Resume restoration", func():
+		SignalBus.play_sfx.emit("case_close")
+		_overlay.queue_free())
 
 
 func _remaining() -> float:
@@ -151,8 +206,7 @@ func _process(_delta: float) -> void:
 	var seconds := maxi(0, ceili(_remaining()))
 	_timer_label.text = "%d:%02d" % [seconds / 60, seconds % 60]
 	if seconds <= 0:
-		_running = false
-		_message.text = "Time expired"
+		_show_outcome(false)
 		for button in _buttons:
 			button.disabled = true
 
@@ -243,6 +297,7 @@ func _animate_swap(first: int, second: int, first_image: Texture2D, second_image
 
 
 func show_reward(coins: int, streak: int, booster: String = "", points: int = 0) -> void:
+	_show_outcome(true, "+%d coins  •  +%d points%s" % [coins, points, "\n+1 " + booster.capitalize() if not booster.is_empty() else ""])
 	_running = false
 	_message.text = "Evidence restored! +%d coins" % coins
 	if points > 0: _message.text += "\n+%d points" % points
@@ -293,6 +348,9 @@ func _resize_board() -> void:
 
 
 func go_back() -> void:
+	if _finished:
+		closed.emit()
+		return
 	if is_instance_valid(_menu):
 		_menu.queue_free()
 	elif is_instance_valid(_overlay):

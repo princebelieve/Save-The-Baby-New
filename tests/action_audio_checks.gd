@@ -32,6 +32,22 @@ func run() -> void:
 	var game := preload("res://scenes/game/Game.tscn").instantiate() as Game
 	add_child(game)
 	await get_tree().create_timer(2).timeout
+	var music_audio := game.get_node("Managers/AudioManager")
+	for state in ["investigation", "play", "pressure", "restoration", "victory", "setback"]:
+		music_audio.play_music("case_" + state)
+		check(music_audio._current_music_track == "case_" + state, "event arrangement selected: " + state)
+		check(music_audio._music_player.stream is AudioStreamWAV and music_audio._music_player.stream.loop_mode == AudioStreamWAV.LOOP_FORWARD, "event music loops: " + state)
+	var current_player = music_audio._music_player
+	music_audio.play_music("case_setback")
+	check(music_audio._music_player == current_player, "repeated state does not restart the musical phrase")
+	await get_tree().create_timer(0.8).timeout
+	music_audio._notification(Node.NOTIFICATION_APPLICATION_PAUSED)
+	music_audio.play_music("case_play")
+	check(music_audio._music_player.stream_paused and music_audio._outgoing_music.stream_paused, "music changes while backgrounded keep both tracks paused")
+	music_audio.set_music_enabled(true)
+	check(music_audio._music_player.stream_paused, "enabling music while backgrounded does not resume playback")
+	music_audio._notification(Node.NOTIFICATION_APPLICATION_RESUMED)
+	check(not music_audio._music_player.stream_paused, "returning resumes the active arrangement")
 	game._skip_opening_story()
 	game.get_node("Managers/LevelManager").load_level(1)
 	game._begin_level("alone")

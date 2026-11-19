@@ -1,55 +1,37 @@
 {
   "story_id": "serial021_intro",
-  "title": "David's Old Page",
-  "background_music": "suspense_opening",
+  "title": "Green Pin",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/factory_map_section.jpeg",
   "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
   "characters": [
     "david",
     "amara",
     "victor",
-    "ethan",
     "detective_morris"
   ],
   "scenes": [
     {
       "scene_id": "serial021_intro",
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "Detective Morris",
-            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
-            "text": "We will verify the cloned portfolio page and keep its source intact. A lead is not a rescue; we cannot assume Victor stayed there.",
-            "routes": [
-              "police"
-            ]
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I will check the technical trail behind the cloned portfolio page. Amara, tell me what the records cannot explain."
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I am following the cloned portfolio page without police backup. Amara has my location; I am not going to turn this into a contest with Victor."
-          }
-        ]
-      },
+      "stage_direction": "Calls and protected interviews interrupt the search. Amara asks practical questions about Ethan's care before she asks about blame.",
       "dialogues": [
+        {
+          "speaker": "Detective Morris",
+          "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
+          "text": "We need to find Lami safely. We do not yet know whether she is hiding from us or from the people who hired her.",
+          "routes": [
+            "police"
+          ]
+        },
         {
           "speaker": "David",
           "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "The next lead is the cloned portfolio page. We need its original source before Victor moves again."
+          "text": "The pin belonged to a former attendant named Lami."
         },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "You did not send it. Now show me how we distinguish its source from your name on it."
+          "text": "I know her face. She used to step aside when the family came down the stairs."
         }
       ],
       "choices": []
@@ -58,11 +40,14 @@
   "metadata": {
     "version": 2,
     "season": 3,
-    "season_title": "A Web of Mirrors",
+    "season_title": "The Woman Who Waited",
     "episode": 1,
     "episode_id": 21,
     "campaign_levels": "251-260",
     "ethan_status": "missing",
-    "season_finale": false
+    "season_finale": false,
+    "known_before": "episode_020_resolved",
+    "unlocks_fact": "",
+    "authored_dialogue_revision": 1
   }
 }

@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Critical Case: Close this investigation and hear what the property agent message changes for the family.",
+  "description": "Amara draws Victor into discussing the morning.",
   "difficulty": "CRITICAL_CASE",
   "level_id": 450,
   "metadata": {
     "chapter_end_level": 450,
     "chapter_id": 46,
     "chapter_start_level": 441,
-    "chapter_title": "The Story She Keeps",
+    "chapter_title": "What He Really Wants",
     "generator_version": 2,
     "map_background": "factory_map_section_cutout.png",
     "map_landmark": "police_car_topdown_cutout.png",
@@ -36,13 +36,32 @@
     "recommended_booster": "bomb",
     "scout_supply": false,
     "season": 4,
-    "season_title": "What He Calls Love",
-    "episode_id": 40
+    "season_title": "The Heart He Couldn't Claim",
+    "episode_id": 40,
+    "balance_revision": 1,
+    "balance_base_moves": 30,
+    "balance_reinforced_cells": [
+      {
+        "x": 4,
+        "y": 5,
+        "health": 1
+      },
+      {
+        "x": 6,
+        "y": 5,
+        "health": 1
+      },
+      {
+        "x": 1,
+        "y": 3,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 30
+    "total": 27
   },
-  "name": "The Story She Keeps 10",
+  "name": "What He Really Wants 10",
   "objectives": [
     {
       "amount": 30,
@@ -53,20 +72,20 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 4,
         "y": 5,
         "inventory_only": false
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "chain",
         "x": 6,
         "y": 5
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "tape",
         "x": 1,
         "y": 3
@@ -122,12 +141,8 @@
     "after_level": "serial040_outro",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the property agent message. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the property agent message. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the property agent message. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the property agent message without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into what he really wants advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

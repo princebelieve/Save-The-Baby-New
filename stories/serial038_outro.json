@@ -1,91 +1,51 @@
 {
   "story_id": "serial038_outro",
-  "title": "Credit Taken | The next lead",
-  "background_music": "suspense_opening",
+  "title": "A Photograph Sent On",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/garden_map_tile.jpeg",
   "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
   "characters": [
     "david",
     "amara",
     "victor",
-    "ethan",
     "detective_morris"
   ],
   "scenes": [
     {
       "scene_id": "serial038_outro",
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "Detective Morris",
-            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
-            "text": "We will verify the colleague's original project file and keep its source intact. A lead is not a rescue; we cannot assume Victor stayed there.",
-            "routes": [
-              "police"
-            ]
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I will check the technical trail behind the colleague's original project file. Amara, tell me what the records cannot explain."
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I am following the colleague's original project file without police backup. Amara has my location; I am not going to turn this into a contest with Victor."
-          }
-        ]
-      },
+      "stage_direction": "Private memories interrupt the investigation. David listens without competing with either man from Amara's past.",
       "dialogues": [
         {
           "speaker": "David",
           "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "The file disproves one of Victor's favourite success stories and contains his old delivery contact."
+          "text": "They admit sending the photograph to Victor."
         },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "The contact has missed him. A fresh voice message mentions a shuttered shop."
+          "text": "A photograph of me laughing became permission for him to visit my gate."
+        },
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "Their account gives us a date for when he learned about us."
         }
       ],
-      "choices": [
-        {
-          "id": "police",
-          "label": "Coordinate the next lead with the police",
-          "impact": "Bring Morris into the next investigation and preserve the evidence behind the colleague's original project file.",
-          "response": "Morris takes the lead into the formal investigation. David checks the record while Amara explains its personal significance.",
-          "speaker": "Detective Morris"
-        },
-        {
-          "id": "signal",
-          "label": "Decode the next connection with Amara",
-          "impact": "David checks the technical trail from the colleague's original project file; Amara tests it against her own history.",
-          "response": "David saves the original record and checks its connections. Amara refuses to let Victor's version replace what she remembers.",
-          "speaker": "David"
-        },
-        {
-          "id": "alone",
-          "label": "Follow the next trail without police backup",
-          "impact": "David follows the physical lead from the colleague's original project file, keeping Amara informed.",
-          "response": "David sends Amara his location before moving. Finding Ethan matters more than claiming the search as his own achievement.",
-          "speaker": "David"
-        }
-      ]
+      "choices": []
     }
   ],
   "metadata": {
     "version": 2,
     "season": 4,
-    "season_title": "What He Calls Love",
+    "season_title": "The Heart He Couldn't Claim",
     "episode": 8,
     "episode_id": 38,
     "campaign_levels": "421-430",
     "ethan_status": "missing",
     "season_finale": false,
-    "evidence_summary": "The file disproves one of Victor's favourite success stories and contains his old delivery contact. The contact has missed him. A fresh voice message mentions a shuttered shop."
+    "known_before": "episode_037_resolved",
+    "unlocks_fact": "episode_038_resolved",
+    "authored_dialogue_revision": 1,
+    "evidence_summary": "A household observer reported Amara and David to Victor."
   }
 }

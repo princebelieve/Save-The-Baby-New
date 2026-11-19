@@ -1,55 +1,29 @@
 {
   "story_id": "serial026_intro",
-  "title": "Below the Signal",
-  "background_music": "suspense_opening",
+  "title": "A Brother at the Yard",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/factory_map_section.jpeg",
   "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
   "characters": [
     "david",
     "amara",
     "victor",
-    "ethan",
     "detective_morris"
   ],
   "scenes": [
     {
       "scene_id": "serial026_intro",
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "Detective Morris",
-            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
-            "text": "We will verify the basement repeater label and keep its source intact. A lead is not a rescue; we cannot assume Victor stayed there.",
-            "routes": [
-              "police"
-            ]
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I will check the technical trail behind the basement repeater label. Amara, tell me what the records cannot explain."
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I am following the basement repeater label without police backup. Amara has my location; I am not going to turn this into a contest with Victor."
-          }
-        ]
-      },
+      "stage_direction": "Calls and protected interviews interrupt the search. Amara asks practical questions about Ethan's care before she asks about blame.",
       "dialogues": [
         {
           "speaker": "David",
           "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "The next lead is the basement repeater label. We need its original source before Victor moves again."
+          "text": "Nessa's brother did not arrive home. Someone warned her to stop making copies."
         },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "You can decode a signal without knowing where my son is. Keep checking both."
+          "text": "We cannot ask her to help us and leave him there."
         }
       ],
       "choices": []
@@ -58,11 +32,14 @@
   "metadata": {
     "version": 2,
     "season": 3,
-    "season_title": "A Web of Mirrors",
+    "season_title": "The Woman Who Waited",
     "episode": 6,
     "episode_id": 26,
     "campaign_levels": "301-310",
     "ethan_status": "missing",
-    "season_finale": false
+    "season_finale": false,
+    "known_before": "episode_025_resolved",
+    "unlocks_fact": "",
+    "authored_dialogue_revision": 1
   }
 }

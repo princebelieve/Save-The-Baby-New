@@ -1,91 +1,51 @@
 {
   "story_id": "serial020_outro",
-  "title": "Control Refused | The next lead",
-  "background_music": "suspense_opening",
+  "title": "Money Is Not a Father",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/iron_gate_map_tile.jpeg",
   "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
   "characters": [
     "david",
     "amara",
     "victor",
-    "ethan",
     "detective_morris"
   ],
   "scenes": [
     {
       "scene_id": "serial020_outro",
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "Detective Morris",
-            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
-            "text": "We will verify the rejected account mandate and keep its source intact. A lead is not a rescue; we cannot assume Victor stayed there.",
-            "routes": [
-              "police"
-            ]
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I will check the technical trail behind the rejected account mandate. Amara, tell me what the records cannot explain."
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I am following the rejected account mandate without police backup. Amara has my location; I am not going to turn this into a contest with Victor."
-          }
-        ]
-      },
+      "stage_direction": "The conversation moves between Amara's home and the estate's public offices. Keep documents distinct from what people claim about them.",
       "dialogues": [
         {
           "speaker": "David",
           "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "The mandate is blocked, preserving Amara's control of the provision, but Victor has moved again."
+          "text": "We have secured the original provision."
         },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "A message arrives from a page David once built. Victor has found another way to boast."
+          "text": "Good. Now show me why a payment beside it says transfer of care."
+        },
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "There should not have been a transfer without you knowing."
         }
       ],
-      "choices": [
-        {
-          "id": "police",
-          "label": "Coordinate the next lead with the police",
-          "impact": "Bring Morris into the next investigation and preserve the evidence behind the rejected account mandate.",
-          "response": "Morris takes the lead into the formal investigation. David checks the record while Amara explains its personal significance.",
-          "speaker": "Detective Morris"
-        },
-        {
-          "id": "signal",
-          "label": "Decode the next connection with Amara",
-          "impact": "David checks the technical trail from the rejected account mandate; Amara tests it against her own history.",
-          "response": "David saves the original record and checks its connections. Amara refuses to let Victor's version replace what she remembers.",
-          "speaker": "David"
-        },
-        {
-          "id": "alone",
-          "label": "Follow the next trail without police backup",
-          "impact": "David follows the physical lead from the rejected account mandate, keeping Amara informed.",
-          "response": "David sends Amara his location before moving. Finding Ethan matters more than claiming the search as his own achievement.",
-          "speaker": "David"
-        }
-      ]
+      "choices": []
     }
   ],
   "metadata": {
     "version": 2,
     "season": 2,
-    "season_title": "The Borrowed Fortune",
+    "season_title": "The Fortune He Claimed",
     "episode": 10,
     "episode_id": 20,
     "campaign_levels": "241-250",
     "ethan_status": "missing",
     "season_finale": true,
-    "evidence_summary": "The mandate is blocked, preserving Amara's control of the provision, but Victor has moved again. A message arrives from a page David once built. Victor has found another way to boast."
+    "known_before": "episode_019_resolved",
+    "unlocks_fact": "episode_020_resolved",
+    "authored_dialogue_revision": 1,
+    "evidence_summary": "Victor's alleged debt is exposed as an unsupported demand."
   }
 }

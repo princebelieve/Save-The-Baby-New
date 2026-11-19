@@ -1,91 +1,51 @@
 {
   "story_id": "serial064_outro",
-  "title": "A Broken Seal | The next lead",
-  "background_music": "suspense_opening",
+  "title": "A Signature Withdrawn",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/riverbank_map_section.jpeg",
   "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
   "characters": [
     "david",
     "amara",
     "victor",
-    "ethan",
     "detective_morris"
   ],
   "scenes": [
     {
       "scene_id": "serial064_outro",
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "Detective Morris",
-            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
-            "text": "We will verify the discarded freight seal and keep its source intact. A lead is not a rescue; we cannot assume Victor stayed there.",
-            "routes": [
-              "police"
-            ]
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I will check the technical trail behind the discarded freight seal. Amara, tell me what the records cannot explain."
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I am following the discarded freight seal without police backup. Amara has my location; I am not going to turn this into a contest with Victor."
-          }
-        ]
-      },
+      "stage_direction": "Victor's commands meet increasingly specific questions he cannot answer. His uncertainty must not be played as proof Ethan is safe.",
       "dialogues": [
         {
           "speaker": "David",
           "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "The seal matches a container opened at a roadside repair shelter."
+          "text": "The original receiving instruction is now formally disputed."
         },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "The shelter is empty. A mechanic recorded a replaced battery serial number."
+          "text": "This time my name means that I spoke."
+        },
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "Someone is already preparing a replacement instruction."
         }
       ],
-      "choices": [
-        {
-          "id": "police",
-          "label": "Coordinate the next lead with the police",
-          "impact": "Bring Morris into the next investigation and preserve the evidence behind the discarded freight seal.",
-          "response": "Morris takes the lead into the formal investigation. David checks the record while Amara explains its personal significance.",
-          "speaker": "Detective Morris"
-        },
-        {
-          "id": "signal",
-          "label": "Decode the next connection with Amara",
-          "impact": "David checks the technical trail from the discarded freight seal; Amara tests it against her own history.",
-          "response": "David saves the original record and checks its connections. Amara refuses to let Victor's version replace what she remembers.",
-          "speaker": "David"
-        },
-        {
-          "id": "alone",
-          "label": "Follow the next trail without police backup",
-          "impact": "David follows the physical lead from the discarded freight seal, keeping Amara informed.",
-          "response": "David sends Amara his location before moving. Finding Ethan matters more than claiming the search as his own achievement.",
-          "speaker": "David"
-        }
-      ]
+      "choices": []
     }
   ],
   "metadata": {
     "version": 2,
     "season": 7,
-    "season_title": "The Night Routes",
+    "season_title": "The Man Outside the Gate",
     "episode": 4,
     "episode_id": 64,
     "campaign_levels": "681-690",
     "ethan_status": "missing",
     "season_finale": false,
-    "evidence_summary": "The seal matches a container opened at a roadside repair shelter. The shelter is empty. A mechanic recorded a replaced battery serial number."
+    "known_before": "episode_063_resolved",
+    "unlocks_fact": "episode_064_resolved",
+    "authored_dialogue_revision": 1,
+    "evidence_summary": "The original receiving authority is formally disputed."
   }
 }

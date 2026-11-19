@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Give Amara a verified account of the workstation session record, so she can choose the next step.",
+  "description": "Lami's booking is secured.",
   "difficulty": "MEDIUM",
   "level_id": 269,
   "metadata": {
     "chapter_end_level": 270,
     "chapter_id": 28,
     "chapter_start_level": 261,
-    "chapter_title": "The Shared Workstation",
+    "chapter_title": "A Room for One Night",
     "generator_version": 2,
     "map_background": "factory_map_section_cutout.png",
     "map_landmark": "police_car_topdown_cutout.png",
@@ -34,13 +34,27 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 2872114,
     "season": 3,
-    "season_title": "A Web of Mirrors",
-    "episode_id": 22
+    "season_title": "The Woman Who Waited",
+    "episode_id": 22,
+    "balance_revision": 1,
+    "balance_base_moves": 32,
+    "balance_reinforced_cells": [
+      {
+        "x": 1,
+        "y": 2,
+        "health": 1
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 32
+    "total": 30
   },
-  "name": "The Shared Workstation 09",
+  "name": "A Room for One Night 09",
   "objectives": [
     {
       "amount": 24,
@@ -51,13 +65,13 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "tape",
         "x": 1,
         "y": 2
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 3,
         "y": 2
@@ -107,12 +121,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the workstation session record. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the workstation session record. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the workstation session record. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the workstation session record without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into a room for one night advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

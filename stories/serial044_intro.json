@@ -1,55 +1,29 @@
 {
   "story_id": "serial044_intro",
-  "title": "The Private Mailbox",
-  "background_music": "suspense_opening",
+  "title": "The House Divides",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/level_map_landscape.jpeg",
   "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
   "characters": [
     "david",
     "amara",
     "victor",
-    "ethan",
     "detective_morris"
   ],
   "scenes": [
     {
       "scene_id": "serial044_intro",
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "Detective Morris",
-            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
-            "text": "We will verify the mailbox rental form and keep its source intact. A lead is not a rescue; we cannot assume Victor stayed there.",
-            "routes": [
-              "police"
-            ]
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I will check the technical trail behind the mailbox rental form. Amara, tell me what the records cannot explain."
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I am following the mailbox rental form without police backup. Amara has my location; I am not going to turn this into a contest with Victor."
-          }
-        ]
-      },
+      "stage_direction": "The household's polished public account meets the records retained by its workers. Amara speaks for herself.",
       "dialogues": [
-        {
-          "speaker": "David",
-          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "The next lead is the mailbox rental form. We need its original source before Victor moves again."
-        },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "Tell them what happened. Let them choose whether to help us rather than order them about."
+          "text": "Orena wants to see the instruction before she speaks to me."
+        },
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "Take the copy. The original stays secured."
         }
       ],
       "choices": []
@@ -58,11 +32,14 @@
   "metadata": {
     "version": 2,
     "season": 5,
-    "season_title": "For Her Son",
+    "season_title": "The Royal Household",
     "episode": 4,
     "episode_id": 44,
     "campaign_levels": "481-490",
     "ethan_status": "missing",
-    "season_finale": false
+    "season_finale": false,
+    "known_before": "episode_043_resolved",
+    "unlocks_fact": "",
+    "authored_dialogue_revision": 1
   }
 }

@@ -1,91 +1,51 @@
 {
   "story_id": "serial082_outro",
-  "title": "An Unpaid Invoice | The next lead",
-  "background_music": "suspense_opening",
+  "title": "His Father's Name",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/factory_map_section.jpeg",
   "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
   "characters": [
     "david",
     "amara",
     "victor",
-    "ethan",
     "detective_morris"
   ],
   "scenes": [
     {
       "scene_id": "serial082_outro",
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "Detective Morris",
-            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
-            "text": "We will verify the transport invoice and keep its source intact. A lead is not a rescue; we cannot assume Victor stayed there.",
-            "routes": [
-              "police"
-            ]
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I will check the technical trail behind the transport invoice. Amara, tell me what the records cannot explain."
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I am following the transport invoice without police backup. Amara has my location; I am not going to turn this into a contest with Victor."
-          }
-        ]
-      },
+      "stage_direction": "The search becomes a confrontation with named decision-makers. Each signed record changes a concrete next step.",
       "dialogues": [
         {
           "speaker": "David",
           "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "The driver refuses further work after learning what the journey concealed."
+          "text": "The official accepts that Adrian acknowledged Ethan as his son."
         },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "The last paid journey is over. Its fuel card records a roadside stop."
+          "text": "He was his son before the official accepted it."
+        },
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "Kellan's representative has raised another objection. We will ask for it in writing."
         }
       ],
-      "choices": [
-        {
-          "id": "police",
-          "label": "Coordinate the next lead with the police",
-          "impact": "Bring Morris into the next investigation and preserve the evidence behind the transport invoice.",
-          "response": "Morris takes the lead into the formal investigation. David checks the record while Amara explains its personal significance.",
-          "speaker": "Detective Morris"
-        },
-        {
-          "id": "signal",
-          "label": "Decode the next connection with Amara",
-          "impact": "David checks the technical trail from the transport invoice; Amara tests it against her own history.",
-          "response": "David saves the original record and checks its connections. Amara refuses to let Victor's version replace what she remembers.",
-          "speaker": "David"
-        },
-        {
-          "id": "alone",
-          "label": "Follow the next trail without police backup",
-          "impact": "David follows the physical lead from the transport invoice, keeping Amara informed.",
-          "response": "David sends Amara his location before moving. Finding Ethan matters more than claiming the search as his own achievement.",
-          "speaker": "David"
-        }
-      ]
+      "choices": []
     }
   ],
   "metadata": {
     "version": 2,
     "season": 9,
-    "season_title": "The Price of Glory",
+    "season_title": "The House That Must Answer",
     "episode": 2,
     "episode_id": 82,
     "campaign_levels": "861-870",
     "ethan_status": "missing",
     "season_finale": false,
-    "evidence_summary": "The driver refuses further work after learning what the journey concealed. The last paid journey is over. Its fuel card records a roadside stop."
+    "known_before": "episode_081_resolved",
+    "unlocks_fact": "episode_082_resolved",
+    "authored_dialogue_revision": 1,
+    "evidence_summary": "Adrian's relationship to Ethan is accepted."
   }
 }

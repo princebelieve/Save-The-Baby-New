@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Preserve the original evidence behind the replacement battery receipt.",
+  "description": "Nessa identifies the document handler.",
   "difficulty": "EASY",
   "level_id": 692,
   "metadata": {
     "chapter_end_level": 700,
     "chapter_id": 71,
     "chapter_start_level": 691,
-    "chapter_title": "The Battery Number",
+    "chapter_title": "The Person Preparing It",
     "generator_version": 2,
     "map_background": "river_map_section_cutout.png",
     "map_landmark": "wooden_bridge_cutout.png",
@@ -34,13 +34,16 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 6221851,
     "season": 7,
-    "season_title": "The Night Routes",
-    "episode_id": 65
+    "season_title": "The Man Outside the Gate",
+    "episode_id": 65,
+    "balance_revision": 1,
+    "balance_base_moves": 34,
+    "balance_reinforced_cells": []
   },
   "moves": {
-    "total": 34
+    "total": 33
   },
-  "name": "The Battery Number 02",
+  "name": "The Person Preparing It 02",
   "objectives": [
     {
       "amount": 18,
@@ -95,12 +98,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the replacement battery receipt. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the replacement battery receipt. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the replacement battery receipt. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the replacement battery receipt without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into the person preparing it advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

@@ -1,91 +1,51 @@
 {
   "story_id": "serial026_outro",
-  "title": "Below the Signal | The next lead",
-  "background_music": "suspense_opening",
+  "title": "A Brother at the Yard",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/factory_map_section.jpeg",
   "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
   "characters": [
     "david",
     "amara",
     "victor",
-    "ethan",
     "detective_morris"
   ],
   "scenes": [
     {
       "scene_id": "serial026_outro",
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "Detective Morris",
-            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
-            "text": "We will verify the basement repeater label and keep its source intact. A lead is not a rescue; we cannot assume Victor stayed there.",
-            "routes": [
-              "police"
-            ]
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I will check the technical trail behind the basement repeater label. Amara, tell me what the records cannot explain."
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I am following the basement repeater label without police backup. Amara has my location; I am not going to turn this into a contest with Victor."
-          }
-        ]
-      },
+      "stage_direction": "Calls and protected interviews interrupt the search. Amara asks practical questions about Ethan's care before she asks about blame.",
       "dialogues": [
         {
           "speaker": "David",
           "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "A repeater made Victor's phone appear upstairs while he used a basement exit."
+          "text": "He is safe. We reached him at the yard."
         },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "The basement exit is vacant. Its repeater was rented under a delivery contract."
+          "text": "Say it again. I need one person to have been reached in time."
+        },
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "He saw the receiving desk. He can identify who recruited Lami."
         }
       ],
-      "choices": [
-        {
-          "id": "police",
-          "label": "Coordinate the next lead with the police",
-          "impact": "Bring Morris into the next investigation and preserve the evidence behind the basement repeater label.",
-          "response": "Morris takes the lead into the formal investigation. David checks the record while Amara explains its personal significance.",
-          "speaker": "Detective Morris"
-        },
-        {
-          "id": "signal",
-          "label": "Decode the next connection with Amara",
-          "impact": "David checks the technical trail from the basement repeater label; Amara tests it against her own history.",
-          "response": "David saves the original record and checks its connections. Amara refuses to let Victor's version replace what she remembers.",
-          "speaker": "David"
-        },
-        {
-          "id": "alone",
-          "label": "Follow the next trail without police backup",
-          "impact": "David follows the physical lead from the basement repeater label, keeping Amara informed.",
-          "response": "David sends Amara his location before moving. Finding Ethan matters more than claiming the search as his own achievement.",
-          "speaker": "David"
-        }
-      ]
+      "choices": []
     }
   ],
   "metadata": {
     "version": 2,
     "season": 3,
-    "season_title": "A Web of Mirrors",
+    "season_title": "The Woman Who Waited",
     "episode": 6,
     "episode_id": 26,
     "campaign_levels": "301-310",
     "ethan_status": "missing",
     "season_finale": false,
-    "evidence_summary": "A repeater made Victor's phone appear upstairs while he used a basement exit. The basement exit is vacant. Its repeater was rented under a delivery contract."
+    "known_before": "episode_025_resolved",
+    "unlocks_fact": "episode_026_resolved",
+    "authored_dialogue_revision": 1,
+    "evidence_summary": "The team reaches him in time and brings him to safety."
   }
 }

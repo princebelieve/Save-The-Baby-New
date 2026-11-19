@@ -1,90 +1,55 @@
 {
   "story_id": "chapter02",
-  "title": "Across the Village Road",
-  "background_music": "suspense_opening",
+  "title": "My Money or Ethan",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/level_map_landscape.jpeg",
   "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
   "characters": [
     "david",
     "amara",
-    "ethan",
-    "victor"
+    "victor",
+    "detective_morris"
   ],
   "scenes": [
     {
-      "scene_id": "chapter_02_intro",
-      "choices": [
-        {
-          "id": "police",
-          "label": "Request a bridge lookout",
-          "impact": "Morris watches the crossing while David examines the riverbank. Morris can watch for danger, but he needs you to share each clue before he can act.",
-          "response": "Morris watches the crossing while David examines the riverbank. Ethan must come home alive.",
-          "speaker": "Detective Morris"
-        },
-        {
-          "id": "signal",
-          "label": "Decode the next lead with Amara",
-          "impact": "David checks the technical evidence. Amara connects it to the people and history behind the records, without police assistance.",
-          "response": "David preserves the original record and tests the next connection while Amara checks its meaning against what she remembers.",
-          "speaker": "David"
-        },
-        {
-          "id": "alone",
-          "label": "Inspect the riverbank myself",
-          "impact": "David follows fresh tire marks, keeping his location on Amara's phone. You can investigate quietly, but no one will be close enough to help immediately if Victor is waiting.",
-          "response": "David follows fresh tire marks, keeping his location on Amara's phone. Ethan must come home alive.",
-          "speaker": "David"
-        }
-      ],
+      "scene_id": "chapter02",
+      "stage_direction": "Rain, interrupted sleep and a missing infant. Preserve the distinction between Amara's true sighting and the unexplained means of entry.",
       "dialogues": [
         {
-          "speaker": "David",
-          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "The tire tracks cross the old bridge. They are fresh, but the rain is already washing them away.",
-          "animation": "fade"
+          "speaker": "Victor",
+          "portrait": "res://assets/sprites/characters/victor_portrait_v2.png",
+          "text": "My money or Ethan."
         },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "A neighbor saw a van stop by the river. He heard a phone ring, then the driver turned toward the workshop road.",
-          "animation": "fade"
+          "text": "He is not your son. That money is not yours."
+        },
+        {
+          "speaker": "Victor",
+          "portrait": "res://assets/sprites/characters/victor_portrait_v2.png",
+          "text": "Then decide which one you want to keep."
         },
         {
           "speaker": "David",
           "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "Victor wants us chasing scraps. We keep gathering evidence, and we do not let the trail split us apart.",
-          "animation": "fade"
+          "text": "He ended the call. My recording started too late."
+        },
+        {
+          "speaker": "Amara",
+          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+          "text": "I thought hearing his voice would make this easier to prove. Now I can only hear what he said."
         }
       ],
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "Morris stops a delivery driver at the bridge. The driver remembers a van turning toward the workshop."
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "David maps the van call to a riverside tower. Amara recognises the old bridge where the signal paused."
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I find a broken tail light at the riverbank. Its tracks turn toward the workshop road."
-          }
-        ]
-      }
+      "choices": []
     }
   ],
   "metadata": {
     "version": 2,
     "chapter": 2,
     "campaign_levels": "009-015",
-    "tutorial_chapter": true
+    "tutorial_chapter": true,
+    "authored_dialogue_revision": 1,
+    "ethan_status": "missing"
   }
 }

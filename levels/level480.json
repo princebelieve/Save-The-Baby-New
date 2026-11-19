@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Close this investigation and hear what the collection authorisation changes for the family.",
+  "description": "The author explains the source of the claim.",
   "difficulty": "HARD",
   "level_id": 480,
   "metadata": {
     "chapter_end_level": 480,
     "chapter_id": 49,
     "chapter_start_level": 471,
-    "chapter_title": "Permission Denied",
+    "chapter_title": "A Witness to a Stranger",
     "generator_version": 2,
     "map_background": "river_map_section_cutout.png",
     "map_landmark": "wooden_bridge_cutout.png",
@@ -34,13 +34,32 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 4543023,
     "season": 5,
-    "season_title": "For Her Son",
-    "episode_id": 43
+    "season_title": "The Royal Household",
+    "episode_id": 43,
+    "balance_revision": 1,
+    "balance_base_moves": 30,
+    "balance_reinforced_cells": [
+      {
+        "x": 4,
+        "y": 5,
+        "health": 1
+      },
+      {
+        "x": 6,
+        "y": 5,
+        "health": 1
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 30
+    "total": 27
   },
-  "name": "Permission Denied 10",
+  "name": "A Witness to a Stranger 10",
   "objectives": [
     {
       "amount": 30,
@@ -51,19 +70,19 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 4,
         "y": 5
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "chain",
         "x": 6,
         "y": 5
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "tape",
         "x": 4,
         "y": 4
@@ -119,12 +138,8 @@
     "after_level": "serial043_outro",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the collection authorisation. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the collection authorisation. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the collection authorisation. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the collection authorisation without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into a witness to a stranger advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

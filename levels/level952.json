@@ -25,14 +25,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Preserve the original evidence behind the compound service diagram.",
+  "description": "Victor demands payment again.",
   "difficulty": "EASY",
   "level_id": 952,
   "metadata": {
     "chapter_end_level": 960,
     "chapter_id": 97,
     "chapter_start_level": 951,
-    "chapter_title": "The Service Diagram",
+    "chapter_title": "The Last Ransom",
     "generator_version": 2,
     "map_background": "river_map_section_cutout.png",
     "map_landmark": "wooden_bridge_cutout.png",
@@ -43,13 +43,16 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 8280791,
     "season": 10,
-    "season_title": "One Door Away",
-    "episode_id": 91
+    "season_title": "The Distance Between Two Voices",
+    "episode_id": 91,
+    "balance_revision": 1,
+    "balance_base_moves": 34,
+    "balance_reinforced_cells": []
   },
   "moves": {
-    "total": 34
+    "total": 33
   },
-  "name": "The Service Diagram 02",
+  "name": "The Last Ransom 02",
   "objectives": [
     {
       "amount": 18,
@@ -104,12 +107,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the compound service diagram. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the compound service diagram. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the compound service diagram. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the compound service diagram without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into the last ransom advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

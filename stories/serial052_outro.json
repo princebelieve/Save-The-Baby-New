@@ -1,91 +1,51 @@
 {
   "story_id": "serial052_outro",
-  "title": "The Cue Sheet | The next lead",
-  "background_music": "suspense_opening",
+  "title": "The Blue Stitch",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/factory_cage_art.jpeg",
   "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
   "characters": [
     "david",
     "amara",
     "victor",
-    "ethan",
     "detective_morris"
   ],
   "scenes": [
     {
       "scene_id": "serial052_outro",
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "Detective Morris",
-            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
-            "text": "We will verify the altered stage cue sheet and keep its source intact. A lead is not a rescue; we cannot assume Victor stayed there.",
-            "routes": [
-              "police"
-            ]
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I will check the technical trail behind the altered stage cue sheet. Amara, tell me what the records cannot explain."
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I am following the altered stage cue sheet without police backup. Amara has my location; I am not going to turn this into a contest with Victor."
-          }
-        ]
-      },
+      "stage_direction": "Phone contact becomes tangible. Let Amara listen before David interprets what the new evidence means.",
       "dialogues": [
         {
           "speaker": "David",
           "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "The call was pre-recorded and played as if live."
+          "text": "She found the two colours. She described the loose stitch herself."
         },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "The playback room has been cleared. Its operator saved the delivery filename."
+          "text": "Then she has it with her."
+        },
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "A trusted intermediary will arrange contact."
         }
       ],
-      "choices": [
-        {
-          "id": "police",
-          "label": "Coordinate the next lead with the police",
-          "impact": "Bring Morris into the next investigation and preserve the evidence behind the altered stage cue sheet.",
-          "response": "Morris takes the lead into the formal investigation. David checks the record while Amara explains its personal significance.",
-          "speaker": "Detective Morris"
-        },
-        {
-          "id": "signal",
-          "label": "Decode the next connection with Amara",
-          "impact": "David checks the technical trail from the altered stage cue sheet; Amara tests it against her own history.",
-          "response": "David saves the original record and checks its connections. Amara refuses to let Victor's version replace what she remembers.",
-          "speaker": "David"
-        },
-        {
-          "id": "alone",
-          "label": "Follow the next trail without police backup",
-          "impact": "David follows the physical lead from the altered stage cue sheet, keeping Amara informed.",
-          "response": "David sends Amara his location before moving. Finding Ethan matters more than claiming the search as his own achievement.",
-          "speaker": "David"
-        }
-      ]
+      "choices": []
     }
   ],
   "metadata": {
     "version": 2,
     "season": 6,
-    "season_title": "An Audience for Victor",
+    "season_title": "A Voice in the Rain",
     "episode": 2,
     "episode_id": 52,
     "campaign_levels": "561-570",
     "ethan_status": "missing",
     "season_finale": false,
-    "evidence_summary": "The call was pre-recorded and played as if live. The playback room has been cleared. Its operator saved the delivery filename."
+    "known_before": "episode_051_resolved",
+    "unlocks_fact": "episode_052_resolved",
+    "authored_dialogue_revision": 1,
+    "evidence_summary": "The carer correctly identifies the repaired seam."
   }
 }

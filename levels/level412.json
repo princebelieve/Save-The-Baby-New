@@ -25,14 +25,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Preserve the original evidence behind the depot receiving signature.",
+  "description": "David recalls repairing Amara's business website.",
   "difficulty": "EASY",
   "level_id": 412,
   "metadata": {
     "chapter_end_level": 420,
     "chapter_id": 43,
     "chapter_start_level": 411,
-    "chapter_title": "Someone Else's Name",
+    "chapter_title": "Someone Who Listened",
     "generator_version": 2,
     "map_background": "river_map_section_cutout.png",
     "map_landmark": "wooden_bridge_cutout.png",
@@ -43,13 +43,16 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 4004531,
     "season": 4,
-    "season_title": "What He Calls Love",
-    "episode_id": 37
+    "season_title": "The Heart He Couldn't Claim",
+    "episode_id": 37,
+    "balance_revision": 1,
+    "balance_base_moves": 34,
+    "balance_reinforced_cells": []
   },
   "moves": {
-    "total": 34
+    "total": 33
   },
-  "name": "Someone Else's Name 02",
+  "name": "Someone Who Listened 02",
   "objectives": [
     {
       "amount": 18,
@@ -104,12 +107,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the depot receiving signature. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the depot receiving signature. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the depot receiving signature. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the depot receiving signature without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into someone who listened advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

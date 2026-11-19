@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Reconstruct the missing step around the neighbour's forwarding card.",
+  "description": "An old neighbour describes Amara leaving.",
   "difficulty": "HARD",
   "level_id": 368,
   "metadata": {
     "chapter_end_level": 370,
     "chapter_id": 38,
     "chapter_start_level": 361,
-    "chapter_title": "A Neighbour's Door",
+    "chapter_title": "The Last Week's Rent",
     "generator_version": 2,
     "map_background": "factory_map_section_cutout.png",
     "map_landmark": "police_car_topdown_cutout.png",
@@ -34,13 +34,32 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 3656095,
     "season": 4,
-    "season_title": "What He Calls Love",
-    "episode_id": 32
+    "season_title": "The Heart He Couldn't Claim",
+    "episode_id": 32,
+    "balance_revision": 1,
+    "balance_base_moves": 30,
+    "balance_reinforced_cells": [
+      {
+        "x": 1,
+        "y": 6,
+        "health": 1
+      },
+      {
+        "x": 2,
+        "y": 6,
+        "health": 1
+      },
+      {
+        "x": 5,
+        "y": 6,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 30
+    "total": 27
   },
-  "name": "A Neighbour's Door 08",
+  "name": "The Last Week's Rent 08",
   "objectives": [
     {
       "amount": 30,
@@ -51,19 +70,19 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "tape",
         "x": 1,
         "y": 6
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 2,
         "y": 6
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "chain",
         "x": 5,
         "y": 6
@@ -119,12 +138,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the neighbour's forwarding card. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the neighbour's forwarding card. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the neighbour's forwarding card. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the neighbour's forwarding card without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into the last week's rent advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

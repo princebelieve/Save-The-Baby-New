@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Check the delivery truck route sheet against an independent record.",
+  "description": "The obstruction is obtained.",
   "difficulty": "MEDIUM",
   "level_id": 927,
   "metadata": {
     "chapter_end_level": 930,
     "chapter_id": 94,
     "chapter_start_level": 921,
-    "chapter_title": "The Transfer Truck",
+    "chapter_title": "The Obstruction Named",
     "generator_version": 2,
     "map_background": "factory_map_section_cutout.png",
     "map_landmark": "police_car_topdown_cutout.png",
@@ -34,13 +34,27 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 8082816,
     "season": 9,
-    "season_title": "The Price of Glory",
-    "episode_id": 88
+    "season_title": "The House That Must Answer",
+    "episode_id": 88,
+    "balance_revision": 1,
+    "balance_base_moves": 32,
+    "balance_reinforced_cells": [
+      {
+        "x": 5,
+        "y": 3,
+        "health": 1
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 32
+    "total": 30
   },
-  "name": "The Transfer Truck 07",
+  "name": "The Obstruction Named 07",
   "objectives": [
     {
       "amount": 24,
@@ -51,13 +65,13 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 5,
         "y": 3
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "chain",
         "x": 2,
         "y": 3
@@ -107,12 +121,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the delivery truck route sheet. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the delivery truck route sheet. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the delivery truck route sheet. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the delivery truck route sheet without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into the obstruction named advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

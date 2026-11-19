@@ -1,82 +1,47 @@
 {
   "story_id": "season03",
-  "title": "The Quiet Informant",
-  "background_music": "suspense_opening",
+  "title": "Someone Knew the House",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/level_map_landscape.jpeg",
   "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
   "characters": [
     "david",
     "amara",
     "victor",
-    "detective_morris",
-    "ethan"
+    "detective_morris"
   ],
   "scenes": [
     {
-      "scene_id": "season03_reveal",
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "Detective Morris",
-            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
-            "text": "The witness gives Morris a badge number, then disappears before the statement is signed."
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "David matches the witness's phrase to a dispatch recording. Amara recognises the caller's manner of speaking."
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "David sees a plain-clothes officer leave with the missing file page."
-          }
-        ]
-      },
+      "scene_id": "season03",
+      "stage_direction": "Rain, interrupted sleep and a missing infant. Preserve the distinction between Amara's true sighting and the unexplained means of entry.",
       "dialogues": [
         {
           "speaker": "David",
           "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "The tunnel signal leads to a witness who saw a child carried past the police station. The witness refuses to speak while uniforms are nearby."
+          "text": "The message mentions the cupboard beside the nursery."
         },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "The witness kept a duplicate of the old destination list. Someone tore the matching page from the public archive. Victor is borrowing other people's work again."
+          "text": "It is behind the door. You cannot see it from the garden."
         },
         {
-          "speaker": "Victor",
-          "portrait": "res://assets/sprites/characters/victor_portrait_v2.png",
-          "text": "The witness calls back once: \"There is someone inside your team.\" Then the line breaks."
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "Then its sender knows something about the inside of the house."
+        },
+        {
+          "speaker": "Amara",
+          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+          "text": "Can that take us to him?"
+        },
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "It gives us a claim we can test. I won't pretend it gives us a location yet."
         }
       ],
-      "choices": [
-        {
-          "id": "police",
-          "label": "Let Morris question the witness privately",
-          "impact": "Morris can protect the witness, but the leaked file may warn the officer involved.",
-          "response": "Morris: I will move the witness somewhere safe and keep the badge number off the radio.",
-          "speaker": "Detective Morris"
-        },
-        {
-          "id": "signal",
-          "label": "Decode the next lead with Amara",
-          "impact": "David checks the technical evidence. Amara connects it to the people and history behind the records, without police assistance.",
-          "response": "David preserves the original record and tests the next connection while Amara checks its meaning against what she remembers.",
-          "speaker": "David"
-        },
-        {
-          "id": "alone",
-          "label": "Wait nearby and watch who visits",
-          "impact": "David can watch the station quietly, but the officer may leave before he identifies them.",
-          "response": "David: I will watch the exits and follow whoever carries that missing page.",
-          "speaker": "David"
-        }
-      ]
+      "choices": []
     }
   ],
   "metadata": {
@@ -84,6 +49,8 @@
     "chapter": 3,
     "season": 1,
     "campaign_levels": "011-015",
-    "episode": "A continuing rescue mystery; the final clue opens the next episode."
+    "episode": "A continuing rescue mystery; the final clue opens the next episode.",
+    "authored_dialogue_revision": 1,
+    "ethan_status": "missing"
   }
 }

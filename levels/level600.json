@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Critical Case: Close this investigation and hear what the office staff rota changes for the family.",
+  "description": "The team confronts the transport contractor.",
   "difficulty": "CRITICAL_CASE",
   "level_id": 600,
   "metadata": {
     "chapter_end_level": 600,
     "chapter_id": 61,
     "chapter_start_level": 591,
-    "chapter_title": "The Unwilling Witness",
+    "chapter_title": "No More Silent Cars",
     "generator_version": 2,
     "map_background": "river_map_section_cutout.png",
     "map_landmark": "wooden_bridge_cutout.png",
@@ -36,13 +36,32 @@
     "recommended_booster": "bomb",
     "scout_supply": false,
     "season": 6,
-    "season_title": "An Audience for Victor",
-    "episode_id": 55
+    "season_title": "A Voice in the Rain",
+    "episode_id": 55,
+    "balance_revision": 1,
+    "balance_base_moves": 30,
+    "balance_reinforced_cells": [
+      {
+        "x": 6,
+        "y": 5,
+        "health": 1
+      },
+      {
+        "x": 6,
+        "y": 6,
+        "health": 1
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 30
+    "total": 27
   },
-  "name": "The Unwilling Witness 10",
+  "name": "No More Silent Cars 10",
   "objectives": [
     {
       "amount": 30,
@@ -53,20 +72,20 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 6,
         "y": 5,
         "inventory_only": false
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "chain",
         "x": 6,
         "y": 6
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "tape",
         "x": 4,
         "y": 4
@@ -122,12 +141,8 @@
     "after_level": "serial055_outro",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the office staff rota. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the office staff rota. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the office staff rota. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the office staff rota without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into no more silent cars advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

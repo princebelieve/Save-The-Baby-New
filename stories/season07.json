@@ -1,82 +1,47 @@
 {
   "story_id": "season07",
-  "title": "The Three Windows",
-  "background_music": "suspense_opening",
+  "title": "The Estate Account",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/river_map_section.jpeg",
   "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
   "characters": [
     "david",
     "amara",
     "victor",
-    "detective_morris",
-    "ethan"
+    "detective_morris"
   ],
   "scenes": [
     {
-      "scene_id": "season07_reveal",
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "Detective Morris",
-            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
-            "text": "Morris spots a watcher leaving the real signal house with a radio."
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "The hidden ink says: \"The river remembers what the road forgets.\""
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "David finds a fresh footprint beside the cup, then hears a lock turn downstairs."
-          }
-        ]
-      },
+      "scene_id": "season07",
+      "stage_direction": "Rain, interrupted sleep and a missing infant. Preserve the distinction between Amara's true sighting and the unexplained means of entry.",
       "dialogues": [
         {
           "speaker": "David",
           "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "The drawing matches a row of abandoned signal houses. Only one has three dark windows; the other two are freshly painted black."
+          "text": "The service company was used by Adrian's estate office."
         },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "Inside, David finds a cup still warm and a note addressed to Amara, not him."
+          "text": "They arranged repairs before we moved in."
         },
         {
-          "speaker": "Victor",
-          "portrait": "res://assets/sprites/characters/victor_portrait_v2.png",
-          "text": "The note's reverse side carries Amara's handwriting, though she swears she never saw it."
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "Was anyone supposed to keep access afterward?"
+        },
+        {
+          "speaker": "Amara",
+          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+          "text": "Not that I knew. I was given keys, not a list of permissions."
+        },
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "Then we need the arrangement behind the repairs, not only the name on the van."
         }
       ],
-      "choices": [
-        {
-          "id": "police",
-          "label": "Ask Morris to watch the painted houses",
-          "impact": "Morris can watch the false houses, but Victor may use them to draw officers away.",
-          "response": "Morris: I will watch the painted windows and keep the real house clear.",
-          "speaker": "Detective Morris"
-        },
-        {
-          "id": "signal",
-          "label": "Decode the next lead with Amara",
-          "impact": "David checks the technical evidence. Amara connects it to the people and history behind the records, without police assistance.",
-          "response": "David preserves the original record and tests the next connection while Amara checks its meaning against what she remembers.",
-          "speaker": "David"
-        },
-        {
-          "id": "alone",
-          "label": "Search the warm room before the trail cools",
-          "impact": "The warm room may hold a fresh clue, but someone could still be downstairs.",
-          "response": "David: I will search the room quickly and keep the stairway in view.",
-          "speaker": "David"
-        }
-      ]
+      "choices": []
     }
   ],
   "metadata": {
@@ -84,6 +49,8 @@
     "chapter": 7,
     "season": 2,
     "campaign_levels": "031-035",
-    "episode": "A continuing rescue mystery; the final clue opens the next episode."
+    "episode": "A continuing rescue mystery; the final clue opens the next episode.",
+    "authored_dialogue_revision": 1,
+    "ethan_status": "missing"
   }
 }

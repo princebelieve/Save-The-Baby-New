@@ -154,3 +154,13 @@ References:
 - https://developers.google.com/admob/android/privacy/gdpr
 - https://developers.google.com/admob/android/targeting
 - https://support.google.com/googleplay/android-developer/answer/9859655
+
+### Published-message device retest — 18 November 2026
+
+The corrected final v11 APK was updated on the authorized Vivo device. UMP returned gdprApplies=0 and the earlier missing-form error cleared. AdMob initialized and both interstitial and rewarded inventory loaded. TikTok reported initialized; TikTok Events Manager receipt and campaign attribution remain unverified. The auth-return URI resolves to one AuthReturnActivity. Evidence: .test-data/published-consent-device-test.log.
+
+
+### Restoration flow changes — pending Android build
+
+Replaced the inert victory/timeout board with full-screen branded outcomes and a continuation action. Restoration backgrounding clears gestures and provides a resume/reference screen; the main match-game pause menu no longer opens behind restoration. Removed the unsolicited gallery auto-save popup after a win; manual result saving and the Daily Rewards preference remain. Gallery checks: 26 passed, including interrupted input, resume, victory navigation and timeout. These changes have not yet been built or verified on Android.
+

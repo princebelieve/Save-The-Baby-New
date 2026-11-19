@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Critical Case: Close this investigation and hear what the identity service request changes for the family.",
+  "description": "The sponsor appears in Adrian's appointment book.",
   "difficulty": "CRITICAL_CASE",
   "level_id": 750,
   "metadata": {
     "chapter_end_level": 750,
     "chapter_id": 76,
     "chapter_start_level": 741,
-    "chapter_title": "Dawn Without Him",
+    "chapter_title": "A Familiar Name",
     "generator_version": 2,
     "map_background": "factory_map_section_cutout.png",
     "map_landmark": "police_car_topdown_cutout.png",
@@ -36,13 +36,32 @@
     "recommended_booster": "bomb",
     "scout_supply": false,
     "season": 7,
-    "season_title": "The Night Routes",
-    "episode_id": 70
+    "season_title": "The Man Outside the Gate",
+    "episode_id": 70,
+    "balance_revision": 1,
+    "balance_base_moves": 30,
+    "balance_reinforced_cells": [
+      {
+        "x": 5,
+        "y": 2,
+        "health": 1
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "health": 1
+      },
+      {
+        "x": 1,
+        "y": 1,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 30
+    "total": 27
   },
-  "name": "Dawn Without Him 10",
+  "name": "A Familiar Name 10",
   "objectives": [
     {
       "amount": 30,
@@ -53,20 +72,20 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 5,
         "y": 2,
         "inventory_only": false
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "chain",
         "x": 5,
         "y": 4
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "tape",
         "x": 1,
         "y": 1
@@ -122,12 +141,8 @@
     "after_level": "serial070_outro",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the identity service request. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the identity service request. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the identity service request. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the identity service request without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into a familiar name advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

@@ -1,89 +1,55 @@
 {
   "story_id": "chapter03",
-  "title": "The Technician’s Office",
-  "background_music": "suspense_opening",
+  "title": "What He Called Luck",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/factory_map_section.jpeg",
   "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
   "characters": [
     "david",
     "amara",
-    "ethan",
-    "victor"
+    "victor",
+    "detective_morris"
   ],
   "scenes": [
     {
-      "scene_id": "chapter_03_intro",
-      "choices": [
-        {
-          "id": "police",
-          "label": "Share the recording with Morris",
-          "impact": "Morris identifies a voice in the recording. Morris can watch for danger, but he needs you to share each clue before he can act.",
-          "response": "Morris identifies a voice in the recording. Ethan must come home alive.",
-          "speaker": "Detective Morris"
-        },
-        {
-          "id": "signal",
-          "label": "Decode the next lead with Amara",
-          "impact": "David checks the technical evidence. Amara connects it to the people and history behind the records, without police assistance.",
-          "response": "David preserves the original record and tests the next connection while Amara checks its meaning against what she remembers.",
-          "speaker": "David"
-        },
-        {
-          "id": "alone",
-          "label": "Question the technician myself",
-          "impact": "David earns the technician's trust and learns about a service entrance. You can investigate quietly, but no one will be close enough to help immediately if Victor is waiting.",
-          "response": "David earns the technician's trust and learns about a service entrance. Ethan must come home alive.",
-          "speaker": "David"
-        }
-      ],
+      "scene_id": "chapter03",
+      "stage_direction": "Rain, interrupted sleep and a missing infant. Preserve the distinction between Amara's true sighting and the unexplained means of entry.",
       "dialogues": [
         {
-          "speaker": "David",
-          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "The workshop owner found a receiver under his bench. Its delivery log points to an industrial property outside town. I can read the record; we still need to verify the place."
+          "speaker": "Amara",
+          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+          "text": "I used to sell breakfast before sunrise, then deliver parcels after lunch."
         },
         {
           "speaker": "David",
           "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "Victor used the workshop to hide his trail. That receiver is still warm.",
-          "animation": "fade"
+          "text": "Was Victor working with you?"
         },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "Then Ethan may be close. David, listen: someone just tried to call from the receiver.",
-          "animation": "fade"
+          "text": "He said his aura brought the customers. Once I bought him shoes and he thanked his luck."
+        },
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "Not you?"
+        },
+        {
+          "speaker": "Amara",
+          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+          "text": "I kept waiting for it. I don't know why that is the part I remember now."
         }
       ],
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "Morris recognizes the recorded voice as a former factory guard. He sends us to the technician who repaired its radio."
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "David decodes a factory extension in the message. Amara recognises the workshop it connects to."
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "The technician agrees to speak to me privately. Victor asked him to repair a service-door radio."
-          }
-        ]
-      }
+      "choices": []
     }
   ],
   "metadata": {
     "version": 2,
     "chapter": 3,
     "campaign_levels": "016-022",
-    "tutorial_chapter": true
+    "tutorial_chapter": true,
+    "authored_dialogue_revision": 1,
+    "ethan_status": "missing"
   }
 }

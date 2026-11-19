@@ -49,6 +49,9 @@ var _pending_voice: Dictionary = {}
 var _voice_not_before := 0
 var _last_praise_tick := -10000 # Kept for diagnostics; praise is no longer discarded by time cooldowns.
 var _last_sfx_tick: Dictionary = {}
+var _impact_variation := 0
+var _outgoing_music: AudioStreamPlayer
+var _music_transition: Tween
 
 
 #===============================================================================
@@ -108,14 +111,34 @@ func play_music(track) -> void:
 		DebugLogger.warning("AudioManager: Unable to load music: %s" % resolved_track)
 		return
 
-	_music_player.stop()
+	var outgoing := _music_player
+	var phrase_position := outgoing.get_playback_position() if _current_music_track.begins_with("case_") and str(track).begins_with("case_") else 0.0
+	if is_instance_valid(_music_transition): _music_transition.kill()
+	if is_instance_valid(_outgoing_music): _outgoing_music.queue_free()
+	_outgoing_music = outgoing
+	_music_player = AudioStreamPlayer.new()
+	_music_player.process_mode = Node.PROCESS_MODE_ALWAYS
+	_music_player.bus = _music_bus_name
+	_music_player.volume_db = -45.0
+	add_child(_music_player)
+	_music_player.finished.connect(_on_music_finished)
+	var transition := create_tween().set_parallel(true)
+	transition.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	_music_transition = transition
+	transition.tween_property(outgoing, "volume_db", -45.0, 0.65)
+	transition.tween_property(_music_player, "volume_db", -8.0 if _voice_player.playing else 0.0, 0.65)
+	transition.finished.connect(outgoing.queue_free)
 	var music_entries = _audio_config.get("music", {})
 	var entry = music_entries.get(str(track), {}) if typeof(music_entries) == TYPE_DICTIONARY else {}
 	if stream is AudioStreamOggVorbis and typeof(entry) == TYPE_DICTIONARY:
 		stream.loop = bool(entry.get("loop", false))
+	elif stream is AudioStreamWAV and typeof(entry) == TYPE_DICTIONARY:
+		stream.loop_mode = AudioStreamWAV.LOOP_FORWARD if bool(entry.get("loop", false)) else AudioStreamWAV.LOOP_DISABLED
+		stream.loop_begin = 0
+		stream.loop_end = roundi(stream.get_length() * stream.mix_rate)
 	_music_player.stream = stream
 	_current_music_track = str(track)
-	_music_player.play()
+	_music_player.play(phrase_position)
 	_music_player.stream_paused = _application_suspended or _muted or not _music_enabled
 
 	emit_signal("music_changed", track)
@@ -125,16 +148,20 @@ func play_music(track) -> void:
 
 
 func stop_music() -> void:
+	if is_instance_valid(_music_transition): _music_transition.kill()
+	if is_instance_valid(_outgoing_music): _outgoing_music.stop()
 	_music_player.stop()
 	_current_music_track = ""
 
 
 func pause_music() -> void:
+	if is_instance_valid(_outgoing_music): _outgoing_music.stream_paused = true
 	if _music_player.playing:
 		_music_player.stream_paused = true
 
 
 func resume_music() -> void:
+	if is_instance_valid(_outgoing_music): _outgoing_music.stream_paused = _application_suspended or _muted or not _music_enabled
 	if _music_player != null and _music_player.stream != null:
 		_music_player.stream_paused = _application_suspended or _muted or not _music_enabled
 		if not _current_music_track.is_empty() and not _music_player.playing:
@@ -177,6 +204,11 @@ func play_sfx(sound) -> void:
 	player.bus = _sfx_bus_name
 	player.stream = stream
 	player.volume_db = float(_audio_config.get("sfx_gain_db", {}).get(id, 0.0))
+	# A restrained variation keeps repeated physical sounds from feeling mechanical.
+	# It uses its own counter so audio never changes the board's random sequence.
+	if id in ["tile_swap", "tile_drop", "tile_fall", "tile_burst"]:
+		player.pitch_scale = [0.97, 1.0, 1.03, 0.99][_impact_variation % 4]
+		_impact_variation += 1
 	player.finished.connect(
 		func():
 			_sfx_players.erase(player)
@@ -235,7 +267,8 @@ func set_sfx_volume(value) -> void:
 func set_music_enabled(enabled: bool) -> void:
 	_music_enabled = enabled
 	if _music_player != null and _music_player.playing:
-		_music_player.stream_paused = _muted or not _music_enabled
+		_music_player.stream_paused = _application_suspended or _muted or not _music_enabled
+	if is_instance_valid(_outgoing_music): _outgoing_music.stream_paused = _application_suspended or _muted or not _music_enabled
 	_apply_bus_volumes()
 	_save_preferences()
 
@@ -316,6 +349,7 @@ func _notification(what: int) -> void:
 		_flush_preferences()
 		_application_suspended = true
 		if _music_player != null: _music_player.stream_paused = true
+		if is_instance_valid(_outgoing_music): _outgoing_music.stream_paused = true
 	elif what == NOTIFICATION_APPLICATION_RESUMED:
 		_application_suspended = false
 		resume_music()
@@ -443,7 +477,7 @@ func _duck_music_for_voice() -> void:
 
 func _restore_music_after_voice() -> void:
 	if _music_player != null:
-		_music_player.volume_db = _music_volume_db_before_voice
+		_music_player.volume_db = 0.0
 
 
 func _stop_voice() -> void:
@@ -471,6 +505,9 @@ func _queue_voice(id: String, stream: AudioStream, cue: Dictionary) -> void:
 
 
 func _process(_delta: float) -> void:
+	if _voice_player.playing:
+		_music_player.volume_db = minf(_music_player.volume_db, -8.0)
+		if is_instance_valid(_outgoing_music): _outgoing_music.volume_db = minf(_outgoing_music.volume_db, -8.0)
 	if _pending_voice.is_empty() or _muted or not _sfx_enabled or _application_suspended: return
 	var now := Time.get_ticks_msec()
 	if now > int(_pending_voice["expires"]):

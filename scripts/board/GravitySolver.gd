@@ -7,33 +7,39 @@ func initialize() -> void:
 
 
 func apply_gravity(board) -> Array:
-	if board == null:
-		return []
-	var movements: Array = []
-	for x in range(board.get_width()):
-		var y: int = board.get_height() - 1
-		while y >= 0:
-			if not board.is_playable_cell(Vector2i(x, y)):
-				y -= 1
-				continue
-			var segment_bottom: int = y
-			while y >= 0 and board.is_playable_cell(Vector2i(x, y)):
-				y -= 1
-			var segment_top: int = y + 1
-			var column: Array[Tile] = []
-			for source_y in range(segment_bottom, segment_top - 1, -1):
-				var tile: Tile = board.get_tile(Vector2i(x, source_y))
-				if tile != null:
-					column.append(tile)
-			for clear_y in range(segment_top, segment_bottom + 1):
-				board.set_tile(Vector2i(x, clear_y), null)
-			for index in range(column.size()):
-				var destination := Vector2i(x, segment_bottom - index)
-				var tile := column[index]
-				var old_position := tile.position
+	if board == null: return []
+	var origins: Dictionary = {}
+	var paths: Dictionary = {}
+	for tile in board.get_all_tiles():
+		origins[tile] = tile.position
+		paths[tile] = [tile.position]
+	# Every step descends one row. Fixed blockers retain their captive tile.
+	for step in range(board.get_height() * board.get_width()):
+		var moved := false
+		for y in range(board.get_height() - 2, -1, -1):
+			for x in range(board.get_width()):
+				var source := Vector2i(x, y)
+				if not board.is_flow_cell(source): continue
+				var tile: Tile = board.get_tile(source)
+				if tile == null: continue
+				var destination := source + Vector2i.DOWN
+				if not board.is_flow_cell(destination) or board.get_tile(destination) != null:
+					destination = source
+					for side in [-1, 1]:
+						var diagonal := source + Vector2i(side, 1)
+						var above := diagonal + Vector2i.UP
+						if board.is_flow_cell(diagonal) and board.get_tile(diagonal) == null and (not board.is_flow_cell(above) or board.get_tile(above) == null):
+							destination = diagonal
+							break
+				if destination == source: continue
+				board.set_tile(source, null)
 				board.set_tile(destination, tile)
-				if old_position != tile.position:
-					movements.append({"tile": tile, "from": old_position, "to": tile.position})
+				paths[tile].append(tile.position)
+				moved = true
+		if not moved: break
+	var movements: Array = []
+	for tile in origins:
+		if tile.position != origins[tile]: movements.append({"tile": tile, "from": origins[tile], "to": tile.position, "path": paths[tile]})
 	return movements
 
 
@@ -45,7 +51,7 @@ func calculate_fall(board) -> Dictionary:
 		var next_y: int = board.get_height() - 1
 		for y in range(board.get_height() - 1, -1, -1):
 			var from_position := Vector2i(x, y)
-			if not board.is_playable_cell(from_position):
+			if not board.is_flow_cell(from_position):
 				next_y = y - 1
 				continue
 			if board.get_tile(from_position) == null:
@@ -63,7 +69,7 @@ func get_fall_path(tile, board = null) -> Array:
 	var path: Array = []
 	for y in range(position.y + 1, board.get_height()):
 		var below := Vector2i(position.x, y)
-		if not board.is_playable_cell(below):
+		if not board.is_flow_cell(below):
 			break
 		if board.get_tile(below) != null:
 			break
@@ -78,7 +84,7 @@ func has_floating_tiles(board) -> bool:
 		var found_empty_below := false
 		for y in range(board.get_height() - 1, -1, -1):
 			var position := Vector2i(x, y)
-			if not board.is_playable_cell(position):
+			if not board.is_flow_cell(position):
 				found_empty_below = false
 			elif board.get_tile(position) == null:
 				found_empty_below = true

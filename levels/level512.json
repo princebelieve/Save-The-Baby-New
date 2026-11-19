@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Preserve the original evidence behind the road transfer docket.",
+  "description": "The offer requires Amara's silence.",
   "difficulty": "EASY",
   "level_id": 512,
   "metadata": {
     "chapter_end_level": 520,
     "chapter_id": 53,
     "chapter_start_level": 511,
-    "chapter_title": "No Public Ticket",
+    "chapter_title": "The Condition",
     "generator_version": 2,
     "map_background": "river_map_section_cutout.png",
     "map_landmark": "wooden_bridge_cutout.png",
@@ -34,13 +34,16 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 4796431,
     "season": 5,
-    "season_title": "For Her Son",
-    "episode_id": 47
+    "season_title": "The Royal Household",
+    "episode_id": 47,
+    "balance_revision": 1,
+    "balance_base_moves": 34,
+    "balance_reinforced_cells": []
   },
   "moves": {
-    "total": 34
+    "total": 33
   },
-  "name": "No Public Ticket 02",
+  "name": "The Condition 02",
   "objectives": [
     {
       "amount": 18,
@@ -95,12 +98,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the road transfer docket. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the road transfer docket. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the road transfer docket. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the road transfer docket without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into the condition advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

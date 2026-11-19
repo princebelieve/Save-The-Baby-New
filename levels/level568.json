@@ -25,14 +25,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Reconstruct the missing step around the altered stage cue sheet.",
+  "description": "Amara describes a repair in Ethan's cover.",
   "difficulty": "HARD",
   "level_id": 568,
   "metadata": {
     "chapter_end_level": 570,
     "chapter_id": 58,
     "chapter_start_level": 561,
-    "chapter_title": "The Cue Sheet",
+    "chapter_title": "The Blue Stitch",
     "generator_version": 2,
     "map_background": "factory_map_section_cutout.png",
     "map_landmark": "police_car_topdown_cutout.png",
@@ -43,13 +43,32 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 5239895,
     "season": 6,
-    "season_title": "An Audience for Victor",
-    "episode_id": 52
+    "season_title": "A Voice in the Rain",
+    "episode_id": 52,
+    "balance_revision": 1,
+    "balance_base_moves": 30,
+    "balance_reinforced_cells": [
+      {
+        "x": 3,
+        "y": 5,
+        "health": 1
+      },
+      {
+        "x": 1,
+        "y": 6,
+        "health": 1
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 30
+    "total": 27
   },
-  "name": "The Cue Sheet 08",
+  "name": "The Blue Stitch 08",
   "objectives": [
     {
       "amount": 30,
@@ -60,19 +79,19 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "chain",
         "x": 3,
         "y": 5
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "tape",
         "x": 1,
         "y": 6
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 3,
         "y": 1
@@ -128,12 +147,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the altered stage cue sheet. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the altered stage cue sheet. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the altered stage cue sheet. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the altered stage cue sheet without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into the blue stitch advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

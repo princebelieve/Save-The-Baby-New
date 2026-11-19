@@ -25,14 +25,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Critical Case: Close this investigation and hear what the revoked access record changes for the family.",
+  "description": "A later movement lacks either man's valid authority.",
   "difficulty": "CRITICAL_CASE",
   "level_id": 550,
   "metadata": {
     "chapter_end_level": 550,
     "chapter_id": 56,
     "chapter_start_level": 541,
-    "chapter_title": "What Cannot Be Signed Away",
+    "chapter_title": "An Order He Didn't Sign",
     "generator_version": 2,
     "map_background": "factory_map_section_cutout.png",
     "map_landmark": "police_car_topdown_cutout.png",
@@ -45,13 +45,32 @@
     "recommended_booster": "rocket",
     "scout_supply": false,
     "season": 5,
-    "season_title": "For Her Son",
-    "episode_id": 50
+    "season_title": "The Royal Household",
+    "episode_id": 50,
+    "balance_revision": 1,
+    "balance_base_moves": 30,
+    "balance_reinforced_cells": [
+      {
+        "x": 2,
+        "y": 2,
+        "health": 1
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "health": 1
+      },
+      {
+        "x": 4,
+        "y": 2,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 30
+    "total": 27
   },
-  "name": "What Cannot Be Signed Away 10",
+  "name": "An Order He Didn't Sign 10",
   "objectives": [
     {
       "amount": 30,
@@ -62,20 +81,20 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 2,
         "y": 2,
         "inventory_only": false
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "tape",
         "x": 3,
         "y": 2
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 4,
         "y": 2
@@ -131,12 +150,8 @@
     "after_level": "serial050_outro",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the revoked access record. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the revoked access record. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the revoked access record. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the revoked access record without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into an order he didn't sign advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

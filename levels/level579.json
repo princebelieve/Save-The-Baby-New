@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Give Amara a verified account of the delivered video filename, so she can choose the next step.",
+  "description": "The carer supplies a brief recording.",
   "difficulty": "MEDIUM",
   "level_id": 579,
   "metadata": {
     "chapter_end_level": 580,
     "chapter_id": 59,
     "chapter_start_level": 571,
-    "chapter_title": "Before the Applause",
+    "chapter_title": "One Sound",
     "generator_version": 2,
     "map_background": "river_map_section_cutout.png",
     "map_landmark": "wooden_bridge_cutout.png",
@@ -34,13 +34,27 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 5327004,
     "season": 6,
-    "season_title": "An Audience for Victor",
-    "episode_id": 53
+    "season_title": "A Voice in the Rain",
+    "episode_id": 53,
+    "balance_revision": 1,
+    "balance_base_moves": 32,
+    "balance_reinforced_cells": [
+      {
+        "x": 5,
+        "y": 3,
+        "health": 1
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 32
+    "total": 30
   },
-  "name": "Before the Applause 09",
+  "name": "One Sound 09",
   "objectives": [
     {
       "amount": 24,
@@ -51,13 +65,13 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 5,
         "y": 3
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "chain",
         "x": 4,
         "y": 4
@@ -107,12 +121,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the delivered video filename. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the delivered video filename. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the delivered video filename. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the delivered video filename without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into one sound advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

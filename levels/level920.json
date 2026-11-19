@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Close this investigation and hear what the concierge vehicle photograph changes for the family.",
+  "description": "The independent welfare visit occurs.",
   "difficulty": "HARD",
   "level_id": 920,
   "metadata": {
     "chapter_end_level": 920,
     "chapter_id": 93,
     "chapter_start_level": 911,
-    "chapter_title": "The Roof Rack",
+    "chapter_title": "Someone Sees Him",
     "generator_version": 2,
     "map_background": "river_map_section_cutout.png",
     "map_landmark": "wooden_bridge_cutout.png",
@@ -34,13 +34,32 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 8027383,
     "season": 9,
-    "season_title": "The Price of Glory",
-    "episode_id": 87
+    "season_title": "The House That Must Answer",
+    "episode_id": 87,
+    "balance_revision": 1,
+    "balance_base_moves": 30,
+    "balance_reinforced_cells": [
+      {
+        "x": 2,
+        "y": 5,
+        "health": 1
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "health": 1
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 30
+    "total": 27
   },
-  "name": "The Roof Rack 10",
+  "name": "Someone Sees Him 10",
   "objectives": [
     {
       "amount": 30,
@@ -51,19 +70,19 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "tape",
         "x": 2,
         "y": 5
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 5,
         "y": 4
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "chain",
         "x": 3,
         "y": 3
@@ -119,12 +138,8 @@
     "after_level": "serial087_outro",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the concierge vehicle photograph. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the concierge vehicle photograph. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the concierge vehicle photograph. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the concierge vehicle photograph without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into someone sees him advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

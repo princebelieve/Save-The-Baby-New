@@ -54,7 +54,7 @@ func _run() -> void:
 		var rebuilt := Serial.apply_to_level(level.duplicate(true))
 		check(level.story == rebuilt.story,"offline/runtime narrative hooks agree %d" % id)
 		check(level.name == rebuilt.name and level.description == rebuilt.description,"level narrative agrees %d" % id)
-		check(str(level.story.win_outcome).contains("Ethan is still missing"),"no rescue on win %d" % id)
+		check(not str(level.story.win_outcome).to_lower().contains("rescued"),"no rescue claimed on win %d" % id)
 	var progress := ConfigFile.new()
 	progress.set_value("story_choices","history",{"serial001_outro":{"id":"signal","response":"obsolete saved dialogue"}})
 	Serial.compact_history(progress)
@@ -104,7 +104,8 @@ func _run() -> void:
 	check(int(saved.get_value("campaign","failed_attempts",0)) == 2,"failure rotation survives a save")
 	game._on_story_finished("serial010_outro")
 	check(game._campaign_progress.get_value("story_seen","serial010_outro",false),"finished story marked seen")
-	check(str(game._campaign_progress.get_value("story_progress","latest",{}).summary).contains("accounts"),"latest evidence appears in case file data")
+	var expected_summary := str(JsonLoader.load_file("res://stories/serial010_outro.json").metadata.evidence_summary)
+	check(str(game._campaign_progress.get_value("story_progress","latest",{}).summary) == expected_summary,"authored evidence summary reaches case file data")
 	check(not CaseJournal.entries(game._campaign_progress).is_empty(),"season finale creates a journal entry")
 	var completed: Dictionary = {}
 	var stars: Dictionary = {}

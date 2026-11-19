@@ -1,55 +1,29 @@
 {
   "story_id": "serial016_intro",
-  "title": "Numbered Coats",
-  "background_music": "suspense_opening",
+  "title": "The Proposal",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/iron_gate_map_tile.jpeg",
   "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
   "characters": [
     "david",
     "amara",
     "victor",
-    "ethan",
     "detective_morris"
   ],
   "scenes": [
     {
       "scene_id": "serial016_intro",
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "Detective Morris",
-            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
-            "text": "We will verify the cloakroom token and keep its source intact. A lead is not a rescue; we cannot assume Victor stayed there.",
-            "routes": [
-              "police"
-            ]
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I will check the technical trail behind the cloakroom token. Amara, tell me what the records cannot explain."
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I am following the cloakroom token without police backup. Amara has my location; I am not going to turn this into a contest with Victor."
-          }
-        ]
-      },
+      "stage_direction": "The conversation moves between Amara's home and the estate's public offices. Keep documents distinct from what people claim about them.",
       "dialogues": [
-        {
-          "speaker": "David",
-          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "The next lead is the cloakroom token. We need its original source before Victor moves again."
-        },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "Please protect that employee. Victor uses people's need for work against them."
+          "text": "Victor smiled when I told him Adrian had proposed."
+        },
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "He was happy for you?"
         }
       ],
       "choices": []
@@ -58,11 +32,14 @@
   "metadata": {
     "version": 2,
     "season": 2,
-    "season_title": "The Borrowed Fortune",
+    "season_title": "The Fortune He Claimed",
     "episode": 6,
     "episode_id": 16,
     "campaign_levels": "201-210",
     "ethan_status": "missing",
-    "season_finale": false
+    "season_finale": false,
+    "known_before": "episode_015_resolved",
+    "unlocks_fact": "",
+    "authored_dialogue_revision": 1
   }
 }

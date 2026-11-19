@@ -25,14 +25,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "The service log records access under an emergency maintenance pretext.",
+  "description": "Amara confronts the limits of her accusation.",
   "difficulty": "EASY",
   "level_id": 796,
   "metadata": {
     "chapter_end_level": 800,
     "chapter_id": 81,
     "chapter_start_level": 791,
-    "chapter_title": "The Service Entrance",
+    "chapter_title": "What Suspicion Cannot Do",
     "generator_version": 2,
     "map_background": "river_map_section_cutout.png",
     "map_landmark": "wooden_bridge_cutout.png",
@@ -43,13 +43,16 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 7045427,
     "season": 8,
-    "season_title": "Names That Do Not Belong",
-    "episode_id": 75
+    "season_title": "The Night Adrian Died",
+    "episode_id": 75,
+    "balance_revision": 1,
+    "balance_base_moves": 34,
+    "balance_reinforced_cells": []
   },
   "moves": {
-    "total": 34
+    "total": 33
   },
-  "name": "The Service Entrance 06",
+  "name": "What Suspicion Cannot Do 06",
   "objectives": [
     {
       "amount": 18,
@@ -104,12 +107,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the property service log. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the property service log. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the property service log. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the property service log without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into what suspicion cannot do advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

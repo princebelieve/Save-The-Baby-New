@@ -25,14 +25,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "The scan identifies a documents service used to create new travel permissions.",
+  "description": "The team establishes an agreed verification channel.",
   "difficulty": "EASY",
   "level_id": 736,
   "metadata": {
     "chapter_end_level": 740,
     "chapter_id": 75,
     "chapter_start_level": 731,
-    "chapter_title": "The Document Bag",
+    "chapter_title": "Who May Enter",
     "generator_version": 2,
     "map_background": "river_map_section_cutout.png",
     "map_landmark": "wooden_bridge_cutout.png",
@@ -43,13 +43,16 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 6570287,
     "season": 7,
-    "season_title": "The Night Routes",
-    "episode_id": 69
+    "season_title": "The Man Outside the Gate",
+    "episode_id": 69,
+    "balance_revision": 1,
+    "balance_base_moves": 34,
+    "balance_reinforced_cells": []
   },
   "moves": {
-    "total": 34
+    "total": 33
   },
-  "name": "The Document Bag 06",
+  "name": "Who May Enter 06",
   "objectives": [
     {
       "amount": 18,
@@ -104,12 +107,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the courier bag scan. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the courier bag scan. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the courier bag scan. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the courier bag scan without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into who may enter advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "That was provision for a journey, not proof that everyone on it knew what he was doing.",
+  "description": "The player helps protect the threatened dependant.",
   "difficulty": "MEDIUM",
   "level_id": 614,
   "metadata": {
     "chapter_end_level": 620,
     "chapter_id": 63,
     "chapter_start_level": 611,
-    "chapter_title": "The Refund Trail",
+    "chapter_title": "A Promise to the Carer",
     "generator_version": 2,
     "map_background": "river_map_section_cutout.png",
     "map_landmark": "wooden_bridge_cutout.png",
@@ -34,13 +34,27 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 5604169,
     "season": 6,
-    "season_title": "An Audience for Victor",
-    "episode_id": 57
+    "season_title": "A Voice in the Rain",
+    "episode_id": 57,
+    "balance_revision": 1,
+    "balance_base_moves": 32,
+    "balance_reinforced_cells": [
+      {
+        "x": 1,
+        "y": 6,
+        "health": 1
+      },
+      {
+        "x": 4,
+        "y": 5,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 32
+    "total": 30
   },
-  "name": "The Refund Trail 04",
+  "name": "A Promise to the Carer 04",
   "objectives": [
     {
       "amount": 24,
@@ -51,13 +65,13 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "tape",
         "x": 1,
         "y": 6
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 4,
         "y": 5
@@ -107,12 +121,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the room hire refund. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the room hire refund. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the room hire refund. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the room hire refund without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into a promise to the carer advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

@@ -1,183 +1,192 @@
 {
-    "story": {
-        "return_to_map": true,
-        "after_level": "",
-        "before_level": "",
-        "first_clear": ""
-    },
-    "metadata": {
-        "chapter_end_level": 50,
-        "map_landmark": "wooden_bridge_cutout.png",
-        "version": 1,
-        "notes": "Academy progression: teach before availability, then practice and mastery.",
-        "author": "Save The Baby",
-        "chapter_title": "Victor's Factory",
-        "map_background": "factory_map_section_cutout.png",
-        "chapter_start_level": 41,
-        "chapter_id": 6,
-        "map_props": [
-            "police_car_topdown_cutout.png",
-            "wooden_bridge_cutout.png"
-        ],
-        "balance_version": 2
-    },
-    "board": {
-        "columns": 8,
-        "spawn_points": [],
-        "tile_size": 64,
-        "locked_cells": [],
-        "blocked_cells": [
-            [
-                0,
-                0
-            ],
-            [
-                1,
-                0
-            ],
-            [
-                0,
-                1
-            ],
-            [
-                7,
-                7
-            ],
-            [
-                6,
-                7
-            ],
-            [
-                7,
-                6
-            ]
-        ],
-        "rows": 8
-    },
-    "powerups": {
-        "enabled": true,
-        "available": [
-            "ROCKET",
-            "BOMB",
-            "THUNDER"
-        ]
-    },
-    "tile_pool": {
-        "tiles": [
-            "key",
-            "phone",
-            "fingerprint",
-            "recorder",
-            "clock",
-            "ethan",
-            "detective",
-            "victor"
-        ],
-        "weights": [
-            18,
-            18,
-            18,
-            18,
-            18,
-            1,
-            1,
-            1
-        ]
-    },
-    "difficulty": "HARD",
-    "objectives": [
-        {
-            "type": "COLLECT_ITEMS",
-            "target": "FINGERPRINT",
-            "amount": 28
-        }
+  "story": {
+    "return_to_map": true,
+    "after_level": "",
+    "before_level": "",
+    "first_clear": ""
+  },
+  "metadata": {
+    "chapter_end_level": 50,
+    "map_landmark": "wooden_bridge_cutout.png",
+    "version": 1,
+    "notes": "Academy progression: teach before availability, then practice and mastery.",
+    "author": "Save The Baby",
+    "chapter_title": "Victor's Factory",
+    "map_background": "factory_map_section_cutout.png",
+    "chapter_start_level": 41,
+    "chapter_id": 6,
+    "map_props": [
+      "police_car_topdown_cutout.png",
+      "wooden_bridge_cutout.png"
     ],
-    "audio": {
-        "music": "",
-        "victory": "",
-        "game_over": ""
-    },
-    "level_id": 42,
-    "settings": {
-        "allow_shuffle": true,
-        "allow_boosters": true,
-        "time_limit": 0,
-        "available_boosters": [
-            "rocket",
-            "bomb",
-            "thunder",
-            "ethan"
-        ]
-    },
-    "description": "Follow David's trail through Victor's Factory and gather the evidence that can lead to Ethan.",
-    "tutorial": {
-        "enabled": true,
-        "steps": [
-            {
-                "mechanic": "mission_briefing",
-                "message": "CASE 042 | THE OUTER FENCE\n\nCollect 28 fingerprints and clear all 7 blockers within 24 moves. You must finish both goals.\n\nMatch on or beside a blocker to damage it; each blocker here has two layers. Locks prevent swapping the tile they cover until the lock breaks. Rockets, bombs and thunder can help reach blocked areas.\n\nPlan matches beside blockers while collecting fingerprints. The dark corner cells are gaps, not tiles. The Case File has earlier lessons on chains, locks, missiles and electric traps."
-            }
-        ]
-    },
-    "obstacles": {
-        "items": [
-            {
-                "x": 2,
-                "y": 5,
-                "type": "missile",
-                "health": 1
-            },
-            {
-                "x": 5,
-                "y": 2,
-                "type": "electric_trap",
-                "health": 1
-            },
-            {
-                "x": 3,
-                "y": 3,
-                "type": "chain",
-                "health": 1
-            },
-            {
-                "x": 4,
-                "y": 4,
-                "type": "lock",
-                "health": 1
-            },
-            {
-                "x": 1,
-                "y": 4,
-                "type": "missile",
-                "health": 1
-            },
-            {
-                "x": 6,
-                "y": 3,
-                "type": "electric_trap",
-                "health": 1
-            },
-            {
-                "x": 2,
-                "y": 2,
-                "type": "chain",
-                "health": 1
-            }
-        ]
-    },
-    "background": {
-        "parallax": false,
-        "image": "res://assets/sprites/backgrounds/dirt_board_background.jpeg"
-    },
-    "moves": {
-        "total": 32
-    },
-    "rewards": {
-        "powerups": [],
-        "perfect_bonus": 20,
-        "coins": 50,
-        "stars": 3,
-        "first_try_bonus": 10
-    },
-    "name": "The Outer Fence"
+    "balance_version": 2,
+    "balance_revision": 1,
+    "balance_base_moves": 32,
+    "balance_reinforced_cells": [
+      {
+        "x": 2,
+        "y": 5,
+        "health": 1
+      }
+    ]
+  },
+  "board": {
+    "columns": 8,
+    "spawn_points": [],
+    "tile_size": 64,
+    "locked_cells": [],
+    "blocked_cells": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        0,
+        1
+      ],
+      [
+        7,
+        7
+      ],
+      [
+        6,
+        7
+      ],
+      [
+        7,
+        6
+      ]
+    ],
+    "rows": 8
+  },
+  "powerups": {
+    "enabled": true,
+    "available": [
+      "ROCKET",
+      "BOMB",
+      "THUNDER"
+    ]
+  },
+  "tile_pool": {
+    "tiles": [
+      "key",
+      "phone",
+      "fingerprint",
+      "recorder",
+      "clock",
+      "ethan",
+      "detective",
+      "victor"
+    ],
+    "weights": [
+      18,
+      18,
+      18,
+      18,
+      18,
+      1,
+      1,
+      1
+    ]
+  },
+  "difficulty": "HARD",
+  "objectives": [
+    {
+      "type": "COLLECT_ITEMS",
+      "target": "FINGERPRINT",
+      "amount": 28
+    }
+  ],
+  "audio": {
+    "music": "",
+    "victory": "",
+    "game_over": ""
+  },
+  "level_id": 42,
+  "settings": {
+    "allow_shuffle": true,
+    "allow_boosters": true,
+    "time_limit": 0,
+    "available_boosters": [
+      "rocket",
+      "bomb",
+      "thunder",
+      "ethan"
+    ]
+  },
+  "description": "Follow David's trail through Victor's Factory and gather the evidence that can lead to Ethan.",
+  "tutorial": {
+    "enabled": true,
+    "steps": [
+      {
+        "mechanic": "mission_briefing",
+        "message": "CASE 042 | THE OUTER FENCE\n\nCollect 28 fingerprints and clear all 7 blockers within 24 moves. You must finish both goals.\n\nMatch on or beside a blocker to damage it; each blocker here has two layers. Locks prevent swapping the tile they cover until the lock breaks. Rockets, bombs and thunder can help reach blocked areas.\n\nPlan matches beside blockers while collecting fingerprints. The dark corner cells are gaps, not tiles. The Case File has earlier lessons on chains, locks, missiles and electric traps."
+      }
+    ]
+  },
+  "obstacles": {
+    "items": [
+      {
+        "x": 2,
+        "y": 5,
+        "type": "missile",
+        "health": 2
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "type": "electric_trap",
+        "health": 1
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "type": "chain",
+        "health": 1
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "type": "lock",
+        "health": 1
+      },
+      {
+        "x": 1,
+        "y": 4,
+        "type": "missile",
+        "health": 1
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "type": "electric_trap",
+        "health": 1
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "type": "chain",
+        "health": 1
+      }
+    ]
+  },
+  "background": {
+    "parallax": false,
+    "image": "res://assets/sprites/backgrounds/dirt_board_background.jpeg"
+  },
+  "moves": {
+    "total": 30
+  },
+  "rewards": {
+    "powerups": [],
+    "perfect_bonus": 20,
+    "coins": 50,
+    "stars": 3,
+    "first_try_bonus": 10
+  },
+  "name": "The Outer Fence"
 }

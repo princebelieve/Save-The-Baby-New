@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Preserve the original evidence behind the colleague's original project file.",
+  "description": "The source of a relationship photograph is identified.",
   "difficulty": "EASY",
   "level_id": 422,
   "metadata": {
     "chapter_end_level": 430,
     "chapter_id": 44,
     "chapter_start_level": 421,
-    "chapter_title": "Credit Taken",
+    "chapter_title": "A Photograph Sent On",
     "generator_version": 2,
     "map_background": "factory_map_section_cutout.png",
     "map_landmark": "police_car_topdown_cutout.png",
@@ -34,13 +34,16 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 4083721,
     "season": 4,
-    "season_title": "What He Calls Love",
-    "episode_id": 38
+    "season_title": "The Heart He Couldn't Claim",
+    "episode_id": 38,
+    "balance_revision": 1,
+    "balance_base_moves": 34,
+    "balance_reinforced_cells": []
   },
   "moves": {
-    "total": 34
+    "total": 33
   },
-  "name": "Credit Taken 02",
+  "name": "A Photograph Sent On 02",
   "objectives": [
     {
       "amount": 18,
@@ -95,12 +98,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the colleague's original project file. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the colleague's original project file. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the colleague's original project file. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the colleague's original project file without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into a photograph sent on advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

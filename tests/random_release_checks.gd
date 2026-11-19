@@ -10,6 +10,7 @@ var _baseline := false
 var _probe_continue := false
 var _inventory_start := false
 var _return_assist := false
+var _candidate := false
 
 
 func _ready() -> void:
@@ -90,9 +91,13 @@ func _run() -> void:
 
 
 func _play_level(level_id: int, policy: String) -> void:
+	_candidate = "--candidate" in OS.get_cmdline_user_args()
 	RandomGenerator.initialize(SAMPLE_SEED + level_id)
 	var path := "res://.test-data/balance-baseline-levels/level%03d.json" % level_id if _baseline else "res://levels/level%03d.json" % level_id
 	var data := JsonLoader.load_file(path)
+	if _candidate:
+		data = data.duplicate(true)
+		data.moves.total = maxi(1, roundi(float(data.moves.total) * 0.9))
 	if _return_assist:
 		var recovery = preload("res://scripts/game/LevelRecovery.gd")
 		var progress := ConfigFile.new()
@@ -112,6 +117,7 @@ func _play_level(level_id: int, policy: String) -> void:
 	var clears := [0]
 	var target := int(Constants.TileType.get(str(data.objectives[0].target)))
 	var goal := int(data.objectives[0].amount)
+	var destroy_goal := str(data.objectives[0].type) == "DESTROY_OBSTACLES"
 	board.match_collected.connect(func(types: Array):
 		for type in types:
 			if int(type) == target:
@@ -157,10 +163,10 @@ func _play_level(level_id: int, policy: String) -> void:
 		check(board.get_remaining_moves() == previous_moves - 1, "Exactly one move spent per turn: %d" % level_id)
 		check(resolved[0] == turns, "Exactly one completion signal per turn: %d" % level_id)
 		check(board.is_stable(), "Cascades settle: %d" % level_id)
-		check(board.get_all_tiles().size() == board.get_width() * board.get_height() - board._blocked_cells.size(), "Every playable cell refills: %d" % level_id)
-		if collected[0] >= goal and board._obstacles.is_empty():
+		check(not board._refill_system.needs_refill(board), "Every open supply inlet refills: %d" % level_id)
+		if (clears[0] >= goal if destroy_goal else collected[0] >= goal) and board._obstacles.is_empty():
 			break
-	var won: bool = collected[0] >= goal and board._obstacles.is_empty()
+	var won: bool = (clears[0] >= goal if destroy_goal else collected[0] >= goal) and board._obstacles.is_empty()
 	var initial_collected: int = collected[0]
 	var initial_blockers: int = board._obstacles.size()
 	var continued_win := false
@@ -175,7 +181,7 @@ func _play_level(level_id: int, policy: String) -> void:
 			while board.is_locked() and Time.get_ticks_msec() < deadline:
 				await get_tree().process_frame
 			check(not board.is_locked(),"Continuation settles: %d" % level_id)
-			continued_win = collected[0] >= goal and board._obstacles.is_empty()
+			continued_win = (clears[0] >= goal if destroy_goal else collected[0] >= goal) and board._obstacles.is_empty()
 			if continued_win:
 				break
 	check(not won or turns > 1, "Non-tutorial case does not win itself immediately: %d" % level_id)

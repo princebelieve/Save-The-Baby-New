@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Trace the source of the crate delivery record before trusting Victor's account.",
+  "description": "An independent source checks the candidate.",
   "difficulty": "MEDIUM",
   "level_id": 633,
   "metadata": {
     "chapter_end_level": 640,
     "chapter_id": 65,
     "chapter_start_level": 631,
-    "chapter_title": "The Equipment Crate",
+    "chapter_title": "A Room with Light",
     "generator_version": 2,
     "map_background": "river_map_section_cutout.png",
     "map_landmark": "wooden_bridge_cutout.png",
@@ -34,13 +34,27 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 5754630,
     "season": 6,
-    "season_title": "An Audience for Victor",
-    "episode_id": 59
+    "season_title": "A Voice in the Rain",
+    "episode_id": 59,
+    "balance_revision": 1,
+    "balance_base_moves": 32,
+    "balance_reinforced_cells": [
+      {
+        "x": 4,
+        "y": 6,
+        "health": 1
+      },
+      {
+        "x": 5,
+        "y": 6,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 32
+    "total": 30
   },
-  "name": "The Equipment Crate 03",
+  "name": "A Room with Light 03",
   "objectives": [
     {
       "amount": 24,
@@ -51,13 +65,13 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 4,
         "y": 6
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "chain",
         "x": 5,
         "y": 6
@@ -107,12 +121,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the crate delivery record. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the crate delivery record. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the crate delivery record. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the crate delivery record without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into a room with light advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

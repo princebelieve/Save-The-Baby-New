@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "The next lead is the reunion invitation. We need its original source before Victor moves again.",
+  "description": "Amara remembers Adrian's visits to her stall.",
   "difficulty": "EASY",
   "level_id": 371,
   "metadata": {
     "chapter_end_level": 380,
     "chapter_id": 39,
     "chapter_start_level": 371,
-    "chapter_title": "The Reunion Invitation",
+    "chapter_title": "A Man Who Returned",
     "generator_version": 2,
     "map_background": "river_map_section_cutout.png",
     "map_landmark": "wooden_bridge_cutout.png",
@@ -34,13 +34,16 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 3679852,
     "season": 4,
-    "season_title": "What He Calls Love",
-    "episode_id": 33
+    "season_title": "The Heart He Couldn't Claim",
+    "episode_id": 33,
+    "balance_revision": 1,
+    "balance_base_moves": 34,
+    "balance_reinforced_cells": []
   },
   "moves": {
-    "total": 34
+    "total": 33
   },
-  "name": "The Reunion Invitation 01",
+  "name": "A Man Who Returned 01",
   "objectives": [
     {
       "amount": 18,
@@ -95,12 +98,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the reunion invitation. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the reunion invitation. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the reunion invitation. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the reunion invitation without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into a man who returned advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

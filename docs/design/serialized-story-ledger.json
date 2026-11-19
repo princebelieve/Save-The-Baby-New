@@ -1,0 +1,3557 @@
+{
+  "status": "authored progressive scene plan; not playable dialogue yet",
+  "rescue_within_levels_1_to_1050": false,
+  "prologue": [
+    [
+      "opening_story",
+      "before level 1",
+      "Rain, the missing infant, Amara seeing Victor, locked exits, the plea to David. End on the three approaches. Do not explain the inheritance, passage or accomplice."
+    ],
+    [
+      "chapter01",
+      "before level 1",
+      "Each approach begins with a different first action. Establish where Amara saw Victor; preserve her account without inventing a recording of the ransom call."
+    ],
+    [
+      "season01",
+      "after level 5",
+      "The external gate was not forced. An innocent delivery worker can be excluded. The house itself becomes the question."
+    ],
+    [
+      "chapter02",
+      "before level 9",
+      "Victor demands money. Amara denies he has any claim. David must ask where that supposed debt comes from; defer the full answer."
+    ],
+    [
+      "season02",
+      "after level 10",
+      "Reveal that Ethan inherited a private provision from his father. Victor is not that father. Keep the identity and death history incomplete."
+    ],
+    [
+      "season03",
+      "after level 15",
+      "A threatening message includes a detail from inside the house. Its sender knew more than a casual observer; establish a source worth testing."
+    ],
+    [
+      "chapter03",
+      "before level 16",
+      "Amara recalls paying the rent while Victor spoke of his aura. One brief domestic memory explains his habit; avoid narrating the entire relationship."
+    ],
+    [
+      "season04",
+      "after level 20",
+      "A planted trace is detected before the team acts against its apparent owner. The player protects an innocent person rather than simply losing a lead."
+    ],
+    [
+      "chapter04",
+      "before level 23",
+      "David admits his first technical interpretation was wrong. Amara identifies a household routine absent from the logs. Their skills complement each other."
+    ],
+    [
+      "season05",
+      "after level 25",
+      "Amara acknowledges her suspicion that Victor was involved in the father's death, then explicitly distinguishes fear from evidence. No killer is named."
+    ],
+    [
+      "season06",
+      "after level 30",
+      "A verified witness places a service vehicle near the house. Preserve the witness and record; do not immediately make the witness disappear."
+    ],
+    [
+      "chapter05",
+      "before level 31",
+      "Victor learns David is helping. Reveal that he approached Amara after the funeral and she refused him. Show jealousy rather than a second aura lecture."
+    ],
+    [
+      "season07",
+      "after level 35",
+      "The vehicle record leads to an estate service arrangement. First hint of the wealthy family's continuing influence; no full conspiracy disclosure."
+    ],
+    [
+      "season08",
+      "after level 40",
+      "Someone tries to persuade Amara that she misunderstood what she saw. Physical details support her account. She truly saw Victor; the game will not reverse this into hallucination."
+    ],
+    [
+      "chapter06",
+      "before level 41",
+      "A poor image from inside the property can be restored. Establish which part matters before the player undertakes restoration. The image is evidence of a route, not a promised rescue."
+    ],
+    [
+      "season09",
+      "after level 45",
+      "The restored image places Victor beside an interior passage. It corroborates his presence without yet explaining how the closed house worked."
+    ],
+    [
+      "season10",
+      "after level 50",
+      "An access record bears Amara's credential while she was asleep. End the first fifty levels on this specific locked-house question, leading directly to episode 1."
+    ]
+  ],
+  "arcs": [
+    {
+      "number": 1,
+      "title": "The Door That Never Opened",
+      "episodes": [
+        {
+          "episode": 1,
+          "title": "The Borrowed Credential",
+          "levels": [
+            51,
+            60
+          ],
+          "entry": "Amara's name appears in the access log.",
+          "discovery": "Her credential was issued before she moved in.",
+          "hook": "Who retained the original household account?",
+          "required_fact": "opening_case",
+          "new_fact": "episode_001_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial001_intro",
+          "outro_scene": "serial001_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 2,
+          "title": "The Second Account",
+          "levels": [
+            61,
+            70
+          ],
+          "entry": "David compares conflicting access records.",
+          "discovery": "An estate service account remained active.",
+          "hook": "Why did the estate still control access?",
+          "required_fact": "episode_001_resolved",
+          "new_fact": "episode_002_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial002_intro",
+          "outro_scene": "serial002_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 3,
+          "title": "Rain Inside",
+          "levels": [
+            71,
+            80
+          ],
+          "entry": "Morris examines water behind the bolted door.",
+          "discovery": "The water came from an internal service stair.",
+          "hook": "Why is the stair missing from the public plan?",
+          "required_fact": "episode_002_resolved",
+          "new_fact": "episode_003_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial003_intro",
+          "outro_scene": "serial003_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 4,
+          "title": "A House Remembered",
+          "levels": [
+            81,
+            90
+          ],
+          "entry": "Amara searches Adrian's ordinary household papers.",
+          "discovery": "A maintenance invoice names a former attendant.",
+          "hook": "The attendant has been ordered not to speak.",
+          "required_fact": "episode_003_resolved",
+          "new_fact": "episode_004_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial004_intro",
+          "outro_scene": "serial004_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 5,
+          "title": "Before the Marriage",
+          "levels": [
+            91,
+            100
+          ],
+          "entry": "The attendant asks why the family distrusts Amara.",
+          "discovery": "Amara reveals Adrian's proposal and his family's refusal.",
+          "hook": "Someone is recording the attendant's visitors.",
+          "required_fact": "episode_004_resolved",
+          "new_fact": "episode_005_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial005_intro",
+          "outro_scene": "serial005_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 6,
+          "title": "The Unsent Warning",
+          "levels": [
+            101,
+            110
+          ],
+          "entry": "David finds an intercepted warning to Amara.",
+          "discovery": "An employee reported reused access before the kidnapping.",
+          "hook": "Who stopped the message reaching her?",
+          "required_fact": "episode_005_resolved",
+          "new_fact": "episode_006_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial006_intro",
+          "outro_scene": "serial006_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 7,
+          "title": "The Wrong Footprints",
+          "levels": [
+            111,
+            120
+          ],
+          "entry": "An innocent worker is blamed for a trace.",
+          "discovery": "Morris establishes that evidence was planted.",
+          "hook": "Its source links to an estate contractor.",
+          "required_fact": "episode_006_resolved",
+          "new_fact": "episode_007_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial007_intro",
+          "outro_scene": "serial007_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 8,
+          "title": "The Door Below",
+          "levels": [
+            121,
+            130
+          ],
+          "entry": "The contractor's plan is recovered.",
+          "discovery": "Victor could leave while the ordinary doors stayed locked.",
+          "hook": "Someone had to release the internal service gate.",
+          "required_fact": "episode_007_resolved",
+          "new_fact": "episode_008_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial008_intro",
+          "outro_scene": "serial008_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 9,
+          "title": "Someone Held It",
+          "levels": [
+            131,
+            140
+          ],
+          "entry": "A witness describes a woman beside the exit.",
+          "discovery": "Amara's sighting is corroborated: Victor had help.",
+          "hook": "The woman wore an estate staff pin.",
+          "required_fact": "episode_008_resolved",
+          "new_fact": "episode_009_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial009_intro",
+          "outro_scene": "serial009_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 10,
+          "title": "The First Promise Kept",
+          "levels": [
+            141,
+            150
+          ],
+          "entry": "The team closes the compromised access.",
+          "discovery": "The house is secured and the innocent worker cleared.",
+          "hook": "The staff pin belongs to Adrian's household.",
+          "required_fact": "episode_009_resolved",
+          "new_fact": "episode_010_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial010_intro",
+          "outro_scene": "serial010_outro",
+          "reveal_at": "outro; never in introduction"
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "The Fortune He Claimed",
+      "episodes": [
+        {
+          "episode": 11,
+          "title": "A Seat at the Table",
+          "levels": [
+            151,
+            160
+          ],
+          "entry": "Amara seeks the household staff list.",
+          "discovery": "Orena receives her but refuses to discuss Ethan's status.",
+          "hook": "A clerk quietly offers another appointment.",
+          "required_fact": "episode_010_resolved",
+          "new_fact": "episode_011_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial011_intro",
+          "outro_scene": "serial011_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 12,
+          "title": "The Clerk's Copy",
+          "levels": [
+            161,
+            170
+          ],
+          "entry": "Nessa supplies a withheld payment record.",
+          "discovery": "The contractor was paid after Adrian died.",
+          "hook": "Who authorised the payment?",
+          "required_fact": "episode_011_resolved",
+          "new_fact": "episode_012_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial012_intro",
+          "outro_scene": "serial012_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 13,
+          "title": "The Price of Shoes",
+          "levels": [
+            171,
+            180
+          ],
+          "entry": "Victor claims Amara owes him her prosperity.",
+          "discovery": "Amara recalls his aura boasts while she paid their rent.",
+          "hook": "An old acquaintance saw him at the estate office.",
+          "required_fact": "episode_012_resolved",
+          "new_fact": "episode_013_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial013_intro",
+          "outro_scene": "serial013_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 14,
+          "title": "Not a Stranger",
+          "levels": [
+            181,
+            190
+          ],
+          "entry": "The acquaintance describes the meeting.",
+          "discovery": "Victor met an estate intermediary before Adrian died.",
+          "hook": "Can the meeting's date be established?",
+          "required_fact": "episode_013_resolved",
+          "new_fact": "episode_014_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial014_intro",
+          "outro_scene": "serial014_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 15,
+          "title": "The Other Side of the Picture",
+          "levels": [
+            191,
+            200
+          ],
+          "entry": "The complete photograph is recovered.",
+          "discovery": "Victor met Kellan, the estate administrator.",
+          "hook": "The photographer was paid through the household account.",
+          "required_fact": "episode_014_resolved",
+          "new_fact": "episode_015_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial015_intro",
+          "outro_scene": "serial015_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 16,
+          "title": "The Proposal",
+          "levels": [
+            201,
+            210
+          ],
+          "entry": "Amara explains why she left Victor.",
+          "discovery": "He suggested exploiting Adrian; she refused and left him.",
+          "hook": "Victor calls the introduction proof the fortune is his.",
+          "required_fact": "episode_015_resolved",
+          "new_fact": "episode_016_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial016_intro",
+          "outro_scene": "serial016_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 17,
+          "title": "For His Son",
+          "levels": [
+            211,
+            220
+          ],
+          "entry": "The bequest is distinguished from the throne dispute.",
+          "discovery": "Adrian acknowledged Ethan and made him a private provision.",
+          "hook": "The family's copy lacks a supporting page.",
+          "required_fact": "episode_016_resolved",
+          "new_fact": "episode_017_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial017_intro",
+          "outro_scene": "serial017_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 18,
+          "title": "The Missing Page",
+          "levels": [
+            221,
+            230
+          ],
+          "entry": "Nessa finds a filing receipt.",
+          "discovery": "The omission predates the kidnapping.",
+          "hook": "Where is the original page held?",
+          "required_fact": "episode_017_resolved",
+          "new_fact": "episode_018_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial018_intro",
+          "outro_scene": "serial018_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 19,
+          "title": "A Request in Her Voice",
+          "levels": [
+            231,
+            240
+          ],
+          "entry": "Amara personally challenges the withholding.",
+          "discovery": "Her objection enters the record and cannot be described as consent.",
+          "hook": "Kellan suspends Nessa's access.",
+          "required_fact": "episode_018_resolved",
+          "new_fact": "episode_019_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial019_intro",
+          "outro_scene": "serial019_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 20,
+          "title": "Money Is Not a Father",
+          "levels": [
+            241,
+            250
+          ],
+          "entry": "The authenticated record is preserved.",
+          "discovery": "Victor's alleged debt is exposed as an unsupported demand.",
+          "hook": "A payment refers to a private transfer of care.",
+          "required_fact": "episode_019_resolved",
+          "new_fact": "episode_020_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial020_intro",
+          "outro_scene": "serial020_outro",
+          "reveal_at": "outro; never in introduction"
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "The Woman Who Waited",
+      "episodes": [
+        {
+          "episode": 21,
+          "title": "Green Pin",
+          "levels": [
+            251,
+            260
+          ],
+          "entry": "The pin identifies Lami, a former attendant.",
+          "discovery": "She accepted work described as protecting Adrian's child.",
+          "hook": "Lami has not collected her wages.",
+          "required_fact": "episode_020_resolved",
+          "new_fact": "episode_021_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial021_intro",
+          "outro_scene": "serial021_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 22,
+          "title": "A Room for One Night",
+          "levels": [
+            261,
+            270
+          ],
+          "entry": "Lami's booking is secured.",
+          "discovery": "She left a note expressing fear of Ethan's collector.",
+          "hook": "A witness saw her change vehicles.",
+          "required_fact": "episode_021_resolved",
+          "new_fact": "episode_022_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial022_intro",
+          "outro_scene": "serial022_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 23,
+          "title": "The Patient Driver",
+          "levels": [
+            271,
+            280
+          ],
+          "entry": "A driver asks for protection before speaking.",
+          "discovery": "He heard Ethan cry after the house exit.",
+          "hook": "Who comforted the baby?",
+          "required_fact": "episode_022_resolved",
+          "new_fact": "episode_023_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial023_intro",
+          "outro_scene": "serial023_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 24,
+          "title": "The Cup She Packed",
+          "levels": [
+            281,
+            290
+          ],
+          "entry": "The driver identifies Ethan's feeding cup.",
+          "discovery": "The first independent sighting confirms Ethan alive that morning.",
+          "hook": "Lami tried to telephone a clinic.",
+          "required_fact": "episode_023_resolved",
+          "new_fact": "episode_024_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial024_intro",
+          "outro_scene": "serial024_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 25,
+          "title": "The Call She Couldn't Finish",
+          "levels": [
+            291,
+            300
+          ],
+          "entry": "David verifies the call without exposing medical records.",
+          "discovery": "Lami asked how to obtain help for a baby in her care.",
+          "hook": "Another person interrupted her.",
+          "required_fact": "episode_024_resolved",
+          "new_fact": "episode_025_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial025_intro",
+          "outro_scene": "serial025_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 26,
+          "title": "A Brother at the Yard",
+          "levels": [
+            301,
+            310
+          ],
+          "entry": "Nessa's brother is threatened over her copies.",
+          "discovery": "The team reaches him in time and brings him to safety.",
+          "hook": "He saw the contractor's receiving desk.",
+          "required_fact": "episode_025_resolved",
+          "new_fact": "episode_026_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial026_intro",
+          "outro_scene": "serial026_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 27,
+          "title": "The Receiving Desk",
+          "levels": [
+            311,
+            320
+          ],
+          "entry": "His account identifies Lami's recruiter.",
+          "discovery": "The recruiter used the royal household's name.",
+          "hook": "She retained a signed instruction.",
+          "required_fact": "episode_026_resolved",
+          "new_fact": "episode_027_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial027_intro",
+          "outro_scene": "serial027_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 28,
+          "title": "What Lami Believed",
+          "levels": [
+            321,
+            330
+          ],
+          "entry": "Lami contacts Amara through a protected channel.",
+          "discovery": "She believed a family custody dispute was being settled.",
+          "hook": "Will she identify Victor directly?",
+          "required_fact": "episode_027_resolved",
+          "new_fact": "episode_028_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial028_intro",
+          "outro_scene": "serial028_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 29,
+          "title": "A Place to Speak",
+          "levels": [
+            331,
+            340
+          ],
+          "entry": "The player helps secure Lami's interview.",
+          "discovery": "Lami confirms Victor carried Ethan from the service stair.",
+          "hook": "Who supplied the instruction?",
+          "required_fact": "episode_028_resolved",
+          "new_fact": "episode_029_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial029_intro",
+          "outro_scene": "serial029_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 30,
+          "title": "The First Accomplice",
+          "levels": [
+            341,
+            350
+          ],
+          "entry": "Lami gives corroborating evidence and remains available.",
+          "discovery": "The access conspiracy no longer rests solely on Amara's account.",
+          "hook": "Kellan's authorisation appears on the transfer.",
+          "required_fact": "episode_029_resolved",
+          "new_fact": "episode_030_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial030_intro",
+          "outro_scene": "serial030_outro",
+          "reveal_at": "outro; never in introduction"
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "title": "The Heart He Couldn't Claim",
+      "episodes": [
+        {
+          "episode": 31,
+          "title": "The Letter Victor Kept",
+          "levels": [
+            351,
+            360
+          ],
+          "entry": "Victor sends part of an old love letter.",
+          "discovery": "Amara recognises writing from before the separation.",
+          "hook": "The missing ending changes its meaning.",
+          "required_fact": "episode_030_resolved",
+          "new_fact": "episode_031_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial031_intro",
+          "outro_scene": "serial031_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 32,
+          "title": "The Last Week's Rent",
+          "levels": [
+            361,
+            370
+          ],
+          "entry": "An old neighbour describes Amara leaving.",
+          "discovery": "The separation preceded her acceptance of Adrian.",
+          "hook": "Victor threatened to collect his reward later.",
+          "required_fact": "episode_031_resolved",
+          "new_fact": "episode_032_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial032_intro",
+          "outro_scene": "serial032_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 33,
+          "title": "A Man Who Returned",
+          "levels": [
+            371,
+            380
+          ],
+          "entry": "Amara remembers Adrian's visits to her stall.",
+          "discovery": "Their relationship grew before his promise of marriage.",
+          "hook": "A saved message records his argument with his family.",
+          "required_fact": "episode_032_resolved",
+          "new_fact": "episode_033_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial033_intro",
+          "outro_scene": "serial033_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 34,
+          "title": "The Door She Wasn't Offered",
+          "levels": [
+            381,
+            390
+          ],
+          "entry": "The family rejection is heard in context.",
+          "discovery": "Opposition to the marriage began before Ethan's birth.",
+          "hook": "Kellan handled Adrian's finances during that dispute.",
+          "required_fact": "episode_033_resolved",
+          "new_fact": "episode_034_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial034_intro",
+          "outro_scene": "serial034_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 35,
+          "title": "The Name at Birth",
+          "levels": [
+            391,
+            400
+          ],
+          "entry": "Adrian's acknowledgement is recovered.",
+          "discovery": "He recognised Ethan despite his family's refusal.",
+          "hook": "Why was it omitted from a later statement?",
+          "required_fact": "episode_034_resolved",
+          "new_fact": "episode_035_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial035_intro",
+          "outro_scene": "serial035_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 36,
+          "title": "After the Funeral",
+          "levels": [
+            401,
+            410
+          ],
+          "entry": "Victor's attempt to reclaim Amara is reconstructed.",
+          "discovery": "She explicitly refused him rather than inviting negotiation.",
+          "hook": "His messages changed from affection to payment.",
+          "required_fact": "episode_035_resolved",
+          "new_fact": "episode_036_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial036_intro",
+          "outro_scene": "serial036_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 37,
+          "title": "Someone Who Listened",
+          "levels": [
+            411,
+            420
+          ],
+          "entry": "David recalls repairing Amara's business website.",
+          "discovery": "Their relationship began through ordinary trust.",
+          "hook": "Who told Victor about them?",
+          "required_fact": "episode_036_resolved",
+          "new_fact": "episode_037_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial037_intro",
+          "outro_scene": "serial037_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 38,
+          "title": "A Photograph Sent On",
+          "levels": [
+            421,
+            430
+          ],
+          "entry": "The source of a relationship photograph is identified.",
+          "discovery": "A household observer reported Amara and David to Victor.",
+          "hook": "The observer thought they were helping reconciliation.",
+          "required_fact": "episode_037_resolved",
+          "new_fact": "episode_038_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial038_intro",
+          "outro_scene": "serial038_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 39,
+          "title": "Do Not Decide for Me",
+          "levels": [
+            431,
+            440
+          ],
+          "entry": "David wants to refuse Victor's meeting demand.",
+          "discovery": "Amara and David agree on a plan together.",
+          "hook": "Amara will speak while her allies verify the surroundings.",
+          "required_fact": "episode_038_resolved",
+          "new_fact": "episode_039_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial039_intro",
+          "outro_scene": "serial039_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 40,
+          "title": "What He Really Wants",
+          "levels": [
+            441,
+            450
+          ],
+          "entry": "Amara draws Victor into discussing the morning.",
+          "discovery": "His knowledge corroborates the ransom evidence.",
+          "hook": "He says the royal household paid for the car.",
+          "required_fact": "episode_039_resolved",
+          "new_fact": "episode_040_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial040_intro",
+          "outro_scene": "serial040_outro",
+          "reveal_at": "outro; never in introduction"
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "title": "The Royal Household",
+      "episodes": [
+        {
+          "episode": 41,
+          "title": "The First Car",
+          "levels": [
+            451,
+            460
+          ],
+          "entry": "The payment is compared with Lami's account.",
+          "discovery": "Kellan's office funded the first transfer.",
+          "hook": "He calls it ordinary household work.",
+          "required_fact": "episode_040_resolved",
+          "new_fact": "episode_041_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial041_intro",
+          "outro_scene": "serial041_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 42,
+          "title": "An Ordinary Invoice",
+          "levels": [
+            461,
+            470
+          ],
+          "entry": "Nessa produces the instruction behind it.",
+          "discovery": "The document falsely describes Amara as unable to care for Ethan.",
+          "hook": "Its author never met her.",
+          "required_fact": "episode_041_resolved",
+          "new_fact": "episode_042_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial042_intro",
+          "outro_scene": "serial042_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 43,
+          "title": "A Witness to a Stranger",
+          "levels": [
+            471,
+            480
+          ],
+          "entry": "The author explains the source of the claim.",
+          "discovery": "The assessment was manufactured from supplied allegations.",
+          "hook": "A message promises discretion to the household.",
+          "required_fact": "episode_042_resolved",
+          "new_fact": "episode_043_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial043_intro",
+          "outro_scene": "serial043_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 44,
+          "title": "The House Divides",
+          "levels": [
+            481,
+            490
+          ],
+          "entry": "Orena confronts the transfer made in her name.",
+          "discovery": "She approved an inquiry, not Victor's ransom.",
+          "hook": "She prevents Kellan destroying the archive.",
+          "required_fact": "episode_043_resolved",
+          "new_fact": "episode_044_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial044_intro",
+          "outro_scene": "serial044_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 45,
+          "title": "A Key Surrendered",
+          "levels": [
+            491,
+            500
+          ],
+          "entry": "Orena releases a controlled record.",
+          "discovery": "The team gains a durable source within the household.",
+          "hook": "It identifies a private receiving house.",
+          "required_fact": "episode_044_resolved",
+          "new_fact": "episode_045_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial045_intro",
+          "outro_scene": "serial045_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 46,
+          "title": "Not the Heir They Wanted",
+          "levels": [
+            501,
+            510
+          ],
+          "entry": "Kellan's succession concerns are established.",
+          "discovery": "His motive is distinct from Victor's financial grievance.",
+          "hook": "A relative offers conditional help.",
+          "required_fact": "episode_045_resolved",
+          "new_fact": "episode_046_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial046_intro",
+          "outro_scene": "serial046_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 47,
+          "title": "The Condition",
+          "levels": [
+            511,
+            520
+          ],
+          "entry": "The offer requires Amara's silence.",
+          "discovery": "She rejects the bargain without surrendering her evidence.",
+          "hook": "A younger employee breaks ranks.",
+          "required_fact": "episode_046_resolved",
+          "new_fact": "episode_047_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial047_intro",
+          "outro_scene": "serial047_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 48,
+          "title": "The Rooms Prepared",
+          "levels": [
+            521,
+            530
+          ],
+          "entry": "The employee describes supplies ordered for Ethan.",
+          "discovery": "The transfer included arrangements for infant care.",
+          "hook": "One order names a carer outside Victor's circle.",
+          "required_fact": "episode_047_resolved",
+          "new_fact": "episode_048_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial048_intro",
+          "outro_scene": "serial048_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 49,
+          "title": "Two Plans, One Child",
+          "levels": [
+            531,
+            540
+          ],
+          "entry": "The correspondence is reconstructed.",
+          "discovery": "Kellan wanted concealed custody; Victor converted it into ransom.",
+          "hook": "The men are withholding information from each other.",
+          "required_fact": "episode_048_resolved",
+          "new_fact": "episode_049_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial049_intro",
+          "outro_scene": "serial049_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 50,
+          "title": "An Order He Didn't Sign",
+          "levels": [
+            541,
+            550
+          ],
+          "entry": "A later movement lacks either man's valid authority.",
+          "discovery": "Another participant has taken initiative.",
+          "hook": "Who now has responsibility for Ethan's care?",
+          "required_fact": "episode_049_resolved",
+          "new_fact": "episode_050_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial050_intro",
+          "outro_scene": "serial050_outro",
+          "reveal_at": "outro; never in introduction"
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "title": "A Voice in the Rain",
+      "episodes": [
+        {
+          "episode": 51,
+          "title": "The Carer's Number",
+          "levels": [
+            551,
+            560
+          ],
+          "entry": "The supply order yields a professional contact.",
+          "discovery": "The contact is a real carer, not an invented identity.",
+          "hook": "She requests a detail only Ethan's mother would know.",
+          "required_fact": "episode_050_resolved",
+          "new_fact": "episode_051_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial051_intro",
+          "outro_scene": "serial051_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 52,
+          "title": "The Blue Stitch",
+          "levels": [
+            561,
+            570
+          ],
+          "entry": "Amara describes a repair in Ethan's cover.",
+          "discovery": "The carer correctly identifies the repaired seam.",
+          "hook": "A trusted intermediary can arrange contact.",
+          "required_fact": "episode_051_resolved",
+          "new_fact": "episode_052_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial052_intro",
+          "outro_scene": "serial052_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 53,
+          "title": "One Sound",
+          "levels": [
+            571,
+            580
+          ],
+          "entry": "The carer supplies a brief recording.",
+          "discovery": "Amara recognises Ethan, but its age is uncertain.",
+          "hook": "A separate delivery record may date it.",
+          "required_fact": "episode_052_resolved",
+          "new_fact": "episode_053_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial053_intro",
+          "outro_scene": "serial053_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 54,
+          "title": "The Delivery Bell",
+          "levels": [
+            581,
+            590
+          ],
+          "entry": "A background sound is compared with the record.",
+          "discovery": "Recent proof of life is independently supported.",
+          "hook": "A new instruction orders movement.",
+          "required_fact": "episode_053_resolved",
+          "new_fact": "episode_054_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial054_intro",
+          "outro_scene": "serial054_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 55,
+          "title": "No More Silent Cars",
+          "levels": [
+            591,
+            600
+          ],
+          "entry": "The team confronts the transport contractor.",
+          "discovery": "One available transport route is closed permanently.",
+          "hook": "An alternative pickup is expected.",
+          "required_fact": "episode_054_resolved",
+          "new_fact": "episode_055_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial055_intro",
+          "outro_scene": "serial055_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 56,
+          "title": "The Car That Never Came",
+          "levels": [
+            601,
+            610
+          ],
+          "entry": "The pickup does not arrive.",
+          "discovery": "The team's intervention prevents that relocation.",
+          "hook": "The carer asks protection for another dependant.",
+          "required_fact": "episode_055_resolved",
+          "new_fact": "episode_056_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial056_intro",
+          "outro_scene": "serial056_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 57,
+          "title": "A Promise to the Carer",
+          "levels": [
+            611,
+            620
+          ],
+          "entry": "The player helps protect the threatened dependant.",
+          "discovery": "The carer can cooperate without abandoning her family.",
+          "hook": "She agrees to identify the current district.",
+          "required_fact": "episode_056_resolved",
+          "new_fact": "episode_057_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial057_intro",
+          "outro_scene": "serial057_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 58,
+          "title": "The Wrong Window",
+          "levels": [
+            621,
+            630
+          ],
+          "entry": "A recent photograph narrows the building type.",
+          "discovery": "One candidate is eliminated before a reckless intervention.",
+          "hook": "A visible repair identifies another candidate.",
+          "required_fact": "episode_057_resolved",
+          "new_fact": "episode_058_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial058_intro",
+          "outro_scene": "serial058_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 59,
+          "title": "A Room with Light",
+          "levels": [
+            631,
+            640
+          ],
+          "entry": "An independent source checks the candidate.",
+          "discovery": "Ethan's location is narrowed to a small group of houses.",
+          "hook": "The carer is warned that Victor is approaching.",
+          "required_fact": "episode_058_resolved",
+          "new_fact": "episode_059_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial059_intro",
+          "outro_scene": "serial059_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 60,
+          "title": "Victor Outside",
+          "levels": [
+            641,
+            650
+          ],
+          "entry": "Victor is independently seen at the district.",
+          "discovery": "His claim of control can finally be tested.",
+          "hook": "The people inside refuse to surrender Ethan to him.",
+          "required_fact": "episode_059_resolved",
+          "new_fact": "episode_060_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial060_intro",
+          "outro_scene": "serial060_outro",
+          "reveal_at": "outro; never in introduction"
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "title": "The Man Outside the Gate",
+      "episodes": [
+        {
+          "episode": 61,
+          "title": "He Has to Ask",
+          "levels": [
+            651,
+            660
+          ],
+          "entry": "A witness hears Victor demand entry.",
+          "discovery": "He no longer has unrestricted access to Ethan.",
+          "hook": "Will he admit that to Amara?",
+          "required_fact": "episode_060_resolved",
+          "new_fact": "episode_061_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial061_intro",
+          "outro_scene": "serial061_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 62,
+          "title": "A Demand Without a Picture",
+          "levels": [
+            661,
+            670
+          ],
+          "entry": "Amara requests current proof.",
+          "discovery": "Victor cannot verify what he still claims to control.",
+          "hook": "He contacts Kellan for leverage.",
+          "required_fact": "episode_061_resolved",
+          "new_fact": "episode_062_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial062_intro",
+          "outro_scene": "serial062_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 63,
+          "title": "The Call Between Them",
+          "levels": [
+            671,
+            680
+          ],
+          "entry": "A preserved message records mutual blame.",
+          "discovery": "Their partnership has broken down.",
+          "hook": "Kellan claims he can reverse the transfer.",
+          "required_fact": "episode_062_resolved",
+          "new_fact": "episode_063_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial063_intro",
+          "outro_scene": "serial063_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 64,
+          "title": "A Signature Withdrawn",
+          "levels": [
+            681,
+            690
+          ],
+          "entry": "Amara challenges the instruction with authenticated records.",
+          "discovery": "The original receiving authority is formally disputed.",
+          "hook": "A replacement instruction is being prepared.",
+          "required_fact": "episode_063_resolved",
+          "new_fact": "episode_064_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial064_intro",
+          "outro_scene": "serial064_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 65,
+          "title": "The Person Preparing It",
+          "levels": [
+            691,
+            700
+          ],
+          "entry": "Nessa identifies the document handler.",
+          "discovery": "The handler acts under a concealed household mandate.",
+          "hook": "Can a witness prove they know about the abduction?",
+          "required_fact": "episode_064_resolved",
+          "new_fact": "episode_065_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial065_intro",
+          "outro_scene": "serial065_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 66,
+          "title": "A Warning Received",
+          "levels": [
+            701,
+            710
+          ],
+          "entry": "The warning's receipt is established.",
+          "discovery": "Continued participation cannot be called innocent misunderstanding.",
+          "hook": "The handler refuses the replacement instruction.",
+          "required_fact": "episode_065_resolved",
+          "new_fact": "episode_066_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial066_intro",
+          "outro_scene": "serial066_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 67,
+          "title": "A Journey Prevented",
+          "levels": [
+            711,
+            720
+          ],
+          "entry": "The stopped instruction is secured.",
+          "discovery": "A planned relocation does not happen.",
+          "hook": "The public address is not the actual nursery.",
+          "required_fact": "episode_066_resolved",
+          "new_fact": "episode_067_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial067_intro",
+          "outro_scene": "serial067_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 68,
+          "title": "The Safe Address",
+          "levels": [
+            721,
+            730
+          ],
+          "entry": "The carer explains a protected receiving address.",
+          "discovery": "The listed office and the care location are distinct.",
+          "hook": "A trusted authority must verify the real place.",
+          "required_fact": "episode_067_resolved",
+          "new_fact": "episode_068_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial068_intro",
+          "outro_scene": "serial068_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 69,
+          "title": "Who May Enter",
+          "levels": [
+            731,
+            740
+          ],
+          "entry": "The team establishes an agreed verification channel.",
+          "discovery": "They gain a visit rather than another guessed address.",
+          "hook": "Its sponsor is connected to Adrian's last appointment.",
+          "required_fact": "episode_068_resolved",
+          "new_fact": "episode_069_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial069_intro",
+          "outro_scene": "serial069_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 70,
+          "title": "A Familiar Name",
+          "levels": [
+            741,
+            750
+          ],
+          "entry": "The sponsor appears in Adrian's appointment book.",
+          "discovery": "The kidnapping and his death share a documented connection.",
+          "hook": "Did Adrian record that meeting?",
+          "required_fact": "episode_069_resolved",
+          "new_fact": "episode_070_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial070_intro",
+          "outro_scene": "serial070_outro",
+          "reveal_at": "outro; never in introduction"
+        }
+      ]
+    },
+    {
+      "number": 8,
+      "title": "The Night Adrian Died",
+      "episodes": [
+        {
+          "episode": 71,
+          "title": "The Appointment",
+          "levels": [
+            751,
+            760
+          ],
+          "entry": "Amara retrieves Adrian's final diary entry.",
+          "discovery": "He planned to dispute a household financial arrangement.",
+          "hook": "A witness confirms he kept the appointment.",
+          "required_fact": "episode_070_resolved",
+          "new_fact": "episode_071_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial071_intro",
+          "outro_scene": "serial071_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 72,
+          "title": "An Argument Overheard",
+          "levels": [
+            761,
+            770
+          ],
+          "entry": "The witness describes a dispute about Ethan.",
+          "discovery": "Adrian defended his son shortly before his death.",
+          "hook": "Someone removed the room recording.",
+          "required_fact": "episode_071_resolved",
+          "new_fact": "episode_072_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial072_intro",
+          "outro_scene": "serial072_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 73,
+          "title": "The Copy Nobody Claimed",
+          "levels": [
+            771,
+            780
+          ],
+          "entry": "A separate recording copy is found.",
+          "discovery": "The family was falsely told no copy remained.",
+          "hook": "Its timing conflicts with the public account.",
+          "required_fact": "episode_072_resolved",
+          "new_fact": "episode_073_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial073_intro",
+          "outro_scene": "serial073_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 74,
+          "title": "Before the Announcement",
+          "levels": [
+            781,
+            790
+          ],
+          "entry": "The timeline is reconstructed.",
+          "discovery": "An estate decision was prepared before the death announcement.",
+          "hook": "Preparation alone does not prove murder.",
+          "required_fact": "episode_073_resolved",
+          "new_fact": "episode_074_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial074_intro",
+          "outro_scene": "serial074_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 75,
+          "title": "What Suspicion Cannot Do",
+          "levels": [
+            791,
+            800
+          ],
+          "entry": "Amara confronts the limits of her accusation.",
+          "discovery": "Victor's estate visit is proved; his role in the death is not.",
+          "hook": "He offers a different participant's name.",
+          "required_fact": "episode_074_resolved",
+          "new_fact": "episode_075_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial075_intro",
+          "outro_scene": "serial075_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 76,
+          "title": "The Bargain Refused",
+          "levels": [
+            801,
+            810
+          ],
+          "entry": "Victor asks to trade information for immunity from blame.",
+          "discovery": "His statement is preserved without surrendering the ransom case.",
+          "hook": "Can his offered name be independently checked?",
+          "required_fact": "episode_075_resolved",
+          "new_fact": "episode_076_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial076_intro",
+          "outro_scene": "serial076_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 77,
+          "title": "Someone Else Was There",
+          "levels": [
+            811,
+            820
+          ],
+          "entry": "A second source confirms the named participant.",
+          "discovery": "Adrian's last evening involved more than Victor and Kellan.",
+          "hook": "A departure record appears altered.",
+          "required_fact": "episode_076_resolved",
+          "new_fact": "episode_077_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial077_intro",
+          "outro_scene": "serial077_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 78,
+          "title": "The Unchanged Original",
+          "levels": [
+            821,
+            830
+          ],
+          "entry": "The original departure record is recovered.",
+          "discovery": "The alteration happened after Adrian could challenge it.",
+          "hook": "Its author is linked to the receiving authority.",
+          "required_fact": "episode_077_resolved",
+          "new_fact": "episode_078_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial078_intro",
+          "outro_scene": "serial078_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 79,
+          "title": "His Own Voice",
+          "levels": [
+            831,
+            840
+          ],
+          "entry": "Amara hears Adrian affirm his provision for Ethan.",
+          "discovery": "His commitment is no longer merely reported by others.",
+          "hook": "The recording mentions an emergency instruction.",
+          "required_fact": "episode_078_resolved",
+          "new_fact": "episode_079_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial079_intro",
+          "outro_scene": "serial079_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 80,
+          "title": "The Letter for His Son",
+          "levels": [
+            841,
+            850
+          ],
+          "entry": "That instruction is authenticated.",
+          "discovery": "It supports action for Ethan without solving the death.",
+          "hook": "The receiving authority must answer it.",
+          "required_fact": "episode_079_resolved",
+          "new_fact": "episode_080_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial080_intro",
+          "outro_scene": "serial080_outro",
+          "reveal_at": "outro; never in introduction"
+        }
+      ]
+    },
+    {
+      "number": 9,
+      "title": "The House That Must Answer",
+      "episodes": [
+        {
+          "episode": 81,
+          "title": "An Answer Due",
+          "levels": [
+            851,
+            860
+          ],
+          "entry": "The instruction reaches a named official.",
+          "discovery": "Someone is accountable for verifying Ethan's placement.",
+          "hook": "The official requests the birth acknowledgement.",
+          "required_fact": "episode_080_resolved",
+          "new_fact": "episode_081_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial081_intro",
+          "outro_scene": "serial081_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 82,
+          "title": "His Father's Name",
+          "levels": [
+            861,
+            870
+          ],
+          "entry": "The acknowledgement and supporting record are produced.",
+          "discovery": "Adrian's relationship to Ethan is accepted.",
+          "hook": "Kellan's representative raises another objection.",
+          "required_fact": "episode_081_resolved",
+          "new_fact": "episode_082_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial082_intro",
+          "outro_scene": "serial082_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 83,
+          "title": "The Mother's Name",
+          "levels": [
+            871,
+            880
+          ],
+          "entry": "Amara disproves the fabricated assessment.",
+          "discovery": "The representative cannot keep reusing the same allegation.",
+          "hook": "An intermediary fears public exposure.",
+          "required_fact": "episode_082_resolved",
+          "new_fact": "episode_083_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial083_intro",
+          "outro_scene": "serial083_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 84,
+          "title": "The Intermediary's Fear",
+          "levels": [
+            881,
+            890
+          ],
+          "entry": "The player separates Ethan's safety from the intermediary's liability.",
+          "discovery": "A witness discloses the receiving procedure.",
+          "hook": "The procedure names only two possible sites.",
+          "required_fact": "episode_083_resolved",
+          "new_fact": "episode_084_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial084_intro",
+          "outro_scene": "serial084_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 85,
+          "title": "Two Houses",
+          "levels": [
+            891,
+            900
+          ],
+          "entry": "Separate checks distinguish the sites.",
+          "discovery": "One is administrative; one recently received infant supplies.",
+          "hook": "A current confirmation can identify the placement.",
+          "required_fact": "episode_084_resolved",
+          "new_fact": "episode_085_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial085_intro",
+          "outro_scene": "serial085_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 86,
+          "title": "Stay Where You Are",
+          "levels": [
+            901,
+            910
+          ],
+          "entry": "The disputed movement instruction is put on hold.",
+          "discovery": "Another relocation is prevented.",
+          "hook": "A welfare visitor can now meet the carer.",
+          "required_fact": "episode_085_resolved",
+          "new_fact": "episode_086_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial086_intro",
+          "outro_scene": "serial086_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 87,
+          "title": "Someone Sees Him",
+          "levels": [
+            911,
+            920
+          ],
+          "entry": "The independent welfare visit occurs.",
+          "discovery": "Ethan is confirmed alive and receiving care.",
+          "hook": "A written obstruction prevents immediate return.",
+          "required_fact": "episode_086_resolved",
+          "new_fact": "episode_087_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial087_intro",
+          "outro_scene": "serial087_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 88,
+          "title": "The Obstruction Named",
+          "levels": [
+            921,
+            930
+          ],
+          "entry": "The obstruction is obtained.",
+          "discovery": "It is a contested instruction, not an unexplained disappearance.",
+          "hook": "Who has authority to set it aside?",
+          "required_fact": "episode_087_resolved",
+          "new_fact": "episode_088_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial088_intro",
+          "outro_scene": "serial088_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 89,
+          "title": "Behind the Signatory",
+          "levels": [
+            931,
+            940
+          ],
+          "entry": "Nessa traces delegated authority.",
+          "discovery": "An office used another person's name to delay action.",
+          "hook": "The person whose authority was borrowed agrees to intervene.",
+          "required_fact": "episode_088_resolved",
+          "new_fact": "episode_089_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial089_intro",
+          "outro_scene": "serial089_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 90,
+          "title": "A Door No Longer Hidden",
+          "levels": [
+            941,
+            950
+          ],
+          "entry": "The real authority repudiates the delay.",
+          "discovery": "The team gains a specific institutional route toward Ethan.",
+          "hook": "Victor discovers how much leverage he has lost.",
+          "required_fact": "episode_089_resolved",
+          "new_fact": "episode_090_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial090_intro",
+          "outro_scene": "serial090_outro",
+          "reveal_at": "outro; never in introduction"
+        }
+      ]
+    },
+    {
+      "number": 10,
+      "title": "The Distance Between Two Voices",
+      "episodes": [
+        {
+          "episode": 91,
+          "title": "The Last Ransom",
+          "levels": [
+            951,
+            960
+          ],
+          "entry": "Victor demands payment again.",
+          "discovery": "The team distinguishes his threat from his actual control.",
+          "hook": "He threatens a damaging family disclosure.",
+          "required_fact": "episode_090_resolved",
+          "new_fact": "episode_091_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial091_intro",
+          "outro_scene": "serial091_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 92,
+          "title": "What He Calls Exposure",
+          "levels": [
+            961,
+            970
+          ],
+          "entry": "Amara refuses to buy silence about her past.",
+          "discovery": "The threat loses its power over her decisions.",
+          "hook": "Will the family publicly support the truth?",
+          "required_fact": "episode_091_resolved",
+          "new_fact": "episode_092_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial092_intro",
+          "outro_scene": "serial092_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 93,
+          "title": "The Household Statement",
+          "levels": [
+            971,
+            980
+          ],
+          "entry": "Orena acknowledges Ethan's relationship to Adrian.",
+          "discovery": "A public denial used to obstruct the search is withdrawn.",
+          "hook": "Kellan challenges the evidence chain.",
+          "required_fact": "episode_092_resolved",
+          "new_fact": "episode_093_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial093_intro",
+          "outro_scene": "serial093_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 94,
+          "title": "Every Hand It Passed",
+          "levels": [
+            981,
+            990
+          ],
+          "entry": "The player reconstructs the transfer chain.",
+          "discovery": "There is no unexplained custody gap in the traced segment.",
+          "hook": "A final receipt has a disputed time.",
+          "required_fact": "episode_093_resolved",
+          "new_fact": "episode_094_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial094_intro",
+          "outro_scene": "serial094_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 95,
+          "title": "The Time We Can Prove",
+          "levels": [
+            991,
+            1000
+          ],
+          "entry": "An independent source establishes the receipt's time.",
+          "discovery": "The team identifies the current placement instruction.",
+          "hook": "A review can now use the authenticated timeline.",
+          "required_fact": "episode_094_resolved",
+          "new_fact": "episode_095_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial095_intro",
+          "outro_scene": "serial095_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 96,
+          "title": "Before the Review",
+          "levels": [
+            1001,
+            1010
+          ],
+          "entry": "David prepares the records while Amara prepares to speak.",
+          "discovery": "Both distinguish proved facts from unanswered questions.",
+          "hook": "The receiving office agrees to live verification.",
+          "required_fact": "episode_095_resolved",
+          "new_fact": "episode_096_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial096_intro",
+          "outro_scene": "serial096_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 97,
+          "title": "Not Another Recording",
+          "levels": [
+            1011,
+            1020
+          ],
+          "entry": "A trusted visitor verifies the call in person.",
+          "discovery": "The next contact cannot be dismissed as a replay.",
+          "hook": "The carer asks how Amara settles Ethan.",
+          "required_fact": "episode_096_resolved",
+          "new_fact": "episode_097_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial097_intro",
+          "outro_scene": "serial097_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 98,
+          "title": "The Song She Knows",
+          "levels": [
+            1021,
+            1030
+          ],
+          "entry": "Amara sings her familiar lullaby.",
+          "discovery": "Ethan responds during the independently verified live call.",
+          "hook": "The carer agrees to support his return.",
+          "required_fact": "episode_097_resolved",
+          "new_fact": "episode_098_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial098_intro",
+          "outro_scene": "serial098_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 99,
+          "title": "A Statement for Tomorrow",
+          "levels": [
+            1031,
+            1040
+          ],
+          "entry": "The carer's statement and placement are secured.",
+          "discovery": "The next operation has a named place, witness and authority.",
+          "hook": "The authority schedules a return assessment.",
+          "required_fact": "episode_098_resolved",
+          "new_fact": "episode_099_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial099_intro",
+          "outro_scene": "serial099_outro",
+          "reveal_at": "outro; never in introduction"
+        },
+        {
+          "episode": 100,
+          "title": "The Other Side of the Line",
+          "levels": [
+            1041,
+            1050
+          ],
+          "entry": "The review accepts the factual chain.",
+          "discovery": "Ethan is alive at a verified placement; a supervised return assessment is scheduled, not completed.",
+          "hook": "Its notice names a representative Amara believed absent from Adrian's last night.",
+          "required_fact": "episode_099_resolved",
+          "new_fact": "episode_100_resolved",
+          "ethan_rescued": false,
+          "intro_scene": "serial100_intro",
+          "outro_scene": "serial100_outro",
+          "reveal_at": "outro; never in introduction"
+        }
+      ]
+    }
+  ],
+  "scenes": [
+    {
+      "scene": "opening_story",
+      "trigger": "before level 1",
+      "beat": "Rain, the missing infant, Amara seeing Victor, locked exits, the plea to David. End on the three approaches. Do not explain the inheritance, passage or accomplice.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "chapter01",
+      "trigger": "before level 1",
+      "beat": "Each approach begins with a different first action. Establish where Amara saw Victor; preserve her account without inventing a recording of the ransom call.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "season01",
+      "trigger": "after level 5",
+      "beat": "The external gate was not forced. An innocent delivery worker can be excluded. The house itself becomes the question.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "chapter02",
+      "trigger": "before level 9",
+      "beat": "Victor demands money. Amara denies he has any claim. David must ask where that supposed debt comes from; defer the full answer.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "season02",
+      "trigger": "after level 10",
+      "beat": "Reveal that Ethan inherited a private provision from his father. Victor is not that father. Keep the identity and death history incomplete.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "season03",
+      "trigger": "after level 15",
+      "beat": "A threatening message includes a detail from inside the house. Its sender knew more than a casual observer; establish a source worth testing.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "chapter03",
+      "trigger": "before level 16",
+      "beat": "Amara recalls paying the rent while Victor spoke of his aura. One brief domestic memory explains his habit; avoid narrating the entire relationship.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "season04",
+      "trigger": "after level 20",
+      "beat": "A planted trace is detected before the team acts against its apparent owner. The player protects an innocent person rather than simply losing a lead.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "chapter04",
+      "trigger": "before level 23",
+      "beat": "David admits his first technical interpretation was wrong. Amara identifies a household routine absent from the logs. Their skills complement each other.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "season05",
+      "trigger": "after level 25",
+      "beat": "Amara acknowledges her suspicion that Victor was involved in the father's death, then explicitly distinguishes fear from evidence. No killer is named.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "season06",
+      "trigger": "after level 30",
+      "beat": "A verified witness places a service vehicle near the house. Preserve the witness and record; do not immediately make the witness disappear.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "chapter05",
+      "trigger": "before level 31",
+      "beat": "Victor learns David is helping. Reveal that he approached Amara after the funeral and she refused him. Show jealousy rather than a second aura lecture.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "season07",
+      "trigger": "after level 35",
+      "beat": "The vehicle record leads to an estate service arrangement. First hint of the wealthy family's continuing influence; no full conspiracy disclosure.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "season08",
+      "trigger": "after level 40",
+      "beat": "Someone tries to persuade Amara that she misunderstood what she saw. Physical details support her account. She truly saw Victor; the game will not reverse this into hallucination.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "chapter06",
+      "trigger": "before level 41",
+      "beat": "A poor image from inside the property can be restored. Establish which part matters before the player undertakes restoration. The image is evidence of a route, not a promised rescue.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "season09",
+      "trigger": "after level 45",
+      "beat": "The restored image places Victor beside an interior passage. It corroborates his presence without yet explaining how the closed house worked.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "season10",
+      "trigger": "after level 50",
+      "beat": "An access record bears Amara's credential while she was asleep. End the first fifty levels on this specific locked-house question, leading directly to episode 1.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial001_intro",
+      "trigger": "before level 51",
+      "required_fact": "opening_case",
+      "show": "Amara's name appears in the access log.",
+      "withhold": "Her credential was issued before she moved in.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial001_outro",
+      "trigger": "after level 60",
+      "show": "Her credential was issued before she moved in.",
+      "grant_fact": "episode_001_resolved",
+      "next_question": "Who retained the original household account?",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial002_intro",
+      "trigger": "before level 61",
+      "required_fact": "episode_001_resolved",
+      "show": "David compares conflicting access records.",
+      "withhold": "An estate service account remained active.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial002_outro",
+      "trigger": "after level 70",
+      "show": "An estate service account remained active.",
+      "grant_fact": "episode_002_resolved",
+      "next_question": "Why did the estate still control access?",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial003_intro",
+      "trigger": "before level 71",
+      "required_fact": "episode_002_resolved",
+      "show": "Morris examines water behind the bolted door.",
+      "withhold": "The water came from an internal service stair.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial003_outro",
+      "trigger": "after level 80",
+      "show": "The water came from an internal service stair.",
+      "grant_fact": "episode_003_resolved",
+      "next_question": "Why is the stair missing from the public plan?",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial004_intro",
+      "trigger": "before level 81",
+      "required_fact": "episode_003_resolved",
+      "show": "Amara searches Adrian's ordinary household papers.",
+      "withhold": "A maintenance invoice names a former attendant.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial004_outro",
+      "trigger": "after level 90",
+      "show": "A maintenance invoice names a former attendant.",
+      "grant_fact": "episode_004_resolved",
+      "next_question": "The attendant has been ordered not to speak.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial005_intro",
+      "trigger": "before level 91",
+      "required_fact": "episode_004_resolved",
+      "show": "The attendant asks why the family distrusts Amara.",
+      "withhold": "Amara reveals Adrian's proposal and his family's refusal.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial005_outro",
+      "trigger": "after level 100",
+      "show": "Amara reveals Adrian's proposal and his family's refusal.",
+      "grant_fact": "episode_005_resolved",
+      "next_question": "Someone is recording the attendant's visitors.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial006_intro",
+      "trigger": "before level 101",
+      "required_fact": "episode_005_resolved",
+      "show": "David finds an intercepted warning to Amara.",
+      "withhold": "An employee reported reused access before the kidnapping.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial006_outro",
+      "trigger": "after level 110",
+      "show": "An employee reported reused access before the kidnapping.",
+      "grant_fact": "episode_006_resolved",
+      "next_question": "Who stopped the message reaching her?",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial007_intro",
+      "trigger": "before level 111",
+      "required_fact": "episode_006_resolved",
+      "show": "An innocent worker is blamed for a trace.",
+      "withhold": "Morris establishes that evidence was planted.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial007_outro",
+      "trigger": "after level 120",
+      "show": "Morris establishes that evidence was planted.",
+      "grant_fact": "episode_007_resolved",
+      "next_question": "Its source links to an estate contractor.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial008_intro",
+      "trigger": "before level 121",
+      "required_fact": "episode_007_resolved",
+      "show": "The contractor's plan is recovered.",
+      "withhold": "Victor could leave while the ordinary doors stayed locked.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial008_outro",
+      "trigger": "after level 130",
+      "show": "Victor could leave while the ordinary doors stayed locked.",
+      "grant_fact": "episode_008_resolved",
+      "next_question": "Someone had to release the internal service gate.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial009_intro",
+      "trigger": "before level 131",
+      "required_fact": "episode_008_resolved",
+      "show": "A witness describes a woman beside the exit.",
+      "withhold": "Amara's sighting is corroborated: Victor had help.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial009_outro",
+      "trigger": "after level 140",
+      "show": "Amara's sighting is corroborated: Victor had help.",
+      "grant_fact": "episode_009_resolved",
+      "next_question": "The woman wore an estate staff pin.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial010_intro",
+      "trigger": "before level 141",
+      "required_fact": "episode_009_resolved",
+      "show": "The team closes the compromised access.",
+      "withhold": "The house is secured and the innocent worker cleared.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial010_outro",
+      "trigger": "after level 150",
+      "show": "The house is secured and the innocent worker cleared.",
+      "grant_fact": "episode_010_resolved",
+      "next_question": "The staff pin belongs to Adrian's household.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial011_intro",
+      "trigger": "before level 151",
+      "required_fact": "episode_010_resolved",
+      "show": "Amara seeks the household staff list.",
+      "withhold": "Orena receives her but refuses to discuss Ethan's status.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial011_outro",
+      "trigger": "after level 160",
+      "show": "Orena receives her but refuses to discuss Ethan's status.",
+      "grant_fact": "episode_011_resolved",
+      "next_question": "A clerk quietly offers another appointment.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial012_intro",
+      "trigger": "before level 161",
+      "required_fact": "episode_011_resolved",
+      "show": "Nessa supplies a withheld payment record.",
+      "withhold": "The contractor was paid after Adrian died.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial012_outro",
+      "trigger": "after level 170",
+      "show": "The contractor was paid after Adrian died.",
+      "grant_fact": "episode_012_resolved",
+      "next_question": "Who authorised the payment?",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial013_intro",
+      "trigger": "before level 171",
+      "required_fact": "episode_012_resolved",
+      "show": "Victor claims Amara owes him her prosperity.",
+      "withhold": "Amara recalls his aura boasts while she paid their rent.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial013_outro",
+      "trigger": "after level 180",
+      "show": "Amara recalls his aura boasts while she paid their rent.",
+      "grant_fact": "episode_013_resolved",
+      "next_question": "An old acquaintance saw him at the estate office.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial014_intro",
+      "trigger": "before level 181",
+      "required_fact": "episode_013_resolved",
+      "show": "The acquaintance describes the meeting.",
+      "withhold": "Victor met an estate intermediary before Adrian died.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial014_outro",
+      "trigger": "after level 190",
+      "show": "Victor met an estate intermediary before Adrian died.",
+      "grant_fact": "episode_014_resolved",
+      "next_question": "Can the meeting's date be established?",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial015_intro",
+      "trigger": "before level 191",
+      "required_fact": "episode_014_resolved",
+      "show": "The complete photograph is recovered.",
+      "withhold": "Victor met Kellan, the estate administrator.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial015_outro",
+      "trigger": "after level 200",
+      "show": "Victor met Kellan, the estate administrator.",
+      "grant_fact": "episode_015_resolved",
+      "next_question": "The photographer was paid through the household account.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial016_intro",
+      "trigger": "before level 201",
+      "required_fact": "episode_015_resolved",
+      "show": "Amara explains why she left Victor.",
+      "withhold": "He suggested exploiting Adrian; she refused and left him.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial016_outro",
+      "trigger": "after level 210",
+      "show": "He suggested exploiting Adrian; she refused and left him.",
+      "grant_fact": "episode_016_resolved",
+      "next_question": "Victor calls the introduction proof the fortune is his.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial017_intro",
+      "trigger": "before level 211",
+      "required_fact": "episode_016_resolved",
+      "show": "The bequest is distinguished from the throne dispute.",
+      "withhold": "Adrian acknowledged Ethan and made him a private provision.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial017_outro",
+      "trigger": "after level 220",
+      "show": "Adrian acknowledged Ethan and made him a private provision.",
+      "grant_fact": "episode_017_resolved",
+      "next_question": "The family's copy lacks a supporting page.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial018_intro",
+      "trigger": "before level 221",
+      "required_fact": "episode_017_resolved",
+      "show": "Nessa finds a filing receipt.",
+      "withhold": "The omission predates the kidnapping.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial018_outro",
+      "trigger": "after level 230",
+      "show": "The omission predates the kidnapping.",
+      "grant_fact": "episode_018_resolved",
+      "next_question": "Where is the original page held?",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial019_intro",
+      "trigger": "before level 231",
+      "required_fact": "episode_018_resolved",
+      "show": "Amara personally challenges the withholding.",
+      "withhold": "Her objection enters the record and cannot be described as consent.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial019_outro",
+      "trigger": "after level 240",
+      "show": "Her objection enters the record and cannot be described as consent.",
+      "grant_fact": "episode_019_resolved",
+      "next_question": "Kellan suspends Nessa's access.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial020_intro",
+      "trigger": "before level 241",
+      "required_fact": "episode_019_resolved",
+      "show": "The authenticated record is preserved.",
+      "withhold": "Victor's alleged debt is exposed as an unsupported demand.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial020_outro",
+      "trigger": "after level 250",
+      "show": "Victor's alleged debt is exposed as an unsupported demand.",
+      "grant_fact": "episode_020_resolved",
+      "next_question": "A payment refers to a private transfer of care.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial021_intro",
+      "trigger": "before level 251",
+      "required_fact": "episode_020_resolved",
+      "show": "The pin identifies Lami, a former attendant.",
+      "withhold": "She accepted work described as protecting Adrian's child.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial021_outro",
+      "trigger": "after level 260",
+      "show": "She accepted work described as protecting Adrian's child.",
+      "grant_fact": "episode_021_resolved",
+      "next_question": "Lami has not collected her wages.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial022_intro",
+      "trigger": "before level 261",
+      "required_fact": "episode_021_resolved",
+      "show": "Lami's booking is secured.",
+      "withhold": "She left a note expressing fear of Ethan's collector.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial022_outro",
+      "trigger": "after level 270",
+      "show": "She left a note expressing fear of Ethan's collector.",
+      "grant_fact": "episode_022_resolved",
+      "next_question": "A witness saw her change vehicles.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial023_intro",
+      "trigger": "before level 271",
+      "required_fact": "episode_022_resolved",
+      "show": "A driver asks for protection before speaking.",
+      "withhold": "He heard Ethan cry after the house exit.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial023_outro",
+      "trigger": "after level 280",
+      "show": "He heard Ethan cry after the house exit.",
+      "grant_fact": "episode_023_resolved",
+      "next_question": "Who comforted the baby?",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial024_intro",
+      "trigger": "before level 281",
+      "required_fact": "episode_023_resolved",
+      "show": "The driver identifies Ethan's feeding cup.",
+      "withhold": "The first independent sighting confirms Ethan alive that morning.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial024_outro",
+      "trigger": "after level 290",
+      "show": "The first independent sighting confirms Ethan alive that morning.",
+      "grant_fact": "episode_024_resolved",
+      "next_question": "Lami tried to telephone a clinic.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial025_intro",
+      "trigger": "before level 291",
+      "required_fact": "episode_024_resolved",
+      "show": "David verifies the call without exposing medical records.",
+      "withhold": "Lami asked how to obtain help for a baby in her care.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial025_outro",
+      "trigger": "after level 300",
+      "show": "Lami asked how to obtain help for a baby in her care.",
+      "grant_fact": "episode_025_resolved",
+      "next_question": "Another person interrupted her.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial026_intro",
+      "trigger": "before level 301",
+      "required_fact": "episode_025_resolved",
+      "show": "Nessa's brother is threatened over her copies.",
+      "withhold": "The team reaches him in time and brings him to safety.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial026_outro",
+      "trigger": "after level 310",
+      "show": "The team reaches him in time and brings him to safety.",
+      "grant_fact": "episode_026_resolved",
+      "next_question": "He saw the contractor's receiving desk.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial027_intro",
+      "trigger": "before level 311",
+      "required_fact": "episode_026_resolved",
+      "show": "His account identifies Lami's recruiter.",
+      "withhold": "The recruiter used the royal household's name.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial027_outro",
+      "trigger": "after level 320",
+      "show": "The recruiter used the royal household's name.",
+      "grant_fact": "episode_027_resolved",
+      "next_question": "She retained a signed instruction.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial028_intro",
+      "trigger": "before level 321",
+      "required_fact": "episode_027_resolved",
+      "show": "Lami contacts Amara through a protected channel.",
+      "withhold": "She believed a family custody dispute was being settled.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial028_outro",
+      "trigger": "after level 330",
+      "show": "She believed a family custody dispute was being settled.",
+      "grant_fact": "episode_028_resolved",
+      "next_question": "Will she identify Victor directly?",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial029_intro",
+      "trigger": "before level 331",
+      "required_fact": "episode_028_resolved",
+      "show": "The player helps secure Lami's interview.",
+      "withhold": "Lami confirms Victor carried Ethan from the service stair.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial029_outro",
+      "trigger": "after level 340",
+      "show": "Lami confirms Victor carried Ethan from the service stair.",
+      "grant_fact": "episode_029_resolved",
+      "next_question": "Who supplied the instruction?",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial030_intro",
+      "trigger": "before level 341",
+      "required_fact": "episode_029_resolved",
+      "show": "Lami gives corroborating evidence and remains available.",
+      "withhold": "The access conspiracy no longer rests solely on Amara's account.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial030_outro",
+      "trigger": "after level 350",
+      "show": "The access conspiracy no longer rests solely on Amara's account.",
+      "grant_fact": "episode_030_resolved",
+      "next_question": "Kellan's authorisation appears on the transfer.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial031_intro",
+      "trigger": "before level 351",
+      "required_fact": "episode_030_resolved",
+      "show": "Victor sends part of an old love letter.",
+      "withhold": "Amara recognises writing from before the separation.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial031_outro",
+      "trigger": "after level 360",
+      "show": "Amara recognises writing from before the separation.",
+      "grant_fact": "episode_031_resolved",
+      "next_question": "The missing ending changes its meaning.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial032_intro",
+      "trigger": "before level 361",
+      "required_fact": "episode_031_resolved",
+      "show": "An old neighbour describes Amara leaving.",
+      "withhold": "The separation preceded her acceptance of Adrian.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial032_outro",
+      "trigger": "after level 370",
+      "show": "The separation preceded her acceptance of Adrian.",
+      "grant_fact": "episode_032_resolved",
+      "next_question": "Victor threatened to collect his reward later.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial033_intro",
+      "trigger": "before level 371",
+      "required_fact": "episode_032_resolved",
+      "show": "Amara remembers Adrian's visits to her stall.",
+      "withhold": "Their relationship grew before his promise of marriage.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial033_outro",
+      "trigger": "after level 380",
+      "show": "Their relationship grew before his promise of marriage.",
+      "grant_fact": "episode_033_resolved",
+      "next_question": "A saved message records his argument with his family.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial034_intro",
+      "trigger": "before level 381",
+      "required_fact": "episode_033_resolved",
+      "show": "The family rejection is heard in context.",
+      "withhold": "Opposition to the marriage began before Ethan's birth.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial034_outro",
+      "trigger": "after level 390",
+      "show": "Opposition to the marriage began before Ethan's birth.",
+      "grant_fact": "episode_034_resolved",
+      "next_question": "Kellan handled Adrian's finances during that dispute.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial035_intro",
+      "trigger": "before level 391",
+      "required_fact": "episode_034_resolved",
+      "show": "Adrian's acknowledgement is recovered.",
+      "withhold": "He recognised Ethan despite his family's refusal.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial035_outro",
+      "trigger": "after level 400",
+      "show": "He recognised Ethan despite his family's refusal.",
+      "grant_fact": "episode_035_resolved",
+      "next_question": "Why was it omitted from a later statement?",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial036_intro",
+      "trigger": "before level 401",
+      "required_fact": "episode_035_resolved",
+      "show": "Victor's attempt to reclaim Amara is reconstructed.",
+      "withhold": "She explicitly refused him rather than inviting negotiation.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial036_outro",
+      "trigger": "after level 410",
+      "show": "She explicitly refused him rather than inviting negotiation.",
+      "grant_fact": "episode_036_resolved",
+      "next_question": "His messages changed from affection to payment.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial037_intro",
+      "trigger": "before level 411",
+      "required_fact": "episode_036_resolved",
+      "show": "David recalls repairing Amara's business website.",
+      "withhold": "Their relationship began through ordinary trust.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial037_outro",
+      "trigger": "after level 420",
+      "show": "Their relationship began through ordinary trust.",
+      "grant_fact": "episode_037_resolved",
+      "next_question": "Who told Victor about them?",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial038_intro",
+      "trigger": "before level 421",
+      "required_fact": "episode_037_resolved",
+      "show": "The source of a relationship photograph is identified.",
+      "withhold": "A household observer reported Amara and David to Victor.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial038_outro",
+      "trigger": "after level 430",
+      "show": "A household observer reported Amara and David to Victor.",
+      "grant_fact": "episode_038_resolved",
+      "next_question": "The observer thought they were helping reconciliation.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial039_intro",
+      "trigger": "before level 431",
+      "required_fact": "episode_038_resolved",
+      "show": "David wants to refuse Victor's meeting demand.",
+      "withhold": "Amara and David agree on a plan together.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial039_outro",
+      "trigger": "after level 440",
+      "show": "Amara and David agree on a plan together.",
+      "grant_fact": "episode_039_resolved",
+      "next_question": "Amara will speak while her allies verify the surroundings.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial040_intro",
+      "trigger": "before level 441",
+      "required_fact": "episode_039_resolved",
+      "show": "Amara draws Victor into discussing the morning.",
+      "withhold": "His knowledge corroborates the ransom evidence.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial040_outro",
+      "trigger": "after level 450",
+      "show": "His knowledge corroborates the ransom evidence.",
+      "grant_fact": "episode_040_resolved",
+      "next_question": "He says the royal household paid for the car.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial041_intro",
+      "trigger": "before level 451",
+      "required_fact": "episode_040_resolved",
+      "show": "The payment is compared with Lami's account.",
+      "withhold": "Kellan's office funded the first transfer.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial041_outro",
+      "trigger": "after level 460",
+      "show": "Kellan's office funded the first transfer.",
+      "grant_fact": "episode_041_resolved",
+      "next_question": "He calls it ordinary household work.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial042_intro",
+      "trigger": "before level 461",
+      "required_fact": "episode_041_resolved",
+      "show": "Nessa produces the instruction behind it.",
+      "withhold": "The document falsely describes Amara as unable to care for Ethan.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial042_outro",
+      "trigger": "after level 470",
+      "show": "The document falsely describes Amara as unable to care for Ethan.",
+      "grant_fact": "episode_042_resolved",
+      "next_question": "Its author never met her.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial043_intro",
+      "trigger": "before level 471",
+      "required_fact": "episode_042_resolved",
+      "show": "The author explains the source of the claim.",
+      "withhold": "The assessment was manufactured from supplied allegations.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial043_outro",
+      "trigger": "after level 480",
+      "show": "The assessment was manufactured from supplied allegations.",
+      "grant_fact": "episode_043_resolved",
+      "next_question": "A message promises discretion to the household.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial044_intro",
+      "trigger": "before level 481",
+      "required_fact": "episode_043_resolved",
+      "show": "Orena confronts the transfer made in her name.",
+      "withhold": "She approved an inquiry, not Victor's ransom.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial044_outro",
+      "trigger": "after level 490",
+      "show": "She approved an inquiry, not Victor's ransom.",
+      "grant_fact": "episode_044_resolved",
+      "next_question": "She prevents Kellan destroying the archive.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial045_intro",
+      "trigger": "before level 491",
+      "required_fact": "episode_044_resolved",
+      "show": "Orena releases a controlled record.",
+      "withhold": "The team gains a durable source within the household.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial045_outro",
+      "trigger": "after level 500",
+      "show": "The team gains a durable source within the household.",
+      "grant_fact": "episode_045_resolved",
+      "next_question": "It identifies a private receiving house.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial046_intro",
+      "trigger": "before level 501",
+      "required_fact": "episode_045_resolved",
+      "show": "Kellan's succession concerns are established.",
+      "withhold": "His motive is distinct from Victor's financial grievance.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial046_outro",
+      "trigger": "after level 510",
+      "show": "His motive is distinct from Victor's financial grievance.",
+      "grant_fact": "episode_046_resolved",
+      "next_question": "A relative offers conditional help.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial047_intro",
+      "trigger": "before level 511",
+      "required_fact": "episode_046_resolved",
+      "show": "The offer requires Amara's silence.",
+      "withhold": "She rejects the bargain without surrendering her evidence.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial047_outro",
+      "trigger": "after level 520",
+      "show": "She rejects the bargain without surrendering her evidence.",
+      "grant_fact": "episode_047_resolved",
+      "next_question": "A younger employee breaks ranks.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial048_intro",
+      "trigger": "before level 521",
+      "required_fact": "episode_047_resolved",
+      "show": "The employee describes supplies ordered for Ethan.",
+      "withhold": "The transfer included arrangements for infant care.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial048_outro",
+      "trigger": "after level 530",
+      "show": "The transfer included arrangements for infant care.",
+      "grant_fact": "episode_048_resolved",
+      "next_question": "One order names a carer outside Victor's circle.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial049_intro",
+      "trigger": "before level 531",
+      "required_fact": "episode_048_resolved",
+      "show": "The correspondence is reconstructed.",
+      "withhold": "Kellan wanted concealed custody; Victor converted it into ransom.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial049_outro",
+      "trigger": "after level 540",
+      "show": "Kellan wanted concealed custody; Victor converted it into ransom.",
+      "grant_fact": "episode_049_resolved",
+      "next_question": "The men are withholding information from each other.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial050_intro",
+      "trigger": "before level 541",
+      "required_fact": "episode_049_resolved",
+      "show": "A later movement lacks either man's valid authority.",
+      "withhold": "Another participant has taken initiative.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial050_outro",
+      "trigger": "after level 550",
+      "show": "Another participant has taken initiative.",
+      "grant_fact": "episode_050_resolved",
+      "next_question": "Who now has responsibility for Ethan's care?",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial051_intro",
+      "trigger": "before level 551",
+      "required_fact": "episode_050_resolved",
+      "show": "The supply order yields a professional contact.",
+      "withhold": "The contact is a real carer, not an invented identity.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial051_outro",
+      "trigger": "after level 560",
+      "show": "The contact is a real carer, not an invented identity.",
+      "grant_fact": "episode_051_resolved",
+      "next_question": "She requests a detail only Ethan's mother would know.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial052_intro",
+      "trigger": "before level 561",
+      "required_fact": "episode_051_resolved",
+      "show": "Amara describes a repair in Ethan's cover.",
+      "withhold": "The carer correctly identifies the repaired seam.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial052_outro",
+      "trigger": "after level 570",
+      "show": "The carer correctly identifies the repaired seam.",
+      "grant_fact": "episode_052_resolved",
+      "next_question": "A trusted intermediary can arrange contact.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial053_intro",
+      "trigger": "before level 571",
+      "required_fact": "episode_052_resolved",
+      "show": "The carer supplies a brief recording.",
+      "withhold": "Amara recognises Ethan, but its age is uncertain.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial053_outro",
+      "trigger": "after level 580",
+      "show": "Amara recognises Ethan, but its age is uncertain.",
+      "grant_fact": "episode_053_resolved",
+      "next_question": "A separate delivery record may date it.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial054_intro",
+      "trigger": "before level 581",
+      "required_fact": "episode_053_resolved",
+      "show": "A background sound is compared with the record.",
+      "withhold": "Recent proof of life is independently supported.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial054_outro",
+      "trigger": "after level 590",
+      "show": "Recent proof of life is independently supported.",
+      "grant_fact": "episode_054_resolved",
+      "next_question": "A new instruction orders movement.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial055_intro",
+      "trigger": "before level 591",
+      "required_fact": "episode_054_resolved",
+      "show": "The team confronts the transport contractor.",
+      "withhold": "One available transport route is closed permanently.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial055_outro",
+      "trigger": "after level 600",
+      "show": "One available transport route is closed permanently.",
+      "grant_fact": "episode_055_resolved",
+      "next_question": "An alternative pickup is expected.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial056_intro",
+      "trigger": "before level 601",
+      "required_fact": "episode_055_resolved",
+      "show": "The pickup does not arrive.",
+      "withhold": "The team's intervention prevents that relocation.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial056_outro",
+      "trigger": "after level 610",
+      "show": "The team's intervention prevents that relocation.",
+      "grant_fact": "episode_056_resolved",
+      "next_question": "The carer asks protection for another dependant.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial057_intro",
+      "trigger": "before level 611",
+      "required_fact": "episode_056_resolved",
+      "show": "The player helps protect the threatened dependant.",
+      "withhold": "The carer can cooperate without abandoning her family.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial057_outro",
+      "trigger": "after level 620",
+      "show": "The carer can cooperate without abandoning her family.",
+      "grant_fact": "episode_057_resolved",
+      "next_question": "She agrees to identify the current district.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial058_intro",
+      "trigger": "before level 621",
+      "required_fact": "episode_057_resolved",
+      "show": "A recent photograph narrows the building type.",
+      "withhold": "One candidate is eliminated before a reckless intervention.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial058_outro",
+      "trigger": "after level 630",
+      "show": "One candidate is eliminated before a reckless intervention.",
+      "grant_fact": "episode_058_resolved",
+      "next_question": "A visible repair identifies another candidate.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial059_intro",
+      "trigger": "before level 631",
+      "required_fact": "episode_058_resolved",
+      "show": "An independent source checks the candidate.",
+      "withhold": "Ethan's location is narrowed to a small group of houses.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial059_outro",
+      "trigger": "after level 640",
+      "show": "Ethan's location is narrowed to a small group of houses.",
+      "grant_fact": "episode_059_resolved",
+      "next_question": "The carer is warned that Victor is approaching.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial060_intro",
+      "trigger": "before level 641",
+      "required_fact": "episode_059_resolved",
+      "show": "Victor is independently seen at the district.",
+      "withhold": "His claim of control can finally be tested.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial060_outro",
+      "trigger": "after level 650",
+      "show": "His claim of control can finally be tested.",
+      "grant_fact": "episode_060_resolved",
+      "next_question": "The people inside refuse to surrender Ethan to him.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial061_intro",
+      "trigger": "before level 651",
+      "required_fact": "episode_060_resolved",
+      "show": "A witness hears Victor demand entry.",
+      "withhold": "He no longer has unrestricted access to Ethan.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial061_outro",
+      "trigger": "after level 660",
+      "show": "He no longer has unrestricted access to Ethan.",
+      "grant_fact": "episode_061_resolved",
+      "next_question": "Will he admit that to Amara?",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial062_intro",
+      "trigger": "before level 661",
+      "required_fact": "episode_061_resolved",
+      "show": "Amara requests current proof.",
+      "withhold": "Victor cannot verify what he still claims to control.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial062_outro",
+      "trigger": "after level 670",
+      "show": "Victor cannot verify what he still claims to control.",
+      "grant_fact": "episode_062_resolved",
+      "next_question": "He contacts Kellan for leverage.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial063_intro",
+      "trigger": "before level 671",
+      "required_fact": "episode_062_resolved",
+      "show": "A preserved message records mutual blame.",
+      "withhold": "Their partnership has broken down.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial063_outro",
+      "trigger": "after level 680",
+      "show": "Their partnership has broken down.",
+      "grant_fact": "episode_063_resolved",
+      "next_question": "Kellan claims he can reverse the transfer.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial064_intro",
+      "trigger": "before level 681",
+      "required_fact": "episode_063_resolved",
+      "show": "Amara challenges the instruction with authenticated records.",
+      "withhold": "The original receiving authority is formally disputed.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial064_outro",
+      "trigger": "after level 690",
+      "show": "The original receiving authority is formally disputed.",
+      "grant_fact": "episode_064_resolved",
+      "next_question": "A replacement instruction is being prepared.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial065_intro",
+      "trigger": "before level 691",
+      "required_fact": "episode_064_resolved",
+      "show": "Nessa identifies the document handler.",
+      "withhold": "The handler acts under a concealed household mandate.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial065_outro",
+      "trigger": "after level 700",
+      "show": "The handler acts under a concealed household mandate.",
+      "grant_fact": "episode_065_resolved",
+      "next_question": "Can a witness prove they know about the abduction?",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial066_intro",
+      "trigger": "before level 701",
+      "required_fact": "episode_065_resolved",
+      "show": "The warning's receipt is established.",
+      "withhold": "Continued participation cannot be called innocent misunderstanding.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial066_outro",
+      "trigger": "after level 710",
+      "show": "Continued participation cannot be called innocent misunderstanding.",
+      "grant_fact": "episode_066_resolved",
+      "next_question": "The handler refuses the replacement instruction.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial067_intro",
+      "trigger": "before level 711",
+      "required_fact": "episode_066_resolved",
+      "show": "The stopped instruction is secured.",
+      "withhold": "A planned relocation does not happen.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial067_outro",
+      "trigger": "after level 720",
+      "show": "A planned relocation does not happen.",
+      "grant_fact": "episode_067_resolved",
+      "next_question": "The public address is not the actual nursery.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial068_intro",
+      "trigger": "before level 721",
+      "required_fact": "episode_067_resolved",
+      "show": "The carer explains a protected receiving address.",
+      "withhold": "The listed office and the care location are distinct.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial068_outro",
+      "trigger": "after level 730",
+      "show": "The listed office and the care location are distinct.",
+      "grant_fact": "episode_068_resolved",
+      "next_question": "A trusted authority must verify the real place.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial069_intro",
+      "trigger": "before level 731",
+      "required_fact": "episode_068_resolved",
+      "show": "The team establishes an agreed verification channel.",
+      "withhold": "They gain a visit rather than another guessed address.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial069_outro",
+      "trigger": "after level 740",
+      "show": "They gain a visit rather than another guessed address.",
+      "grant_fact": "episode_069_resolved",
+      "next_question": "Its sponsor is connected to Adrian's last appointment.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial070_intro",
+      "trigger": "before level 741",
+      "required_fact": "episode_069_resolved",
+      "show": "The sponsor appears in Adrian's appointment book.",
+      "withhold": "The kidnapping and his death share a documented connection.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial070_outro",
+      "trigger": "after level 750",
+      "show": "The kidnapping and his death share a documented connection.",
+      "grant_fact": "episode_070_resolved",
+      "next_question": "Did Adrian record that meeting?",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial071_intro",
+      "trigger": "before level 751",
+      "required_fact": "episode_070_resolved",
+      "show": "Amara retrieves Adrian's final diary entry.",
+      "withhold": "He planned to dispute a household financial arrangement.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial071_outro",
+      "trigger": "after level 760",
+      "show": "He planned to dispute a household financial arrangement.",
+      "grant_fact": "episode_071_resolved",
+      "next_question": "A witness confirms he kept the appointment.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial072_intro",
+      "trigger": "before level 761",
+      "required_fact": "episode_071_resolved",
+      "show": "The witness describes a dispute about Ethan.",
+      "withhold": "Adrian defended his son shortly before his death.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial072_outro",
+      "trigger": "after level 770",
+      "show": "Adrian defended his son shortly before his death.",
+      "grant_fact": "episode_072_resolved",
+      "next_question": "Someone removed the room recording.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial073_intro",
+      "trigger": "before level 771",
+      "required_fact": "episode_072_resolved",
+      "show": "A separate recording copy is found.",
+      "withhold": "The family was falsely told no copy remained.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial073_outro",
+      "trigger": "after level 780",
+      "show": "The family was falsely told no copy remained.",
+      "grant_fact": "episode_073_resolved",
+      "next_question": "Its timing conflicts with the public account.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial074_intro",
+      "trigger": "before level 781",
+      "required_fact": "episode_073_resolved",
+      "show": "The timeline is reconstructed.",
+      "withhold": "An estate decision was prepared before the death announcement.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial074_outro",
+      "trigger": "after level 790",
+      "show": "An estate decision was prepared before the death announcement.",
+      "grant_fact": "episode_074_resolved",
+      "next_question": "Preparation alone does not prove murder.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial075_intro",
+      "trigger": "before level 791",
+      "required_fact": "episode_074_resolved",
+      "show": "Amara confronts the limits of her accusation.",
+      "withhold": "Victor's estate visit is proved; his role in the death is not.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial075_outro",
+      "trigger": "after level 800",
+      "show": "Victor's estate visit is proved; his role in the death is not.",
+      "grant_fact": "episode_075_resolved",
+      "next_question": "He offers a different participant's name.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial076_intro",
+      "trigger": "before level 801",
+      "required_fact": "episode_075_resolved",
+      "show": "Victor asks to trade information for immunity from blame.",
+      "withhold": "His statement is preserved without surrendering the ransom case.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial076_outro",
+      "trigger": "after level 810",
+      "show": "His statement is preserved without surrendering the ransom case.",
+      "grant_fact": "episode_076_resolved",
+      "next_question": "Can his offered name be independently checked?",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial077_intro",
+      "trigger": "before level 811",
+      "required_fact": "episode_076_resolved",
+      "show": "A second source confirms the named participant.",
+      "withhold": "Adrian's last evening involved more than Victor and Kellan.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial077_outro",
+      "trigger": "after level 820",
+      "show": "Adrian's last evening involved more than Victor and Kellan.",
+      "grant_fact": "episode_077_resolved",
+      "next_question": "A departure record appears altered.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial078_intro",
+      "trigger": "before level 821",
+      "required_fact": "episode_077_resolved",
+      "show": "The original departure record is recovered.",
+      "withhold": "The alteration happened after Adrian could challenge it.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial078_outro",
+      "trigger": "after level 830",
+      "show": "The alteration happened after Adrian could challenge it.",
+      "grant_fact": "episode_078_resolved",
+      "next_question": "Its author is linked to the receiving authority.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial079_intro",
+      "trigger": "before level 831",
+      "required_fact": "episode_078_resolved",
+      "show": "Amara hears Adrian affirm his provision for Ethan.",
+      "withhold": "His commitment is no longer merely reported by others.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial079_outro",
+      "trigger": "after level 840",
+      "show": "His commitment is no longer merely reported by others.",
+      "grant_fact": "episode_079_resolved",
+      "next_question": "The recording mentions an emergency instruction.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial080_intro",
+      "trigger": "before level 841",
+      "required_fact": "episode_079_resolved",
+      "show": "That instruction is authenticated.",
+      "withhold": "It supports action for Ethan without solving the death.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial080_outro",
+      "trigger": "after level 850",
+      "show": "It supports action for Ethan without solving the death.",
+      "grant_fact": "episode_080_resolved",
+      "next_question": "The receiving authority must answer it.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial081_intro",
+      "trigger": "before level 851",
+      "required_fact": "episode_080_resolved",
+      "show": "The instruction reaches a named official.",
+      "withhold": "Someone is accountable for verifying Ethan's placement.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial081_outro",
+      "trigger": "after level 860",
+      "show": "Someone is accountable for verifying Ethan's placement.",
+      "grant_fact": "episode_081_resolved",
+      "next_question": "The official requests the birth acknowledgement.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial082_intro",
+      "trigger": "before level 861",
+      "required_fact": "episode_081_resolved",
+      "show": "The acknowledgement and supporting record are produced.",
+      "withhold": "Adrian's relationship to Ethan is accepted.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial082_outro",
+      "trigger": "after level 870",
+      "show": "Adrian's relationship to Ethan is accepted.",
+      "grant_fact": "episode_082_resolved",
+      "next_question": "Kellan's representative raises another objection.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial083_intro",
+      "trigger": "before level 871",
+      "required_fact": "episode_082_resolved",
+      "show": "Amara disproves the fabricated assessment.",
+      "withhold": "The representative cannot keep reusing the same allegation.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial083_outro",
+      "trigger": "after level 880",
+      "show": "The representative cannot keep reusing the same allegation.",
+      "grant_fact": "episode_083_resolved",
+      "next_question": "An intermediary fears public exposure.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial084_intro",
+      "trigger": "before level 881",
+      "required_fact": "episode_083_resolved",
+      "show": "The player separates Ethan's safety from the intermediary's liability.",
+      "withhold": "A witness discloses the receiving procedure.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial084_outro",
+      "trigger": "after level 890",
+      "show": "A witness discloses the receiving procedure.",
+      "grant_fact": "episode_084_resolved",
+      "next_question": "The procedure names only two possible sites.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial085_intro",
+      "trigger": "before level 891",
+      "required_fact": "episode_084_resolved",
+      "show": "Separate checks distinguish the sites.",
+      "withhold": "One is administrative; one recently received infant supplies.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial085_outro",
+      "trigger": "after level 900",
+      "show": "One is administrative; one recently received infant supplies.",
+      "grant_fact": "episode_085_resolved",
+      "next_question": "A current confirmation can identify the placement.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial086_intro",
+      "trigger": "before level 901",
+      "required_fact": "episode_085_resolved",
+      "show": "The disputed movement instruction is put on hold.",
+      "withhold": "Another relocation is prevented.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial086_outro",
+      "trigger": "after level 910",
+      "show": "Another relocation is prevented.",
+      "grant_fact": "episode_086_resolved",
+      "next_question": "A welfare visitor can now meet the carer.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial087_intro",
+      "trigger": "before level 911",
+      "required_fact": "episode_086_resolved",
+      "show": "The independent welfare visit occurs.",
+      "withhold": "Ethan is confirmed alive and receiving care.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial087_outro",
+      "trigger": "after level 920",
+      "show": "Ethan is confirmed alive and receiving care.",
+      "grant_fact": "episode_087_resolved",
+      "next_question": "A written obstruction prevents immediate return.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial088_intro",
+      "trigger": "before level 921",
+      "required_fact": "episode_087_resolved",
+      "show": "The obstruction is obtained.",
+      "withhold": "It is a contested instruction, not an unexplained disappearance.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial088_outro",
+      "trigger": "after level 930",
+      "show": "It is a contested instruction, not an unexplained disappearance.",
+      "grant_fact": "episode_088_resolved",
+      "next_question": "Who has authority to set it aside?",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial089_intro",
+      "trigger": "before level 931",
+      "required_fact": "episode_088_resolved",
+      "show": "Nessa traces delegated authority.",
+      "withhold": "An office used another person's name to delay action.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial089_outro",
+      "trigger": "after level 940",
+      "show": "An office used another person's name to delay action.",
+      "grant_fact": "episode_089_resolved",
+      "next_question": "The person whose authority was borrowed agrees to intervene.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial090_intro",
+      "trigger": "before level 941",
+      "required_fact": "episode_089_resolved",
+      "show": "The real authority repudiates the delay.",
+      "withhold": "The team gains a specific institutional route toward Ethan.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial090_outro",
+      "trigger": "after level 950",
+      "show": "The team gains a specific institutional route toward Ethan.",
+      "grant_fact": "episode_090_resolved",
+      "next_question": "Victor discovers how much leverage he has lost.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial091_intro",
+      "trigger": "before level 951",
+      "required_fact": "episode_090_resolved",
+      "show": "Victor demands payment again.",
+      "withhold": "The team distinguishes his threat from his actual control.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial091_outro",
+      "trigger": "after level 960",
+      "show": "The team distinguishes his threat from his actual control.",
+      "grant_fact": "episode_091_resolved",
+      "next_question": "He threatens a damaging family disclosure.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial092_intro",
+      "trigger": "before level 961",
+      "required_fact": "episode_091_resolved",
+      "show": "Amara refuses to buy silence about her past.",
+      "withhold": "The threat loses its power over her decisions.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial092_outro",
+      "trigger": "after level 970",
+      "show": "The threat loses its power over her decisions.",
+      "grant_fact": "episode_092_resolved",
+      "next_question": "Will the family publicly support the truth?",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial093_intro",
+      "trigger": "before level 971",
+      "required_fact": "episode_092_resolved",
+      "show": "Orena acknowledges Ethan's relationship to Adrian.",
+      "withhold": "A public denial used to obstruct the search is withdrawn.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial093_outro",
+      "trigger": "after level 980",
+      "show": "A public denial used to obstruct the search is withdrawn.",
+      "grant_fact": "episode_093_resolved",
+      "next_question": "Kellan challenges the evidence chain.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial094_intro",
+      "trigger": "before level 981",
+      "required_fact": "episode_093_resolved",
+      "show": "The player reconstructs the transfer chain.",
+      "withhold": "There is no unexplained custody gap in the traced segment.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial094_outro",
+      "trigger": "after level 990",
+      "show": "There is no unexplained custody gap in the traced segment.",
+      "grant_fact": "episode_094_resolved",
+      "next_question": "A final receipt has a disputed time.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial095_intro",
+      "trigger": "before level 991",
+      "required_fact": "episode_094_resolved",
+      "show": "An independent source establishes the receipt's time.",
+      "withhold": "The team identifies the current placement instruction.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial095_outro",
+      "trigger": "after level 1000",
+      "show": "The team identifies the current placement instruction.",
+      "grant_fact": "episode_095_resolved",
+      "next_question": "A review can now use the authenticated timeline.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial096_intro",
+      "trigger": "before level 1001",
+      "required_fact": "episode_095_resolved",
+      "show": "David prepares the records while Amara prepares to speak.",
+      "withhold": "Both distinguish proved facts from unanswered questions.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial096_outro",
+      "trigger": "after level 1010",
+      "show": "Both distinguish proved facts from unanswered questions.",
+      "grant_fact": "episode_096_resolved",
+      "next_question": "The receiving office agrees to live verification.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial097_intro",
+      "trigger": "before level 1011",
+      "required_fact": "episode_096_resolved",
+      "show": "A trusted visitor verifies the call in person.",
+      "withhold": "The next contact cannot be dismissed as a replay.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial097_outro",
+      "trigger": "after level 1020",
+      "show": "The next contact cannot be dismissed as a replay.",
+      "grant_fact": "episode_097_resolved",
+      "next_question": "The carer asks how Amara settles Ethan.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial098_intro",
+      "trigger": "before level 1021",
+      "required_fact": "episode_097_resolved",
+      "show": "Amara sings her familiar lullaby.",
+      "withhold": "Ethan responds during the independently verified live call.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial098_outro",
+      "trigger": "after level 1030",
+      "show": "Ethan responds during the independently verified live call.",
+      "grant_fact": "episode_098_resolved",
+      "next_question": "The carer agrees to support his return.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial099_intro",
+      "trigger": "before level 1031",
+      "required_fact": "episode_098_resolved",
+      "show": "The carer's statement and placement are secured.",
+      "withhold": "The next operation has a named place, witness and authority.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial099_outro",
+      "trigger": "after level 1040",
+      "show": "The next operation has a named place, witness and authority.",
+      "grant_fact": "episode_099_resolved",
+      "next_question": "The authority schedules a return assessment.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial100_intro",
+      "trigger": "before level 1041",
+      "required_fact": "episode_099_resolved",
+      "show": "The review accepts the factual chain.",
+      "withhold": "Ethan is alive at a verified placement; a supervised return assessment is scheduled, not completed.",
+      "ethan_rescued": false
+    },
+    {
+      "scene": "serial100_outro",
+      "trigger": "after level 1050",
+      "show": "Ethan is alive at a verified placement; a supervised return assessment is scheduled, not completed.",
+      "grant_fact": "episode_100_resolved",
+      "next_question": "Its notice names a representative Amara believed absent from Adrian's last night.",
+      "ethan_rescued": false
+    }
+  ]
+}

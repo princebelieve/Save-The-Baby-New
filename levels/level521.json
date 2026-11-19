@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "The next lead is the vehicle service tag. We need its original source before Victor moves again.",
+  "description": "The employee describes supplies ordered for Ethan.",
   "difficulty": "EASY",
   "level_id": 521,
   "metadata": {
     "chapter_end_level": 530,
     "chapter_id": 54,
     "chapter_start_level": 521,
-    "chapter_title": "The Dashboard Tag",
+    "chapter_title": "The Rooms Prepared",
     "generator_version": 2,
     "map_background": "factory_map_section_cutout.png",
     "map_landmark": "police_car_topdown_cutout.png",
@@ -34,13 +34,16 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 4867702,
     "season": 5,
-    "season_title": "For Her Son",
-    "episode_id": 48
+    "season_title": "The Royal Household",
+    "episode_id": 48,
+    "balance_revision": 1,
+    "balance_base_moves": 34,
+    "balance_reinforced_cells": []
   },
   "moves": {
-    "total": 34
+    "total": 33
   },
-  "name": "The Dashboard Tag 01",
+  "name": "The Rooms Prepared 01",
   "objectives": [
     {
       "amount": 18,
@@ -95,12 +98,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the vehicle service tag. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the vehicle service tag. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the vehicle service tag. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the vehicle service tag without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into the rooms prepared advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

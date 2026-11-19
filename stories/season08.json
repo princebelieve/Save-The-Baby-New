@@ -1,82 +1,47 @@
 {
   "story_id": "season08",
-  "title": "A Voice in the Static",
-  "background_music": "suspense_opening",
+  "title": "What Amara Saw",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/riverside_landscape.jpeg",
   "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
   "characters": [
     "david",
     "amara",
     "victor",
-    "detective_morris",
-    "ethan"
+    "detective_morris"
   ],
   "scenes": [
     {
-      "scene_id": "season08_reveal",
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "Detective Morris",
-            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
-            "text": "Morris hears a second voice in the recording and recognizes the station leak."
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "David narrows the radio source to the old flood channel. Amara remembers the approach beneath the dam."
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "David keeps Victor talking long enough to hear a train horn in the background."
-          }
-        ]
-      },
+      "scene_id": "season08",
+      "stage_direction": "Rain, interrupted sleep and a missing infant. Preserve the distinction between Amara's true sighting and the unexplained means of entry.",
       "dialogues": [
+        {
+          "speaker": "Amara",
+          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+          "text": "Someone called to tell me grief can make a person see things."
+        },
         {
           "speaker": "David",
           "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "At the rail spur, I filter the radio recording without overwriting it. A child's voice reaches Amara through the static: 'Mum.' Water crashes somewhere nearby."
+          "text": "What did you say?"
         },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "Then Victor cuts in: \"You have one move left. Choose who hears this first.\""
+          "text": "That grief did not put a blue sleeve against Victor's coat."
         },
         {
-          "speaker": "Victor",
-          "portrait": "res://assets/sprites/characters/victor_portrait_v2.png",
-          "text": "A flood siren starts across the valley. The channel is filling."
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "The marks beside the internal doorway support your account."
+        },
+        {
+          "speaker": "Amara",
+          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+          "text": "I want them to stop asking me whether I saw him and start asking how he got through."
         }
       ],
-      "choices": [
-        {
-          "id": "police",
-          "label": "Give the recording to Morris",
-          "impact": "Giving Morris the recording may expose Ethan's location if the station leak is real.",
-          "response": "Morris: I will listen away from the station and find out whose voice is on that call.",
-          "speaker": "Detective Morris"
-        },
-        {
-          "id": "signal",
-          "label": "Decode the next lead with Amara",
-          "impact": "David checks the technical evidence. Amara connects it to the people and history behind the records, without police assistance.",
-          "response": "David preserves the original record and tests the next connection while Amara checks its meaning against what she remembers.",
-          "speaker": "David"
-        },
-        {
-          "id": "alone",
-          "label": "Answer Victor and keep him talking",
-          "impact": "Keeping Victor talking may reveal his location, but he will know David is listening.",
-          "response": "David: I will keep him talking and listen for the train horn.",
-          "speaker": "David"
-        }
-      ]
+      "choices": []
     }
   ],
   "metadata": {
@@ -84,6 +49,8 @@
     "chapter": 8,
     "season": 2,
     "campaign_levels": "036-040",
-    "episode": "A continuing rescue mystery; the final clue opens the next episode."
+    "episode": "A continuing rescue mystery; the final clue opens the next episode.",
+    "authored_dialogue_revision": 1,
+    "ethan_status": "missing"
   }
 }

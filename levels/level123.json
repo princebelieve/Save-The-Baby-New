@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Trace the source of the stair camera gap before trusting Victor's account.",
+  "description": "The contractor's plan is recovered.",
   "difficulty": "MEDIUM",
   "level_id": 123,
   "metadata": {
     "chapter_end_level": 130,
     "chapter_id": 14,
     "chapter_start_level": 121,
-    "chapter_title": "Nine Missing Minutes",
+    "chapter_title": "The Door Below",
     "generator_version": 2,
     "map_background": "factory_map_section_cutout.png",
     "map_landmark": "police_car_topdown_cutout.png",
@@ -34,13 +34,27 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 1715940,
     "season": 1,
-    "season_title": "The River Between Us",
-    "episode_id": 8
+    "season_title": "The Door That Never Opened",
+    "episode_id": 8,
+    "balance_revision": 1,
+    "balance_base_moves": 32,
+    "balance_reinforced_cells": [
+      {
+        "x": 4,
+        "y": 4,
+        "health": 1
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 32
+    "total": 30
   },
-  "name": "Nine Missing Minutes 03",
+  "name": "The Door Below 03",
   "objectives": [
     {
       "amount": 24,
@@ -51,13 +65,13 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 4,
         "y": 4
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "chain",
         "x": 5,
         "y": 2
@@ -107,12 +121,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the stair camera gap. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the stair camera gap. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the stair camera gap. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the stair camera gap without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into the door below advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

@@ -1,11 +1,11 @@
 {
-  "version": 2,
+  "version": 3,
   "title": "Amara, Ethan and the people around them",
-  "summary": "Ethan is Amara's child. After her long relationship with Victor ended, she had Ethan with a wealthy man who provided for their future. Ethan's father has since died. Amara later fell in love with David, a web developer with hacking skills who believes every system has something he can decode. Victor cannot accept her choice: he takes credit for what other people built and treats Amara's independence as a betrayal. David is trying to bring Amara's child home; he is not Ethan's biological father.",
-  "father_name": "",
-  "father_death_cause": "unspecified",
+  "summary": "Amara left Victor after he urged her to exploit Adrian's marriage proposal. Victor claimed his aura caused her success while she supported them through street work. Adrian's royal family opposed the marriage and rejected their infant Ethan. Adrian acknowledged his son and left him a private provision before dying mysteriously. Amara suspected Victor without proof. She refused Victor's attempt to reclaim her and later fell in love with David, a web developer. Victor demanded a share of Ethan's provision and abducted the baby, saying 'My money or Ethan.' Amara truly saw Victor taking Ethan, although the house appeared securely locked. David must help her uncover the access conspiracy and locate Ethan. Neither Victor's aura nor his ownership claim is a fact.",
+  "father_name": "Adrian",
+  "father_death_cause": "unresolved; murder suspected but not proved",
   "ethan_status": "missing",
-  "continuing_story_rule": "Wins uncover evidence and narrowly missed opportunities. Losses remain on the same level and show Victor's threats. Ethan is never rescued in the continuing campaign; a rescue would end this story.",
+  "continuing_story_rule": "Ethan is not rescued during levels 1–1050. The search earns lasting discoveries and genuine proof of life. His eventual rescue belongs to later content.",
   "failure_taunts": [
     "My money or Ethan.",
     "I told you, David. You won't return alive.",
@@ -20,12 +20,16 @@
     "You cannot decode your way out of every mistake.",
     "Keep chasing. I will choose where we meet."
   ],
-  "opening_choices": {"police":"Call the police","signal":"Trace Victor's signal","alone":"Go after Victor alone"},
+  "opening_choices": {
+    "police": "Call the police",
+    "signal": "Trace Victor's signal",
+    "alone": "Go after Victor alone"
+  },
   "roles": {
-    "amara":"Ethan's mother. She knows her own history and makes her own decisions.",
-    "ethan":"Amara's child with his deceased wealthy father.",
-    "david":"Amara's partner, a web developer and hacker. His confidence in decoding systems is both useful and a source of mistakes.",
-    "victor":"Amara's former long-term partner. He claims other people's achievements, resents her independence and wants the credit and control he believes he deserves.",
-    "detective_morris":"The investigator brought into the active story when the player chooses police assistance."
+    "amara": "Ethan's mother. She knows her own history and makes her own decisions.",
+    "ethan": "Amara's child with his deceased wealthy father.",
+    "david": "Amara's partner, a web developer and hacker. His confidence in decoding systems is both useful and a source of mistakes.",
+    "victor": "Amara's former long-term partner. He claims other people's achievements, resents her independence and wants the credit and control he believes he deserves.",
+    "detective_morris": "The investigator brought into the active story when the player chooses police assistance."
   }
 }

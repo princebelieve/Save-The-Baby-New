@@ -1,55 +1,29 @@
 {
   "story_id": "serial070_intro",
-  "title": "Dawn Without Him",
-  "background_music": "suspense_opening",
+  "title": "A Familiar Name",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/riverbank_map_section.jpeg",
   "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
   "characters": [
     "david",
     "amara",
     "victor",
-    "ethan",
     "detective_morris"
   ],
   "scenes": [
     {
       "scene_id": "serial070_intro",
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "Detective Morris",
-            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
-            "text": "We will verify the identity service request and keep its source intact. A lead is not a rescue; we cannot assume Victor stayed there.",
-            "routes": [
-              "police"
-            ]
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I will check the technical trail behind the identity service request. Amara, tell me what the records cannot explain."
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I am following the identity service request without police backup. Amara has my location; I am not going to turn this into a contest with Victor."
-          }
-        ]
-      },
+      "stage_direction": "Victor's commands meet increasingly specific questions he cannot answer. His uncertainty must not be played as proof Ethan is safe.",
       "dialogues": [
-        {
-          "speaker": "David",
-          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "The next lead is the identity service request. We need its original source before Victor moves again."
-        },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "The people who helped us are safe. We have stopped one route, not found my son."
+          "text": "Read the name again."
+        },
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "It is the same person. The date still needs checking."
         }
       ],
       "choices": []
@@ -58,11 +32,14 @@
   "metadata": {
     "version": 2,
     "season": 7,
-    "season_title": "The Night Routes",
+    "season_title": "The Man Outside the Gate",
     "episode": 10,
     "episode_id": 70,
     "campaign_levels": "741-750",
     "ethan_status": "missing",
-    "season_finale": false
+    "season_finale": false,
+    "known_before": "episode_069_resolved",
+    "unlocks_fact": "",
+    "authored_dialogue_revision": 1
   }
 }

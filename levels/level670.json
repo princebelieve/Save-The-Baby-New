@@ -25,14 +25,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Close this investigation and hear what the stall collection token changes for the family.",
+  "description": "Amara requests current proof.",
   "difficulty": "HARD",
   "level_id": 670,
   "metadata": {
     "chapter_end_level": 670,
     "chapter_id": 68,
     "chapter_start_level": 661,
-    "chapter_title": "The Last Stall",
+    "chapter_title": "A Demand Without a Picture",
     "generator_version": 2,
     "map_background": "factory_map_section_cutout.png",
     "map_landmark": "police_car_topdown_cutout.png",
@@ -43,13 +43,32 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 6047633,
     "season": 7,
-    "season_title": "The Night Routes",
-    "episode_id": 62
+    "season_title": "The Man Outside the Gate",
+    "episode_id": 62,
+    "balance_revision": 1,
+    "balance_base_moves": 30,
+    "balance_reinforced_cells": [
+      {
+        "x": 6,
+        "y": 2,
+        "health": 1
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "health": 1
+      },
+      {
+        "x": 5,
+        "y": 6,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 30
+    "total": 27
   },
-  "name": "The Last Stall 10",
+  "name": "A Demand Without a Picture 10",
   "objectives": [
     {
       "amount": 30,
@@ -60,19 +79,19 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "chain",
         "x": 6,
         "y": 2
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "tape",
         "x": 4,
         "y": 3
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 5,
         "y": 6
@@ -128,12 +147,8 @@
     "after_level": "serial062_outro",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the stall collection token. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the stall collection token. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the stall collection token. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the stall collection token without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into a demand without a picture advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

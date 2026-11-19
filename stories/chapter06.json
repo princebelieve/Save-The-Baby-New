@@ -1,90 +1,50 @@
 {
   "story_id": "chapter06",
-  "title": "Victor’s Factory",
-  "background_music": "suspense_opening",
+  "title": "The Missing Corner",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/factory_cage_art.jpeg",
   "portrait": "res://assets/sprites/characters/victor_portrait_v2.png",
   "characters": [
     "david",
     "amara",
-    "ethan",
-    "victor"
+    "victor",
+    "detective_morris"
   ],
   "scenes": [
     {
-      "scene_id": "chapter_06_intro",
-      "choices": [
-        {
-          "id": "police",
-          "label": "Coordinate with Morris outside",
-          "impact": "Morris covers the perimeter while David checks the service route. Morris can watch for danger, but he needs you to share each clue before he can act.",
-          "response": "Morris covers the perimeter while David checks the service route. Ethan must come home alive.",
-          "speaker": "Detective Morris"
-        },
-        {
-          "id": "signal",
-          "label": "Decode the next lead with Amara",
-          "impact": "David checks the technical evidence. Amara connects it to the people and history behind the records, without police assistance.",
-          "response": "David preserves the original record and tests the next connection while Amara checks its meaning against what she remembers.",
-          "speaker": "David"
-        },
-        {
-          "id": "alone",
-          "label": "Scout the service entrance myself",
-          "impact": "David scouts quietly and sends his findings to Amara. You can investigate quietly, but no one will be close enough to help immediately if Victor is waiting.",
-          "response": "David scouts quietly and sends his findings to Amara. Ethan must come home alive.",
-          "speaker": "David"
-        }
-      ],
+      "scene_id": "chapter06",
+      "stage_direction": "Rain, interrupted sleep and a missing infant. Preserve the distinction between Amara's true sighting and the unexplained means of entry.",
       "dialogues": [
         {
           "speaker": "David",
           "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "The factory lights are on. Victor brought Ethan here, and the outer gate is still warm.",
-          "animation": "fade"
+          "text": "There is a damaged image from inside the property."
         },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "I can hear Ethan inside. We have one chance to reach him before Victor moves him again.",
-          "animation": "fade"
+          "text": "Another picture that ends before the part we need?"
         },
         {
-          "speaker": "Victor",
-          "portrait": "res://assets/sprites/characters/victor_portrait_v2.png",
-          "text": "You found the door. Now prove you can get through it. I will be waiting on the other side.",
-          "animation": "fade"
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "The corner near the service passage may still be recoverable. That is the detail worth restoring."
+        },
+        {
+          "speaker": "Amara",
+          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+          "text": "Then work on the doorway. Don't spend our time making the curtains clearer."
         }
       ],
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "Morris confirms activity by the loading bay. He will cover the outside while I investigate the service route."
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "David filters the factory transmitter. Amara recognises a faint sound; we need its source without alerting Victor."
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I see fresh boot prints beside the service door. I send Amara my position and watch for a safe opening."
-          }
-        ]
-      }
+      "choices": []
     }
   ],
   "metadata": {
     "version": 2,
     "chapter": 6,
     "campaign_levels": "041-050",
-    "tutorial_chapter": false
+    "tutorial_chapter": false,
+    "authored_dialogue_revision": 1,
+    "ethan_status": "missing"
   }
 }

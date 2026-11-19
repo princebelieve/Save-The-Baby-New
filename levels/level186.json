@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "The unit held household papers, but fresh tyre marks show the boxes were moved.",
+  "description": "The acquaintance describes the meeting.",
   "difficulty": "EASY",
   "level_id": 186,
   "metadata": {
     "chapter_end_level": 190,
     "chapter_id": 20,
     "chapter_start_level": 181,
-    "chapter_title": "Paid Storage",
+    "chapter_title": "Not a Stranger",
     "generator_version": 2,
     "map_background": "factory_map_section_cutout.png",
     "map_landmark": "police_car_topdown_cutout.png",
@@ -34,13 +34,16 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 2214837,
     "season": 2,
-    "season_title": "The Borrowed Fortune",
-    "episode_id": 14
+    "season_title": "The Fortune He Claimed",
+    "episode_id": 14,
+    "balance_revision": 1,
+    "balance_base_moves": 34,
+    "balance_reinforced_cells": []
   },
   "moves": {
-    "total": 34
+    "total": 33
   },
-  "name": "Paid Storage 06",
+  "name": "Not a Stranger 06",
   "objectives": [
     {
       "amount": 18,
@@ -95,12 +98,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the storage billing address. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the storage billing address. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the storage billing address. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the storage billing address without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into not a stranger advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

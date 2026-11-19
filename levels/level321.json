@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "The next lead is the locker access receipt. We need its original source before Victor moves again.",
+  "description": "Lami contacts Amara through a protected channel.",
   "difficulty": "EASY",
   "level_id": 321,
   "metadata": {
     "chapter_end_level": 330,
     "chapter_id": 34,
     "chapter_start_level": 321,
-    "chapter_title": "The Second Compartment",
+    "chapter_title": "What Lami Believed",
     "generator_version": 2,
     "map_background": "factory_map_section_cutout.png",
     "map_landmark": "police_car_topdown_cutout.png",
@@ -34,13 +34,16 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 3283902,
     "season": 3,
-    "season_title": "A Web of Mirrors",
-    "episode_id": 28
+    "season_title": "The Woman Who Waited",
+    "episode_id": 28,
+    "balance_revision": 1,
+    "balance_base_moves": 34,
+    "balance_reinforced_cells": []
   },
   "moves": {
-    "total": 34
+    "total": 33
   },
-  "name": "The Second Compartment 01",
+  "name": "What Lami Believed 01",
   "objectives": [
     {
       "amount": 18,
@@ -95,12 +98,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the locker access receipt. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the locker access receipt. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the locker access receipt. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the locker access receipt without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into what lami believed advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

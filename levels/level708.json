@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Reconstruct the missing step around the ride-share pickup record.",
+  "description": "The warning's receipt is established.",
   "difficulty": "HARD",
   "level_id": 708,
   "metadata": {
     "chapter_end_level": 710,
     "chapter_id": 72,
     "chapter_start_level": 701,
-    "chapter_title": "The Collected Passenger",
+    "chapter_title": "A Warning Received",
     "generator_version": 2,
     "map_background": "factory_map_section_cutout.png",
     "map_landmark": "police_car_topdown_cutout.png",
@@ -34,13 +34,32 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 6348555,
     "season": 7,
-    "season_title": "The Night Routes",
-    "episode_id": 66
+    "season_title": "The Man Outside the Gate",
+    "episode_id": 66,
+    "balance_revision": 1,
+    "balance_base_moves": 30,
+    "balance_reinforced_cells": [
+      {
+        "x": 4,
+        "y": 2,
+        "health": 1
+      },
+      {
+        "x": 2,
+        "y": 4,
+        "health": 1
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 30
+    "total": 27
   },
-  "name": "The Collected Passenger 08",
+  "name": "A Warning Received 08",
   "objectives": [
     {
       "amount": 30,
@@ -51,19 +70,19 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 4,
         "y": 2
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "chain",
         "x": 2,
         "y": 4
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "tape",
         "x": 2,
         "y": 1
@@ -119,12 +138,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the ride-share pickup record. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the ride-share pickup record. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the ride-share pickup record. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the ride-share pickup record without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into a warning received advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

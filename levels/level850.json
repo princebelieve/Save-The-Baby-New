@@ -25,14 +25,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Critical Case: Close this investigation and hear what the discarded victory speech changes for the family.",
+  "description": "That instruction is authenticated.",
   "difficulty": "CRITICAL_CASE",
   "level_id": 850,
   "metadata": {
     "chapter_end_level": 850,
     "chapter_id": 86,
     "chapter_start_level": 841,
-    "chapter_title": "The Name He Wants",
+    "chapter_title": "The Letter for His Son",
     "generator_version": 2,
     "map_background": "factory_map_section_cutout.png",
     "map_landmark": "police_car_topdown_cutout.png",
@@ -45,13 +45,32 @@
     "recommended_booster": "rocket",
     "scout_supply": false,
     "season": 8,
-    "season_title": "Names That Do Not Belong",
-    "episode_id": 80
+    "season_title": "The Night Adrian Died",
+    "episode_id": 80,
+    "balance_revision": 1,
+    "balance_base_moves": 30,
+    "balance_reinforced_cells": [
+      {
+        "x": 6,
+        "y": 1,
+        "health": 1
+      },
+      {
+        "x": 6,
+        "y": 6,
+        "health": 1
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 30
+    "total": 27
   },
-  "name": "The Name He Wants 10",
+  "name": "The Letter for His Son 10",
   "objectives": [
     {
       "amount": 30,
@@ -62,20 +81,20 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 6,
         "y": 1,
         "inventory_only": false
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "tape",
         "x": 6,
         "y": 6
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 6,
         "y": 3
@@ -131,12 +150,8 @@
     "after_level": "serial080_outro",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the discarded victory speech. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the discarded victory speech. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the discarded victory speech. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the discarded victory speech without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into the letter for his son advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

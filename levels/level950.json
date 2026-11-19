@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Critical Case: Close this investigation and hear what the sponsors' original correspondence changes for the family.",
+  "description": "The real authority repudiates the delay.",
   "difficulty": "CRITICAL_CASE",
   "level_id": 950,
   "metadata": {
     "chapter_end_level": 950,
     "chapter_id": 96,
     "chapter_start_level": 941,
-    "chapter_title": "Credit Withdrawn",
+    "chapter_title": "A Door No Longer Hidden",
     "generator_version": 2,
     "map_background": "factory_map_section_cutout.png",
     "map_landmark": "police_car_topdown_cutout.png",
@@ -36,13 +36,32 @@
     "recommended_booster": "thunder",
     "scout_supply": false,
     "season": 9,
-    "season_title": "The Price of Glory",
-    "episode_id": 90
+    "season_title": "The House That Must Answer",
+    "episode_id": 90,
+    "balance_revision": 1,
+    "balance_base_moves": 30,
+    "balance_reinforced_cells": [
+      {
+        "x": 1,
+        "y": 1,
+        "health": 1
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "health": 1
+      },
+      {
+        "x": 1,
+        "y": 6,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 30
+    "total": 27
   },
-  "name": "Credit Withdrawn 10",
+  "name": "A Door No Longer Hidden 10",
   "objectives": [
     {
       "amount": 30,
@@ -53,20 +72,20 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 1,
         "y": 1,
         "inventory_only": false
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 2,
         "y": 3
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "chain",
         "x": 1,
         "y": 6
@@ -122,12 +141,8 @@
     "after_level": "serial090_outro",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the sponsors' original correspondence. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the sponsors' original correspondence. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the sponsors' original correspondence. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the sponsors' original correspondence without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into a door no longer hidden advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

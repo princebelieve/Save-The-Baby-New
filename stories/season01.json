@@ -1,82 +1,47 @@
 {
   "story_id": "season01",
-  "title": "The Key Under the Gate",
-  "background_music": "suspense_opening",
+  "title": "The Gate Was Never Opened",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/garden_map_tile.jpeg",
   "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
   "characters": [
     "david",
     "amara",
     "victor",
-    "detective_morris",
-    "ethan"
+    "detective_morris"
   ],
   "scenes": [
     {
-      "scene_id": "season01_reveal",
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "Detective Morris",
-            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
-            "text": "Morris finds the car registered to a shell company. The record is real; the owner is not."
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "The depot mark matches an old shipping code Amara saw on Victor's phone."
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "The tire tracks lead away from the road and end beside a covered drain."
-          }
-        ]
-      },
+      "scene_id": "season01",
+      "stage_direction": "Rain, interrupted sleep and a missing infant. Preserve the distinction between Amara's true sighting and the unexplained means of entry.",
       "dialogues": [
         {
           "speaker": "David",
           "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "David finds a brass key stamped with a mark from the old river depot. The garden gate had not been forced; someone inside opened it for Victor."
+          "text": "The gate has not been forced."
         },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "A camera frame catches a second car leaving just before Victor. Its driver turns toward the depot and looks straight at the lens."
+          "text": "You can stop looking at me when you say that."
         },
         {
-          "speaker": "Victor",
-          "portrait": "res://assets/sprites/characters/victor_portrait_v2.png",
-          "text": "The camera goes dark. A voice from the depot speaker says: \"You are already late.\""
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "I am not doubting you. I am doubting the route we assumed he used."
+        },
+        {
+          "speaker": "Amara",
+          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+          "text": "There was a delivery worker here yesterday. His wife keeps calling him."
+        },
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "We can establish where he was without blaming him for being nearby."
         }
       ],
-      "choices": [
-        {
-          "id": "police",
-          "label": "Ask Morris to trace the car",
-          "impact": "Morris can trace the shell company, but visible patrol cars could tip off its driver.",
-          "response": "Morris: I will check the company records quietly and put one officer at the depot road.",
-          "speaker": "Detective Morris"
-        },
-        {
-          "id": "signal",
-          "label": "Decode the next lead with Amara",
-          "impact": "David checks the technical evidence. Amara connects it to the people and history behind the records, without police assistance.",
-          "response": "David preserves the original record and tests the next connection while Amara checks its meaning against what she remembers.",
-          "speaker": "David"
-        },
-        {
-          "id": "alone",
-          "label": "Follow the driver's tire tracks",
-          "impact": "David can reach the covered drain first, but the tracks may lead into a trap.",
-          "response": "David: I will follow the tracks to the drain and send you my location before I go in.",
-          "speaker": "David"
-        }
-      ]
+      "choices": []
     }
   ],
   "metadata": {
@@ -84,6 +49,8 @@
     "chapter": 1,
     "season": 1,
     "campaign_levels": "001-005",
-    "episode": "A continuing rescue mystery; the final clue opens the next episode."
+    "episode": "A continuing rescue mystery; the final clue opens the next episode.",
+    "authored_dialogue_revision": 1,
+    "ethan_status": "missing"
   }
 }

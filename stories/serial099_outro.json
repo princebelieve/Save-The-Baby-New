@@ -1,91 +1,51 @@
 {
   "story_id": "serial099_outro",
-  "title": "The Ringing Phone | The next lead",
-  "background_music": "suspense_opening",
+  "title": "A Statement for Tomorrow",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/river_waterfall_map_tile.jpeg",
   "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
   "characters": [
     "david",
     "amara",
     "victor",
-    "ethan",
     "detective_morris"
   ],
   "scenes": [
     {
       "scene_id": "serial099_outro",
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "Detective Morris",
-            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
-            "text": "We will verify the abandoned phone call record and keep its source intact. A lead is not a rescue; we cannot assume Victor stayed there.",
-            "routes": [
-              "police"
-            ]
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I will check the technical trail behind the abandoned phone call record. Amara, tell me what the records cannot explain."
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I am following the abandoned phone call record without police backup. Amara has my location; I am not going to turn this into a contest with Victor."
-          }
-        ]
-      },
+      "stage_direction": "The room grows quieter as live contact approaches. The last call is real; physical reunion is still beyond this campaign.",
       "dialogues": [
         {
           "speaker": "David",
           "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "Victor calls the abandoned handset to boast while a background signal identifies a transfer point."
+          "text": "Her statement and Ethan's current placement are secured."
         },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "The transfer point is empty when we arrive. One overlooked dispatch label survives the cleared floor."
+          "text": "You said tomorrow. Tell me what tomorrow means."
+        },
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "A named authority, a place and a supervised return assessment. We are waiting for the notice."
         }
       ],
-      "choices": [
-        {
-          "id": "police",
-          "label": "Coordinate the next lead with the police",
-          "impact": "Bring Morris into the next investigation and preserve the evidence behind the abandoned phone call record.",
-          "response": "Morris takes the lead into the formal investigation. David checks the record while Amara explains its personal significance.",
-          "speaker": "Detective Morris"
-        },
-        {
-          "id": "signal",
-          "label": "Decode the next connection with Amara",
-          "impact": "David checks the technical trail from the abandoned phone call record; Amara tests it against her own history.",
-          "response": "David saves the original record and checks its connections. Amara refuses to let Victor's version replace what she remembers.",
-          "speaker": "David"
-        },
-        {
-          "id": "alone",
-          "label": "Follow the next trail without police backup",
-          "impact": "David follows the physical lead from the abandoned phone call record, keeping Amara informed.",
-          "response": "David sends Amara his location before moving. Finding Ethan matters more than claiming the search as his own achievement.",
-          "speaker": "David"
-        }
-      ]
+      "choices": []
     }
   ],
   "metadata": {
     "version": 2,
     "season": 10,
-    "season_title": "One Door Away",
+    "season_title": "The Distance Between Two Voices",
     "episode": 9,
     "episode_id": 99,
     "campaign_levels": "1031-1040",
     "ethan_status": "missing",
     "season_finale": false,
-    "evidence_summary": "Victor calls the abandoned handset to boast while a background signal identifies a transfer point. The transfer point is empty when we arrive. One overlooked dispatch label survives the cleared floor."
+    "known_before": "episode_098_resolved",
+    "unlocks_fact": "episode_099_resolved",
+    "authored_dialogue_revision": 1,
+    "evidence_summary": "The next operation has a named place, witness and authority."
   }
 }

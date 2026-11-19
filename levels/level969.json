@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Give Amara a verified account of the lift inspection strip, so she can choose the next step.",
+  "description": "Amara refuses to buy silence about her past.",
   "difficulty": "MEDIUM",
   "level_id": 969,
   "metadata": {
     "chapter_end_level": 970,
     "chapter_id": 98,
     "chapter_start_level": 961,
-    "chapter_title": "The Maintenance Lift",
+    "chapter_title": "What He Calls Exposure",
     "generator_version": 2,
     "map_background": "factory_map_section_cutout.png",
     "map_landmark": "police_car_topdown_cutout.png",
@@ -34,13 +34,27 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 8415414,
     "season": 10,
-    "season_title": "One Door Away",
-    "episode_id": 92
+    "season_title": "The Distance Between Two Voices",
+    "episode_id": 92,
+    "balance_revision": 1,
+    "balance_base_moves": 32,
+    "balance_reinforced_cells": [
+      {
+        "x": 1,
+        "y": 3,
+        "health": 1
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 32
+    "total": 30
   },
-  "name": "The Maintenance Lift 09",
+  "name": "What He Calls Exposure 09",
   "objectives": [
     {
       "amount": 24,
@@ -51,13 +65,13 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 1,
         "y": 3
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "chain",
         "x": 2,
         "y": 3
@@ -107,12 +121,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the lift inspection strip. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the lift inspection strip. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the lift inspection strip. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the lift inspection strip without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into what he calls exposure advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

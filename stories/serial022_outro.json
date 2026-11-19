@@ -1,91 +1,51 @@
 {
   "story_id": "serial022_outro",
-  "title": "The Shared Workstation | The next lead",
-  "background_music": "suspense_opening",
+  "title": "A Room for One Night",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/factory_map_section.jpeg",
   "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
   "characters": [
     "david",
     "amara",
     "victor",
-    "ethan",
     "detective_morris"
   ],
   "scenes": [
     {
       "scene_id": "serial022_outro",
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "Detective Morris",
-            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
-            "text": "We will verify the workstation session record and keep its source intact. A lead is not a rescue; we cannot assume Victor stayed there.",
-            "routes": [
-              "police"
-            ]
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I will check the technical trail behind the workstation session record. Amara, tell me what the records cannot explain."
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I am following the workstation session record without police backup. Amara has my location; I am not going to turn this into a contest with Victor."
-          }
-        ]
-      },
+      "stage_direction": "Calls and protected interviews interrupt the search. Amara asks practical questions about Ethan's care before she asks about blame.",
       "dialogues": [
         {
           "speaker": "David",
           "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "A session token was reused after its owner logged out."
+          "text": "She left a note. She was afraid of the man coming to collect Ethan."
         },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "We reach the workstation after the visitor leaves. A printer spool retains a route slip."
+          "text": "She was afraid, and she still let him take my son?"
+        },
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "A witness saw her change vehicles. We can follow what happened next."
         }
       ],
-      "choices": [
-        {
-          "id": "police",
-          "label": "Coordinate the next lead with the police",
-          "impact": "Bring Morris into the next investigation and preserve the evidence behind the workstation session record.",
-          "response": "Morris takes the lead into the formal investigation. David checks the record while Amara explains its personal significance.",
-          "speaker": "Detective Morris"
-        },
-        {
-          "id": "signal",
-          "label": "Decode the next connection with Amara",
-          "impact": "David checks the technical trail from the workstation session record; Amara tests it against her own history.",
-          "response": "David saves the original record and checks its connections. Amara refuses to let Victor's version replace what she remembers.",
-          "speaker": "David"
-        },
-        {
-          "id": "alone",
-          "label": "Follow the next trail without police backup",
-          "impact": "David follows the physical lead from the workstation session record, keeping Amara informed.",
-          "response": "David sends Amara his location before moving. Finding Ethan matters more than claiming the search as his own achievement.",
-          "speaker": "David"
-        }
-      ]
+      "choices": []
     }
   ],
   "metadata": {
     "version": 2,
     "season": 3,
-    "season_title": "A Web of Mirrors",
+    "season_title": "The Woman Who Waited",
     "episode": 2,
     "episode_id": 22,
     "campaign_levels": "261-270",
     "ethan_status": "missing",
     "season_finale": false,
-    "evidence_summary": "A session token was reused after its owner logged out. We reach the workstation after the visitor leaves. A printer spool retains a route slip."
+    "known_before": "episode_021_resolved",
+    "unlocks_fact": "episode_022_resolved",
+    "authored_dialogue_revision": 1,
+    "evidence_summary": "She left a note expressing fear of Ethan's collector."
   }
 }

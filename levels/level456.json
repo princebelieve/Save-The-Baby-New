@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "The file records that Ethan's father provided for Amara and Ethan after her separation from Victor.",
+  "description": "The payment is compared with Lami's account.",
   "difficulty": "EASY",
   "level_id": 456,
   "metadata": {
     "chapter_end_level": 460,
     "chapter_id": 47,
     "chapter_start_level": 451,
-    "chapter_title": "The Provision File",
+    "chapter_title": "The First Car",
     "generator_version": 2,
     "map_background": "river_map_section_cutout.png",
     "map_landmark": "wooden_bridge_cutout.png",
@@ -34,13 +34,16 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 4352967,
     "season": 5,
-    "season_title": "For Her Son",
-    "episode_id": 41
+    "season_title": "The Royal Household",
+    "episode_id": 41,
+    "balance_revision": 1,
+    "balance_base_moves": 34,
+    "balance_reinforced_cells": []
   },
   "moves": {
-    "total": 34
+    "total": 33
   },
-  "name": "The Provision File 06",
+  "name": "The First Car 06",
   "objectives": [
     {
       "amount": 18,
@@ -95,12 +98,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the original provision file. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the original provision file. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the original provision file. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the original provision file without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into the first car advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

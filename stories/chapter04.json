@@ -1,87 +1,55 @@
 {
   "story_id": "chapter04",
-  "title": "The Camera Archive",
-  "background_music": "suspense_opening",
+  "title": "The Sound She Remembered",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/riverside_landscape.jpeg",
   "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
   "characters": [
     "david",
     "amara",
-    "ethan",
-    "victor"
+    "victor",
+    "detective_morris"
   ],
   "scenes": [
     {
-      "scene_id": "chapter_04_intro",
-      "choices": [
-        {
-          "id": "police",
-          "label": "Coordinate a quiet search",
-          "impact": "Morris organizes a discreet search beyond the station. Morris can watch for danger, but he needs you to share each clue before he can act.",
-          "response": "Morris organizes a discreet search beyond the station. Ethan must come home alive.",
-          "speaker": "Detective Morris"
-        },
-        {
-          "id": "signal",
-          "label": "Decode the next lead with Amara",
-          "impact": "David checks the technical evidence. Amara connects it to the people and history behind the records, without police assistance.",
-          "response": "David preserves the original record and tests the next connection while Amara checks its meaning against what she remembers.",
-          "speaker": "David"
-        },
-        {
-          "id": "alone",
-          "label": "Visit the witness myself",
-          "impact": "A witness tells David which forest trail Victor used. You can investigate quietly, but no one will be close enough to help immediately if Victor is waiting.",
-          "response": "A witness tells David which forest trail Victor used. Ethan must come home alive.",
-          "speaker": "David"
-        }
-      ],
+      "scene_id": "chapter04",
+      "stage_direction": "Rain, interrupted sleep and a missing infant. Preserve the distinction between Amara's true sighting and the unexplained means of entry.",
       "dialogues": [
         {
           "speaker": "David",
           "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "The van carries a stolen plate. The public camera archive shows it heading north, but a direction is not a location."
+          "text": "I thought the timestamps gave us the route. I was wrong."
         },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "Victor always wanted an audience for his victories. He may have left one camera running on purpose. Check what the image does not show."
+          "text": "Ethan wakes when the pump starts. I used to turn it off early."
         },
         {
           "speaker": "David",
           "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "A second camera catches the turn toward the forest. I saved both originals before making a copy for comparison."
+          "text": "The pump?"
+        },
+        {
+          "speaker": "Amara",
+          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+          "text": "The sound before I saw Victor. I thought it was the storm."
+        },
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "That is not in the log. Show me where you normally switch it off."
         }
       ],
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "Morris compares the witness statement with a patrol report. Both place the van near the forest road."
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I identify a second device moving beyond the station. Someone is carrying it toward the forest."
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "The witness trusts me with a detail left out of the report: Victor changed vehicles beside the forest road."
-          }
-        ]
-      }
+      "choices": []
     }
   ],
   "metadata": {
     "version": 2,
     "chapter": 4,
     "campaign_levels": "023-030",
-    "tutorial_chapter": true
+    "tutorial_chapter": true,
+    "authored_dialogue_revision": 1,
+    "ethan_status": "missing"
   }
 }

@@ -1,55 +1,29 @@
 {
   "story_id": "serial013_intro",
-  "title": "The Notary's Copy",
-  "background_music": "suspense_opening",
+  "title": "The Price of Shoes",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/iron_gate_map_tile.jpeg",
   "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
   "characters": [
     "david",
     "amara",
     "victor",
-    "ethan",
     "detective_morris"
   ],
   "scenes": [
     {
       "scene_id": "serial013_intro",
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "Detective Morris",
-            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
-            "text": "We will verify the notarised contact form and keep its source intact. A lead is not a rescue; we cannot assume Victor stayed there.",
-            "routes": [
-              "police"
-            ]
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I will check the technical trail behind the notarised contact form. Amara, tell me what the records cannot explain."
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I am following the notarised contact form without police backup. Amara has my location; I am not going to turn this into a contest with Victor."
-          }
-        ]
-      },
+      "stage_direction": "The conversation moves between Amara's home and the estate's public offices. Keep documents distinct from what people claim about them.",
       "dialogues": [
         {
-          "speaker": "David",
-          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "The next lead is the notarised contact form. We need its original source before Victor moves again."
+          "speaker": "Victor",
+          "portrait": "res://assets/sprites/characters/victor_portrait_v2.png",
+          "text": "You never had this kind of luck before me, Amara."
         },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "That is not my number. I can challenge the substitution myself."
+          "text": "I bought your shoes with six weeks of standing beside a hot stove."
         }
       ],
       "choices": []
@@ -58,11 +32,14 @@
   "metadata": {
     "version": 2,
     "season": 2,
-    "season_title": "The Borrowed Fortune",
+    "season_title": "The Fortune He Claimed",
     "episode": 3,
     "episode_id": 13,
     "campaign_levels": "171-180",
     "ethan_status": "missing",
-    "season_finale": false
+    "season_finale": false,
+    "known_before": "episode_012_resolved",
+    "unlocks_fact": "",
+    "authored_dialogue_revision": 1
   }
 }

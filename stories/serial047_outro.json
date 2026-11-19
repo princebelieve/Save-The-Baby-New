@@ -1,91 +1,51 @@
 {
   "story_id": "serial047_outro",
-  "title": "No Public Ticket | The next lead",
-  "background_music": "suspense_opening",
+  "title": "The Condition",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/level_map_landscape.jpeg",
   "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
   "characters": [
     "david",
     "amara",
     "victor",
-    "ethan",
     "detective_morris"
   ],
   "scenes": [
     {
       "scene_id": "serial047_outro",
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "Detective Morris",
-            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
-            "text": "We will verify the road transfer docket and keep its source intact. A lead is not a rescue; we cannot assume Victor stayed there.",
-            "routes": [
-              "police"
-            ]
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I will check the technical trail behind the road transfer docket. Amara, tell me what the records cannot explain."
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I am following the road transfer docket without police backup. Amara has my location; I am not going to turn this into a contest with Victor."
-          }
-        ]
-      },
+      "stage_direction": "The household's polished public account meets the records retained by its workers. Amara speaks for herself.",
       "dialogues": [
+        {
+          "speaker": "Amara",
+          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+          "text": "No. My silence is not a fee for finding my baby."
+        },
         {
           "speaker": "David",
           "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "The transfer bypassed the public passenger list using a contractor's vehicle."
+          "text": "You don't have to surrender the evidence."
         },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "The contractor's yard is empty. A dashboard service tag gives the next workshop."
+          "text": "The younger employee heard me refuse. Now she wants to speak privately."
         }
       ],
-      "choices": [
-        {
-          "id": "police",
-          "label": "Coordinate the next lead with the police",
-          "impact": "Bring Morris into the next investigation and preserve the evidence behind the road transfer docket.",
-          "response": "Morris takes the lead into the formal investigation. David checks the record while Amara explains its personal significance.",
-          "speaker": "Detective Morris"
-        },
-        {
-          "id": "signal",
-          "label": "Decode the next connection with Amara",
-          "impact": "David checks the technical trail from the road transfer docket; Amara tests it against her own history.",
-          "response": "David saves the original record and checks its connections. Amara refuses to let Victor's version replace what she remembers.",
-          "speaker": "David"
-        },
-        {
-          "id": "alone",
-          "label": "Follow the next trail without police backup",
-          "impact": "David follows the physical lead from the road transfer docket, keeping Amara informed.",
-          "response": "David sends Amara his location before moving. Finding Ethan matters more than claiming the search as his own achievement.",
-          "speaker": "David"
-        }
-      ]
+      "choices": []
     }
   ],
   "metadata": {
     "version": 2,
     "season": 5,
-    "season_title": "For Her Son",
+    "season_title": "The Royal Household",
     "episode": 7,
     "episode_id": 47,
     "campaign_levels": "511-520",
     "ethan_status": "missing",
     "season_finale": false,
-    "evidence_summary": "The transfer bypassed the public passenger list using a contractor's vehicle. The contractor's yard is empty. A dashboard service tag gives the next workshop."
+    "known_before": "episode_046_resolved",
+    "unlocks_fact": "episode_047_resolved",
+    "authored_dialogue_revision": 1,
+    "evidence_summary": "She rejects the bargain without surrendering her evidence."
   }
 }

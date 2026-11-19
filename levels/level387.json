@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Check the catering delivery note against an independent record.",
+  "description": "The family rejection is heard in context.",
   "difficulty": "MEDIUM",
   "level_id": 387,
   "metadata": {
     "chapter_end_level": 390,
     "chapter_id": 40,
     "chapter_start_level": 381,
-    "chapter_title": "An Unset Table",
+    "chapter_title": "The Door She Wasn't Offered",
     "generator_version": 2,
     "map_background": "factory_map_section_cutout.png",
     "map_landmark": "police_car_topdown_cutout.png",
@@ -34,13 +34,27 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 3806556,
     "season": 4,
-    "season_title": "What He Calls Love",
-    "episode_id": 34
+    "season_title": "The Heart He Couldn't Claim",
+    "episode_id": 34,
+    "balance_revision": 1,
+    "balance_base_moves": 32,
+    "balance_reinforced_cells": [
+      {
+        "x": 3,
+        "y": 1,
+        "health": 1
+      },
+      {
+        "x": 1,
+        "y": 3,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 32
+    "total": 30
   },
-  "name": "An Unset Table 07",
+  "name": "The Door She Wasn't Offered 07",
   "objectives": [
     {
       "amount": 24,
@@ -51,13 +65,13 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 3,
         "y": 1
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "chain",
         "x": 1,
         "y": 3
@@ -107,12 +121,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the catering delivery note. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the catering delivery note. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the catering delivery note. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the catering delivery note without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into the door she wasn't offered advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

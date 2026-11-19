@@ -1,70 +1,82 @@
 {
   "story_id": "opening_story",
-  "title": "The Night Ethan Vanished",
-  "background_music": "suspense_opening",
+  "title": "The Morning Ethan Vanished",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/riverside_landscape.jpeg",
   "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
   "characters": [
     "david",
     "amara",
-    "victor"
+    "victor",
+    "detective_morris"
   ],
   "scenes": [
     {
-      "scene_id": "the_call",
+      "scene_id": "opening_story",
+      "stage_direction": "Rain, interrupted sleep and a missing infant. Preserve the distinction between Amara's true sighting and the unexplained means of entry.",
       "dialogues": [
-        {
-          "speaker": "Late that night",
-          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "David was closing his laptop when Amara called. A web developer who believed every system could be decoded, he had no answer for the fear in her voice. Her son, Ethan, was missing."
-        },
-        {
-          "speaker": "Before this night",
-          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "Amara and Victor had ended a long relationship before she met Ethan's father, a wealthy man. He provided for Amara and their child. He was now dead, but the future he had secured for them remained."
-        },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "Victor thought I would return after Ethan's father died. I chose you instead. He keeps saying everything I have is because of him. Now he has taken my child, David."
+          "text": "David. Come to the house. Ethan is gone."
         },
         {
           "speaker": "David",
           "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "Ethan is your son, Amara. Neither your future nor your love belongs to Victor. Tell me exactly what happened. We will work from what we know."
-        },
-        {
-          "speaker": "Victor",
-          "portrait": "res://assets/sprites/characters/victor_portrait_v2.png",
-          "text": "A video opens on David's phone. 'I made her what she is,' Victor says. 'That rich man is gone. You think you can decode your way into my place? Follow the trail. Let us see who gets remembered.'"
+          "text": "I am coming. Are you somewhere safe?"
         },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "Ethan's father wanted him safe. Victor wants everyone to owe him. Please, David. Bring my baby home."
+          "text": "I saw Victor carrying him. I called his name and the lights went out."
+        },
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "Tell me which door you are standing beside."
+        },
+        {
+          "speaker": "Amara",
+          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+          "text": "The back door. It is still bolted. The gate is locked. I don't understand how he left."
+        },
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "Stay there. Don't go into the rain looking by yourself."
+        },
+        {
+          "speaker": "Amara",
+          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+          "text": "Bring him back. Please, David. Save the baby. Whatever happens, make sure he comes back alive."
+        },
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "I am at the gate. Let me in, Amara."
         }
       ],
       "choices": [
         {
           "id": "police",
-          "label": "Call the police",
-          "impact": "Bring a formal investigator into the search. Detective Morris can secure evidence and coordinate help.",
-          "response": "David calls the police. Detective Morris answers: 'Tell me where Amara last saw Ethan. We will preserve the scene while you follow the lead.'",
-          "speaker": "Detective Morris"
+          "label": "Call Detective Morris",
+          "speaker": "David",
+          "impact": "Request police assistance and preserve the scene while the search begins.",
+          "response": "I am calling Morris. He needs to hear what you saw from you, Amara. I will stay beside you."
         },
         {
           "id": "signal",
-          "label": "Trace Victor's signal",
-          "impact": "David examines the message's technical trail while Amara supplies the context only she knows. They begin without police support.",
-          "response": "David saves the original message and checks its delivery records. Amara points out a detail from Victor's old routines. Together, they find a first lead.",
-          "speaker": "David"
+          "label": "Trace the message with Amara",
+          "speaker": "David",
+          "impact": "Begin with the original message and Amara's knowledge of the household. No technical result is certain.",
+          "response": "Keep the original message open. I will examine the record; you tell me what the names and places mean."
         },
         {
           "id": "alone",
-          "label": "Go after Victor alone",
-          "impact": "David follows the physical trail without police backup. He must check his conclusions and keep Amara informed.",
-          "response": "David sends Amara his location, closes the laptop and follows the prints. Victor expects a rival chasing glory. David is going for Amara's child.",
-          "speaker": "David"
+          "label": "Follow the rear passage yourself",
+          "speaker": "David",
+          "impact": "Begin with direct observation without nearby police backup. Amara receives David's location.",
+          "response": "I will check the passage first. Here is my location. If I need help, I am going to ask for it—not disappear too."
         }
       ]
     }
@@ -73,6 +85,8 @@
     "version": 2,
     "chapter": "The First Clue",
     "notes": "Opening suspense scene and choice for the first playable investigation.",
-    "canon": "Ethan is Amara's child; David is her partner, not his biological father."
+    "canon": "Ethan is Amara's child; David is her partner, not his biological father.",
+    "authored_dialogue_revision": 1,
+    "ethan_status": "missing"
   }
 }

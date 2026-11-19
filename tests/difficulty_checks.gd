@@ -82,6 +82,7 @@ func _check_seal(kind: String) -> void:
 	var data := JsonLoader.load_file("res://levels/level100.json")
 	# Retain coverage of the optional seal mechanic without requiring it in campaign levels.
 	data.obstacles.items[0]["inventory_only"] = true
+	data.obstacles.items[0]["health"] = 1
 	var seal: Dictionary = data.obstacles.items[0]
 	var cell := Vector2i(int(seal.x),int(seal.y))
 	var board := Board.new()
@@ -120,6 +121,11 @@ func _check_game() -> void:
 	await get_tree().create_timer(2.0).timeout
 	Engine.time_scale = 30
 	game._highest_unlocked_level = 1050
+	# This fixture exercises the briefing, not the separate chapter/story screens.
+	var fixture := JsonLoader.load_file("res://levels/level100.json")
+	game._campaign_progress.set_value("chapter_introductions", str(int(fixture.metadata.chapter_id)), true)
+	var before_story := str(fixture.get("story", {}).get("before_level", ""))
+	if not before_story.is_empty(): game._campaign_progress.set_value("story_seen", before_story, true)
 	for kind in ["rocket","bomb","thunder"]:
 		game._economy_manager.set_booster_count(kind,0)
 	game._on_campaign_level_selected(100,"alone")
@@ -143,10 +149,11 @@ func _check_game() -> void:
 	check(game._economy_manager.get_booster_count("rocket") == 1,"The recommended supply is placed in the real inventory")
 	var seal: Dictionary = game.get_node("Managers/LevelManager").get_level_data().obstacles.items[0]
 	var cell := Vector2i(int(seal.x),int(seal.y))
+	var previous_health: int = game._board._obstacles[cell].get_obstacle_state().get_health()
 	check(game._board.use_booster_at("rocket",cell),"Real game can fire the owned tray booster")
 	await _settle(game._board)
 	check(game._economy_manager.get_booster_count("rocket") == 0,"Real game consumes exactly one inventory booster")
-	check(not game._board._obstacles.has(cell),"Real game opens the seal after consuming the booster")
+	check(not game._board._obstacles.has(cell) or game._board._obstacles[cell].get_obstacle_state().get_health() < previous_health,"Real game damages the reinforced seal after consuming the booster")
 	Engine.time_scale = 1.0
 	await get_tree().create_timer(1.0).timeout
 	game.queue_free()

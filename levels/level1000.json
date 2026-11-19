@@ -25,14 +25,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Critical Case: Close this investigation and hear what the original yard recording changes for the family.",
+  "description": "An independent source establishes the receipt's time.",
   "difficulty": "CRITICAL_CASE",
   "level_id": 1000,
   "metadata": {
     "chapter_end_level": 1000,
     "chapter_id": 101,
     "chapter_start_level": 991,
-    "chapter_title": "The Voice She Knows",
+    "chapter_title": "The Time We Can Prove",
     "generator_version": 2,
     "map_background": "river_map_section_cutout.png",
     "map_landmark": "wooden_bridge_cutout.png",
@@ -45,13 +45,32 @@
     "recommended_booster": "rocket",
     "scout_supply": false,
     "season": 10,
-    "season_title": "One Door Away",
-    "episode_id": 95
+    "season_title": "The Distance Between Two Voices",
+    "episode_id": 95,
+    "balance_revision": 1,
+    "balance_base_moves": 30,
+    "balance_reinforced_cells": [
+      {
+        "x": 1,
+        "y": 4,
+        "health": 1
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "health": 1
+      },
+      {
+        "x": 5,
+        "y": 5,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 30
+    "total": 27
   },
-  "name": "The Voice She Knows 10",
+  "name": "The Time We Can Prove 10",
   "objectives": [
     {
       "amount": 30,
@@ -62,20 +81,20 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 1,
         "y": 4,
         "inventory_only": false
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "tape",
         "x": 4,
         "y": 3
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 5,
         "y": 5
@@ -131,12 +150,8 @@
     "after_level": "serial095_outro",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the original yard recording. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the original yard recording. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the original yard recording. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the original yard recording without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into the time we can prove advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

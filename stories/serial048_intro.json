@@ -1,55 +1,29 @@
 {
   "story_id": "serial048_intro",
-  "title": "The Dashboard Tag",
-  "background_music": "suspense_opening",
+  "title": "The Rooms Prepared",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/level_map_landscape.jpeg",
   "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
   "characters": [
     "david",
     "amara",
     "victor",
-    "ethan",
     "detective_morris"
   ],
   "scenes": [
     {
       "scene_id": "serial048_intro",
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "Detective Morris",
-            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
-            "text": "We will verify the vehicle service tag and keep its source intact. A lead is not a rescue; we cannot assume Victor stayed there.",
-            "routes": [
-              "police"
-            ]
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I will check the technical trail behind the vehicle service tag. Amara, tell me what the records cannot explain."
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I am following the vehicle service tag without police backup. Amara has my location; I am not going to turn this into a contest with Victor."
-          }
-        ]
-      },
+      "stage_direction": "The household's polished public account meets the records retained by its workers. Amara speaks for herself.",
       "dialogues": [
         {
           "speaker": "David",
           "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "The next lead is the vehicle service tag. We need its original source before Victor moves again."
+          "text": "The employee remembers supplies being ordered for an infant."
         },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "Keep the broken mirror. Something discarded can still tell us where he went."
+          "text": "Ask about the bottles. Not just whether there was a cot."
         }
       ],
       "choices": []
@@ -58,11 +32,14 @@
   "metadata": {
     "version": 2,
     "season": 5,
-    "season_title": "For Her Son",
+    "season_title": "The Royal Household",
     "episode": 8,
     "episode_id": 48,
     "campaign_levels": "521-530",
     "ethan_status": "missing",
-    "season_finale": false
+    "season_finale": false,
+    "known_before": "episode_047_resolved",
+    "unlocks_fact": "",
+    "authored_dialogue_revision": 1
   }
 }

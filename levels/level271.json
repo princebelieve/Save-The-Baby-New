@@ -25,14 +25,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "The next lead is the printer spool entry. We need its original source before Victor moves again.",
+  "description": "A driver asks for protection before speaking.",
   "difficulty": "EASY",
   "level_id": 271,
   "metadata": {
     "chapter_end_level": 280,
     "chapter_id": 29,
     "chapter_start_level": 271,
-    "chapter_title": "The Route Slip",
+    "chapter_title": "The Patient Driver",
     "generator_version": 2,
     "map_background": "river_map_section_cutout.png",
     "map_landmark": "wooden_bridge_cutout.png",
@@ -43,13 +43,16 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 2887952,
     "season": 3,
-    "season_title": "A Web of Mirrors",
-    "episode_id": 23
+    "season_title": "The Woman Who Waited",
+    "episode_id": 23,
+    "balance_revision": 1,
+    "balance_base_moves": 34,
+    "balance_reinforced_cells": []
   },
   "moves": {
-    "total": 34
+    "total": 33
   },
-  "name": "The Route Slip 01",
+  "name": "The Patient Driver 01",
   "objectives": [
     {
       "amount": 18,
@@ -104,12 +107,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the printer spool entry. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the printer spool entry. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the printer spool entry. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the printer spool entry without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into the patient driver advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

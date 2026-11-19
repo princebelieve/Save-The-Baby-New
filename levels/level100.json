@@ -25,14 +25,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Critical Case: Close this investigation and hear what the landing maintenance notice changes for the family.",
+  "description": "The attendant asks why the family distrusts Amara.",
   "difficulty": "CRITICAL_CASE",
   "level_id": 100,
   "metadata": {
     "chapter_end_level": 100,
     "chapter_id": 11,
     "chapter_start_level": 91,
-    "chapter_title": "The Quiet Landing",
+    "chapter_title": "Before the Marriage",
     "generator_version": 2,
     "map_background": "river_map_section_cutout.png",
     "map_landmark": "wooden_bridge_cutout.png",
@@ -45,13 +45,22 @@
     "recommended_booster": "rocket",
     "scout_supply": true,
     "season": 1,
-    "season_title": "The River Between Us",
-    "episode_id": 5
+    "season_title": "The Door That Never Opened",
+    "episode_id": 5,
+    "balance_revision": 1,
+    "balance_base_moves": 32,
+    "balance_reinforced_cells": [
+      {
+        "x": 5,
+        "y": 1,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 32
+    "total": 30
   },
-  "name": "The Quiet Landing 10",
+  "name": "Before the Marriage 10",
   "objectives": [
     {
       "amount": 30,
@@ -62,7 +71,7 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 5,
         "y": 1,
@@ -131,12 +140,8 @@
     "after_level": "serial005_outro",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the landing maintenance notice. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the landing maintenance notice. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the landing maintenance notice. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the landing maintenance notice without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into before the marriage advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

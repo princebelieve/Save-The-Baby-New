@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Trace the source of the employee payment note before trusting Victor's account.",
+  "description": "The bequest is distinguished from the throne dispute.",
   "difficulty": "MEDIUM",
   "level_id": 213,
   "metadata": {
     "chapter_end_level": 220,
     "chapter_id": 23,
     "chapter_start_level": 211,
-    "chapter_title": "The Wage Note",
+    "chapter_title": "For His Son",
     "generator_version": 2,
     "map_background": "river_map_section_cutout.png",
     "map_landmark": "wooden_bridge_cutout.png",
@@ -34,13 +34,27 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 2428650,
     "season": 2,
-    "season_title": "The Borrowed Fortune",
-    "episode_id": 17
+    "season_title": "The Fortune He Claimed",
+    "episode_id": 17,
+    "balance_revision": 1,
+    "balance_base_moves": 32,
+    "balance_reinforced_cells": [
+      {
+        "x": 2,
+        "y": 6,
+        "health": 1
+      },
+      {
+        "x": 1,
+        "y": 1,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 32
+    "total": 30
   },
-  "name": "The Wage Note 03",
+  "name": "For His Son 03",
   "objectives": [
     {
       "amount": 24,
@@ -51,13 +65,13 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 2,
         "y": 6
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "chain",
         "x": 1,
         "y": 1
@@ -107,12 +121,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the employee payment note. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the employee payment note. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the employee payment note. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the employee payment note without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into for his son advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

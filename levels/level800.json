@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Critical Case: Close this investigation and hear what the property service log changes for the family.",
+  "description": "Amara confronts the limits of her accusation.",
   "difficulty": "CRITICAL_CASE",
   "level_id": 800,
   "metadata": {
     "chapter_end_level": 800,
     "chapter_id": 81,
     "chapter_start_level": 791,
-    "chapter_title": "The Service Entrance",
+    "chapter_title": "What Suspicion Cannot Do",
     "generator_version": 2,
     "map_background": "river_map_section_cutout.png",
     "map_landmark": "wooden_bridge_cutout.png",
@@ -36,13 +36,32 @@
     "recommended_booster": "thunder",
     "scout_supply": false,
     "season": 8,
-    "season_title": "Names That Do Not Belong",
-    "episode_id": 75
+    "season_title": "The Night Adrian Died",
+    "episode_id": 75,
+    "balance_revision": 1,
+    "balance_base_moves": 30,
+    "balance_reinforced_cells": [
+      {
+        "x": 4,
+        "y": 5,
+        "health": 1
+      },
+      {
+        "x": 1,
+        "y": 5,
+        "health": 1
+      },
+      {
+        "x": 1,
+        "y": 2,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 30
+    "total": 27
   },
-  "name": "The Service Entrance 10",
+  "name": "What Suspicion Cannot Do 10",
   "objectives": [
     {
       "amount": 30,
@@ -53,20 +72,20 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 4,
         "y": 5,
         "inventory_only": false
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "lock",
         "x": 1,
         "y": 5
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "chain",
         "x": 1,
         "y": 2
@@ -122,12 +141,8 @@
     "after_level": "serial075_outro",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the property service log. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the property service log. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the property service log. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the property service log without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into what suspicion cannot do advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

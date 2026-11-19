@@ -83,7 +83,7 @@ static func label(parent: Node, value: String, font_size: int = 34, color: Color
 	text.add_theme_font_size_override("font_size", font_size)
 	text.add_theme_font_override("font", DISPLAY_FONT)
 	text.add_theme_color_override("font_color", color)
-	parent.add_child(text)
+	if parent != null: parent.add_child(text)
 	return text
 
 static func button(parent: Node, value: String, action: Callable, color: Color = TEAL, pending_caption := "") -> Button:
@@ -91,6 +91,16 @@ static func button(parent: Node, value: String, action: Callable, color: Color =
 	control.text = value
 	control.custom_minimum_size = Vector2(92, 92)
 	control.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	# Let a swipe reach the surrounding scroll area, including over disabled buttons.
+	# Keep ordinary buttons blocking input from reaching the game underneath.
+	control.ready.connect(func():
+		var ancestor := control.get_parent()
+		while ancestor != null and not ancestor is Window:
+			if ancestor is ScrollContainer:
+				control.mouse_filter = Control.MOUSE_FILTER_PASS
+				break
+			ancestor = ancestor.get_parent()
+	)
 	control.add_theme_font_size_override("font_size", 36)
 	control.add_theme_font_override("font", DISPLAY_FONT)
 	for state in ["normal", "hover", "pressed", "disabled", "focus"]:
@@ -144,6 +154,8 @@ static func spacer(parent: Node) -> Control:
 
 static func field_menu(parent: Control, settings: Callable, case_file: Callable, leave: Callable) -> Control:
 	var overlay := Control.new()
+	overlay.tree_entered.connect(func(): SignalBus.play_sfx.emit("case_open"), CONNECT_ONE_SHOT)
+	overlay.tree_exiting.connect(func(): SignalBus.play_sfx.emit("case_close"), CONNECT_ONE_SHOT)
 	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	parent.add_child(overlay)
 	var shade := ColorRect.new()

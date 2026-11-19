@@ -1,55 +1,29 @@
 {
   "story_id": "serial063_intro",
-  "title": "The Cold Lane",
-  "background_music": "suspense_opening",
+  "title": "The Call Between Them",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/riverbank_map_section.jpeg",
   "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
   "characters": [
     "david",
     "amara",
     "victor",
-    "ethan",
     "detective_morris"
   ],
   "scenes": [
     {
       "scene_id": "serial063_intro",
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "Detective Morris",
-            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
-            "text": "We will verify the warehouse shift board and keep its source intact. A lead is not a rescue; we cannot assume Victor stayed there.",
-            "routes": [
-              "police"
-            ]
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I will check the technical trail behind the warehouse shift board. Amara, tell me what the records cannot explain."
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I am following the warehouse shift board without police backup. Amara has my location; I am not going to turn this into a contest with Victor."
-          }
-        ]
-      },
+      "stage_direction": "Victor's commands meet increasingly specific questions he cannot answer. His uncertainty must not be played as proof Ethan is safe.",
       "dialogues": [
         {
           "speaker": "David",
           "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "The next lead is the warehouse shift board. We need its original source before Victor moves again."
+          "text": "We have a message between the two men."
         },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "A routine can hide someone for a moment. It cannot erase every person who saw it."
+          "text": "Whose fault are they calling it now?"
         }
       ],
       "choices": []
@@ -58,11 +32,14 @@
   "metadata": {
     "version": 2,
     "season": 7,
-    "season_title": "The Night Routes",
+    "season_title": "The Man Outside the Gate",
     "episode": 3,
     "episode_id": 63,
     "campaign_levels": "671-680",
     "ethan_status": "missing",
-    "season_finale": false
+    "season_finale": false,
+    "known_before": "episode_062_resolved",
+    "unlocks_fact": "",
+    "authored_dialogue_revision": 1
   }
 }

@@ -16,14 +16,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "The next lead is the abandoned phone call record. We need its original source before Victor moves again.",
+  "description": "The carer's statement and placement are secured.",
   "difficulty": "EASY",
   "level_id": 1031,
   "metadata": {
     "chapter_end_level": 1040,
     "chapter_id": 105,
     "chapter_start_level": 1031,
-    "chapter_title": "The Ringing Phone",
+    "chapter_title": "A Statement for Tomorrow",
     "generator_version": 2,
     "map_background": "river_map_section_cutout.png",
     "map_landmark": "wooden_bridge_cutout.png",
@@ -34,13 +34,16 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 8906392,
     "season": 10,
-    "season_title": "One Door Away",
-    "episode_id": 99
+    "season_title": "The Distance Between Two Voices",
+    "episode_id": 99,
+    "balance_revision": 1,
+    "balance_base_moves": 34,
+    "balance_reinforced_cells": []
   },
   "moves": {
-    "total": 34
+    "total": 33
   },
-  "name": "The Ringing Phone 01",
+  "name": "A Statement for Tomorrow 01",
   "objectives": [
     {
       "amount": 18,
@@ -95,12 +98,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the abandoned phone call record. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the abandoned phone call record. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the abandoned phone call record. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the abandoned phone call record without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into a statement for tomorrow advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [

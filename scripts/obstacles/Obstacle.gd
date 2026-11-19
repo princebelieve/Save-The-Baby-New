@@ -190,7 +190,7 @@ func get_texture() -> Texture2D:
 
 func reset_modulate() -> void:
 	if _sprite:
-		_sprite.modulate = Color(1, 1, 1, 0.24 if _overlay_size > 0 else 1.0)
+		_sprite.modulate = Color(1, 1, 1, 0.55 if _overlay_size > 0 and not bool(get_meta("solid", false)) else 1.0)
 
 
 func configure_board_overlay(cell_size: float, reinforced := false) -> void:

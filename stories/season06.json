@@ -1,82 +1,55 @@
 {
   "story_id": "season06",
-  "title": "Tracks in the Forest",
-  "background_music": "suspense_opening",
+  "title": "The Service Vehicle",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/riverbank_map_section.jpeg",
   "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
   "characters": [
     "david",
     "amara",
     "victor",
-    "detective_morris",
-    "ethan"
+    "detective_morris"
   ],
   "scenes": [
     {
-      "scene_id": "season06_reveal",
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "Detective Morris",
-            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
-            "text": "Morris's team finds a lookout, but the person escapes toward the river."
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "The bell rhythm points to an abandoned rail spur hidden beyond the trees."
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "David finds Ethan's drawing beneath a stone: a bridge and three dark windows."
-          }
-        ]
-      },
+      "scene_id": "season06",
+      "stage_direction": "Rain, interrupted sleep and a missing infant. Preserve the distinction between Amara's true sighting and the unexplained means of entry.",
       "dialogues": [
+        {
+          "speaker": "Detective Morris",
+          "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
+          "text": "I have taken the witness's account. We will protect the person and preserve the original statement.",
+          "routes": [
+            "police"
+          ]
+        },
         {
           "speaker": "David",
           "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "The quarry road divides at the forest. One track is heavy with mud; the other is nearly invisible beneath fallen leaves."
+          "text": "The witness remembers a service vehicle before the rain became heavy."
         },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "That knot is mine. I tied Ethan's blanket that way before we left home. Someone pulled this strip from it beside the forest path."
+          "text": "Did they see Ethan?"
         },
         {
-          "speaker": "Victor",
-          "portrait": "res://assets/sprites/characters/victor_portrait_v2.png",
-          "text": "The trail reaches a fork. Victor's voice comes from both directions at once."
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "No. We should not put that into their account."
+        },
+        {
+          "speaker": "Amara",
+          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+          "text": "Then tell me what they did see."
+        },
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "A company mark and a staff coat. Both are things we can check. The witness will remain available."
         }
       ],
-      "choices": [
-        {
-          "id": "police",
-          "label": "Ask Morris to cover both trails",
-          "impact": "Morris can cover both forest paths, but splitting the team leaves each group smaller.",
-          "response": "Morris: I will take the upper path and send a second team toward the river.",
-          "speaker": "Detective Morris"
-        },
-        {
-          "id": "signal",
-          "label": "Decode the next lead with Amara",
-          "impact": "David checks the technical evidence. Amara connects it to the people and history behind the records, without police assistance.",
-          "response": "David preserves the original record and tests the next connection while Amara checks its meaning against what she remembers.",
-          "speaker": "David"
-        },
-        {
-          "id": "alone",
-          "label": "Follow Ethan's marked trail without backup",
-          "impact": "Ethan's knot may lead home, but following it means David moves alone.",
-          "response": "David: I will follow Ethan's mark and call out before I leave the trail.",
-          "speaker": "David"
-        }
-      ]
+      "choices": []
     }
   ],
   "metadata": {
@@ -84,6 +57,8 @@
     "chapter": 6,
     "season": 2,
     "campaign_levels": "026-030",
-    "episode": "A continuing rescue mystery; the final clue opens the next episode."
+    "episode": "A continuing rescue mystery; the final clue opens the next episode.",
+    "authored_dialogue_revision": 1,
+    "ethan_status": "missing"
   }
 }

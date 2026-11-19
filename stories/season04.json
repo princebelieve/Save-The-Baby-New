@@ -1,82 +1,55 @@
 {
   "story_id": "season04",
-  "title": "The Freight Ledger",
-  "background_music": "suspense_opening",
+  "title": "The Wrong Man",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/factory_map_section.jpeg",
   "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
   "characters": [
     "david",
     "amara",
     "victor",
-    "detective_morris",
-    "ethan"
+    "detective_morris"
   ],
   "scenes": [
     {
-      "scene_id": "season04_reveal",
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "Detective Morris",
-            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
-            "text": "Morris gets the order, but the factory has been emptied by the time officers arrive."
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "The code names a quarry road that does not appear on current maps."
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "David reaches the loading door just as it locks from the other side."
-          }
-        ]
-      },
+      "scene_id": "season04",
+      "stage_direction": "Rain, interrupted sleep and a missing infant. Preserve the distinction between Amara's true sighting and the unexplained means of entry.",
       "dialogues": [
+        {
+          "speaker": "Detective Morris",
+          "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
+          "text": "The worker is cleared. I have spoken to his family. We will not use a frightened man's name to make this case look further along.",
+          "routes": [
+            "police"
+          ]
+        },
         {
           "speaker": "David",
           "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "A freight ledger links Victor's shell company to the old factory. One entry is written in a child's handwriting and circles a departure time."
+          "text": "The trace does not belong to the person who left it here."
         },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "The factory has no power, yet a light blinks behind a sealed loading door. Someone is keeping time inside."
+          "text": "Then the worker did not come back that morning?"
         },
         {
-          "speaker": "Victor",
-          "portrait": "res://assets/sprites/characters/victor_portrait_v2.png",
-          "text": "A toy rolls back through the door by itself. Its speaker whispers: \"Come alone.\""
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "No. Someone wanted us to think he had."
+        },
+        {
+          "speaker": "Amara",
+          "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
+          "text": "Tell his wife before she hears another rumour."
+        },
+        {
+          "speaker": "David",
+          "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
+          "text": "We will keep the planted material. Finding the lie has told us what someone wanted us to do."
         }
       ],
-      "choices": [
-        {
-          "id": "police",
-          "label": "Ask Morris to obtain a search order",
-          "impact": "A search order protects the team, but the factory could be emptied while it is approved.",
-          "response": "Morris: I will request the order and keep the outer road watched.",
-          "speaker": "Detective Morris"
-        },
-        {
-          "id": "signal",
-          "label": "Decode the next lead with Amara",
-          "impact": "David checks the technical evidence. Amara connects it to the people and history behind the records, without police assistance.",
-          "response": "David preserves the original record and tests the next connection while Amara checks its meaning against what she remembers.",
-          "speaker": "David"
-        },
-        {
-          "id": "alone",
-          "label": "Slip through the loading bay before the signal stops",
-          "impact": "The loading bay is open now, but someone may be waiting beyond the sealed door.",
-          "response": "David: I will enter the bay and leave the door marked for Morris.",
-          "speaker": "David"
-        }
-      ]
+      "choices": []
     }
   ],
   "metadata": {
@@ -84,6 +57,8 @@
     "chapter": 4,
     "season": 1,
     "campaign_levels": "016-020",
-    "episode": "A continuing rescue mystery; the final clue opens the next episode."
+    "episode": "A continuing rescue mystery; the final clue opens the next episode.",
+    "authored_dialogue_revision": 1,
+    "ethan_status": "missing"
   }
 }

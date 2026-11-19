@@ -142,7 +142,7 @@ func _notification(what: int) -> void:
 		if _board != null:
 			_board.cancel_pointer_gesture()
 		_persist_campaign_progress()
-		if (_ads == null or not _ads.busy) and not CloudAccount.login_in_progress() and _board != null and _launch_layer == null and _story_layer == null and _campaign_layer == null and _result_layer == null:
+		if not is_instance_valid(_portrait_layer) and (_ads == null or not _ads.busy) and not CloudAccount.login_in_progress() and _board != null and _launch_layer == null and _story_layer == null and _campaign_layer == null and _result_layer == null:
 			_show_pause_menu(true)
 	elif what == NOTIFICATION_APPLICATION_RESUMED:
 		Recovery.begin_session(_campaign_progress,TimeHelper.current_unix_time())
@@ -396,8 +396,9 @@ func _show_loading_screen() -> void:
 
 
 func _show_launch_screen() -> void:
-	SignalBus.play_music.emit("suspense_opening")
+	SignalBus.play_music.emit("case_investigation")
 	_launch_layer = CanvasLayer.new()
+	_wire_screen_audio(_launch_layer)
 	_launch_layer.name = "LaunchScreen"
 	_launch_layer.layer = 10
 	add_child(_launch_layer)
@@ -583,6 +584,7 @@ func _build_gameplay_hud() -> void:
 	_build_booster_dock(hud)
 
 	_story_layer = CanvasLayer.new()
+	_wire_screen_audio(_story_layer)
 	_story_layer.name = "OpeningStory"
 	_story_layer.layer = 5
 	add_child(_story_layer)
@@ -1016,6 +1018,7 @@ func _make_texture_button(name: String, button_size: Vector2, folder: String = "
 
 
 func _show_pause_menu(force_pause: bool = false) -> void:
+	SignalBus.play_sfx.emit("case_open")
 	if _pause_layer != null:
 		return
 	if not force_pause and _tutorial_active and _tutorial_action != "pause":
@@ -1032,6 +1035,7 @@ func _show_pause_menu(force_pause: bool = false) -> void:
 			_tutorial_overlay.hide_tip()
 	get_tree().paused = true
 	_pause_layer = CanvasLayer.new()
+	_wire_screen_audio(_pause_layer)
 	_pause_layer.name = "PauseMenuLayer"
 	_pause_layer.layer = 12
 	_pause_layer.process_mode = Node.PROCESS_MODE_ALWAYS
@@ -1136,6 +1140,7 @@ func _close_pause_menu() -> void:
 
 
 func _show_case_file() -> void:
+	SignalBus.play_sfx.emit("case_open")
 	if _case_file_layer != null or (_tutorial_active and _tutorial_action != "field_guide" and not is_instance_valid(_portrait_layer) and not is_instance_valid(_daily_rewards_layer)):
 		return
 	if _idle_hint_timer != null:
@@ -1148,6 +1153,7 @@ func _show_case_file() -> void:
 		_board.clear_required_swap()
 		_board.lock()
 	_case_file_layer = CanvasLayer.new()
+	_wire_screen_audio(_case_file_layer)
 	_case_file_layer.name = "EvidenceCaseFile"
 	_case_file_layer.layer = 20
 	_case_file_layer.process_mode = Node.PROCESS_MODE_ALWAYS
@@ -1270,6 +1276,7 @@ func _show_gameplay_audio_settings() -> void:
 func _prepare_dialog(dialog: AcceptDialog) -> void:
 	# Paper dialogs need their own readable defaults, including controls added later.
 	var paper_theme := Theme.new()
+	paper_theme.default_font = DISPLAY_FONT
 	for control_type in ["Label", "Button", "CheckButton", "CheckBox"]:
 		for state in ["font_color", "font_hover_color", "font_pressed_color", "font_hover_pressed_color", "font_focus_color"]:
 			paper_theme.set_color(state, control_type, Color("#4b3424"))
@@ -1282,6 +1289,11 @@ func _prepare_dialog(dialog: AcceptDialog) -> void:
 	dialog.add_theme_constant_override("buttons_min_width", 200)
 	dialog.add_theme_constant_override("buttons_min_height", 92)
 	dialog.add_theme_constant_override("buttons_separation", 18)
+	dialog.about_to_popup.connect(func(): SignalBus.play_sfx.emit("case_open"))
+	dialog.visibility_changed.connect(func():
+		if not dialog.visible: SignalBus.play_sfx.emit("case_close"))
+	dialog.tree_exiting.connect(func():
+		if dialog.visible: SignalBus.play_sfx.emit("case_close"))
 	dialog.about_to_popup.connect(func():
 		if not dialog.has_meta("custom_heading"):
 			dialog.dialog_text = dialog.title.to_upper() + ("\n\n" + dialog.dialog_text if not dialog.dialog_text.is_empty() else "")
@@ -1309,7 +1321,7 @@ func _prepare_dialog(dialog: AcceptDialog) -> void:
 	panel.content_margin_top = 18 if dialog.has_meta("custom_heading") else 24
 	dialog.add_theme_stylebox_override("panel", panel)
 	var label := dialog.get_label()
-	label.add_theme_font_override("font", ThemeDB.fallback_font)
+	label.add_theme_font_override("font", DISPLAY_FONT)
 	label.add_theme_font_size_override("font_size", 28)
 	label.add_theme_color_override("font_color", Color("#4b3424"))
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -1321,7 +1333,7 @@ func _prepare_dialog(dialog: AcceptDialog) -> void:
 	for button in buttons:
 		button.custom_minimum_size = Vector2(200, 92)
 		button.add_theme_font_size_override("font_size", 26)
-		button.add_theme_font_override("font", ThemeDB.fallback_font)
+		button.add_theme_font_override("font", DISPLAY_FONT)
 		for state in ["font_color", "font_hover_color", "font_pressed_color", "font_hover_pressed_color", "font_focus_color"]:
 			button.add_theme_color_override(state, Color("#4b2d1a"))
 		var style := StyleBoxFlat.new()
@@ -1630,6 +1642,8 @@ func _prepare_opening_story() -> void:
 
 
 func _show_story_overlay() -> void:
+	SignalBus.play_sfx.emit("door_open")
+	SignalBus.play_music.emit("case_investigation")
 	var viewport_size := get_viewport_rect().size
 	var background := _story_layer.get_node_or_null("StoryBackground") as TextureRect
 	if background == null:
@@ -1640,13 +1654,13 @@ func _show_story_overlay() -> void:
 	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	background.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-	_apply_opening_background_blur(background)
+	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var veil := ColorRect.new()
 	veil.name = "StoryVeil"
-	veil.color = Color(0.09, 0.07, 0.045, 0.25)
+	veil.color = Color(0.035, 0.12, 0.16, 0.68)
 	veil.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_story_layer.add_child(veil)
-	var title := _make_label(str(_story.get("title", "The Night Ethan Vanished")), 24)
+	var title := MobileGameUI.label(null, str(_story.get("title", "The Night Ethan Vanished")), 24)
 	title.anchor_left = 0.06
 	title.anchor_right = 0.94
 	title.anchor_top = 0.025
@@ -1656,9 +1670,9 @@ func _show_story_overlay() -> void:
 	title.add_theme_color_override("font_color", Color("#f4e4bd"))
 	veil.add_child(title)
 	_story_portrait = TextureRect.new()
-	_position_story_portrait(0.15)
+	_position_story_portrait(0.085)
 	_story_portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	_story_portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	_story_portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	_story_portrait.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	_story_portrait.z_index = 1
 	_story_portrait.texture = ResourceManager.load_portrait(str(_story.get("portrait", "")))
@@ -1673,33 +1687,16 @@ func _show_story_overlay() -> void:
 	dialogue_panel.offset_top = 58.0
 	dialogue_panel.offset_bottom = 58.0
 	var panel_style := StyleBoxFlat.new()
-	panel_style.bg_color = Color("#f4e4bd")
-	panel_style.border_color = Color("#8b572b")
-	panel_style.set_border_width_all(5)
-	panel_style.set_corner_radius_all(10)
+	panel_style.bg_color = Color("#fff8e8")
+	panel_style.border_color = Color("#d8ac60")
+	panel_style.set_border_width_all(3)
+	panel_style.set_corner_radius_all(24)
 	panel_style.set_content_margin_all(22)
 	panel_style.shadow_color = Color(0, 0, 0, 0.55)
 	panel_style.shadow_size = 14
 	dialogue_panel.add_theme_stylebox_override("panel", panel_style)
 	veil.add_child(dialogue_panel)
-	for roll_y in [0.50, 0.95]:
-		var scroll_roll := Panel.new()
-		scroll_roll.anchor_left = 0.035
-		scroll_roll.anchor_right = 0.965
-		scroll_roll.anchor_top = roll_y
-		scroll_roll.anchor_bottom = roll_y
-		scroll_roll.offset_top = -7.0
-		scroll_roll.offset_bottom = 9.0
-		var roll_style := StyleBoxFlat.new()
-		roll_style.bg_color = Color("#b27a3e")
-		roll_style.border_color = Color("#70421f")
-		roll_style.set_border_width_all(2)
-		roll_style.set_corner_radius_all(8)
-		scroll_roll.add_theme_stylebox_override("panel", roll_style)
-		scroll_roll.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		veil.add_child(scroll_roll)
-		if is_equal_approx(roll_y, 0.50):
-			_story_scroll_top_roll = scroll_roll
+	_story_scroll_top_roll = null
 	var layout := VBoxContainer.new()
 	layout.add_theme_constant_override("separation", 14)
 	dialogue_panel.add_child(layout)
@@ -1711,17 +1708,22 @@ func _show_story_overlay() -> void:
 	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	content.add_theme_constant_override("separation", 8)
 	scroll.add_child(content)
-	_speaker_label = _make_label("", 23)
+	_speaker_label = MobileGameUI.label(null, "", 30, MobileGameUI.INK)
 	_speaker_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	_speaker_label.add_theme_color_override("font_color", Color("#713d1e"))
+	_speaker_label.add_theme_color_override("font_color", MobileGameUI.INK)
 	content.add_child(_speaker_label)
-	_dialogue_label = _make_label("", 25)
+	_dialogue_label = MobileGameUI.label(null, "", 32, MobileGameUI.INK)
 	_dialogue_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_dialogue_label.custom_minimum_size = Vector2(0, 112)
 	_dialogue_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_dialogue_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	_dialogue_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_dialogue_label.add_theme_color_override("font_color", Color("#4b2d1a"))
+	_dialogue_label.add_theme_color_override("font_color", MobileGameUI.INK)
+	for text_label in [_speaker_label, _dialogue_label, title]:
+		text_label.add_theme_constant_override("outline_size", 0)
+		text_label.add_theme_constant_override("shadow_offset_x", 0)
+		text_label.add_theme_constant_override("shadow_offset_y", 0)
+		text_label.add_theme_color_override("font_shadow_color", Color.TRANSPARENT)
 	_dialogue_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0))
 	content.add_child(_dialogue_label)
 	_choice_box = VBoxContainer.new()
@@ -1835,7 +1837,7 @@ func _position_story_portrait(top_ratio: float) -> void:
 	if _story_portrait == null:
 		return
 	var viewport_size := get_viewport_rect().size
-	var portrait_size := minf(236.0, minf(viewport_size.x * 0.50, viewport_size.y * 0.265))
+	var portrait_size := minf(viewport_size.x * 0.68, viewport_size.y * 0.30)
 	_story_portrait.position = Vector2((viewport_size.x - portrait_size) * 0.5, viewport_size.y * top_ratio)
 	_story_portrait.size = Vector2.ONE * portrait_size
 
@@ -1987,7 +1989,7 @@ func _show_campaign_map(route_id: String) -> void:
 	_turn_praise_rank = 0
 	if is_instance_valid(_gameplay_effects): _gameplay_effects.clear()
 	_current_route_id = route_id
-	SignalBus.play_music.emit("suspense_opening")
+	SignalBus.play_music.emit("case_investigation")
 	_is_dialogue_typing = false
 	if _dialogue_tween != null and _dialogue_tween.is_running():
 		_dialogue_tween.kill()
@@ -1997,6 +1999,7 @@ func _show_campaign_map(route_id: String) -> void:
 	if _campaign_layer != null and is_instance_valid(_campaign_layer):
 		_campaign_layer.queue_free()
 	_campaign_layer = CanvasLayer.new()
+	_wire_screen_audio(_campaign_layer)
 	_campaign_layer.name = "CampaignMapLayer"
 	_campaign_layer.layer = 9
 	add_child(_campaign_layer)
@@ -2097,6 +2100,7 @@ func _show_new_chapter(data: Dictionary, route: String) -> bool:
 		return false
 	if is_instance_valid(_chapter_layer): return true
 	_chapter_layer = CanvasLayer.new()
+	_wire_screen_audio(_chapter_layer)
 	_chapter_layer.layer = 23
 	add_child(_chapter_layer)
 	var intro := preload("res://scripts/ui/ChapterTransition.gd").new()
@@ -2127,6 +2131,7 @@ func _start_campaign_story(story_id: String) -> void:
 	_story = _story_manager.get_story_data()
 	SignalBus.play_sfx.emit("case_open")
 	_story_layer = CanvasLayer.new()
+	_wire_screen_audio(_story_layer)
 	_story_layer.name = "CampaignStory"
 	_story_layer.layer = 5
 	add_child(_story_layer)
@@ -2161,6 +2166,12 @@ func _on_story_finished(story_id: String) -> void:
 
 
 func _show_level_briefing(route_id: String) -> void:
+	# Story completion and activity return can both request this screen.
+	# Replace the previous instance so its Play button cannot remain over the board.
+	if is_instance_valid(_briefing_layer):
+		_briefing_layer.visible = false
+		_briefing_layer.queue_free()
+		_briefing_layer = null
 	SignalBus.play_sfx.emit("screen_briefing")
 	SignalBus.play_sfx.emit("case_open")
 	if _story_layer != null and is_instance_valid(_story_layer):
@@ -2174,8 +2185,10 @@ func _show_level_briefing(route_id: String) -> void:
 		return
 
 	_briefing_layer = CanvasLayer.new()
+	_wire_screen_audio(_briefing_layer)
 	_briefing_layer.name = "LevelBriefing"
 	_briefing_layer.layer = 10
+	_briefing_layer.process_mode = Node.PROCESS_MODE_ALWAYS
 	add_child(_briefing_layer)
 	var veil := ColorRect.new()
 	veil.color = Color(0.12, 0.075, 0.035, 0.76)
@@ -2447,6 +2460,15 @@ func _objective_icon_path(target: String) -> String:
 
 
 func _begin_level(_route_id: String) -> void:
+	# Ending a leftover story must not re-enter the briefing during this transition.
+	_pending_level_id = 0
+	_pending_story_id = ""
+	_pending_route_id = ""
+	# A briefing may follow a paused result, restoration or application return.
+	# Starting a new attempt must restore processing and remove its old pause UI.
+	get_tree().paused = false
+	if is_instance_valid(_pause_layer): _pause_layer.queue_free()
+	_pause_layer = null
 	_configure_player_tools()
 	_victory_settled = false
 	_victory_bonus_points = 0
@@ -2480,7 +2502,7 @@ func _begin_level(_route_id: String) -> void:
 	var level_data: Dictionary = level_manager.get_level_data() if level_manager != null else {}
 	_booster_dock.visible = true
 	var level_music := str(level_data.get("audio", {}).get("music", ""))
-	SignalBus.play_music.emit(level_music if not level_music.is_empty() else "suspense_opening")
+	SignalBus.play_music.emit(level_music if not level_music.is_empty() else "case_play")
 	var audio_manager := get_node_or_null("Managers/AudioManager")
 	if audio_manager != null:
 		audio_manager.resume_music()
@@ -2573,6 +2595,8 @@ func _on_board_created() -> void:
 
 
 func _on_moves_changed(remaining: int) -> void:
+	if remaining > 0 and remaining <= 5:
+		SignalBus.play_music.emit("case_pressure")
 	_moves_remaining = remaining
 	_moves_label.text = str(remaining)
 
@@ -3260,6 +3284,7 @@ func _show_booster_confirmation(kind: String) -> void:
 		"ethan": "Tap Ethan to place him near objective clues automatically. Matching him with two identical tiles grants five moves. You can hold two gifts."
 	}
 	_booster_confirm_layer = CanvasLayer.new()
+	_wire_screen_audio(_booster_confirm_layer)
 	_booster_confirm_layer.name = "BoosterConfirmationLayer"
 	_booster_confirm_layer.layer = 38
 	_booster_confirm_layer.process_mode = Node.PROCESS_MODE_ALWAYS
@@ -3439,6 +3464,7 @@ func _show_level_result(won: bool) -> void:
 	if _result_in_progress or _result_layer != null:
 		return
 	_result_in_progress = true
+	SignalBus.play_music.emit("case_victory" if won else "case_setback")
 	if won or not _attempt_failure_recorded:
 		Recovery.record_result(_campaign_progress,_current_level_id,won,TimeHelper.current_unix_time())
 		_attempt_failure_recorded = not won
@@ -3461,6 +3487,7 @@ func _show_level_result(won: bool) -> void:
 	if won:
 		first_clear = _record_level_completion()
 	_result_layer = CanvasLayer.new()
+	_wire_screen_audio(_result_layer)
 	_result_layer.name = "LevelResult"
 	_result_layer.layer = 22
 	_result_layer.process_mode = Node.PROCESS_MODE_ALWAYS
@@ -4000,6 +4027,7 @@ func _show_detail(title: String, body: String, confirm: Callable = Callable(), c
 	if is_instance_valid(_detail_layer):
 		return
 	_detail_layer = CanvasLayer.new()
+	_wire_screen_audio(_detail_layer)
 	_detail_layer.name = "CaseDetail"
 	_detail_layer.layer = 35
 	add_child(_detail_layer)
@@ -4270,6 +4298,7 @@ func _open_portrait_puzzle() -> void:
 	if offer.is_empty():
 		return
 	_portrait_layer = CanvasLayer.new()
+	_wire_screen_audio(_portrait_layer)
 	_portrait_layer.layer = 20
 	add_child(_portrait_layer)
 	var config := DailyActivities.settings()
@@ -4299,7 +4328,10 @@ func _start_portrait_attempt() -> void:
 
 
 func _show_portrait_attempt(attempt: Dictionary) -> void:
+	SignalBus.play_music.emit("case_restoration")
+	SignalBus.play_sfx.emit("case_open")
 	_portrait_layer = CanvasLayer.new()
+	_wire_screen_audio(_portrait_layer)
 	_portrait_layer.layer = 20
 	_portrait_layer.name = "PortraitPuzzleLayer"
 	add_child(_portrait_layer)
@@ -4342,11 +4374,14 @@ func _complete_portrait_puzzle(slot: int) -> void:
 	_persist_campaign_progress()
 	if not result.is_empty() and _portrait_puzzle != null:
 		_portrait_puzzle.show_reward(int(result.coins), int(result.streak), str(result.get("booster", "")), int(result.get("points", 0)))
+	elif is_instance_valid(_portrait_puzzle):
+		_portrait_puzzle._show_outcome(false)
 	if not result.is_empty() and not completed_attempt.is_empty():
 		_completed_portrait_id = _portrait_gallery.record_completed(str(completed_attempt.portrait),slot)
 
 
 func _close_portrait_puzzle(resume_followup := true) -> void:
+	SignalBus.play_music.emit("case_investigation" if is_instance_valid(_launch_layer) or is_instance_valid(_campaign_layer) else "case_play")
 	if _portrait_layer != null and is_instance_valid(_portrait_layer):
 		_portrait_layer.queue_free()
 	_portrait_layer = null
@@ -4368,9 +4403,11 @@ func _record_daily_mission(kind: String, amount: int) -> void:
 
 
 func _show_daily_rewards() -> void:
+	SignalBus.play_sfx.emit("case_open")
 	if is_instance_valid(_daily_rewards_layer):
 		return
 	_daily_rewards_layer = CanvasLayer.new()
+	_wire_screen_audio(_daily_rewards_layer)
 	_daily_rewards_layer.layer = 20
 	var hub := RewardsHub.new()
 	hub.name = "RewardsHub"
@@ -4425,3 +4462,7 @@ func _return_from_activity_to_map() -> void:
 	if is_instance_valid(_pause_layer): _close_pause_menu()
 	if _board != null: _board.lock()
 	_show_campaign_map(_current_route_id)
+
+func _wire_screen_audio(screen: CanvasLayer) -> void:
+	screen.tree_entered.connect(func(): SignalBus.play_sfx.emit("case_open"), CONNECT_ONE_SHOT)
+	screen.tree_exiting.connect(func(): SignalBus.play_sfx.emit("case_close"), CONNECT_ONE_SHOT)

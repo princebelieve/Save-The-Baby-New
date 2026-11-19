@@ -1,55 +1,29 @@
 {
   "story_id": "serial042_intro",
-  "title": "The Duplicate Index",
-  "background_music": "suspense_opening",
+  "title": "An Ordinary Invoice",
+  "background_music": "case_investigation",
   "default_background": "res://assets/sprites/backgrounds/level_map_landscape.jpeg",
   "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
   "characters": [
     "david",
     "amara",
     "victor",
-    "ethan",
     "detective_morris"
   ],
   "scenes": [
     {
       "scene_id": "serial042_intro",
-      "route_dialogues": {
-        "police": [
-          {
-            "speaker": "Detective Morris",
-            "portrait": "res://assets/sprites/characters/detective_portrait_cutout.png",
-            "text": "We will verify the duplicate archive index and keep its source intact. A lead is not a rescue; we cannot assume Victor stayed there.",
-            "routes": [
-              "police"
-            ]
-          }
-        ],
-        "signal": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I will check the technical trail behind the duplicate archive index. Amara, tell me what the records cannot explain."
-          }
-        ],
-        "alone": [
-          {
-            "speaker": "David",
-            "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-            "text": "I am following the duplicate archive index without police backup. Amara has my location; I am not going to turn this into a contest with Victor."
-          }
-        ]
-      },
+      "stage_direction": "The household's polished public account meets the records retained by its workers. Amara speaks for herself.",
       "dialogues": [
         {
           "speaker": "David",
           "portrait": "res://assets/sprites/characters/david_portrait_v2.png",
-          "text": "The next lead is the duplicate archive index. We need its original source before Victor moves again."
+          "text": "Nessa has the instruction. You should read this sitting down."
         },
         {
           "speaker": "Amara",
           "portrait": "res://assets/sprites/characters/amara_and_ethan_portrait_cutout.png",
-          "text": "Money set aside for Ethan is not a reward for the man who threatens him."
+          "text": "Do not decide how strong I have to look before you tell me."
         }
       ],
       "choices": []
@@ -58,11 +32,14 @@
   "metadata": {
     "version": 2,
     "season": 5,
-    "season_title": "For Her Son",
+    "season_title": "The Royal Household",
     "episode": 2,
     "episode_id": 42,
     "campaign_levels": "461-470",
     "ethan_status": "missing",
-    "season_finale": false
+    "season_finale": false,
+    "known_before": "episode_041_resolved",
+    "unlocks_fact": "",
+    "authored_dialogue_revision": 1
   }
 }

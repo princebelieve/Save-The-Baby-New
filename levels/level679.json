@@ -25,14 +25,14 @@
     "spawn_points": [],
     "tile_size": 64
   },
-  "description": "Give Amara a verified account of the warehouse shift board, so she can choose the next step.",
+  "description": "A preserved message records mutual blame.",
   "difficulty": "MEDIUM",
   "level_id": 679,
   "metadata": {
     "chapter_end_level": 680,
     "chapter_id": 69,
     "chapter_start_level": 671,
-    "chapter_title": "The Cold Lane",
+    "chapter_title": "The Call Between Them",
     "generator_version": 2,
     "map_background": "river_map_section_cutout.png",
     "map_landmark": "wooden_bridge_cutout.png",
@@ -43,13 +43,27 @@
     "notes": "Collect a common evidence tile while clearing dispersed single-hit blockers. Recovery cases alternate with combined challenges.",
     "seed": 6118904,
     "season": 7,
-    "season_title": "The Night Routes",
-    "episode_id": 63
+    "season_title": "The Man Outside the Gate",
+    "episode_id": 63,
+    "balance_revision": 1,
+    "balance_base_moves": 32,
+    "balance_reinforced_cells": [
+      {
+        "x": 5,
+        "y": 3,
+        "health": 1
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "health": 1
+      }
+    ]
   },
   "moves": {
-    "total": 32
+    "total": 30
   },
-  "name": "The Cold Lane 09",
+  "name": "The Call Between Them 09",
   "objectives": [
     {
       "amount": 24,
@@ -60,13 +74,13 @@
   "obstacles": {
     "items": [
       {
-        "health": 1,
+        "health": 2,
         "type": "chain",
         "x": 5,
         "y": 3
       },
       {
-        "health": 1,
+        "health": 2,
         "type": "tape",
         "x": 2,
         "y": 1
@@ -116,12 +130,8 @@
     "after_level": "",
     "first_clear": "",
     "return_to_map": true,
-    "win_outcome": "You verified the lead behind the warehouse shift board. Ethan is still missing; the trail continues.",
-    "briefings": {
-      "police": "Morris coordinates the investigation into the warehouse shift board. David checks the records; Amara supplies the history the evidence cannot tell on its own.",
-      "signal": "David checks the digital trail behind the warehouse shift board. Amara compares it with what she knows; no police team has joined this approach.",
-      "alone": "David follows the physical trail behind the warehouse shift board without police backup, keeping Amara informed rather than claiming the search as his own."
-    }
+    "win_outcome": "The investigation into the call between them advances.",
+    "briefings": {}
   },
   "tile_pool": {
     "tiles": [
