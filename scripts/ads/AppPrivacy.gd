@@ -5,11 +5,21 @@ signal state_changed
 var privacy_ready := false
 var consent_status := ConsentInformation.ConsentStatus.UNKNOWN
 var _updating := false
+var _retry_at_ms := 0
+
+func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS
+
+func _process(_delta: float) -> void:
+	if _retry_at_ms > 0 and not _updating and Time.get_ticks_msec() >= _retry_at_ms:
+		_retry_at_ms = 0
+		start_session()
 
 func start_session() -> void:
 	if _updating or OS.get_name() != "Android":
 		return
 	_updating = true
+	_retry_at_ms = 0
 	privacy_ready = false
 	state_changed.emit()
 	UserMessagingPlatform.consent_information.update(_consent_parameters(), _on_updated, _on_update_failed)
@@ -36,6 +46,7 @@ func _on_update_failed(_error: FormError) -> void:
 	_updating = false
 	privacy_ready = false
 	consent_status = ConsentInformation.ConsentStatus.UNKNOWN
+	_retry_at_ms = Time.get_ticks_msec() + 60000
 	state_changed.emit()
 
 func _finish() -> void:
@@ -43,6 +54,7 @@ func _finish() -> void:
 	consent_status = UserMessagingPlatform.consent_information.get_consent_status()
 	print("Privacy: consent status=%s" % consent_status)
 	privacy_ready = consent_status in [ConsentInformation.ConsentStatus.OBTAINED, ConsentInformation.ConsentStatus.NOT_REQUIRED]
+	_retry_at_ms = 0 if privacy_ready else Time.get_ticks_msec() + 60000
 	state_changed.emit()
 
 func ad_requests_allowed() -> bool:

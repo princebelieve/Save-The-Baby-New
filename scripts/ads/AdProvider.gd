@@ -7,11 +7,15 @@ const REWARDED_ID := "ca-app-pub-7480928068306811/7596260199"
 const TEST_INTERSTITIAL_ID := "ca-app-pub-3940256099942544/1033173712"
 const TEST_REWARDED_ID := "ca-app-pub-3940256099942544/5224354917"
 const MAX_AD_AGE_MS := 50 * 60 * 1000
+const LOAD_TIMEOUT_MS := 120000
+const RETRY_DELAY_MS := 60000
 var _initialized := false
 var _initializing := false
 var _consent_ready := false
 var _ads: Dictionary = {}
 var _loading: Dictionary = {}
+var _load_started_at: Dictionary = {}
+var _load_generation: Dictionary = {}
 var _loaded_at: Dictionary = {}
 var _retry_at: Dictionary = {}
 var _showing := false
@@ -58,6 +62,9 @@ func _on_privacy_changed() -> void:
 	var privacy := get_node_or_null("/root/AppPrivacy")
 	_consent_ready = privacy != null and privacy.ad_requests_allowed()
 	if not _consent_ready:
+		for kind in ["interstitial", "rewarded"]:
+			_load_generation[kind] = int(_load_generation.get(kind, 0)) + 1
+			_loading[kind] = false
 		for ad in _ads.values():
 			ad.destroy()
 		_ads.clear()
@@ -69,6 +76,12 @@ func _process(_delta: float) -> void:
 	if not _initialized or not _consent_ready or _showing:
 		return
 	for kind in ["interstitial", "rewarded"]:
+		if _loading.get(kind, false) and Time.get_ticks_msec() - int(_load_started_at.get(kind, 0)) >= LOAD_TIMEOUT_MS:
+			_load_generation[kind] = int(_load_generation.get(kind, 0)) + 1
+			_loading[kind] = false
+			_retry_at[kind] = Time.get_ticks_msec() + RETRY_DELAY_MS
+			print("AdMob: %s load callback timed out; retry scheduled" % kind)
+			availability_changed.emit()
 		if not _ads.has(kind) and not _loading.get(kind, false) and Time.get_ticks_msec() >= int(_retry_at.get(kind, 0)):
 			_load_ad(kind)
 		elif _ads.has(kind) and Time.get_ticks_msec() - int(_loaded_at.get(kind, 0)) >= MAX_AD_AGE_MS:
@@ -146,7 +159,14 @@ func _load_ad(kind: String) -> void:
 		_retry_at[kind] = Time.get_ticks_msec() + 60000
 		return
 	_loading[kind] = true
+	_load_started_at[kind] = Time.get_ticks_msec()
+	_load_generation[kind] = int(_load_generation.get(kind, 0)) + 1
+	var generation := int(_load_generation[kind])
+	print("AdMob: requesting %s; attempt=%d" % [kind, generation])
 	var loaded := func(ad):
+		if generation != int(_load_generation.get(kind, 0)):
+			ad.destroy()
+			return
 		_loading[kind] = false
 		if not _consent_ready:
 			ad.destroy()
@@ -157,10 +177,15 @@ func _load_ad(kind: String) -> void:
 		_loaded_at[kind] = Time.get_ticks_msec()
 		availability_changed.emit()
 	var failed := func(error: LoadAdError):
+		if generation != int(_load_generation.get(kind, 0)):
+			return
 		_loading[kind] = false
-		_retry_at[kind] = Time.get_ticks_msec() + 60000
+		_retry_at[kind] = Time.get_ticks_msec() + RETRY_DELAY_MS
 		print("AdMob: %s unavailable: code=%s domain=%s message=%s" % [kind, error.code, error.domain, error.message])
 		availability_changed.emit()
+	_begin_native_load(kind, loaded, failed)
+
+func _begin_native_load(kind: String, loaded: Callable, failed: Callable) -> void:
 	if kind == "rewarded":
 		var callback := RewardedAdLoadCallback.new()
 		callback.on_ad_loaded = loaded
@@ -201,6 +226,12 @@ func show_ad(kind: String, _placement: String, earned: Callable, closed: Callabl
 	blocker.color = Color(0, 0, 0, 0.85)
 	blocker.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_cover.add_child(blocker)
+	var opening := CenterContainer.new()
+	opening.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	opening.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	blocker.add_child(opening)
+	var message := preload("res://scripts/ui/MobileGameUI.gd").label(opening, "Opening advertisement…", 34, Color.WHITE)
+	message.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_cover)
 	var callback := FullScreenContentCallback.new()
 	callback.on_ad_dismissed_full_screen_content = func(): _finish_ad(generation)
@@ -219,6 +250,17 @@ func show_ad(kind: String, _placement: String, earned: Callable, closed: Callabl
 				print("AdMob: reward earned; presentation=%d; elapsed_ms=%d" % [generation, _presentation_elapsed_ms()])
 				_earned.call()
 				_earned = Callable()
+		_present_after_feedback(generation, listener)
+	else:
+		_present_after_feedback(generation)
+
+func _present_after_feedback(generation: int, listener: OnUserEarnedRewardListener = null) -> void:
+	# Let the pressed/pending state and overlay draw before the native SDK takes
+	# over the surface. Native presentation can take time on slower phones.
+	await get_tree().process_frame
+	if not _showing or generation != _show_generation or _active_ad == null:
+		return
+	if listener != null:
 		_active_ad.show(listener)
 	else:
 		_active_ad.show()

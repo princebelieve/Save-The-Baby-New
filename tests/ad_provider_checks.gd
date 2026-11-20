@@ -19,6 +19,16 @@ class FakeAd extends RefCounted:
 		full_screen_content_callback = null
 		reward_listener = null
 
+class LoadProvider extends "res://scripts/ads/AdProvider.gd":
+	var pending: Array = []
+	func _begin_native_load(kind: String, loaded: Callable, failed: Callable) -> void:
+		pending.append({"kind": kind, "loaded": loaded, "failed": failed})
+
+class RetryPrivacy extends "res://scripts/ads/AppPrivacy.gd":
+	var attempts := 0
+	func start_session() -> void:
+		attempts += 1
+
 var rewards := 0
 var closes := 0
 
@@ -26,6 +36,55 @@ func _ready() -> void:
 	call_deferred("_run")
 
 func _run() -> void:
+	var loader := LoadProvider.new()
+	get_tree().root.add_child(loader)
+	loader.set_process(false)
+	loader._initialized = true
+	loader._consent_ready = true
+	loader._load_ad("interstitial")
+	loader._load_ad("rewarded")
+	assert(loader.pending.size() == 2)
+	var first_interstitial: Dictionary = loader.pending[0]
+	var first_rewarded: Dictionary = loader.pending[1]
+	# A missing callback must eventually release the loading gate, without
+	# starting a second request immediately or affecting the other format.
+	loader._load_started_at["interstitial"] = Time.get_ticks_msec() - loader.LOAD_TIMEOUT_MS
+	loader._process(0)
+	assert(not loader._loading.interstitial and loader._loading.rewarded)
+	assert(loader.pending.size() == 2)
+	loader._retry_at.interstitial = 0
+	loader._process(0)
+	assert(loader.pending.size() == 3 and loader._loading.interstitial)
+	var obsolete := FakeAd.new()
+	first_interstitial.loaded.call(obsolete)
+	assert(obsolete.destroyed and loader._loading.interstitial)
+	first_interstitial.failed.call(LoadAdError.new(null, 3, "test", "old no fill", null))
+	assert(loader._loading.interstitial)
+	var recovered := FakeAd.new()
+	loader.pending[2].loaded.call(recovered)
+	assert(loader.is_ad_ready("interstitial"))
+	first_rewarded.failed.call(LoadAdError.new(null, 0, "test", "internal error", null))
+	assert(not loader._loading.rewarded and loader._retry_at.rewarded > Time.get_ticks_msec())
+	assert(loader.is_ad_ready("interstitial"))
+	loader._retry_at.rewarded = 0
+	loader._process(0)
+	assert(loader.pending.size() == 4 and loader._loading.rewarded)
+	loader.pending[3].loaded.call(FakeAd.new())
+	assert(loader.is_ad_ready("rewarded"))
+	loader.queue_free()
+	var retry_privacy := RetryPrivacy.new()
+	get_tree().root.add_child(retry_privacy)
+	retry_privacy.set_process(false)
+	retry_privacy._on_update_failed(null)
+	assert(not retry_privacy.ad_requests_allowed() and retry_privacy._retry_at_ms > Time.get_ticks_msec())
+	retry_privacy._retry_at_ms = 1
+	retry_privacy._updating = true
+	retry_privacy._process(0)
+	assert(retry_privacy.attempts == 0)
+	retry_privacy._updating = false
+	retry_privacy._process(0)
+	assert(retry_privacy.attempts == 1 and retry_privacy._retry_at_ms == 0)
+	retry_privacy.queue_free()
 	var provider := TestProvider.new()
 	get_tree().root.add_child(provider)
 	var configuration := provider._request_configuration().convert_to_dictionary()
@@ -56,6 +115,8 @@ func _run() -> void:
 	provider.show_ad("rewarded", "test", func(): rewards += 1, func(): closes += 1)
 	assert(get_tree().paused and AudioServer.is_bus_mute(0))
 	assert(not provider.is_ad_ready("rewarded"))
+	assert(ad.reward_listener == null) # Native presentation waits for visible feedback.
+	await get_tree().process_frame
 	ad.full_screen_content_callback.on_ad_showed_full_screen_content.call()
 	assert(provider._presentation_elapsed_ms() >= 0)
 	var stale_shown := ad.full_screen_content_callback.on_ad_showed_full_screen_content
@@ -70,6 +131,7 @@ func _run() -> void:
 	get_tree().paused = true
 	AudioServer.set_bus_mute(0, true)
 	provider.show_ad("rewarded", "test", func(): rewards += 1, func(): closes += 1)
+	await get_tree().process_frame
 	stale_shown.call()
 	assert(provider._shown_at_ms == -1)
 	stale_reward.call(null)
@@ -90,6 +152,9 @@ func _run() -> void:
 	ad.full_screen_content_callback.on_ad_failed_to_show_full_screen_content.call(null)
 	assert(not get_tree().paused and closes == 3 and rewards == 1)
 	assert(provider.reloads == 3)
+	# A failed/cancelled presentation must not start on the following frame.
+	await get_tree().process_frame
+	assert(ad.destroyed and ad.reward_listener == null)
 	provider._ads["interstitial"] = FakeAd.new()
 	provider._loaded_at["interstitial"] = Time.get_ticks_msec() - provider.MAX_AD_AGE_MS
 	assert(not provider.is_ad_ready("interstitial"))
