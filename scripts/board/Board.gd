@@ -93,7 +93,7 @@ func initialize(level_data: Dictionary) -> bool:
 	var columns := maxi(get_width(), 1)
 	var viewport_size := get_viewport_rect().size
 	var board_top := 244.0
-	var board_bottom := viewport_size.y - 176.0
+	var board_bottom := viewport_size.y - 216.0
 	var horizontal_limit := int(floor((viewport_size.x - 32.0) / columns))
 	var vertical_limit := int(floor((board_bottom - board_top) / maxi(get_height(), 1)))
 	# Respect the HUD and booster tray on short phones as well as tall screens.
@@ -111,7 +111,7 @@ func initialize(level_data: Dictionary) -> bool:
 
 	position = Vector2(
 		(viewport_size.x - get_width() * _tile_size) * 0.5,
-		board_top
+		board_top + maxf(0.0, board_bottom - board_top - get_height() * _tile_size) * 0.5
 	)
 	_shake_origin = position
 	moves_changed.emit(_remaining_moves)

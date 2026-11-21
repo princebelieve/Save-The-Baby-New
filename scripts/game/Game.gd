@@ -442,7 +442,7 @@ func _show_launch_screen() -> void:
 	tagline.add_theme_color_override("font_color", Color("#f2ce7c"))
 	content.add_child(tagline)
 	var start := _make_texture_button("play", Vector2(minf(300.0, get_viewport_rect().size.x * 0.66), 92))
-	start.position = Vector2((viewport_size.x - minf(300.0, viewport_size.x * 0.66)) * 0.5, viewport_size.y * 0.78)
+	start.position = Vector2((viewport_size.x - minf(300.0, viewport_size.x * 0.66)) * 0.5, minf(viewport_size.y * 0.78, viewport_size.y - 268.0))
 	start.size = Vector2(minf(300.0, viewport_size.x * 0.66), 92)
 	start.pressed.connect(_start_opening_story)
 	content.add_child(start)
@@ -452,12 +452,12 @@ func _show_launch_screen() -> void:
 	settings_button.size = settings_size
 	settings_button.pressed.connect(_show_title_settings)
 	content.add_child(settings_button)
-	var account_button := _make_menu_button("ACCOUNT & COINS")
-	account_button.position = Vector2(viewport_size.x * 0.22, viewport_size.y * 0.89)
-	account_button.size = Vector2(viewport_size.x * 0.56, 92)
-	account_button.add_theme_font_size_override("font_size",32)
-	account_button.pressed.connect(func(): _account_panel.show_account())
-	content.add_child(account_button)
+	var close_button := MobileGameUI.button(content, "Close", _request_exit, MobileGameUI.PURPLE)
+	close_button.name = "CloseGameButton"
+	close_button.position = Vector2(18, 18)
+	close_button.size = Vector2(132, 92)
+	close_button.add_theme_font_size_override("font_size", 30)
+	_build_bottom_navigation(content)
 	family.modulate.a = 0.0
 	family.scale = Vector2(0.97, 0.97)
 	var entrance := create_tween().set_parallel(true)
@@ -995,12 +995,46 @@ func _layout_play_area() -> void:
 	if _booster_dock == null:
 		return
 	var viewport_size := get_viewport_rect().size
-	var columns := _board.get_width() if _board != null else 8
-	var rows := _board.get_height() if _board != null else 8
-	var cell := floorf(minf((viewport_size.x - 32.0) / maxi(columns, 1), (viewport_size.y - 420.0) / maxi(rows, 1)))
-	var dock_top := 244.0 + rows * maxf(24.0, cell) + 16.0
+	var dock_top := viewport_size.y - 204.0
 	_booster_dock.offset_top = dock_top
-	_booster_dock.offset_bottom = dock_top + 140.0
+	_booster_dock.offset_bottom = dock_top + 180.0
+	if _board != null:
+		var board_height := _board.get_height() * _board.get_tile_size()
+		_board.position.y = 244.0 + maxf(0.0, viewport_size.y - 460.0 - board_height) * 0.5
+		_board._shake_origin = _board.position
+
+
+func _build_bottom_navigation(parent: Control) -> void:
+	var bar := PanelContainer.new()
+	bar.name = "BottomNavigation"
+	bar.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	bar.offset_top = -152
+	bar.offset_bottom = -12
+	bar.offset_left = 16
+	bar.offset_right = -16
+	bar.add_theme_stylebox_override("panel", MobileGameUI.style(Color("#102c2b"), 24))
+	parent.add_child(bar)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
+	bar.add_child(row)
+	var actions := [
+		["Map", _open_navigation_map],
+		["Rewards", _show_daily_rewards],
+		["Shop", func(): _coin_shop.open(self)],
+		["Account", func(): _account_panel.show_account()]
+	]
+	for action in actions:
+		var tab := MobileGameUI.button(row, str(action[0]), action[1])
+		tab.name = str(action[0]) + "Tab"
+		tab.custom_minimum_size = Vector2(0, 92)
+		tab.add_theme_font_size_override("font_size", 26)
+
+
+func _open_navigation_map() -> void:
+	if is_instance_valid(_launch_layer):
+		_start_opening_story()
+	elif is_instance_valid(_campaign_map):
+		_campaign_map.scroll_to_level(_highest_unlocked_level)
 
 
 func _make_texture_button(name: String, button_size: Vector2, folder: String = "buttons") -> TextureButton:
@@ -1067,6 +1101,27 @@ func _show_pause_menu(force_pause: bool = false) -> void:
 	var title := _make_menu_button("RETURN TO TITLE")
 	title.pressed.connect(_return_to_title)
 	actions.add_child(title)
+	MobileGameUI.button(actions, "CLOSE GAME", _request_exit, MobileGameUI.PURPLE)
+
+
+func _request_exit() -> void:
+	var purchases := get_node_or_null("/root/CoinPurchases")
+	if purchases != null and purchases.processing_purchase():
+		return
+	var dialog := ConfirmationDialog.new()
+	dialog.name = "CloseGameConfirmation"
+	dialog.title = "CLOSE SAVE THE BABY?"
+	dialog.dialog_text = "Completed levels and earned rewards are saved. An unfinished match will restart."
+	dialog.ok_button_text = "CLOSE GAME"
+	dialog.cancel_button_text = "KEEP PLAYING"
+	dialog.process_mode = Node.PROCESS_MODE_ALWAYS
+	_prepare_dialog(dialog)
+	add_child(dialog)
+	dialog.confirmed.connect(func():
+		_persist_campaign_progress()
+		get_tree().quit())
+	dialog.canceled.connect(dialog.queue_free)
+	dialog.popup_centered_clamped(Vector2i(620, 300))
 
 
 func _make_menu_button(caption: String) -> Button:
@@ -2015,6 +2070,7 @@ func _show_campaign_map(route_id: String) -> void:
 	_campaign_map.configure_daily(_campaign_progress)
 	_campaign_map.daily_rewards_requested.connect(_show_daily_rewards)
 	_campaign_layer.add_child(_campaign_map)
+	_build_bottom_navigation(_campaign_map)
 	_campaign_map.modulate.a = 0.0
 	var entrance := create_tween()
 	entrance.tween_property(_campaign_map, "modulate:a", 1.0, 0.3)

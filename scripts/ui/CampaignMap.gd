@@ -130,7 +130,7 @@ func _build_map() -> void:
 	scroll.name = "CampaignScroll"
 	scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	scroll.offset_top = 118.0
-	scroll.offset_bottom = -340.0
+	scroll.offset_bottom = -352.0
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 	add_child(scroll)
@@ -189,11 +189,12 @@ func _build_map() -> void:
 	var footer_background := ColorRect.new()
 	footer_background.color = Color("#102c2b")
 	footer_background.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
-	footer_background.offset_top = -340
+	footer_background.offset_top = -352
 	add_child(footer_background)
 	var footer := VBoxContainer.new()
 	footer.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
-	footer.offset_top = -330
+	footer.offset_top = -342
+	footer.offset_bottom = -160
 	footer.offset_left = 16
 	footer.offset_right = -16
 	footer.add_theme_constant_override("separation", 5)
@@ -203,11 +204,6 @@ func _build_map() -> void:
 	pages.add_theme_constant_override("separation", 12)
 	MobileGameUI.button(pages, "My case", scroll_to_level.bind(_highest_unlocked_level))
 	MobileGameUI.button(pages, "Ahead >", scroll_chapters.bind(1))
-	var range_label := Label.new()
-	range_label.text = "THE INVESTIGATION TRAIL"
-	range_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	range_label.add_theme_font_size_override("font_size", 32)
-	footer.add_child(range_label)
 	_portrait_button = MobileGameUI.button(footer, "Restore portrait", portrait_requested.emit)
 	_portrait_button.hide()
 	_daily_label = Label.new()
@@ -215,7 +211,6 @@ func _build_map() -> void:
 	_daily_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_daily_label.add_theme_font_size_override("font_size", 32)
 	footer.add_child(_daily_label)
-	MobileGameUI.button(footer, "CASE REWARDS", daily_rewards_requested.emit, MobileGameUI.PURPLE)
 
 
 

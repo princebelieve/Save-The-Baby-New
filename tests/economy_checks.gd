@@ -2,6 +2,13 @@ extends Node
 
 var failures: Array[String] = []
 
+class CatalogBilling extends BillingClient:
+	var queries := 0
+	func is_ready() -> bool: return true
+	func query_product_details(_ids: PackedStringArray, _kind: ProductType) -> void:
+		queries += 1
+	func query_purchases(_kind: ProductType, _suspended := false) -> void: pass
+
 class SlowCatalog extends Node:
 	signal released
 	var user_id := "local-catalog-test"
@@ -56,6 +63,7 @@ func _run() -> void:
 	await _check_help_preferences(game)
 	await _check_account_opening(game)
 	await _check_background_notices(game)
+	_check_product_recovery()
 	economy.set_coins(1000)
 	economy.set_lives(0)
 	shop.open(game,"lives")
@@ -251,6 +259,25 @@ func _check_background_notices(game: Game) -> void:
 	check(game._coin_shop._status == "Purchase verification will retry.", "Background status is readable in an open shop")
 	game._coin_shop._close()
 	await get_tree().process_frame
+
+func _check_product_recovery() -> void:
+	var purchases := preload("res://scripts/online/CoinPurchases.gd").new()
+	add_child(purchases)
+	var client := CatalogBilling.new()
+	purchases._billing = client
+	purchases._refresh_play_products()
+	purchases.restore()
+	check(client.queries == 1, "Catalog retries are throttled while Google responds")
+	purchases._on_products({"response_code": 0, "product_details": []})
+	purchases._catalog_query_started -= 60000
+	purchases.restore()
+	check(client.queries == 2, "Empty Google Play catalog retries without restarting")
+	purchases.busy = true
+	purchases._catalog_query_started -= 60000
+	purchases.restore()
+	check(client.queries == 2, "Catalog refresh never interrupts an initiated purchase")
+	purchases.free()
+	client.free()
 
 func _check_ads(economy: EconomyManager) -> void:
 	var ads := AdManager.new()

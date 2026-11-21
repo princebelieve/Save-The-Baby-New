@@ -15,6 +15,7 @@ var _checking_catalog := false
 var _restore_waiting := false
 var _restore_ok := false
 var _catalog_received := false
+var _catalog_query_started := -60000
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -68,14 +69,26 @@ func _refresh_catalog() -> void:
 	changed.emit()
 
 func _on_connected() -> void:
-	_billing.query_product_details(PackedStringArray(PRODUCTS.keys()),BillingClient.ProductType.INAPP)
+	_refresh_play_products()
 	_account_changed()
 	restore()
+
+func _refresh_play_products() -> void:
+	if _billing == null or not _billing.is_ready() or busy:
+		return
+	var now := Time.get_ticks_msec()
+	if now - _catalog_query_started < 60000:
+		return
+	_catalog_query_started = now
+	_billing.query_product_details(PackedStringArray(PRODUCTS.keys()),BillingClient.ProductType.INAPP)
 
 func _on_products(response: Dictionary) -> void:
 	products = {}
 	_catalog_received = true
 	print("Google Play billing: product query code=%d, returned=%d" % [int(response.get("response_code", -1)), response.get("product_details", []).size()])
+	for missing in response.get("unfetched_products", []):
+		if missing is Dictionary and PRODUCTS.has(str(missing.get("product_id", ""))):
+			print("Google Play billing: unavailable product=%s, status=%d" % [str(missing.product_id), int(missing.get("status_code", -1))])
 	if int(response.get("response_code",-1)) == BillingClient.BillingResponseCode.OK:
 		for product in response.get("product_details",[]):
 			var offers: Variant = product.get("one_time_purchase_offer_details_list",[])
@@ -125,6 +138,10 @@ func restore() -> void:
 	if not _billing.is_ready():
 		_billing.start_connection()
 		return
+	# Newly activated products and transient catalog errors must recover without
+	# requiring the player to restart the game. Never refresh an active purchase.
+	if products.size() < PRODUCTS.size():
+		_refresh_play_products()
 	_billing.query_purchases(BillingClient.ProductType.INAPP)
 	_verify_pending()
 
